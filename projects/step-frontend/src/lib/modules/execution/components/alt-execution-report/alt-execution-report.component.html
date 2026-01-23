@@ -25,13 +25,7 @@
         @if (editMode()) {
           <button type="button" mat-stroked-button (click)="toggleAddWidget()">Add widget</button>
           <button type="button" mat-stroked-button (click)="cloneLayout()">Clone</button>
-          <button
-            type="button"
-            mat-flat-button
-            color="primary"
-            (click)="saveLayout()"
-            [disabled]="activeLayout()?.protected || !dirty()"
-          >
+          <button type="button" mat-flat-button color="primary" (click)="saveLayout()" [disabled]="!dirty()">
             Save
           </button>
           <button type="button" mat-stroked-button (click)="toggleEditMode()">Done</button>
@@ -63,35 +57,78 @@
     cdkDropList
     [cdkDropListData]="orderedWidgets()"
     [cdkDropListDisabled]="!editMode()"
+    [cdkDropListSortingDisabled]="true"
     (cdkDropListDropped)="handleDrop($event)"
   >
+    @if (editMode()) {
+      <div class="dashboard-grid__overlay">
+        @for (cell of gridCellIds(); track cell) {
+          <div class="dashboard-grid__cell"></div>
+        }
+      </div>
+      @if (dragPreview(); as preview) {
+        <div
+          class="dashboard-grid__preview"
+          [style.--colStart]="preview.colStart"
+          [style.--rowStart]="preview.rowStart"
+          [style.--colSpan]="preview.colSpan"
+          [style.--rowSpan]="preview.rowSpan"
+        ></div>
+      }
+    }
     @for (widget of orderedWidgets(); track widget.id) {
       <article
         class="dashboard-tile"
         [class.dashboard-tile--edit]="editMode()"
-        [class.dashboard-tile--hidden]="!editMode() && shouldHideWidget(widget)"
-        [class.dashboard-tile--dim]="editMode() && shouldHideWidget(widget)"
+        [class.dashboard-tile--hidden]="shouldHideWidget(widget)"
         [class.dashboard-tile--compact]="isCompact(widget)"
         cdkDrag
         [cdkDragDisabled]="!editMode()"
         cdkDragBoundary=".dashboard-grid"
+        (cdkDragMoved)="handleDragMoved($event, widget)"
+        (cdkDragEnded)="handleDragEnd($event, widget)"
+        [style.--colStart]="widget.colStart ?? 1"
+        [style.--rowStart]="widget.rowStart ?? 1"
         [style.--colSpan]="widget.colSpan"
         [style.--rowSpan]="widget.rowSpan"
       >
-        <div class="dashboard-tile__controls" cdkDragHandle>
-          @if (editMode()) {
-            <button type="button" class="dashboard-tile__handle">
-              <step-icon name="grip-vertical" />
-            </button>
-            <button type="button" mat-icon-button (click)="removeWidget(widget)">
-              <step-icon name="trash-2" />
-            </button>
-          }
-          @if (canEnlarge(widget)) {
-            <button type="button" mat-icon-button (click)="openEnlarge(widget)">
-              <step-icon name="maximize-2" />
-            </button>
-          }
+        <ng-template cdkDragPlaceholder>
+          <div
+            class="dashboard-tile dashboard-tile--placeholder"
+            [style.--colStart]="widget.colStart ?? 1"
+            [style.--rowStart]="widget.rowStart ?? 1"
+            [style.--colSpan]="widget.colSpan"
+            [style.--rowSpan]="widget.rowSpan"
+          ></div>
+        </ng-template>
+        <ng-template cdkDragPreview>
+          <div class="dashboard-tile dashboard-tile--preview">
+            <div class="dashboard-tile__content">
+              <span class="dashboard-tile__preview-label">{{ getWidgetDefinition(widget.type)?.label }}</span>
+            </div>
+          </div>
+        </ng-template>
+        <div class="dashboard-tile__header">
+          <div class="dashboard-tile__drag" cdkDragHandle>
+            @if (editMode()) {
+              <button type="button" class="dashboard-tile__handle">
+                <step-icon name="grip-vertical" />
+              </button>
+            }
+            <span class="dashboard-tile__title">{{ getWidgetDefinition(widget.type)?.label ?? 'Widget' }}</span>
+          </div>
+          <div class="dashboard-tile__actions">
+            @if (editMode()) {
+              <button type="button" mat-icon-button (click)="removeWidget(widget)">
+                <step-icon name="trash-2" />
+              </button>
+            }
+            @if (canEnlarge(widget)) {
+              <button type="button" mat-icon-button (click)="openEnlarge(widget)">
+                <step-icon name="maximize-2" />
+              </button>
+            }
+          </div>
         </div>
         <div class="dashboard-tile__content">
           @switch (widget.type) {
@@ -182,8 +219,12 @@
           }
         </div>
         @if (editMode()) {
-          <button type="button" class="dashboard-tile__resize" (pointerdown)="startResize($event, widget)">
-            <step-icon name="arrow-down-right" />
+          <button
+            type="button"
+            class="dashboard-tile__resize"
+            (pointerdown)="$event.stopPropagation(); startResize($event, widget)"
+          >
+            <step-icon name="expand-all" />
           </button>
         }
       </article>

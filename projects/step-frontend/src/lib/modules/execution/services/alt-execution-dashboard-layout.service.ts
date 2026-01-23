@@ -17,6 +17,8 @@ export interface AltExecutionDashboardWidget {
   type: AltExecutionDashboardWidgetType;
   colSpan: number;
   rowSpan: number;
+  colStart?: number;
+  rowStart?: number;
 }
 
 export interface AltExecutionDashboardLayout {
