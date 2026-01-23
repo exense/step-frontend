@@ -1,90 +1,301 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
-  @if (_state.errors$ | async; as errors) {
-    <step-alt-execution-errors-widget
-      class="widget"
-      [style.--colSpan]="4"
-      [errors]="errors"
-      (showDetails)="scrollToErrorsSection()"
-      (searchFor)="searchFor($event)"
-    />
-  }
-  @if (hasTestCases$ | async) {
-    @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases
-        class="widget"
-        [style.--colSpan]="3"
-        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
-      />
-    }
-    @if (_testCasesState.summary$ | async; as testCasesSummary) {
-      <step-alt-report-node-summary
-        class="widget"
-        [style.--colSpan]="1"
-        title="Summary: Testcases"
-        totalTooltip="Total number of test cases"
-        totalForecastTooltip="Forecast number of test cases"
-        [summary]="testCasesSummary"
-        [statusFilter]="_testCasesState.statusCtrlValue()"
-        (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
-      />
-    }
-  }
-  @if (_keywordsState.summary$ | async; as keywordsSummary) {
-    <step-alt-report-node-summary
-      class="widget"
-      [style.--colSpan]="1"
-      title="Summary: Keyword Calls"
-      totalTooltip="Total number of keyword calls"
-      totalForecastTooltip="Forecast number of keyword calls"
-      [summary]="keywordsSummary"
-      [statusFilter]="_keywordsState.statusCtrlValue()"
-      (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
-    />
-  }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget #treeWidget class="widget" [style.--colSpan]="3" />
-  }
-  @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords
-      class="keywords widget"
-      [style.--colSpan]="3"
-      (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
-    />
-  }
-  @if (_state.executionId$ | async; as executionId) {
-    <step-alt-report-performance-overview-chart
-      class="widget"
-      [style.--colSpan]="1"
-      [executionId]="executionId"
-      [isFullRange]="(_state.timeRangeSelection$ | async)?.type === 'FULL'"
-      (timeRangeChange)="handleChartZooming($event)"
-      (fullRange)="_state.selectFullRange()"
-    />
-  }
-  <step-alt-report-widget #errors title="Errors" class="widget" [style.--colSpan]="4">
-    <step-alt-report-widget-content>
-      <step-alt-execution-errors
-        [dataSource]="_state.errors$"
-        [statusFilterItems]="_state.availableErrorTypes$ | async"
-        [showExecutionsMenu]="false"
-        (searchFor)="searchFor($event)"
-      />
-    </step-alt-report-widget-content>
-  </step-alt-report-widget>
-  @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations [operations]="currentOperations" class="widget" [style.--colSpan]="2" />
-  }
-  @if (_state.execution$ | async; as execution) {
-    @for (panel of customPanels; track panel.type) {
-      <step-alt-panel [info]="panel" [execution]="execution" />
+    <header class="dashboard-toolbar">
+      <div class="dashboard-toolbar__group">
+        <span class="dashboard-toolbar__label">Layout</span>
+        <mat-form-field appearance="outline" class="dashboard-toolbar__select">
+          <mat-select
+            [value]="activeLayout()?.id"
+            (selectionChange)="selectLayout($event.value)"
+            [disabled]="editMode()"
+          >
+            @for (layout of layoutsState()?.layouts ?? []; track layout.id) {
+              <mat-option [value]="layout.id">
+                {{ layout.name }}
+                @if (layout.protected) {
+                  <span class="dashboard-toolbar__tag">Protected</span>
+                }
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="dashboard-toolbar__group dashboard-toolbar__actions">
+        <mat-slide-toggle [checked]="editMode()" (change)="toggleEditMode()">Edit layout</mat-slide-toggle>
+        @if (editMode()) {
+          <button type="button" mat-stroked-button (click)="toggleAddWidget()">Add widget</button>
+          <button type="button" mat-stroked-button (click)="cloneLayout()">Clone</button>
+          <button
+            type="button"
+            mat-flat-button
+            color="primary"
+            (click)="saveLayout()"
+            [disabled]="activeLayout()?.protected || !dirty()"
+          >
+            Save
+          </button>
+          <button type="button" mat-stroked-button (click)="toggleEditMode()">Done</button>
+        }
+      </div>
+    </header>
+    @if (editMode() && addWidgetOpen()) {
+      <div class="add-widget-panel">
+        <div class="add-widget-panel__header">
+          <span>Add widget</span>
+          <button type="button" mat-icon-button (click)="toggleAddWidget()">
+            <step-icon name="x" />
+          </button>
+        </div>
+        <div class="add-widget-panel__list">
+          @for (item of availableWidgetDefinitions(); track item.type) {
+            <button type="button" mat-stroked-button (click)="addWidget(item.type)">
+              {{ item.label }}
+            </button>
+          }
+        </div>
+      </div>
     }
   }
+
+  <div
+    #grid
+    class="dashboard-grid"
+    cdkDropList
+    [cdkDropListData]="orderedWidgets()"
+    [cdkDropListDisabled]="!editMode()"
+    (cdkDropListDropped)="handleDrop($event)"
+  >
+    @for (widget of orderedWidgets(); track widget.id) {
+      <article
+        class="dashboard-tile"
+        [class.dashboard-tile--edit]="editMode()"
+        [class.dashboard-tile--hidden]="!editMode() && shouldHideWidget(widget)"
+        [class.dashboard-tile--dim]="editMode() && shouldHideWidget(widget)"
+        [class.dashboard-tile--compact]="isCompact(widget)"
+        cdkDrag
+        [cdkDragDisabled]="!editMode()"
+        cdkDragBoundary=".dashboard-grid"
+        [style.--colSpan]="widget.colSpan"
+        [style.--rowSpan]="widget.rowSpan"
+      >
+        <div class="dashboard-tile__controls" cdkDragHandle>
+          @if (editMode()) {
+            <button type="button" class="dashboard-tile__handle">
+              <step-icon name="grip-vertical" />
+            </button>
+            <button type="button" mat-icon-button (click)="removeWidget(widget)">
+              <step-icon name="trash-2" />
+            </button>
+          }
+          @if (canEnlarge(widget)) {
+            <button type="button" mat-icon-button (click)="openEnlarge(widget)">
+              <step-icon name="maximize-2" />
+            </button>
+          }
+        </div>
+        <div class="dashboard-tile__content">
+          @switch (widget.type) {
+            @case ('errorsSummary') {
+              @if (_state.errors$ | async; as errors) {
+                <step-alt-execution-errors-widget
+                  [errors]="errors"
+                  (showDetails)="scrollToErrorsSection()"
+                  (searchFor)="searchFor($event)"
+                />
+              }
+            }
+            @case ('testCasesList') {
+              @if (hasTestCases$ | async) {
+                <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)" />
+              }
+            }
+            @case ('testCasesSummary') {
+              @if (_testCasesState.summary$ | async; as testCasesSummary) {
+                <step-alt-report-node-summary
+                  title="Summary: Testcases"
+                  totalTooltip="Total number of test cases"
+                  totalForecastTooltip="Forecast number of test cases"
+                  [summary]="testCasesSummary"
+                  [statusFilter]="_testCasesState.statusCtrlValue()"
+                  (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
+                />
+              }
+            }
+            @case ('keywordsSummary') {
+              @if (_keywordsState.summary$ | async; as keywordsSummary) {
+                <step-alt-report-node-summary
+                  title="Summary: Keyword Calls"
+                  totalTooltip="Total number of keyword calls"
+                  totalForecastTooltip="Forecast number of keyword calls"
+                  [summary]="keywordsSummary"
+                  [statusFilter]="_keywordsState.statusCtrlValue()"
+                  (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
+                />
+              }
+            }
+            @case ('executionTree') {
+              @if (_mode === ViewMode.VIEW) {
+                <step-alt-execution-tree-widget #treeWidget />
+              }
+            }
+            @case ('keywordsList') {
+              @if (_mode === ViewMode.VIEW) {
+                <step-alt-report-node-keywords (openKeywordInTreeView)="handleOpenNodeInTreePage($event)" />
+              }
+            }
+            @case ('performanceChart') {
+              @if (_state.executionId$ | async; as executionId) {
+                <step-alt-report-performance-overview-chart
+                  [executionId]="executionId"
+                  [isFullRange]="(_state.timeRangeSelection$ | async)?.type === 'FULL'"
+                  (timeRangeChange)="handleChartZooming($event)"
+                  (fullRange)="_state.selectFullRange()"
+                />
+              }
+            }
+            @case ('errorsTable') {
+              <step-alt-report-widget #errors title="Errors">
+                <step-alt-report-widget-content>
+                  <step-alt-execution-errors
+                    [dataSource]="_state.errors$"
+                    [statusFilterItems]="_state.availableErrorTypes$ | async"
+                    [showExecutionsMenu]="false"
+                    (searchFor)="searchFor($event)"
+                  />
+                </step-alt-report-widget-content>
+              </step-alt-report-widget>
+            }
+            @case ('currentOperations') {
+              @if (_state.currentOperations$ | async; as currentOperations) {
+                <step-alt-report-current-operations [operations]="currentOperations" />
+              }
+            }
+            @default {
+              @if (_state.execution$ | async; as execution) {
+                @for (panel of customPanels; track panel.type) {
+                  @if (widget.type === 'customPanel:' + panel.type) {
+                    <step-alt-panel [info]="panel" [execution]="execution" />
+                  }
+                }
+              }
+            }
+          }
+        </div>
+        @if (editMode()) {
+          <button type="button" class="dashboard-tile__resize" (pointerdown)="startResize($event, widget)">
+            <step-icon name="arrow-down-right" />
+          </button>
+        }
+      </article>
+    }
+  </div>
+
   @if (_mode === ViewMode.PRINT) {
     <div class="print-footer"></div>
   }
 </section>
+
 @if (_mode === ViewMode.PRINT) {
   <div class="print-overlay">
     <h2>Print in progress</h2>
   </div>
 }
+
+<ng-template #enlargeDialog let-data="data">
+  <div class="dashboard-enlarge">
+    <div class="dashboard-enlarge__header">
+      <span>{{ getWidgetDefinition(data.type)?.label ?? 'Widget' }}</span>
+      <button type="button" mat-icon-button mat-dialog-close>
+        <step-icon name="x" />
+      </button>
+    </div>
+    <div class="dashboard-enlarge__content">
+      <ng-container [ngSwitch]="data.type">
+        <ng-container *ngSwitchCase="'errorsSummary'">
+          @if (_state.errors$ | async; as errors) {
+            <step-alt-execution-errors-widget
+              [errors]="errors"
+              (showDetails)="scrollToErrorsSection()"
+              (searchFor)="searchFor($event)"
+            />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'testCasesList'">
+          @if (hasTestCases$ | async) {
+            <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)" />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'testCasesSummary'">
+          @if (_testCasesState.summary$ | async; as testCasesSummary) {
+            <step-alt-report-node-summary
+              title="Summary: Testcases"
+              totalTooltip="Total number of test cases"
+              totalForecastTooltip="Forecast number of test cases"
+              [summary]="testCasesSummary"
+              [statusFilter]="_testCasesState.statusCtrlValue()"
+              (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
+            />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'keywordsSummary'">
+          @if (_keywordsState.summary$ | async; as keywordsSummary) {
+            <step-alt-report-node-summary
+              title="Summary: Keyword Calls"
+              totalTooltip="Total number of keyword calls"
+              totalForecastTooltip="Forecast number of keyword calls"
+              [summary]="keywordsSummary"
+              [statusFilter]="_keywordsState.statusCtrlValue()"
+              (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
+            />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'executionTree'">
+          @if (_mode === ViewMode.VIEW) {
+            <step-alt-execution-tree-widget />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'keywordsList'">
+          @if (_mode === ViewMode.VIEW) {
+            <step-alt-report-node-keywords (openKeywordInTreeView)="handleOpenNodeInTreePage($event)" />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'performanceChart'">
+          @if (_state.executionId$ | async; as executionId) {
+            <step-alt-report-performance-overview-chart
+              [executionId]="executionId"
+              [isFullRange]="(_state.timeRangeSelection$ | async)?.type === 'FULL'"
+              (timeRangeChange)="handleChartZooming($event)"
+              (fullRange)="_state.selectFullRange()"
+            />
+          }
+        </ng-container>
+        <ng-container *ngSwitchCase="'errorsTable'">
+          <step-alt-report-widget title="Errors">
+            <step-alt-report-widget-content>
+              <step-alt-execution-errors
+                [dataSource]="_state.errors$"
+                [statusFilterItems]="_state.availableErrorTypes$ | async"
+                [showExecutionsMenu]="false"
+                (searchFor)="searchFor($event)"
+              />
+            </step-alt-report-widget-content>
+          </step-alt-report-widget>
+        </ng-container>
+        <ng-container *ngSwitchCase="'currentOperations'">
+          @if (_state.currentOperations$ | async; as currentOperations) {
+            <step-alt-report-current-operations [operations]="currentOperations" />
+          }
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          @if (_state.execution$ | async; as execution) {
+            @for (panel of customPanels; track panel.type) {
+              @if (data.type === 'customPanel:' + panel.type) {
+                <step-alt-panel [info]="panel" [execution]="execution" />
+              }
+            }
+          }
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

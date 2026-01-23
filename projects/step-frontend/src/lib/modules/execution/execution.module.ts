@@ -118,6 +118,7 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
@@ -295,6 +296,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    DragDropModule,
   ],
   exports: [
     ExecutionListComponent,

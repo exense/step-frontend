@@ -1,39 +1,203 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-@mixin single-col-view {
-  min-width: 60rem;
-  grid-template-columns: 100%;
-}
-
 step-alt-execution-report {
   position: relative;
 
   & > section {
-    display: grid;
-    grid-template-rows: auto;
-    row-gap: 2.4rem;
-    column-gap: 1.5rem;
     margin-bottom: 2rem;
+  }
 
-    &:not(.print) {
-      &.small-screen {
-        @include single-col-view;
+  .dashboard-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 1.6rem;
+
+    &__group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    &__select {
+      min-width: 18rem;
+    }
+
+    &__label {
+      font-weight: 600;
+    }
+
+    &__actions {
+      gap: 1.2rem;
+    }
+
+    &__tag {
+      margin-left: 0.6rem;
+      font-size: 1.1rem;
+      color: var.$gray-500;
+    }
+  }
+
+  .add-widget-panel {
+    display: grid;
+    gap: 1rem;
+    padding: 1.2rem 1.6rem;
+    background: var.$gray-50;
+    border: 1px solid var.$gray-200;
+    border-radius: 1.2rem;
+    margin-bottom: 1.6rem;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    &__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: 4.6rem;
+    column-gap: 1.2rem;
+    row-gap: 1.2rem;
+    width: 100%;
+  }
+
+  .dashboard-tile {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-column: span var(--colSpan, 1);
+    grid-row: span var(--rowSpan, 3);
+    background: var.$white;
+    border-radius: 1.2rem;
+    border: 1px solid var.$gray-200;
+    box-shadow: 0 0.6rem 1.6rem rgba(16, 24, 40, 0.04);
+    overflow: hidden;
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.4rem;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var.$gray-100;
+      background: var.$gray-50;
+      z-index: 2;
+      cursor: grab;
+    }
+
+    &__handle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      padding: 0.2rem;
+      cursor: grab;
+      margin-right: auto;
+    }
+
+    &__content {
+      padding: 1rem 1.2rem;
+      overflow: auto;
+      display: grid;
+      align-content: start;
+      gap: 1rem;
+    }
+
+    &__resize {
+      position: absolute;
+      bottom: 0.6rem;
+      right: 0.6rem;
+      border: none;
+      background: var.$gray-100;
+      border-radius: 0.6rem;
+      padding: 0.4rem;
+      cursor: nwse-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    &--edit &__resize {
+      opacity: 1;
+    }
+
+    &--compact {
+      .dashboard-tile__content {
+        padding: 0.6rem 0.8rem;
+        gap: 0.6rem;
       }
 
-      &:not(.small-screen) {
-        width: 100%;
-        grid-template-columns: repeat(4, 1fr);
+      step-alt-report-node-summary {
+        font-size: 1.2rem;
+      }
 
-        .widget {
-          grid-column: span var(--colSpan, 1);
-        }
+      step-alt-execution-errors-widget {
+        font-size: 1.2rem;
       }
     }
 
-    &.print {
-      @include single-col-view;
-      width: 100%;
-      grid-template-rows: auto;
+    &--hidden {
+      display: none;
+    }
+
+    &--dim {
+      opacity: 0.45;
+      filter: grayscale(0.6);
+    }
+  }
+
+  .dashboard-enlarge {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var.$gray-200;
+      font-weight: 600;
+    }
+
+    &__content {
+      padding: 1.2rem;
+      overflow: auto;
+    }
+  }
+
+  & > section.small-screen {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+    }
+
+    .dashboard-tile {
+      grid-column: span 1 !important;
+      grid-row: auto / span 1;
+    }
+  }
+
+  & > section.print {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
     }
   }
 
