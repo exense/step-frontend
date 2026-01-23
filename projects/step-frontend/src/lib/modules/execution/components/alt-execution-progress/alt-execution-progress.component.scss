@@ -6,7 +6,11 @@ step-alt-execution-progress {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 0 1.5rem;
+  padding: 0 2.5rem;
+
+  &.small-screen {
+    padding: 0.75rem 2.25rem;
+  }
 
   section.no-gap {
     margin-bottom: -2rem;
