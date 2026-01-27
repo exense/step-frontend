@@ -1,11 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import {
-  CustomMenuEntriesService,
-  ExecutionNamePipe,
-  ExecutionViewModeService,
-  IS_SMALL_SCREEN,
-} from '@exense/step-core';
+import { CustomMenuEntriesService, ExecutionNamePipe, ExecutionViewModeService } from '@exense/step-core';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { filter, map, of, startWith, switchMap, take, tap } from 'rxjs';
@@ -37,8 +32,6 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
   private _executionViewMode = inject(ExecutionViewModeService);
 
   private activeExecutionId?: string;
-
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   ngOnInit(): void {
     this._router.events
