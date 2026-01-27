@@ -96,6 +96,9 @@ interface RefreshParams {
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   hostDirectives: [ReloadableDirective],
+  host: {
+    '[class.small-screen]': 'isSmallScreen()',
+  },
   providers: [
     DashboardUrlParamsService,
     AltExecutionTabsService,
@@ -162,7 +165,7 @@ export class AltExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionId = inject(EXECUTION_ID);
   private _dateUtils = inject(DateUtilsService);
@@ -171,6 +174,7 @@ export class AltExecutionProgressComponent
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
 
+  protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
