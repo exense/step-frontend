@@ -25,6 +25,7 @@ step-alt-execution-progress {
     column-gap: 1rem;
     row-gap: 0.5rem;
     align-items: flex-start;
+    min-height: 8.3rem;
 
     &.small-screen {
       grid-template-columns: 1fr 1fr;
@@ -32,6 +33,7 @@ step-alt-execution-progress {
         'title title'
         'sub-title sub-title'
         'controls ranger';
+      min-height: 12.5rem;
 
       .controls {
         justify-self: flex-start;
