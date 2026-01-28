@@ -12,6 +12,16 @@
   }
 }
 
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  z-index: 100;
+}
+
 .warnings-container {
   position: absolute;
   left: 0.6rem;

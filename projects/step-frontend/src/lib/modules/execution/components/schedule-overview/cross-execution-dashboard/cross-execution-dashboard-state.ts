@@ -10,6 +10,7 @@ import {
   Subject,
   switchMap,
   take,
+  tap,
 } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
@@ -49,6 +50,8 @@ interface EntityWithKeywordsStats {
   statuses: Record<string, number>;
 }
 
+type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: Execution[] };
+
 export type CrossExecutionViewType = 'task' | 'plan';
 
 export abstract class CrossExecutionDashboardState {
@@ -57,11 +60,13 @@ export abstract class CrossExecutionDashboardState {
   protected _executionService = inject(ExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
-  private _uPlotUtils = inject(UPlotUtilsService);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
   readonly plan = signal<Plan | null | undefined>(undefined);
+  readonly lastRefreshTrigger = signal<'manual' | 'auto'>('manual');
+  readonly onRefreshTriggered = new Subject<TimeRange>();
+  readonly onTimeSelectionChanged = new Subject<TimeRange>();
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -74,8 +79,19 @@ export abstract class CrossExecutionDashboardState {
   abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
 
-  updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+  executionsChartLoading = signal<boolean>(false);
+  summaryWidgetLoading = signal<boolean>(false);
+  testCasesCountChartLoading = signal<boolean>(false);
+  keywordsCountChartLoading = signal<boolean>(false);
+  errorsTableLoading = signal<boolean>(false);
+  successRateValueLoading = signal<boolean>(false);
+  averageDurationValueLoading = signal<boolean>(false);
+  totalExecutionsValueLoading = signal<boolean>(false);
+
+  public updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set(selection);
+    this.onTimeSelectionChanged.next(this.convertSelectionToTimeRange(selection));
   }
 
   updateRefreshInterval(interval: number): void {
@@ -86,18 +102,20 @@ export abstract class CrossExecutionDashboardState {
     filter((value): value is TimeRangePickerSelection => value != null),
   );
 
+  public triggerRefresh() {
+    this.lastRefreshTrigger.set('auto');
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+    this.fetchLastExecutionTrigger$.next();
+    let timeRangeSelection = this.activeTimeRangeSelection();
+    if (!timeRangeSelection) {
+      return;
+    }
+    const timeRange = this.convertSelectionToTimeRange(timeRangeSelection);
+    this.onRefreshTriggered.next(timeRange);
+  }
+
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
-    map((rangeSelection) => {
-      switch (rangeSelection.type) {
-        case 'FULL':
-          throw new Error('Full range is not supported');
-        case 'ABSOLUTE':
-          return rangeSelection.absoluteSelection!;
-        case 'RELATIVE':
-          const endTime = new Date().getTime();
-          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
-      }
-    }),
+    map(this.convertSelectionToTimeRange),
     filter((range): range is TimeRange => range !== undefined),
     shareReplay(1),
   ) as Observable<TimeRange>;
@@ -109,10 +127,26 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
+  private convertSelectionToTimeRange(rangeSelection: TimeRangePickerSelection) {
+    switch (rangeSelection.type) {
+      case 'FULL':
+        throw new Error('Full range is not supported');
+      case 'ABSOLUTE':
+        return rangeSelection.absoluteSelection!;
+      case 'RELATIVE':
+        const endTime = new Date().getTime();
+        return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
+    }
+  }
+
   // charts
 
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      this.summaryWidgetLoading.set(true);
+      this.successRateValueLoading.set(true);
+      this.totalExecutionsValueLoading.set(true);
+      this.averageDurationValueLoading.set(true);
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
@@ -138,12 +172,14 @@ export abstract class CrossExecutionDashboardState {
         items[keyAttributes['result'] as string] = bucket.count;
         total += bucket.count;
       });
+      this.summaryWidgetLoading.set(false);
       return { items: items, total: total };
     }),
   );
 
   executionsChartSettings$ = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      this.executionsChartLoading.set(true);
       const statusAttribute = 'result';
       const oql = new OQLBuilder()
         .open('and')
@@ -225,6 +261,7 @@ export abstract class CrossExecutionDashboardState {
               },
             },
           ];
+          this.executionsChartLoading.set(false);
           return {
             title: '',
             showLegend: false,
@@ -260,6 +297,10 @@ export abstract class CrossExecutionDashboardState {
   );
 
   readonly lastExecutionsSorted$ = this.timeRange$.pipe(
+    tap(() => {
+      this.testCasesCountChartLoading.set(true);
+      this.keywordsCountChartLoading.set(true);
+    }),
     switchMap((timeRange) => this.fetchLastExecutions(timeRange)),
     map((executions) => {
       executions.sort((a, b) => a.startTime! - b.startTime!);
@@ -268,7 +309,7 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
-  keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
+  keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
       return this.timeRange$.pipe(
         take(1),
@@ -276,6 +317,7 @@ export abstract class CrossExecutionDashboardState {
           const statusAttribute = 'status';
           const executionIdAttribute = 'executionId';
           if (executions.length === 0) {
+            this.keywordsCountChartLoading.set(false);
             return of(this.createKeywordsChart([], []));
           } else {
             const executionsIdsJoined =
@@ -338,7 +380,9 @@ export abstract class CrossExecutionDashboardState {
                   return s;
                 });
                 this.cumulateSeriesData(series);
-                return this.createKeywordsChart(executions, series);
+                let chartSettings = this.createKeywordsChart(executions, series);
+                this.keywordsCountChartLoading.set(false);
+                return chartSettings;
               }),
             );
           }
@@ -355,6 +399,7 @@ export abstract class CrossExecutionDashboardState {
           take(1),
           switchMap((timeRange) => {
             if (executions.length === 0) {
+              this.testCasesCountChartLoading.set(false);
               return of({ chart: this.createTestCasesChart([], []), hasData: false, lastExecutions: [] });
             } else {
               const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
@@ -421,6 +466,7 @@ export abstract class CrossExecutionDashboardState {
                     return s;
                   });
                   this.cumulateSeriesData(series);
+                  this.testCasesCountChartLoading.set(false);
                   return {
                     chart: this.createTestCasesChart(executions, series),
                     lastExecutions: executions,
@@ -440,7 +486,7 @@ export abstract class CrossExecutionDashboardState {
     let filterItem = this.getDashboardFilter();
     // this is working only with searchEntities for now. extend it if needed
     const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter }, hideProgress: false });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {

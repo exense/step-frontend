@@ -3,11 +3,13 @@
     <step-alt-report-widget-content>
       <div class="card-value">
         @if (successRateValue$ | async; as data) {
-          {{ data }}
+          @if (_state.successRateValueLoading() && displayLoadingOnProgress()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          } @else {
+            {{ data }}
+          }
         } @else {
-          <div class="spinner-container">
-            <mat-spinner [diameter]="18" />
-          </div>
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
       </div>
     </step-alt-report-widget-content>
@@ -17,11 +19,13 @@
     <step-alt-report-widget-content>
       <div class="card-value">
         @if (averageExecutionDurationLabel$ | async; as data) {
-          {{ data }}
+          @if (_state.averageDurationValueLoading() && displayLoadingOnProgress()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          } @else {
+            {{ data }}
+          }
         } @else {
-          <div class="spinner-container">
-            <mat-spinner [diameter]="18" />
-          </div>
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
       </div>
     </step-alt-report-widget-content>
@@ -31,13 +35,21 @@
     <step-alt-report-widget-content>
       <div class="card-value">
         @if ((totalExecutionsCount$ | async) === null) {
-          <div class="spinner-container">
-            <mat-spinner [diameter]="18" />
-          </div>
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         } @else {
-          {{ totalExecutionsCount$ | async | bigNumber }}
+          @if (_state.totalExecutionsValueLoading() && displayLoadingOnProgress()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          } @else {
+            {{ totalExecutionsCount$ | async | bigNumber }}
+          }
         }
       </div>
     </step-alt-report-widget-content>
   </step-alt-report-widget>
 </div>
+
+<ng-template #loadingSpinner>
+  <div class="spinner-container">
+    <mat-spinner [diameter]="18" />
+  </div>
+</ng-template>

@@ -3,7 +3,7 @@
     <step-execution-dashboard
       #dashboard
       [execution]="execution!"
-      [timeRange]="(_state.timeRange$ | async)!"
+      [initialTimeRange]="(_state.timeRange$ | async)!"
       (contextSettingsChanged)="handleDashboardSettingsChange($event)"
       (contextSettingsInit)="handleDashboardSettingsInit($event)"
       (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"

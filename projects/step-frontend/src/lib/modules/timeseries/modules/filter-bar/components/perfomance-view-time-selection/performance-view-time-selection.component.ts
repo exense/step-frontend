@@ -3,9 +3,11 @@ import {
   DestroyRef,
   EventEmitter,
   inject,
+  input,
   Input,
   OnInit,
   Output,
+  signal,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -22,6 +24,7 @@ import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { sign } from 'chart.js/helpers';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -29,9 +32,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./performance-view-time-selection.component.scss'],
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, TSRangerComponent],
+  standalone: true,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {
   @Input() context!: TimeSeriesContext;
+  showSpinnerWhileLoading = input<boolean>(false);
 
   @Output() rangerLoaded = new EventEmitter<void>();
 
@@ -42,6 +47,8 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _destroyRef = inject(DestroyRef);
+
+  isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     if (!this.context) {
@@ -72,6 +79,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   }
 
   createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
+    this.isLoading.set(true);
     const customFiltering = JSON.parse(JSON.stringify(this.context.getFilteringSettings())) as TsFilteringSettings;
     customFiltering.filterItems = []; // ignore visible filters.
     const request = new FindBucketsRequestBuilder()
@@ -104,6 +112,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
             },
           ],
         };
+        this.isLoading.set(false);
       }),
     );
   }

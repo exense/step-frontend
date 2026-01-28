@@ -2,10 +2,12 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
   output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -29,7 +31,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -77,6 +79,7 @@ const resolutionLabels: Record<string, string> = {
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],
+  standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -100,7 +103,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
-  _internalSettings?: TSChartSettings;
+  _internalSettings = signal<TSChartSettings | undefined>(undefined);
   _attributesByIds: Record<string, MetricAttribute> = {};
 
   @Input() item!: DashboardItem;
@@ -108,11 +111,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() height!: number;
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
+  showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+
+  isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -133,7 +139,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       throw new Error('Missing input values');
     }
     this.prepareState(this.item);
-    this.fetchDataAndCreateChart().subscribe();
+    this.createChart();
+  }
+
+  private createChart(): void {
+    this.fetchDataAndCreateChartSettings().subscribe((settings) => {
+      this._internalSettings.set(settings);
+      console.log(settings);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -199,7 +212,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (blur) {
       this.chart?.setBlur(true);
     }
-    return this.fetchDataAndCreateChart();
+    return this.fetchDataAndCreateChartSettings().pipe(tap((settings) => this._internalSettings.set(settings)));
   }
 
   handleZoomReset() {
@@ -226,9 +239,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
 
     if (this.cachedResponse && this.cachedRequest) {
-      this.createChart(this.cachedResponse, this.cachedRequest);
+      this.createChartSettings(this.cachedResponse, this.cachedRequest).subscribe((settings) =>
+        this._internalSettings.set(settings),
+      );
     } else {
-      this.fetchDataAndCreateChart();
+      this.createChart();
     }
   }
 
@@ -278,7 +293,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
    * When there is no grouping, the key and label will be 'Value'.
    * If there are grouping, all empty elements will be replaced with an empty label
    */
-  private createChart(response: TimeSeriesAPIResponse, request: FetchBucketsRequest): void {
+  private createChartSettings(
+    response: TimeSeriesAPIResponse,
+    request: FetchBucketsRequest,
+  ): Observable<TSChartSettings> {
     let syncGroup: TimeSeriesSyncGroup | undefined;
     if (this.item.masterChartId) {
       syncGroup = this.context.getSyncGroup(this.item.masterChartId);
@@ -442,25 +460,28 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       );
     };
 
-    this.fetchLegendEntities(series).subscribe((v) => {
-      this._internalSettings = {
-        title: this.getChartTitle(),
-        xAxesSettings: {
-          values: xLabels,
-        },
-        series: series,
-        tooltipOptions: {
-          enabled: true,
-          zAxisLabel: this.getSecondAxesLabel(),
-          yAxisUnit: yAxesUnit,
-          useExecutionLinks: this.showExecutionLinks,
-          fetchExecutionsFn: fetchExecutionsFn,
-        },
-        showLegend: true,
-        axes: axes,
-        truncated: response.truncated,
-      };
-    });
+    return this.fetchLegendEntities(series).pipe(
+      map((v) => {
+        return {
+          title: this.getChartTitle(),
+          xAxesSettings: {
+            values: xLabels,
+          },
+          series: series,
+          tooltipOptions: {
+            enabled: true,
+            zAxisLabel: this.getSecondAxesLabel(),
+            yAxisUnit: yAxesUnit,
+            useExecutionLinks: this.showExecutionLinks,
+            fetchExecutionsFn: fetchExecutionsFn,
+          },
+          showLegend: true,
+          axes: axes,
+          truncated: response.truncated,
+        };
+      }),
+      tap(() => this.isLoading.set(false)),
+    );
   }
 
   private removeDataGaps(data: (number | undefined)[]): number[] {
@@ -521,7 +542,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     return aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM] || 's';
   }
 
-  private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
+  private fetchDataAndCreateChartSettings(): Observable<TSChartSettings> {
+    this.isLoading.set(true);
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;
@@ -554,8 +576,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
         this.cachedRequest = request;
-        this.createChart(response, request);
       }),
+      switchMap((response) => this.createChartSettings(response, request)),
     );
   }
 
