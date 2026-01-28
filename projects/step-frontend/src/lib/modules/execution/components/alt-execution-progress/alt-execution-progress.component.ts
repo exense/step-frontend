@@ -96,6 +96,9 @@ interface RefreshParams {
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   hostDirectives: [ReloadableDirective],
+  host: {
+    '[class.small-screen]': 'isSmallScreen()',
+  },
   providers: [
     DashboardUrlParamsService,
     AltExecutionTabsService,
@@ -162,7 +165,7 @@ export class AltExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionId = inject(EXECUTION_ID);
   private _dateUtils = inject(DateUtilsService);
@@ -171,7 +174,8 @@ export class AltExecutionProgressComponent
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
 
-  private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
+  protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
+  private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -196,7 +200,7 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
-  private execution = toSignal(this.execution$, { initialValue: undefined });
+  private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -205,7 +209,7 @@ export class AltExecutionProgressComponent
     shareReplay(1),
   );
 
-  protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
+  protected readonly isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
   /** Active execution's range selection data stream **/
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
@@ -234,7 +238,7 @@ export class AltExecutionProgressComponent
       }
     });
 
-  protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
     this.updateTimeRangeSelection(selection);
   }
 
@@ -250,8 +254,8 @@ export class AltExecutionProgressComponent
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
   );
-  protected isResolvedParametersVisible = signal(false);
-  protected isAgentsVisible = signal(false);
+  protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -419,7 +423,7 @@ export class AltExecutionProgressComponent
 
   readonly currentEntity = this.execution;
 
-  private setupNavigationHistoryChange() {
+  private setupNavigationHistoryChange(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

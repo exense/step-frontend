@@ -21,7 +21,7 @@ step-scheduler-page {
       'sub-title sub-title sub-title';
     gap: 0.5rem;
     align-items: flex-start;
-    margin: 1rem 2rem;
+    margin: 0 2rem 1rem;
 
     &.small-screen {
       grid-template-columns: 1fr 1fr;

@@ -32,6 +32,6 @@ export class LongInlineTextComponent {
 
   protected readonly suffix = computed(() => {
     const text = this.text();
-    return text.slice(-6);
+    return '...' + text.slice(-6);
   });
 }
