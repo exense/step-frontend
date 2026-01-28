@@ -17,7 +17,7 @@ import { AttachmentInlinePreviewComponent } from '../attachment-inline-preview/a
 import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
 
 const GAP = 5;
-const MIN_WIDTH = 150;
+const MIN_WIDTH = 100;
 const PADDINGS = 6;
 const CAP_ICON_SPACE = 20;
 const OFFSET = 15;

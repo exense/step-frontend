@@ -1,7 +1,7 @@
 @if (attachments(); as attachments) {
   <div class="attachments-container invisible-items">
     @for (att of attachments; track att.id) {
-      <step-attachment-inline-preview #items [attachment]="att" [withPopover]="false" [maxWidth]="150" />
+      <step-attachment-inline-preview #items [attachment]="att" [withPopover]="false" [maxWidth]="100" />
     }
   </div>
   <div class="attachments-container">

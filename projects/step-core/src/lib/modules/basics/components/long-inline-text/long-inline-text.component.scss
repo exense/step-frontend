@@ -2,7 +2,7 @@
   display: block;
   position: relative;
   &.cut-value {
-    width: 73%;
+    width: calc(100% - 4.3rem);
     .value {
       overflow: hidden;
       text-overflow: clip;
