@@ -40,10 +40,10 @@ export class ViewRegistryService implements OnDestroy {
   private isNavigationInitializedInternal$ = new BehaviorSubject(false);
   readonly isNavigationInitialized$ = this.isNavigationInitializedInternal$.asObservable();
 
-  registeredViews: { [key: string]: CustomView } = {};
+  registeredViews: Record<string, CustomView> = {};
   registeredMenuEntries: MenuEntry[] = [];
   registeredMenuIds: string[] = [];
-  registeredDashlets: { [key: string]: Dashlet[] | undefined } = {};
+  registeredDashlets: Record<string, Dashlet[] | undefined> = {};
 
   private static registeredRoutes: string[] = [];
 
@@ -69,7 +69,7 @@ export class ViewRegistryService implements OnDestroy {
   /**
    * Registers basic set of main- and submenu entries
    */
-  registerStandardMenuEntries() {
+  registerStandardMenuEntries(): void {
     // Main Menus
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
     this.registerMenuEntry('Reporting', 'execute-root', 'file-check-03', { weight: 20 });
@@ -81,6 +81,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
+    this.registerMenuEntry('Grid View', 'grid-view', 'grid', { weight: 50, parentId: 'automation-root' });
     this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute
@@ -135,7 +136,7 @@ export class ViewRegistryService implements OnDestroy {
    * @deprecated use getCustomView instead
    * @param view
    */
-  getViewTemplate(view: string) {
+  getViewTemplate(view: string): string {
     return this.getCustomView(view).template;
   }
 
@@ -143,7 +144,7 @@ export class ViewRegistryService implements OnDestroy {
    * @deprecated use getCustomView instead
    * @param view
    */
-  isPublicView(view: string) {
+  isPublicView(view: string): boolean {
     return this.getCustomView(view).isPublicView;
   }
 
@@ -151,7 +152,7 @@ export class ViewRegistryService implements OnDestroy {
    * @deprecated use getCustomView instead
    * @param view
    */
-  isStaticView(view: string) {
+  isStaticView(view: string): boolean | undefined {
     return this.getCustomView(view).isStaticView;
   }
 
@@ -320,7 +321,7 @@ export class ViewRegistryService implements OnDestroy {
     const dashlets = this.getDashletsInternal(path);
 
     // weightless dashlets should be last
-    const normalizeWeight = (weight?: number) => weight || Infinity;
+    const normalizeWeight = (weight?: number): number => weight || Infinity;
 
     const result = dashlets.sort((a, b) => normalizeWeight(a.weight) - normalizeWeight(b.weight));
     return result;

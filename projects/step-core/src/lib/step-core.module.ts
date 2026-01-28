@@ -79,6 +79,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
 import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
 import { ScreenInputTypePipe } from './pipes/screen-input-type.pipe';
 import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
+import { EDITABLE_GIRD_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
 
 @NgModule({
   declarations: [
@@ -154,6 +155,7 @@ import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
     SEARCH_EXPORTS,
+    EDITABLE_GIRD_LAYOUT_EXPORTS,
     ClampFadeDirective,
   ],
   exports: [
@@ -225,6 +227,7 @@ import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     IncludesStringPipe,
+    EDITABLE_GIRD_LAYOUT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -360,3 +363,4 @@ export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';
 export * from './shared/no-access-entity-error';
+export * from './modules/editable-grid-layout';

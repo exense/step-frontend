@@ -31,6 +31,7 @@ import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './mo
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 import { InProgressComponent } from './components/in-progress/in-progress.component';
+import { GRID_VIEW_TEST_INITIALIZER } from './modules/grid-view-test';
 
 Settings.defaultLocale = 'en';
 
@@ -39,6 +40,7 @@ const MODULES_INITIALIZERS = [
   AUTOMATION_PACKAGE_INITIALIZER,
   ERRORS_VIEW_INITIALIZER,
   RESOURCES_INITIALIZER,
+  GRID_VIEW_TEST_INITIALIZER,
 ];
 
 @NgModule({

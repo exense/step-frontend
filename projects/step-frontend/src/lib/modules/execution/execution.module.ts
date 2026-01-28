@@ -169,6 +169,7 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 
 @NgModule({
   declarations: [
@@ -217,6 +218,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
+    AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -327,6 +329,9 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
+    AltReportWidgetTitleDirective,
+    AltReportWidgetContentDirective,
+    AltReportWidgetFooterDirective,
   ],
   providers: [
     {
@@ -641,9 +646,9 @@ export class ExecutionModule {
                 },
                 canActivate: [
                   () => {
-                    const ctx = inject(AggregatedReportViewTreeStateContextService);
-                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                    ctx.setState(treeState);
+                    const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    _ctx.setState(_treeState);
                     return true;
                   },
                 ],
@@ -676,9 +681,9 @@ export class ExecutionModule {
               path: 'tree',
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AGGREGATED_TREE_TAB_STATE);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],
@@ -700,9 +705,9 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AggregatedReportViewTreeStateService);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AggregatedReportViewTreeStateService);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],
