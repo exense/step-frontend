@@ -110,8 +110,12 @@ export class PlanEditorActionsComponent {
   }
 
   setTargetExecutionParameters(parameters?: Record<string, unknown>) {
-    this.targetExecutionParameters = parameters;
-    this.targetExecutionParametersChange.emit(parameters as Record<string, string>);
+    const nonEmptyParameters = Object.fromEntries(
+      Object.entries(parameters ?? {}).filter(([, value]) => value !== undefined),
+    ) as Record<string, unknown>;
+
+    this.targetExecutionParameters = nonEmptyParameters;
+    this.targetExecutionParametersChange.emit(nonEmptyParameters as Record<string, string>);
   }
 
   protected readonly Object = Object;

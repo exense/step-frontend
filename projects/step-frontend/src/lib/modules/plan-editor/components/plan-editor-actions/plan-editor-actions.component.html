@@ -95,13 +95,12 @@
 
 @if (_interactiveSession.hasExecutionParameters()) {
   <step-btn-group class="with-borders">
-    <step-popover [mode]="PopoverMode.HOVER">
+    <step-popover yPosition="above" [mode]="PopoverMode.HOVER">
       <button
         type="button"
         mat-stroked-button
         [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
         (click)="toggleTargetParameterSelection()"
-        matTooltipPosition="below"
       >
         <step-icon name="sliders" />
       </button>
