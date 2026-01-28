@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, inject, Signal } from '@angular/core';
 import {
-  arrayToRegex,
   DateUtilsService,
   FilterConditionFactoryService,
   ItemsPerPageService,
@@ -70,11 +69,11 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   protected setupStatusesFilter(): void {
     this._state.selectedStatuses$
       .pipe(
-        map((statuses) => arrayToRegex(Array.from(statuses))),
+        map((statuses) => Array.from(statuses)),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((statuses) => {
-        this.tableSearch()?.onSearch?.('status', { value: statuses, regex: true });
+        this.tableSearch()?.onSearch?.('status', this._filterConditionFactory.inFilterCondition(statuses));
       });
   }
 

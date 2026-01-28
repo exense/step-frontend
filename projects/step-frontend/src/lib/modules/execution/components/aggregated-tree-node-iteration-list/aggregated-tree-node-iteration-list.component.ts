@@ -15,7 +15,6 @@ import {
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
-  arrayToRegex,
   AugmentedExecutionsService,
   DateRange,
   DateUtilsService,
@@ -144,11 +143,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private statusesSubscription = this.statusesCtrl.valueChanges
     .pipe(
       startWith(this.statusesCtrl.value),
-      map((statuses) => new Set(statuses)),
-      map((statuses) => arrayToRegex(Array.from(statuses) as string[])),
+      map((statuses) => Array.from(statuses)),
       takeUntilDestroyed(),
     )
-    .subscribe((statuses) => this.tableSearch()?.onSearch('status', { value: statuses, regex: true }));
+    .subscribe((statuses) =>
+      this.tableSearch()?.onSearch('status', this._filterConditionFactory.inFilterCondition(statuses)),
+    );
 
   protected readonly showCountWarning = computed(() => {
     const initialStatus = this.initialStatus();
