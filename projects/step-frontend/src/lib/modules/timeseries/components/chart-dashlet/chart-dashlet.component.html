@@ -1,14 +1,14 @@
 <div>
-  @if (!_internalSettings) {
-    <step-chart-skeleton [height]="height" />
+  @if (!_internalSettings()) {
+    <step-chart-skeleton [height]="height()" />
   } @else {
     <step-timeseries-chart
       #chart
       (zoomReset)="handleZoomReset()"
-      [syncKey]="context.id"
-      [settings]="_internalSettings!"
+      [syncKey]="context().id"
+      [settings]="_internalSettings()!"
       (lockStateChange)="handleLockStateChange($event)"
-      [height]="height"
+      [height]="height()"
     >
       <ng-template tooltipContent let-data>
         <step-chart-standard-tooltip [data]="data" />
@@ -31,7 +31,7 @@
 </div>
 
 <div class="settings-container">
-  @if (editMode) {
+  @if (editMode()) {
     <div class="edit-buttons">
       <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
         <step-icon name="chevron-left"></step-icon>
@@ -62,10 +62,10 @@
       </div>
     </mat-menu>
     @if (
-      (!item.readonlyGrouping && !item.inheritGlobalGrouping) ||
-      !item.readonlyAggregate ||
-      item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
-      item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE
+      (!item().readonlyGrouping && !item().inheritGlobalGrouping) ||
+      !item().readonlyAggregate ||
+      item().chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+      item().chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE
     ) {
       <button
         mat-icon-button
@@ -79,16 +79,16 @@
   }
 
   <mat-menu #settingsMenu="matMenu">
-    @if (!item.masterChartId && !item.readonlyGrouping && !item.inheritGlobalGrouping) {
+    @if (!item().masterChartId && !item().readonlyGrouping && !item().inheritGlobalGrouping) {
       <button mat-menu-item [matMenuTriggerFor]="groupingMenu">Grouping</button>
     }
-    @if (!item.readonlyAggregate) {
+    @if (!item().readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
     }
     @if (
-      item.readonlyAggregate &&
-      (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
-        item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE)
+      item().readonlyAggregate &&
+      (item().chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+        item().chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE)
     ) {
       <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
     }
@@ -119,8 +119,8 @@
 
   <mat-menu #aggregateMenu="matMenu">
     <step-timeseries-aggregate-picker
-      [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
-      [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+      [selectedAggregate]="$any(item().chartSettings!.primaryAxes.aggregation)"
+      [pclValue]="item().chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
       (aggregateChange)="handleAggregateChange($event)"
     />
   </mat-menu>
