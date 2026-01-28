@@ -27,11 +27,14 @@ export class LongInlineTextComponent {
   protected readonly cutValue = computed(() => {
     const fullWidth = this.fullWidth() ?? 0;
     const availableWidth = this.availableWidth();
+    if (!availableWidth) {
+      return false;
+    }
     return availableWidth < fullWidth;
   });
 
   protected readonly suffix = computed(() => {
     const text = this.text();
-    return text.slice(-6);
+    return '...' + text.slice(-6);
   });
 }

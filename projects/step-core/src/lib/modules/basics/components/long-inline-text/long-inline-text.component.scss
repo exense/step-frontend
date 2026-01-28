@@ -2,10 +2,10 @@
   display: block;
   position: relative;
   &.cut-value {
-    width: 75%;
+    width: 73%;
     .value {
       overflow: hidden;
-      text-overflow: ellipsis;
+      text-overflow: clip;
     }
     &:after {
       content: attr(data-suffix);
