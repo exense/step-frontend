@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   inject,
   input,
   OnChanges,
@@ -79,7 +80,7 @@ const resolutionLabels: Record<string, string> = {
     ChartStandardTooltipComponent,
   ],
 })
-export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
+export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
@@ -130,6 +131,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   showHigherResolutionWarning = false;
   collectionResolutionUsed: number = 0;
 
+  firstEffectTriggered = false;
+
+  readonly itemChangeEffect = effect(() => {
+    const item = this.item();
+    if (this.firstEffectTriggered) {
+      this.prepareState(item);
+      this.refresh(true).subscribe(() => {
+        this._cd.markForCheck();
+      });
+    }
+    this.firstEffectTriggered = true;
+  });
+
   ngOnInit(): void {
     if (!this.item() || !this.context() || !this.height()) {
       throw new Error('Missing input values');
@@ -142,16 +156,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.fetchDataAndCreateChartSettings().subscribe((settings) => {
       this._internalSettings.set(settings);
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
-      this.prepareState(cItem.currentValue);
-      this.refresh(true).subscribe(() => {
-        this._cd.markForCheck();
-      });
-    }
   }
 
   private subscribeToMasterDashletChanges(): void {
@@ -255,7 +259,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item, context: this.context } })
+      .open(ChartDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
       .afterClosed()
       .subscribe((updatedItem) => {
         this.handleChartUpdate(updatedItem);
@@ -264,7 +268,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private handleChartUpdate(updatedItem: DashboardItem): void {
     if (updatedItem) {
-      Object.assign(this.item, updatedItem);
+      Object.assign(this.item(), updatedItem);
       this.prepareState(this.item());
       this.refresh(true).subscribe(() => {
         this._cd.markForCheck();
