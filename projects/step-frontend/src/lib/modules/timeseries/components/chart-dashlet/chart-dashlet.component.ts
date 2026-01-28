@@ -102,8 +102,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
   readonly chart = viewChild<TimeSeriesChartComponent>('chart');
 
-  // @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
-  // @ViewChild('chart') chart!: TimeSeriesChartComponent;
   readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
   _attributesByIds: Record<string, MetricAttribute> = {};
 
