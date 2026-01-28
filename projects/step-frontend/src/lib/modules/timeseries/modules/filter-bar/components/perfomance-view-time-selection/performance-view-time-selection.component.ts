@@ -3,13 +3,16 @@ import {
   DestroyRef,
   EventEmitter,
   inject,
-  Input,
+  input,
   OnInit,
+  output,
   Output,
+  signal,
+  viewChild,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
@@ -31,12 +34,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [COMMON_IMPORTS, TSRangerComponent],
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {
-  @Input() context!: TimeSeriesContext;
+  readonly context = input.required<TimeSeriesContext>();
 
-  @Output() rangerLoaded = new EventEmitter<void>();
+  readonly rangerLoaded = output<void>();
 
-  rangerSettings: TSRangerSettings | undefined;
-  @ViewChild(TSRangerComponent) rangerComponent!: TSRangerComponent;
+  readonly rangerSettings = signal<TSRangerSettings | undefined>(undefined);
+  readonly rangerComponent = viewChild<TSRangerComponent>('rangerComponent');
 
   timeLabels: number[] = [];
 
@@ -44,35 +47,36 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    if (!this.context) {
+    const context = this.context();
+    if (!context) {
       throw new Error('Context input is required');
     }
-    this.createRanger(this.context).subscribe(() => this.rangerLoaded.next());
-    this.context
+    this.createRanger(this.context()).subscribe(() => this.rangerLoaded.emit());
+    context
       .onTimeSelectionChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((selection) => {
-        if (this.context.isFullRangeSelected()) {
-          this.rangerComponent.resetSelect();
+        if (context.isFullRangeSelected()) {
+          this.rangerComponent()!.resetSelect();
         } else {
-          this.rangerComponent.selectRange(selection);
+          this.rangerComponent()!.selectRange(selection);
         }
       });
-    this.context
+    this.context()
       .onFullRangeChange()
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((range) => {
-        // this.settings.timeRange = range;
-        this.createRanger(this.context).subscribe();
-      });
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        switchMap(() => this.createRanger(context)),
+      )
+      .subscribe();
   }
 
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
-    return this.createRanger(this.context);
+    return this.createRanger(this.context());
   }
 
   createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
-    const customFiltering = JSON.parse(JSON.stringify(this.context.getFilteringSettings())) as TsFilteringSettings;
+    const customFiltering = JSON.parse(JSON.stringify(this.context().getFilteringSettings())) as TsFilteringSettings;
     customFiltering.filterItems = []; // ignore visible filters.
     const request = new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
@@ -85,12 +89,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-        let avgData: (number | null)[] = [];
-        if (response.matrix[0]) {
-          avgData = response.matrix[0].map((b) => b?.throughputPerHour || 0);
-        }
+        let avgData: (number | null)[] = response.matrix[0]?.map((b) => b?.throughputPerHour || 0) || [];
         const customSelection = context.isFullRangeSelected() ? undefined : context.getSelectedTimeRange();
-        this.rangerSettings = {
+        this.rangerSettings.set({
           xValues: this.timeLabels,
           selection: customSelection,
           series: [
@@ -103,18 +104,18 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
               legendName: 'Ranger',
             },
           ],
-        };
+        });
       }),
     );
   }
 
-  onRangerSelectionChange(event: TimeRange) {
+  onRangerSelectionChange(event: TimeRange): void {
     // check for full range selection
-    this.context.updateSelectedRange(event);
+    this.context().updateSelectedRange(event);
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
-  onRangerZoomReset() {
-    this.context.resetZoom();
+  onRangerZoomReset(): void {
+    this.context().resetZoom();
   }
 }
