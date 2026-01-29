@@ -33,7 +33,16 @@ export class HistoryNodesComponent {
   nodesSize = input<number>(20);
 
   paddedPastExecutions = computed(() => {
-    return this.padArrayWithNull(this.pastNodes().slice(0, -1), this.nodesCount());
+    const pastNodes = this.pastNodes();
+    const count = this.nodesCount();
+
+    if (count <= 0) return [];
+
+    if (pastNodes.length < count) {
+      return this.padArrayWithNull(pastNodes, count - 1); // one element is the current node
+    }
+
+    return pastNodes.slice(-(count - 1));
   });
 
   logEffect = effect(() => {

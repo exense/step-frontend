@@ -1,70 +1,12 @@
-<div class="container">
-  @if (historyArtefactsData$ | async; as historyData) {
-    <div class="previous-executions-container">
-      @for (executionItem of historyData.previousExecutions; track executionItem?.execution?.id! || $index) {
-        @if (executionItem === null) {
-          <div
-            class="history-item-container connect-line"
-            matTooltipPosition="above"
-            matTooltip="No execution"
-            [class.arrow]="$last"
-          >
-            <div class="empty-piechart"></div>
-          </div>
-        } @else {
-          <ng-container
-            *ngTemplateOutlet="historyItem; context: { item: executionItem, last: $last, isCurrentExecution: false }"
-          />
-        }
-      }
-    </div>
-  }
-</div>
 <div>
   @if (newData | async; as x) {
     <step-history-nodes
       [nodesCount]="8"
       [nodesSize]="40"
       [showTooltip]="true"
-      [showTimestamps]="false"
+      [showTimestamps]="true"
       [currentNode]="x.currentNode"
       [pastNodes]="x.pastNodes"
     />
   }
 </div>
-
-<ng-template #historyItem let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
-  <step-popover [noPadding]="true">
-    <ng-container
-      *ngTemplateOutlet="
-        historyItemContent;
-        context: { item: item, last: last, isCurrentExecution: isCurrentExecution }
-      "
-    ></ng-container>
-
-    <step-popover-content>
-      <step-status-distribution-tooltip
-        [statuses]="[]"
-        [linkLabel]="isCurrentExecution ? 'Current execution' : 'See execution'"
-        [link]="isCurrentExecution ? '' : '/executions/' + item.execution.id!"
-        [timestamp]="item.execution.startTime!"
-      />
-    </step-popover-content>
-  </step-popover>
-</ng-template>
-
-<ng-template #historyItemContent let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
-  <div
-    class="history-item-container"
-    [class.highlight]="isCurrentExecution"
-    [class.connect-line]="!isCurrentExecution"
-    [class.arrow]="last && !isCurrentExecution"
-  >
-    <step-aggregated-tree-node-statuses-piechart [slices]="item.statusSlices" [highlight]="isCurrentExecution" />
-
-    <div class="timestamp">
-      <div>{{ item.execution.startTime! | date: 'dd.MM' }}</div>
-      <div>{{ item.execution.startTime! | date: 'HH:mm' }}</div>
-    </div>
-  </div>
-</ng-template>
