@@ -16,7 +16,7 @@ export class HistoryCellComponent {
 
   readonly currentNode: Signal<HistoryNodeItem> = computed(() => {
     const execution = this.execution()!;
-    const resultStatus = execution.result!;
+    const resultStatus = execution.status === 'RUNNING' ? 'RUNNING' : execution.result!;
     const color = this._statusColors[resultStatus];
     return {
       statusSlices: [
@@ -31,9 +31,10 @@ export class HistoryCellComponent {
 
   readonly historyNodes: Signal<HistoryNodeItem[]> = computed(() => {
     const execution = this.execution()!;
-    return (execution?.historyResults || []).map((e) => {
+    return (execution?.historyResults || []).reverse().map((e) => {
       const color = this._statusColors[e.result];
       return {
+        link: `/executions/${e.id!}`,
         statusSlices: [
           {
             color: color,

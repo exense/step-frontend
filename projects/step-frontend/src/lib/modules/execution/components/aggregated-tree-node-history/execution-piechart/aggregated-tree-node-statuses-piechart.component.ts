@@ -1,5 +1,6 @@
-import { Component, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, OnDestroy, viewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
+import { Router } from '@angular/router';
 
 export interface TreeNodePieChartSlice {
   color: string;
@@ -20,9 +21,19 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   readonly circumferenceDeg = input<number>(360);
   readonly emptyColor = input<string>('#e5e7eb');
   readonly highlight = input<boolean>(false);
+  readonly link = input<string>();
+
+  private _router = inject(Router);
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private chart?: Chart | undefined;
+
+  protected navigateToLink() {
+    let link = this.link();
+    if (link) {
+      this._router.navigateByUrl(link);
+    }
+  }
 
   private renderEffect = effect(() => {
     const canvasElement = this.canvas();

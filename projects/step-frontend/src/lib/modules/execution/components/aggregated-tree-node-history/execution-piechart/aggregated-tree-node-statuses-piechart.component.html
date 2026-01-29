@@ -2,5 +2,5 @@
   @if (highlight()) {
     <div class="highlight-background"></div>
   }
-  <canvas #canvas></canvas>
+  <canvas #canvas [class.link]="link()" (click)="navigateToLink()"></canvas>
 </div>

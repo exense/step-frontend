@@ -10,6 +10,7 @@ export interface HistoryNodeItem {
   statusSlices: TreeNodePieChartSlice[];
   timestamp?: number;
   tooltipLinkLabel?: string;
+  link?: string;
   tooltipLink?: string;
 }
 
