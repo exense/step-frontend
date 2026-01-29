@@ -1,106 +1,143 @@
 <!-- Header -->
 <header>
   <section class="name">
-    <step-report-node-icon [node]="node"> </step-report-node-icon>
+    <step-report-node-icon [node]="node" />
     <span class="mat-subheading-1">{{ headerText }}</span>
-    <span class="mat-small muted m-left" *ngIf="headerText !== node?.name">{{ node?.name }}</span>
+    @if (headerText !== node?.name) {
+      <span class="mat-small muted m-left">{{ node?.name }}</span>
+    }
   </section>
   <section class="content">
     <span>
       <step-legacy-attachments [node]="node" />
     </span>
     <step-btn-group>
-      <button
-        *ngIf="isShowNodeInTreeVisible"
-        type="button"
-        mat-icon-button
-        matTooltip="Show this node in the tree view"
-        (click)="showNodeInTree.emit(reportNodeId)"
-      >
-        <step-icon name="git-pull-request">account_tree</step-icon>
-      </button>
-      <button
-        *ngIf="isShowTestCaseVisible"
-        type="button"
-        mat-icon-button
-        matTooltip="Select the test case containing this node in the test case table"
-        (click)="showTestCase.emit(reportNodeId)"
-      >
-        <step-icon name="list"></step-icon>
-      </button>
+      @if (isShowNodeInTreeVisible) {
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Show this node in the tree view"
+          (click)="showNodeInTree.emit(reportNodeId)"
+        >
+          <step-icon name="git-pull-request" />
+        </button>
+      }
+      @if (isShowTestCaseVisible) {
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Select the test case containing this node in the test case table"
+          (click)="showTestCase.emit(reportNodeId)"
+        >
+          <step-icon name="list" />
+        </button>
+      }
     </step-btn-group>
-    <span *ngIf="includeStatus">
-      <step-report-node-status [status]="node?.status"> </step-report-node-status>
-    </span>
+    @if (includeStatus) {
+      <span>
+        <step-report-node-status [status]="node?.status" />
+      </span>
+    }
   </section>
 </header>
 <!-- Specific content -->
 <!-- CallFunction -->
-<div *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
-  <div *ngIf="showDetails">
-    <a href="#" (click)="toggleInput(); (false)">Input</a>
+@if (node?.resolvedArtefact?._class === 'CallKeyword') {
+  <div>
+    @if (showDetails) {
+      <div>
+        <a href="#" (click)="toggleInput(); (false)">Input</a>
+      </div>
+    }
+    @if (!(node?.input | isEmptyJson) && (!hideInput || !showDetails)) {
+      <div class="detail-container">
+        @if (!showDetails) {
+          <div class="detail-label m-right">Input</div>
+          <step-json-viewer class="detail" [json]="node!.input!" [format]="ViewerFormat.KV" />
+        }
+      </div>
+    }
+    @if (showDetails) {
+      <div>
+        <a href="#" (click)="toggleOutput(); (false)">Output</a>
+      </div>
+    }
+    @if (!(node?.output | isEmptyJson) && (!hideOutput || !showDetails)) {
+      <div class="detail-container">
+        @if (!showDetails) {
+          <div class="detail-label m-right">Output</div>
+        }
+        <step-json-viewer class="detail" [json]="node!.output!" [format]="ViewerFormat.KV" />
+      </div>
+    }
   </div>
-  <div *ngIf="!(node?.input | isEmptyJson) && (!hideInput || !showDetails)" class="detail-container">
-    <div *ngIf="!showDetails" class="detail-label m-right">Input</div>
-    <step-json-viewer class="detail" [json]="node!.input!" [format]="ViewerFormat.KV"></step-json-viewer>
-  </div>
-  <div *ngIf="showDetails">
-    <a href="#" (click)="toggleOutput(); (false)">Output</a>
-  </div>
-  <div *ngIf="!(node?.output | isEmptyJson) && (!hideOutput || !showDetails)" class="detail-container">
-    <div *ngIf="!showDetails" class="detail-label m-right">Output</div>
-    <step-json-viewer class="detail" [json]="node!.output!" [format]="ViewerFormat.KV"></step-json-viewer>
-  </div>
-</div>
+}
 <!-- Echo -->
-<div *ngIf="node?.resolvedArtefact?._class === 'Echo'">
-  <div *ngIf="node?.echo" class="wordbreak">
-    <span class="muted mat-small">Echo</span>
-    <span class="m-left detail">{{ node!.echo }}</span>
+@if (node?.resolvedArtefact?._class === 'Echo') {
+  <div>
+    @if (node?.echo) {
+      <div class="wordbreak">
+        <span class="muted mat-small">Echo</span>
+        <span class="m-left detail">{{ node!.echo }}</span>
+      </div>
+    }
   </div>
-</div>
+}
 <!-- Assert -->
-<div *ngIf="node?.resolvedArtefact?._class === 'Assert'">
-  <div *ngIf="node?.message && !node?.error" class="detail">
-    {{ node!.message }}
+@if (node?.resolvedArtefact?._class === 'Assert') {
+  <div>
+    @if (node?.message && !node?.error) {
+      <div class="detail">
+        {{ node!.message }}
+      </div>
+    }
   </div>
-</div>
+}
 <!-- Set -->
-<div *ngIf="node?.resolvedArtefact?._class === 'Set'">
-  <div>{{ node?.key }} = {{ node?.value }}</div>
-</div>
+@if (node?.resolvedArtefact?._class === 'Set') {
+  <div>
+    <div>{{ node?.key }} = {{ node?.value }}</div>
+  </div>
+}
 <!-- Assertion Errors -->
-<div *ngIf="!showDetails && children && children.length > 0" class="detail-container wordbreak">
-  <div class="detail-label m-right">Errors</div>
-  <div class="detail">
-    <step-report-node-error *ngFor="let child of children; trackBy: trackByReportNode" [node]="child">
-    </step-report-node-error>
+@if (!showDetails && children && children.length > 0) {
+  <div class="detail-container wordbreak">
+    <div class="detail-label m-right">Errors</div>
+    <div class="detail">
+      @for (child of children; track child.id) {
+        <step-report-node-error [node]="child" />
+      }
+    </div>
   </div>
-</div>
+}
 <!-- Errors -->
-<div *ngIf="node?.error" class="detail-container wordbreak">
-  <div class="detail-label m-right">Error</div>
-  <div class="detail m-left">
-    {{ node?.error?.msg }}
-    {{ node?.attachments && node!.attachments!.length > 0 ? '. Check the attachments for more details.' : '' }}
+@if (node?.error) {
+  <div class="detail-container wordbreak">
+    <div class="detail-label m-right">Error</div>
+    <div class="detail m-left">
+      {{ node?.error?.msg }}
+      {{ node?.attachments && node!.attachments!.length > 0 ? '. Check the attachments for more details.' : '' }}
+    </div>
   </div>
-</div>
+}
 <!-- Attachments -->
 <div>
-  <step-attachments-inline-preview [attachmentMetas]="node?.attachments" />
+  <step-attachment-inline-preview-list [attachmentMetas]="node?.attachments" />
 </div>
 <!-- Details -->
-<div *ngIf="showDetails">
-  <step-report-node [reportNodeId]="reportNodeId" [showArtefact]="false"> </step-report-node>
-</div>
+@if (showDetails) {
+  <div>
+    <step-report-node [reportNodeId]="reportNodeId" [showArtefact]="false" />
+  </div>
+}
 <!--Footer-->
-<ng-container *ngIf="showFooter">
+@if (showFooter) {
   <hr />
   <div>
     <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
     <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
-    <span class="muted mat-small" *ngIf="node?.resolvedArtefact?._class === 'CallKeyword'">
-      | Agent: {{ node?.agentUrl }}
-    </span>
+    @if (node?.resolvedArtefact?._class === 'CallKeyword') {
+      <span class="muted mat-small"> | Agent: {{ node?.agentUrl }} </span>
+    }
   </div>
-</ng-container>
+}
