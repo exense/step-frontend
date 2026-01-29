@@ -276,15 +276,23 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(options?: TableGetDataOptions): void;
-  getTableData(req: TableRequestInternal): void;
-  getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
+  getTableData(req: TableRequestInternal, isForce?: boolean): void;
+  getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined, isForce?: boolean): void {
     if (reqOrOptions instanceof TableRequestInternal) {
       const req = convertTableRequest(reqOrOptions);
-      this._request$.next({ request: req, isForce: true });
+      this._request$.next({ request: req, isForce });
       return;
     }
 
-    let { page, sort, search, params, filter, calculateCounts } = (reqOrOptions || {}) as TableGetDataOptions;
+    let {
+      page,
+      sort,
+      search,
+      params,
+      filter,
+      calculateCounts,
+      isForce: isForceOptions,
+    } = (reqOrOptions || {}) as TableGetDataOptions;
 
     const tableRequest = this.createInternalRequestObject({ search, filter, params });
 
@@ -309,7 +317,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.calculateCounts = calculateCounts;
     }
 
-    this.getTableData(tableRequest);
+    this.getTableData(tableRequest, isForceOptions);
   }
 
   setColumnMap(key: string, value: string): void {

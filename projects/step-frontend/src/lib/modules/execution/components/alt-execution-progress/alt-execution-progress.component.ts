@@ -33,6 +33,7 @@ import {
   AugmentedExecutionsService,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
+  combineLatestWithTrackChanges,
   DateUtilsService,
   EntityRefService,
   Execution,
@@ -46,7 +47,6 @@ import {
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  TimeRange,
   TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -78,6 +78,7 @@ import { AltExecutionCloseHandleService } from '../../services/alt-execution-clo
 import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
 import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
+import { TimeRangeExt } from '../../shared/time-range-ext';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -263,13 +264,23 @@ export class AltExecutionProgressComponent
     }),
   );
 
-  readonly timeRange$: Observable<TimeRange> = combineLatest([this.timeRangeSelection$, this.execution$]).pipe(
-    map(([rangeSelection, execution]) =>
-      convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId()),
-    ),
-    filter((range): range is TimeRange => range !== undefined),
+  readonly timeRange$: Observable<TimeRangeExt> = combineLatestWithTrackChanges([
+    this.timeRangeSelection$,
+    this.execution$,
+  ]).pipe(
+    map(({ result, isChanged }) => {
+      const [rangeSelection, execution] = result;
+      const [rangeSelectionChanged] = isChanged;
+      const timeRange = convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId());
+      if (!timeRange) {
+        return undefined;
+      }
+      const isManualChange = execution.id !== this._executionId() || !!rangeSelectionChanged;
+      return { ...timeRange, isManualChange } as TimeRangeExt;
+    }),
+    filter((range): range is TimeRangeExt => range !== undefined),
     shareReplay(1),
-  ) as Observable<TimeRange>;
+  ) as Observable<TimeRangeExt>;
 
   readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
 
