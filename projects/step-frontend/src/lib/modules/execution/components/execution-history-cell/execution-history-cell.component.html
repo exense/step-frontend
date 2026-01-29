@@ -1,7 +1,16 @@
 <div class="container">
-  @for (resultItem of historyItems(); track resultItem) {
-    <div [class.connect-line]="!$last" class="item">
-      <step-aggregated-tree-node-statuses-piechart [slices]="[resultItem]" [size]="20" />
-    </div>
-  }
+  <!--  @for (resultItem of historyItems(); track resultItem) {-->
+  <!--    <div [class.connect-line]="!$last" class="item">-->
+  <!--      <step-aggregated-tree-node-statuses-piechart [slices]="[resultItem]" [size]="20" />-->
+  <!--    </div>-->
+  <!--  }-->
+
+  <step-history-nodes
+    [nodesCount]="8"
+    [nodesSize]="20"
+    [showTooltip]="false"
+    [showTimestamps]="false"
+    [currentNode]="currentNode()"
+    [pastNodes]="historyNodes()"
+  />
 </div>

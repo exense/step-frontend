@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, Signal } from '@angular/core';
 import { Execution, STATUS_COLORS } from '@exense/step-core';
 import { TreeNodePieChartSlice } from '../aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { HistoryNodeItem } from '../aggregated-tree-node-history/history-nodes/history-nodes.component';
 
 @Component({
   selector: 'step-history-cell',
@@ -11,7 +12,38 @@ import { TreeNodePieChartSlice } from '../aggregated-tree-node-history/execution
 export class HistoryCellComponent {
   private _statusColors = inject(STATUS_COLORS);
 
-  execution = input.required<Execution>();
+  readonly execution = input.required<Execution>();
+
+  readonly currentNode: Signal<HistoryNodeItem> = computed(() => {
+    const execution = this.execution()!;
+    const resultStatus = execution.result!;
+    const color = this._statusColors[resultStatus];
+    return {
+      statusSlices: [
+        {
+          color: color,
+          label: resultStatus,
+          count: 1,
+        },
+      ],
+    };
+  });
+
+  readonly historyNodes: Signal<HistoryNodeItem[]> = computed(() => {
+    const execution = this.execution()!;
+    return (execution?.historyResults || []).map((e) => {
+      const color = this._statusColors[e.result];
+      return {
+        statusSlices: [
+          {
+            color: color,
+            label: e.result,
+            count: 1,
+          },
+        ],
+      };
+    });
+  });
 
   historyItems: Signal<TreeNodePieChartSlice[]> = computed(() => {
     let execution = this.execution();
