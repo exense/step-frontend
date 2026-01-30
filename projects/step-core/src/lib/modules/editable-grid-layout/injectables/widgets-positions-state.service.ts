@@ -161,6 +161,32 @@ export class WidgetsPositionsStateService {
       return undefined;
     }
     result.column = c;
+
+    // Check inside cells
+    let row = 0;
+    let column = 0;
+    let newHeight = 0;
+    let newWidth = -1;
+    for (r = result.topEdge; r <= result.bottomEdge; r++) {
+      row = r;
+      let localNewWidth = 0;
+      for (c = result.leftEdge; c <= result.rightEdge; c++) {
+        column = c;
+        if (this.isCellTaken(row, column)) {
+          break;
+        }
+        localNewWidth++;
+      }
+      newWidth = newWidth < 0 ? localNewWidth : Math.min(newWidth, localNewWidth);
+      if (this.isCellTaken(row, column)) {
+        break;
+      }
+      newHeight++;
+    }
+
+    result.widthInCells = newWidth;
+    result.heightInCells = newHeight;
+
     return result;
   }
 
