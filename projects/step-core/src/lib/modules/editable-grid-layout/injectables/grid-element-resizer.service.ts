@@ -115,15 +115,6 @@ export class GridElementResizerService implements OnDestroy {
     const heightInCells = this._gridDimensions.determineCellRow(distanceY);
 
     const widgetPosition = new WidgetPosition(id, { column, row, widthInCells, heightInCells });
-
-    const rowCorrection = this._widgetsPositions.overlapsInsideRow(widgetPosition);
-    widgetPosition.applyRowCorrection(rowCorrection);
-
-    const columnCorrection = this._widgetsPositions.overlapsInsideColumn(widgetPosition);
-    widgetPosition.applyColumnCorrection(columnCorrection);
-
-    widgetPosition.applyLimits(this._gridDimensions.COL_COUNT);
-
-    return widgetPosition;
+    return this._widgetsPositions.correctPositionForResize(id, widgetPosition);
   }
 }

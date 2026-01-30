@@ -10,10 +10,10 @@ import {
 } from '@angular/core';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { WidgetsPositionsStateService } from '../../injectables/widgets-positions-state.service';
-import { GridDimensionsService } from '../../injectables/grid-dimensions.service';
 import { GridDimensionsDirective } from '../../directives/grid-dimensions.directive';
 import { GridElementResizerService } from '../../injectables/grid-element-resizer.service';
 import { GridElementDragService } from '../../injectables/grid-element-drag.service';
+import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 
 @Component({
   selector: 'step-grid-layout',
@@ -23,13 +23,13 @@ import { GridElementDragService } from '../../injectables/grid-element-drag.serv
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class.show-preview]': 'showPreview()',
-    '[style.--style__cols-count]': '_gridDimensions.COL_COUNT',
+    '[style.--style__cols-count]': '_colCount',
   },
   hostDirectives: [GridDimensionsDirective],
   providers: [WidgetsPositionsStateService, GridElementResizerService, GridElementDragService],
 })
 export class GridLayoutComponent implements AfterViewInit {
-  protected _gridDimensions = inject(GridDimensionsService);
+  protected readonly _colCount = inject(GRID_COLUMN_COUNT);
   private _gridElementResizer = inject(GridElementResizerService);
   private _gridElementDragService = inject(GridElementDragService);
 

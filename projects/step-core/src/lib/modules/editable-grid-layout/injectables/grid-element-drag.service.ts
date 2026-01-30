@@ -112,11 +112,20 @@ export class GridElementDragService implements OnDestroy {
     if (!id) {
       return undefined;
     }
+
+    const originalPosition = this._widgetsPositions.getPosition(id);
+    if (!originalPosition) {
+      return undefined;
+    }
+
     const gridRect = this._elementRef.nativeElement.getBoundingClientRect();
     const column = this._gridDimensions.determineCellColumn(mouseX - gridRect.x);
     const row = this._gridDimensions.determineCellRow(mouseY - gridRect.y);
-    const result = this._widgetsPositions.findAvailablePositionForElement(id, column, row);
-    result.applyLimits(this._gridDimensions.COL_COUNT);
-    return result;
+
+    const position = originalPosition.clone();
+    position.column = column;
+    position.row = row;
+
+    return this._widgetsPositions.correctPositionForDrag(id, position);
   }
 }

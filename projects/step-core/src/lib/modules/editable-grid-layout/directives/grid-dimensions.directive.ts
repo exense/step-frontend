@@ -18,8 +18,6 @@ export class GridDimensionsDirective implements GridDimensionsService {
   private _elementSize = inject(ElementSizeDirective, { self: true });
   private _doc = inject(DOCUMENT);
 
-  readonly COL_COUNT = 8;
-
   private readonly gridStyles = computed(() => {
     const width = this._elementSize.width();
     return this._doc?.defaultView?.getComputedStyle(this._elementRef.nativeElement);

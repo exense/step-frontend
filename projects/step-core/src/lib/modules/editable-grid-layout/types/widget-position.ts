@@ -1,6 +1,3 @@
-import { RowCorrection } from './row-correction';
-import { ColumnCorrection } from './column-correction';
-
 interface WidgetPositionParams {
   column: number;
   row: number;
@@ -40,12 +37,8 @@ export class WidgetPosition implements WidgetPositionParams {
     return this.row + this.heightInCells - 1;
   }
 
-  private get centerCol(): number {
-    return this.column + this.widthInCells / 2;
-  }
-
-  private get centerRow(): number {
-    return this.row + this.heightInCells / 2;
+  includesPoint(row: number, column: number): boolean {
+    return row >= this.topEdge && row <= this.bottomEdge && column >= this.leftEdge && column <= this.rightEdge;
   }
 
   applyLimits(maxWidthInCells: number, maxHeightInCells?: number): void {
@@ -70,48 +63,7 @@ export class WidgetPosition implements WidgetPositionParams {
     }
   }
 
-  applyRowCorrection({ left, right }: RowCorrection): void {
-    this.column += left;
-    this.widthInCells -= right;
-    if (this.widthInCells < 1) {
-      this.widthInCells = 1;
-    }
-  }
-
-  applyColumnCorrection({ top, bottom }: ColumnCorrection): void {
-    this.row += top;
-    this.heightInCells -= bottom;
-    if (this.heightInCells < 1) {
-      this.heightInCells = 1;
-    }
-  }
-
   clone(): WidgetPosition {
     return new WidgetPosition(this.id, this);
-  }
-
-  distance(pos: WidgetPosition): number {
-    const x = Math.abs(this.centerCol - pos.centerCol);
-    const y = Math.abs(this.centerRow - pos.centerRow);
-    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-  }
-
-  logPosition(prefix: string): void {
-    console.log(
-      'POSITION',
-      prefix,
-      'COL:',
-      this.column,
-      'ROW:',
-      this.row,
-      'WIDTH:',
-      this.widthInCells,
-      'HEIGHT:',
-      this.heightInCells,
-      'RIGHT:',
-      this.rightEdge,
-      'BOTTOM:',
-      this.bottomEdge,
-    );
   }
 }

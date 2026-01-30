@@ -30,6 +30,13 @@ step-grid-layout {
     border-radius: 0.5rem;
     position: absolute;
     display: none;
+
+    $animation-duration: 0.2s;
+    transition:
+      top $animation-duration ease,
+      left $animation-duration ease,
+      width $animation-duration ease,
+      height $animation-duration ease;
   }
 
   &.show-preview {

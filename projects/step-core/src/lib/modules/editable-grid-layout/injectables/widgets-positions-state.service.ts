@@ -1,13 +1,28 @@
-import { Injectable, signal, untracked } from '@angular/core';
+import { computed, inject, Injectable, signal, untracked } from '@angular/core';
 import { WidgetPosition } from '../types/widget-position';
-import { RowCorrection } from '../types/row-correction';
-import { ColumnCorrection } from '../types/column-correction';
+import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 
 @Injectable()
 export class WidgetsPositionsStateService {
+  private _colCount = inject(GRID_COLUMN_COUNT);
+
   private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
 
   readonly positions = this.positionsStateInternal.asReadonly();
+
+  private readonly filedState = computed(() => {
+    const positions = Object.values(this.positions());
+    const fieldBottom = Math.max(...positions.map((item) => item.bottomEdge));
+    const size = this._colCount * fieldBottom;
+
+    const field = new Uint8Array(size);
+    positions.forEach((item) => this.fillPosition(field, item, 1));
+    return field;
+  });
+
+  getPosition(elementId: string): WidgetPosition | undefined {
+    return untracked(() => this.positions())[elementId];
+  }
 
   updatePosition(position: WidgetPosition): void {
     this.positionsStateInternal.update((value) => ({
@@ -32,124 +47,152 @@ export class WidgetsPositionsStateService {
     }));
   }
 
-  findAvailablePositionForElement(elementId: string, column: number, row: number): WidgetPosition {
-    const positions = untracked(() => this.positions());
-    const positionItems = Object.values(positions);
+  correctPositionForDrag(elementId: string, position: WidgetPosition): WidgetPosition | undefined {
+    // Erase information about original position to avoid conflicts for current element
+    if (!this.clearElementPosition(elementId)) {
+      return undefined;
+    }
 
-    const otherWidgetPosition = positionItems.find((pos) => {
-      return column >= pos.leftEdge && column <= pos.rightEdge && row >= pos.topEdge && row <= pos.bottomEdge;
-    });
+    //If position is taken by other widget, return other's widgets original position
+    if (this.isCellTaken(position.row, position.column)) {
+      const otherWidgetPosition = Object.values(untracked(() => this.positions())).find(
+        (pos) => pos.id !== elementId && pos.includesPoint(position.row, position.column),
+      );
 
-    if (!!otherWidgetPosition) {
       return otherWidgetPosition;
     }
 
-    const currentElementPosition = positions[elementId];
-    const possiblePosition = new WidgetPosition(elementId, {
-      column,
-      row,
-      widthInCells: currentElementPosition?.widthInCells ?? 1,
-      heightInCells: currentElementPosition?.heightInCells ?? 1,
-    });
+    const result = position.clone();
+    result.applyLimits(this._colCount);
 
-    const rowCorrections = this.overlapsInsideRow(possiblePosition);
-    const columnCorrections = this.overlapsInsideColumn(possiblePosition);
+    // Determine width / height
+    let row = 0;
+    let column = 0;
+    let heightInCells = 0;
+    let widthInCells = 0;
+    for (let r = result.topEdge; r <= result.bottomEdge; r++) {
+      row = r;
+      let widthInCellPerRow = 0;
+      for (let c = result.leftEdge; c <= result.rightEdge; c++) {
+        column = c;
+        if (this.isCellTaken(row, column)) {
+          break;
+        }
+        widthInCellPerRow++;
+      }
+      widthInCells = Math.max(widthInCells, widthInCellPerRow);
+      if (this.isCellTaken(row, column)) {
+        if (heightInCells === 0) {
+          heightInCells = result.heightInCells;
+        }
+        if (widthInCells === 0) {
+          widthInCells = result.widthInCells;
+        }
+        break;
+      }
+      heightInCells++;
+    }
 
-    const fixedByRow = possiblePosition.clone();
-    fixedByRow.applyRowCorrection(rowCorrections);
+    if (heightInCells <= 0 || widthInCells <= 0) {
+      return undefined;
+    }
+    result.widthInCells = widthInCells;
+    result.heightInCells = heightInCells;
 
-    const fixedByColumn = possiblePosition.clone();
-    fixedByColumn.applyColumnCorrection(columnCorrections);
-
-    const fixedByBoth = possiblePosition.clone();
-    fixedByBoth.applyRowCorrection(rowCorrections);
-    fixedByColumn.applyColumnCorrection(columnCorrections);
-
-    const positionVariants = [fixedByRow, fixedByColumn, fixedByBoth]
-      .map((pos) => ({
-        pos,
-        distance: pos.distance(possiblePosition),
-      }))
-      .sort((a, b) => a.distance - b.distance);
-
-    return positionVariants[0].pos;
+    return result;
   }
 
-  overlapsInsideRow(checkPosition: WidgetPosition): RowCorrection {
-    const positions = Object.values(untracked(() => this.positions()));
+  correctPositionForResize(elementId: string, position: WidgetPosition): WidgetPosition | undefined {
+    // Erase information about original position to avoid conflicts for current element
+    if (!this.clearElementPosition(elementId)) {
+      return undefined;
+    }
 
-    const lefts: number[] = [];
-    const rights: number[] = [];
+    const result = position.clone();
+    result.applyLimits(this._colCount);
 
-    positions.forEach((pos) => {
-      if (
-        pos.id === checkPosition.id ||
-        checkPosition.topEdge > pos.bottomEdge ||
-        pos.topEdge > checkPosition.bottomEdge ||
-        checkPosition.leftEdge > pos.rightEdge ||
-        pos.leftEdge > checkPosition.rightEdge
-      ) {
-        return;
+    let r: number;
+    let c: number;
+
+    // Check top edge
+    r = result.row;
+    for (c = result.leftEdge; c <= result.rightEdge; c++) {
+      while (this.isCellTaken(r, c) && r <= result.bottomEdge + 1) {
+        r++;
       }
+    }
+    if (r > result.bottomEdge) {
+      return undefined;
+    }
+    result.row = r;
 
-      if (checkPosition.leftEdge >= pos.leftEdge && checkPosition.rightEdge <= pos.rightEdge) {
-        lefts.push(checkPosition.column);
-        rights.push(checkPosition.widthInCells);
-        return;
+    // Check right edge
+    c = result.rightEdge;
+    for (r = result.topEdge; r <= result.bottomEdge; r++) {
+      while (this.isCellTaken(r, c) && c >= result.leftEdge - 1) {
+        c--;
       }
+    }
+    if (c < result.leftEdge) {
+      return undefined;
+    }
+    result.widthInCells -= result.rightEdge - c;
 
-      if (checkPosition.rightEdge >= pos.leftEdge) {
-        rights.push(checkPosition.rightEdge - pos.leftEdge + 1);
-        return;
+    // Check bottom edge
+    r = result.bottomEdge;
+    for (c = result.leftEdge; c <= result.rightEdge; c++) {
+      while (this.isCellTaken(r, c) && r >= result.topEdge - 1) {
+        r--;
       }
+    }
+    if (r < result.topEdge) {
+      return undefined;
+    }
+    result.heightInCells -= result.bottomEdge - r;
 
-      if (checkPosition.leftEdge >= pos.leftEdge) {
-        debugger;
-        lefts.push(Math.abs(checkPosition.rightEdge - pos.leftEdge) + 1);
+    // Check left edge
+    c = result.column;
+    for (r = result.topEdge; r <= result.bottomEdge; r++) {
+      while (this.isCellTaken(r, c) && c <= result.rightEdge + 1) {
+        c++;
       }
-    });
-
-    const left = !lefts.length ? 0 : Math.max(...lefts);
-    const right = !rights.length ? 0 : Math.max(...rights);
-
-    return { left, right };
+    }
+    if (c > result.rightEdge) {
+      return undefined;
+    }
+    result.column = c;
+    return result;
   }
 
-  overlapsInsideColumn(checkPosition: WidgetPosition): ColumnCorrection {
-    const positions = Object.values(untracked(() => this.positions()));
+  private isCellTaken(row: number, column: number): boolean {
+    const field = untracked(() => this.filedState());
+    const index = this.getFieldIndex(row, column);
+    if (index >= field.length) {
+      return false;
+    }
+    return !!field[index];
+  }
 
-    const tops: number[] = [];
-    const bottoms: number[] = [];
-
-    positions.forEach((pos) => {
-      if (
-        pos.id === checkPosition.id ||
-        checkPosition.leftEdge > pos.rightEdge ||
-        pos.leftEdge > checkPosition.rightEdge ||
-        checkPosition.topEdge > pos.bottomEdge ||
-        pos.topEdge > checkPosition.bottomEdge
-      ) {
-        return;
+  private fillPosition(field: Uint8Array, position: WidgetPosition, fillValue: number): void {
+    for (let r = position.topEdge; r <= position.bottomEdge; r++) {
+      for (let c = position.leftEdge; c <= position.rightEdge; c++) {
+        const index = this.getFieldIndex(r, c);
+        field[index] = fillValue;
       }
+    }
+  }
 
-      if (checkPosition.topEdge >= pos.topEdge && checkPosition.bottomEdge <= pos.bottomEdge) {
-        tops.push(checkPosition.row);
-        bottoms.push(checkPosition.heightInCells);
-        return;
-      }
+  private clearElementPosition(elementId: string): boolean {
+    const originalPosition = untracked(() => this.positions())[elementId];
+    if (!originalPosition) {
+      return false;
+    }
+    const filed = untracked(() => this.filedState());
+    this.fillPosition(filed, originalPosition, 0);
+    return true;
+  }
 
-      if (checkPosition.bottomEdge >= pos.topEdge) {
-        bottoms.push(checkPosition.bottomEdge - pos.topEdge + 1);
-        return;
-      }
-
-      if (checkPosition.topEdge >= pos.topEdge) {
-        tops.push(Math.abs(checkPosition.bottomEdge - pos.topEdge) + 1);
-      }
-    });
-
-    const top = !tops.length ? 0 : Math.max(...tops);
-    const bottom = !bottoms.length ? 0 : Math.max(...bottoms);
-    return { top, bottom };
+  private getFieldIndex(row: number, column: number): number {
+    return (row - 1) * this._colCount + (column - 1);
   }
 }
