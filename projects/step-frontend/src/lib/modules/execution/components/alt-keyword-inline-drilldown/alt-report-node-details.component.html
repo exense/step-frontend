@@ -83,4 +83,28 @@
       />
     </div>
   </div>
+  <section class="data-container execution-report-node-details">
+    <div class="container-title">
+      <step-icon name="clock" />
+      @if (isScheduledExecution()) {
+        <span>Schedule Execution History</span>
+        <step-icon
+          class="help-icon"
+          matTooltip="Shows the results of this step in previous executions of the same schedule. Each circle represents one scheduled plan execution. If the step was executed multiple times within a plan, the success and failure ratio is displayed as a pie chart."
+          name="help-circle"
+        />
+      } @else {
+        <span>Execution History</span>
+        <step-icon
+          class="help-icon"
+          matTooltip="Shows the results of this step in previous plan executions. Each circle represents one plan execution. If the step was executed multiple times within a plan, the success and failure ratio is displayed as a pie chart."
+          name="help-circle"
+        />
+      }
+    </div>
+    <step-aggregated-tree-node-history
+      [artefactHashContainer]="artefactHashContainer()"
+      [previousExecutionsCount]="previousExecutionsToDisplay"
+    />
+  </section>
 }

@@ -61,3 +61,8 @@ step-alt-execution-tree-partial {
   display: grid;
   gap: 2rem;
 }
+
+:host ::ng-deep step-alt-execution-tree-partial step-alt-execution-tree step-tree {
+  position: static;
+  padding-bottom: 0;
+}
