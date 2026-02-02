@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
-import { GridElementDirective } from '@exense/step-core';
 import { GridElementDragService } from '../injectables/grid-element-drag.service';
+import { GridElementDirective } from './grid-element.directive';
 
 @Directive({
   selector: '[stepGridDragHandle]',
