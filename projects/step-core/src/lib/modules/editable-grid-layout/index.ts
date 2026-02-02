@@ -14,3 +14,4 @@ export * from './components/grid-layout/grid-layout.component';
 export * from './components/grid-resizer/grid-resizer.component';
 export * from './directives/grid-element.directive';
 export * from './directives/grid-drag-handle.directive';
+export * from './directives/grid-dimensions.directive';
