@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
@@ -14,7 +14,6 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 
 @Component({
   selector: 'step-alt-report-node-details',
@@ -42,7 +41,6 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
   private _artefactService = inject(ArtefactService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  private _executionState = inject(AltExecutionStateService);
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
@@ -124,10 +122,4 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     const artefactHash = (aggregatedNode?.artefactHash || reportNode.artefactHash)!;
     return { artefactHash };
   });
-
-  protected readonly isScheduledExecution = toSignal(
-    this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)),
-  );
-
-  protected readonly previousExecutionsToDisplay = 8;
 }

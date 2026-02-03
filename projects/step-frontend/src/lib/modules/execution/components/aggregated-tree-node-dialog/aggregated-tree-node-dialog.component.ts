@@ -12,6 +12,7 @@ import { AltReportNodeDetailsStateService } from '../../services/alt-report-node
 import { filter, map, of, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNodeId?: string;
@@ -90,6 +91,13 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   protected readonly selectedReportNode = toSignal(this.reportNode$);
   protected readonly aggregatedNode = toSignal(this.aggregatedNode$);
+  protected readonly historyHashContainer = computed<HashContainer | undefined>(() => {
+    const aggregatedNode = this.aggregatedNode();
+    if (!aggregatedNode?.artefactHash) {
+      return undefined;
+    }
+    return { artefactHash: aggregatedNode.artefactHash };
+  });
 
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;

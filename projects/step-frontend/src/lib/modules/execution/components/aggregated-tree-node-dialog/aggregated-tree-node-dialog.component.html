@@ -50,8 +50,8 @@
               (openTreeView)="handleOpenTreeView(reportNode!)"
             />
           } @else {
-            <div class="iteration-list">
-              @if (aggregatedNode(); as aggregatedNode) {
+            @if (aggregatedNode(); as aggregatedNode) {
+              <div class="iteration-list">
                 <step-aggregated-tree-node-iteration-list
                   [node]="aggregatedNode!"
                   [resolvedPartialPath]="resolvedPartialPath"
@@ -60,8 +60,11 @@
                   (showDetails)="handleOpenDetails($event)"
                   (openTreeView)="handleOpenTreeView($event)"
                 />
+              </div>
+              @if (historyHashContainer(); as historyHashContainer) {
+                <step-execution-history-section [artefactHashContainer]="historyHashContainer" />
               }
-            </div>
+            }
           }
         </div>
       </div>
