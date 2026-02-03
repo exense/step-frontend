@@ -1,6 +1,6 @@
 @if (hasData()) {
   <section class="etc-container">
-    <step-attachments-inline-preview [attachmentMetas]="attachmentMetas()" />
+    <step-attachment-inline-preview-list [attachmentMetas]="attachmentMetas()" />
     @if (error(); as error) {
       <div class="error-container">
         <step-icon name="alert-triangle" />
