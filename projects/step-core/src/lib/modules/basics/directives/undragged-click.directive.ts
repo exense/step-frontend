@@ -8,7 +8,7 @@ import { ClickGuardService, ClickGuard } from '../injectables/click-guard.servic
     '(click)': 'handleClick($event)',
     '(dblclick)': 'handleClick($event)',
   },
-  standalone: false,
+  standalone: true,
 })
 export class UndraggedClickDirective {
   private _guardService = inject(ClickGuardService);

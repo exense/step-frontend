@@ -100,6 +100,7 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
     LongInlineTextComponent,
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
+    UndraggedClickDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -168,7 +169,6 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
     DynamicInputWidthDirective,
     TruncateStringPipe,
     StrategyClickDirective,
-    UndraggedClickDirective,
   ],
   exports: [
     CommonModule,
