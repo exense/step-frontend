@@ -80,6 +80,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
 import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
 import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
+import { UndraggedClickDirective } from './directives/undragged-click.directive';
 
 @NgModule({
   imports: [
@@ -167,6 +168,7 @@ import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.p
     DynamicInputWidthDirective,
     TruncateStringPipe,
     StrategyClickDirective,
+    UndraggedClickDirective,
   ],
   exports: [
     CommonModule,
@@ -244,6 +246,7 @@ import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.p
     OverflowIndicatorDirective,
     TruncateStringPipe,
     StrategyClickDirective,
+    UndraggedClickDirective,
     ElementSizeDirective,
     StatusIconClassDirective,
     FilterAddonDirective,
@@ -384,6 +387,7 @@ export * from './injectables/dynamic-values-utils.service';
 export * from './types/reloadable';
 export * from './injectables/global-reload.service';
 export * from './directives/strategy-click.directive';
+export * from './directives/undragged-click.directive';
 export * from './injectables/click-strategy.token';
 export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';

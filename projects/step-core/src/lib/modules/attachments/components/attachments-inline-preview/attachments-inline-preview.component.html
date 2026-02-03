@@ -20,11 +20,11 @@
                   />
                 }
                 @if (attachmentType === AttachmentType.STREAMING_BINARY) {
-                  <span (click)="downloadBinaryStream(att, $event)">
+                  <span stepUndraggedClick (undraggedClick)="downloadBinaryStream(att, $event)">
                     <step-long-inline-text [text]="att.name" />
                   </span>
                 } @else {
-                  <span class="highlight-inline-item" (click)="open(att, $event)">
+                  <span class="highlight-inline-item" stepUndraggedClick (undraggedClick)="open(att, $event)">
                     <step-long-inline-text [text]="att.name" />
                   </span>
                 }
