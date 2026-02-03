@@ -1,7 +1,7 @@
-import { ActivatedRouteSnapshot, CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from '../injectables/auth.service';
-import { NavigatorService } from '../../routing';
+import { DEFAULT_PAGE, NavigatorService } from '../../routing';
 
 export const authGuard: CanActivateFn = (_route: ActivatedRouteSnapshot) => {
   const _authService = inject(AuthService);
@@ -17,5 +17,11 @@ export const authGuard: CanActivateFn = (_route: ActivatedRouteSnapshot) => {
 
 export const nonAuthGuard: CanActivateFn = () => {
   const _authService = inject(AuthService);
-  return !!_authService.getConf()?.authentication && !_authService.isAuthenticated();
+  if (!!_authService.getConf()?.authentication && !_authService.isAuthenticated()) {
+    return true;
+  }
+
+  const _router = inject(Router);
+  const _defaultPage = inject(DEFAULT_PAGE);
+  return _router.parseUrl(_defaultPage());
 };

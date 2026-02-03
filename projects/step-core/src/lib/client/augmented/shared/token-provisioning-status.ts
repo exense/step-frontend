@@ -1,7 +1,3 @@
-/* istanbul ignore file */
-/* tslint:disable */
-/* eslint-disable */
-
 import type { AgentProvisioningLog } from '../models/AgentProvisioningLog';
 import type { TokenProvisioningError } from '../models/TokenProvisioningError';
 

@@ -6,7 +6,11 @@ step-alt-execution-progress {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 0 1.5rem;
+  padding: 0 2.5rem;
+
+  &.small-screen {
+    padding: 0.75rem 2.25rem;
+  }
 
   section.no-gap {
     margin-bottom: -2rem;
@@ -21,6 +25,7 @@ step-alt-execution-progress {
     column-gap: 1rem;
     row-gap: 0.5rem;
     align-items: flex-start;
+    min-height: 8.3rem;
 
     &.small-screen {
       grid-template-columns: 1fr 1fr;
@@ -28,6 +33,7 @@ step-alt-execution-progress {
         'title title'
         'sub-title sub-title'
         'controls ranger';
+      min-height: 12.5rem;
 
       .controls {
         justify-self: flex-start;

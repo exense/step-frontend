@@ -2,6 +2,7 @@ import { Directive } from '@angular/core';
 import { EntitySelectionState, EntitySelectionStateUpdatable } from '../../entities-selection';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-table[noSelectionState]',
   providers: [
     {

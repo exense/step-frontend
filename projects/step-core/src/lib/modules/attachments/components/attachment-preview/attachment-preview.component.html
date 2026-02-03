@@ -30,7 +30,11 @@
     overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT
   }"
 >
-  <step-long-inline-text [text]="attachment()?.name" />
+  <step-long-inline-text
+    [text]="attachment()?.name"
+    [stepOverflowTooltip]="attachment()?.name"
+    matTooltipPosition="below"
+  />
 </div>
 
 <div class="actions">

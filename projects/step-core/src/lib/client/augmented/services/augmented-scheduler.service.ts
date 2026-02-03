@@ -1,6 +1,3 @@
-/* istanbul ignore file */
-/* tslint:disable */
-/* eslint-disable */
 import { inject, Injectable } from '@angular/core';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
