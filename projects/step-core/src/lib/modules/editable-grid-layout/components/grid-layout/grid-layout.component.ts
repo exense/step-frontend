@@ -41,6 +41,7 @@ import { GridElementTitleComponent } from '../grid-element-title/grid-element-ti
   host: {
     '[class.show-preview]': 'showPreview()',
     '[class.edit-mode]': '_gridEditable.editMode()',
+    '[class.hidden]': '!isInitialised()',
     '[style.--style__cols-count]': '_colCount',
   },
   hostDirectives: [
@@ -62,6 +63,7 @@ export class GridLayoutComponent implements AfterViewInit {
 
   private readonly isRenderComplete = signal(false);
   private readonly preview = viewChild<ElementRef<HTMLDivElement>>('preview');
+  protected readonly isInitialised = computed(() => this._widgetPositions.isInitialized());
 
   protected readonly showPreview = computed(() => {
     const isResize = this._gridElementResizer.resizeInProgress();

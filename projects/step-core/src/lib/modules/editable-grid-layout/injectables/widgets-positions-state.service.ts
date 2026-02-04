@@ -1,9 +1,12 @@
-import { computed, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
 import { WidgetIDs } from '../types/widget-ids';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
+import { GridPersistencePositionsService } from './grid-persistence-positions.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, switchMap } from 'rxjs';
 
 const EMPTY = 0;
 
@@ -12,11 +15,18 @@ export class WidgetsPositionsStateService implements OnDestroy {
   private _gridConfig = inject(GRID_LAYOUT_CONFIG);
   private _colCount = inject(GRID_COLUMN_COUNT);
   private _gridEditable = inject(GridEditableService);
+  private _gridPersistencePositions = inject(GridPersistencePositionsService);
+  private _destroyRef = inject(DestroyRef);
 
   private widgetIDs = new WidgetIDs(this._gridConfig.defaultElementParams.map((item) => item.id));
 
-  protected readonly hiddenWidgets = signal<string[]>([]);
+  private readonly isInitializedInternal = signal(false);
+  readonly isInitialized = this.isInitializedInternal.asReadonly();
+
+  private readonly hiddenWidgets = signal<string[]>([]);
   private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
+
+  private readonly positionsState$ = toObservable(this.positionsStateInternal);
 
   readonly positions = computed(() => {
     const positions = this.positionsStateInternal();
@@ -50,7 +60,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
   });
 
   constructor() {
-    this.determineInitialPositions();
+    this.initialize();
   }
 
   ngOnDestroy(): void {
@@ -270,6 +280,19 @@ export class WidgetsPositionsStateService implements OnDestroy {
     this.hiddenWidgets.set(widgetsIds);
   }
 
+  private initialize(): void {
+    const isInitialized = untracked(() => this.isInitialized());
+    if (isInitialized) {
+      return;
+    }
+    this._gridPersistencePositions.loadPositions(this._gridConfig.gridId).subscribe((positions) => {
+      this.positionsStateInternal.set(positions);
+      this.determineInitialPositions();
+      this.isInitializedInternal.set(true);
+      this.setupPositionsSync();
+    });
+  }
+
   private isCellTaken(row: number, column: number): boolean {
     const field = untracked(() => this.filedState());
     const index = this.getFieldIndex(row, column);
@@ -364,5 +387,15 @@ export class WidgetsPositionsStateService implements OnDestroy {
       const position = new WidgetPosition(info.id, positionParams);
       this.updatePosition(position);
     }
+  }
+
+  private setupPositionsSync(): void {
+    this.positionsState$
+      .pipe(
+        debounceTime(300),
+        switchMap((positions) => this._gridPersistencePositions.savePositions(this._gridConfig.gridId, positions)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
   }
 }

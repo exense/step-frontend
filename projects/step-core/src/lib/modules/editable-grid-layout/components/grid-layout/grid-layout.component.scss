@@ -10,6 +10,10 @@ step-grid-layout {
   column-gap: 1.5rem;
   position: relative;
 
+  &.hidden {
+    visibility: hidden;
+  }
+
   .step-grid-element {
     position: relative;
 

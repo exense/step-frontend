@@ -38,7 +38,8 @@ export class GridElementDirective {
   private effectInitializePosition = effect(() => {
     const position = this.position();
     const isRenderComplete = this.isRenderComplete();
-    if (isRenderComplete && !position) {
+    const isPositionStateInitialized = this._positionsState.isInitialized();
+    if (isRenderComplete && isPositionStateInitialized && !position) {
       this.updatePositionIfRequired();
     }
   });
