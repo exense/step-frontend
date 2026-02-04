@@ -65,6 +65,12 @@ step-tree {
     position: fixed;
   }
 
+  div[draggable='false'] {
+    .tree-node {
+      user-select: text;
+    }
+  }
+
   .tree-action-item {
     height: 3.2rem;
     line-height: 3.2rem;
