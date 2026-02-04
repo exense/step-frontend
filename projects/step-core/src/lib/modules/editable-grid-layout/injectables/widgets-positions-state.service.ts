@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
-import { WidgetPosition } from '../types/widget-position';
+import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
 import { WidgetIDs } from '../types/widget-ids';
@@ -13,10 +13,10 @@ export class WidgetsPositionsStateService implements OnDestroy {
   private _colCount = inject(GRID_COLUMN_COUNT);
   private _gridEditable = inject(GridEditableService);
 
-  private widgetIDs = new WidgetIDs(Object.keys(this._gridConfig.defaultElementParams));
+  private widgetIDs = new WidgetIDs(this._gridConfig.defaultElementParams.map((item) => item.id));
 
   protected readonly hiddenWidgets = signal<string[]>([]);
-  private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>(this.determineInitialPositions());
+  private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
 
   readonly positions = computed(() => {
     const positions = this.positionsStateInternal();
@@ -28,18 +28,30 @@ export class WidgetsPositionsStateService implements OnDestroy {
     return this.realignPositionsWithHiddenWidgets(positions, hiddenWidgets);
   });
 
-  private readonly filedState = computed(() => {
+  private readonly fieldBottom = computed(() => {
     const positions = Object.values(this.positionsStateInternal());
     if (!positions.length) {
+      return 0;
+    }
+    return Math.max(...positions.map((item) => item.bottomEdge));
+  });
+
+  private readonly filedState = computed(() => {
+    const positions = Object.values(this.positionsStateInternal());
+    const fieldBottom = this.fieldBottom();
+    if (!positions.length || !fieldBottom) {
       return new Uint8Array(0);
     }
-    const fieldBottom = Math.max(...positions.map((item) => item.bottomEdge));
     const size = this._colCount * fieldBottom;
 
     const field = new Uint8Array(size);
     positions.forEach((item) => this.fillPosition(field, item));
     return field;
   });
+
+  constructor() {
+    this.determineInitialPositions();
+  }
 
   ngOnDestroy(): void {
     this.widgetIDs.destroy();
@@ -215,6 +227,45 @@ export class WidgetsPositionsStateService implements OnDestroy {
     return result;
   }
 
+  findProperPosition(widthInCells: number, heightInCells: number): WidgetPositionParams {
+    // First search for last widget
+    const field = untracked(() => this.filedState());
+    const widgetPositions = untracked(() => this.positionsStateInternal());
+
+    let widgetId: string | undefined = undefined;
+
+    for (let index = field.length - 1; index >= 0; index--) {
+      if (field[index] !== EMPTY) {
+        widgetId = this.widgetIDs.getStringIdByNumber(field[index]);
+        break;
+      }
+    }
+
+    // If there is no widgets, define new one at first position
+    if (widgetId === undefined) {
+      return { row: 1, column: 1, widthInCells, heightInCells };
+    }
+
+    const lastWidgetPosition = widgetPositions[widgetId];
+
+    // If last widget heights smaller the new widget's height - allocate new widget on the new row
+    const nextRow = lastWidgetPosition.bottomEdge + 1;
+    if (lastWidgetPosition.heightInCells < heightInCells) {
+      return { row: nextRow, column: 1, widthInCells, heightInCells };
+    }
+
+    // Check if there is enough available cells in width after last widget
+    const column = lastWidgetPosition.rightEdge + 1;
+    const rightEdge = column + widthInCells - 1;
+    if (rightEdge > this._colCount) {
+      //If not allocate new widget on the new row
+      return { row: nextRow, column: 1, widthInCells, heightInCells };
+    }
+
+    // In case of available space, allocate new widget just after the last one
+    return { row: lastWidgetPosition.row, column, widthInCells, heightInCells };
+  }
+
   setHiddenWidgets(widgetsIds: string[]): void {
     this.hiddenWidgets.set(widgetsIds);
   }
@@ -262,8 +313,8 @@ export class WidgetsPositionsStateService implements OnDestroy {
       return originalPositions;
     }
     const filed = untracked(() => this.filedState());
+    const fieldBottom = untracked(() => this.fieldBottom());
     const hiddenWidgetsNumIds = new Set(hiddenWidgets.map((idStr) => this.widgetIDs.getNumericIdByString(idStr)));
-    const fieldBottom = Math.max(...positions.map((item) => item.bottomEdge));
 
     // This arrays show, how many rows are skipped above each row
     const hiddenRowsState: number[] = new Array(fieldBottom);
@@ -304,13 +355,14 @@ export class WidgetsPositionsStateService implements OnDestroy {
     return result;
   }
 
-  private determineInitialPositions(): Record<string, WidgetPosition> {
-    return Object.entries(this._gridConfig.defaultElementParams).reduce(
-      (res, [key, info]) => {
-        res[key] = new WidgetPosition(key, info.position);
-        return res;
-      },
-      {} as Record<string, WidgetPosition>,
-    );
+  private determineInitialPositions(): void {
+    for (const info of this._gridConfig.defaultElementParams) {
+      if (!!this.getPosition(info.id)) {
+        continue;
+      }
+      const positionParams = this.findProperPosition(info.widthInCells, info.heightInCells);
+      const position = new WidgetPosition(info.id, positionParams);
+      this.updatePosition(position);
+    }
   }
 }

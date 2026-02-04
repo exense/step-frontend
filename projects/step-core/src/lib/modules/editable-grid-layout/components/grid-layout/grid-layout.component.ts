@@ -69,7 +69,7 @@ export class GridLayoutComponent implements AfterViewInit {
     return !!isResize || !!isDrag;
   });
 
-  private allWidgets = Object.keys(this._gridLayoutConfig.defaultElementParams);
+  private allWidgets = this._gridLayoutConfig.defaultElementParams.map((item) => item.id);
   private readonly renderedWidgets = contentChildren(GridElementDirective);
   private readonly renderedWidgetsIds = computed(() => {
     const renderedWidgets = this.renderedWidgets();

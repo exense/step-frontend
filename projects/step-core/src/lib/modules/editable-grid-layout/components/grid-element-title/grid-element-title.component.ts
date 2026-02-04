@@ -14,7 +14,7 @@ export class GridElementTitleComponent {
 
   protected readonly displayTitle = computed(() => {
     const id = this._gridElement.elementId();
-    const title = this._gridConfig.defaultElementParams?.[id]?.title;
+    const title = this._gridConfig.defaultElementParams?.find((item) => item.id === id)?.title;
     return title ?? id;
   });
 }
