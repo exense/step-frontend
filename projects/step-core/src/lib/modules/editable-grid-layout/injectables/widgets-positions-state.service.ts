@@ -1,27 +1,52 @@
-import { computed, inject, Injectable, signal, untracked } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { WidgetPosition } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
+import { GridEditableService } from './grid-editable.service';
+import { WidgetIDs } from '../types/widget-ids';
+import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
+
+const EMPTY = 0;
 
 @Injectable()
-export class WidgetsPositionsStateService {
+export class WidgetsPositionsStateService implements OnDestroy {
+  private _gridConfig = inject(GRID_LAYOUT_CONFIG);
   private _colCount = inject(GRID_COLUMN_COUNT);
+  private _gridEditable = inject(GridEditableService);
 
-  private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
+  private widgetIDs = new WidgetIDs(Object.keys(this._gridConfig.defaultElementParams));
 
-  readonly positions = this.positionsStateInternal.asReadonly();
+  protected readonly hiddenWidgets = signal<string[]>([]);
+  private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>(this.determineInitialPositions());
+
+  readonly positions = computed(() => {
+    const positions = this.positionsStateInternal();
+    const hiddenWidgets = this.hiddenWidgets();
+    const isEditMode = this._gridEditable.editMode();
+    if (isEditMode) {
+      return positions;
+    }
+    return this.realignPositionsWithHiddenWidgets(positions, hiddenWidgets);
+  });
 
   private readonly filedState = computed(() => {
-    const positions = Object.values(this.positions());
+    const positions = Object.values(this.positionsStateInternal());
+    if (!positions.length) {
+      return new Uint8Array(0);
+    }
     const fieldBottom = Math.max(...positions.map((item) => item.bottomEdge));
     const size = this._colCount * fieldBottom;
 
     const field = new Uint8Array(size);
-    positions.forEach((item) => this.fillPosition(field, item, 1));
+    positions.forEach((item) => this.fillPosition(field, item));
     return field;
   });
 
+  ngOnDestroy(): void {
+    this.widgetIDs.destroy();
+  }
+
   getPosition(elementId: string): WidgetPosition | undefined {
-    return untracked(() => this.positions())[elementId];
+    return untracked(() => this.positionsStateInternal())[elementId];
   }
 
   updatePosition(position: WidgetPosition): void {
@@ -32,7 +57,7 @@ export class WidgetsPositionsStateService {
   }
 
   swapPositions(aElementId: string, bElementId: string): void {
-    const positions = untracked(() => this.positions());
+    const positions = untracked(() => this.positionsStateInternal());
     const positionA = positions[aElementId];
     const positionB = positions[bElementId];
     if (!positionA || !positionB) {
@@ -55,7 +80,7 @@ export class WidgetsPositionsStateService {
 
     //If position is taken by other widget, return other's widgets original position
     if (this.isCellTaken(position.row, position.column)) {
-      const otherWidgetPosition = Object.values(untracked(() => this.positions())).find(
+      const otherWidgetPosition = Object.values(untracked(() => this.positionsStateInternal())).find(
         (pos) => pos.id !== elementId && pos.includesPoint(position.row, position.column),
       );
 
@@ -190,6 +215,10 @@ export class WidgetsPositionsStateService {
     return result;
   }
 
+  setHiddenWidgets(widgetsIds: string[]): void {
+    this.hiddenWidgets.set(widgetsIds);
+  }
+
   private isCellTaken(row: number, column: number): boolean {
     const field = untracked(() => this.filedState());
     const index = this.getFieldIndex(row, column);
@@ -199,7 +228,9 @@ export class WidgetsPositionsStateService {
     return !!field[index];
   }
 
-  private fillPosition(field: Uint8Array, position: WidgetPosition, fillValue: number): void {
+  private fillPosition(field: Uint8Array, position: WidgetPosition, isClear?: boolean): void {
+    const fillValue = isClear ? EMPTY : this.widgetIDs.getNumericIdByString(position.id);
+
     for (let r = position.topEdge; r <= position.bottomEdge; r++) {
       for (let c = position.leftEdge; c <= position.rightEdge; c++) {
         const index = this.getFieldIndex(r, c);
@@ -209,16 +240,77 @@ export class WidgetsPositionsStateService {
   }
 
   private clearElementPosition(elementId: string): boolean {
-    const originalPosition = untracked(() => this.positions())[elementId];
+    const originalPosition = untracked(() => this.positionsStateInternal())[elementId];
     if (!originalPosition) {
       return false;
     }
     const filed = untracked(() => this.filedState());
-    this.fillPosition(filed, originalPosition, 0);
+    this.fillPosition(filed, originalPosition, true);
     return true;
   }
 
   private getFieldIndex(row: number, column: number): number {
     return (row - 1) * this._colCount + (column - 1);
+  }
+
+  private realignPositionsWithHiddenWidgets(
+    originalPositions: Record<string, WidgetPosition>,
+    hiddenWidgets: string[],
+  ): Record<string, WidgetPosition> {
+    const positions = Object.values(originalPositions);
+    if (!positions.length || !hiddenWidgets?.length) {
+      return originalPositions;
+    }
+    const filed = untracked(() => this.filedState());
+    const hiddenWidgetsNumIds = new Set(hiddenWidgets.map((idStr) => this.widgetIDs.getNumericIdByString(idStr)));
+    const fieldBottom = Math.max(...positions.map((item) => item.bottomEdge));
+
+    // This arrays show, how many rows are skipped above each row
+    const hiddenRowsState: number[] = new Array(fieldBottom);
+
+    for (let row = 1; row <= fieldBottom; row++) {
+      let hiddenColCount = 0;
+      for (let col = 1; col <= this._colCount; col++) {
+        const index = this.getFieldIndex(row, col);
+        const widgetId = filed[index];
+        if (hiddenWidgetsNumIds.has(widgetId) || widgetId === EMPTY) {
+          hiddenColCount++;
+        }
+      }
+      const rowIndex = row - 1;
+      hiddenRowsState[rowIndex] = rowIndex === 0 ? 0 : hiddenRowsState[rowIndex - 1];
+      if (hiddenColCount === this._colCount) {
+        hiddenRowsState[rowIndex]++;
+      }
+    }
+
+    const result = positions.reduce(
+      (res, position) => {
+        const idNum = this.widgetIDs.getNumericIdByString(position.id);
+        if (hiddenWidgetsNumIds.has(idNum)) {
+          return res;
+        }
+
+        const updatesPos = position.clone();
+        const hiddenRows = hiddenRowsState[updatesPos.row - 1];
+        updatesPos.row -= hiddenRows;
+        res[position.id] = updatesPos;
+
+        return res;
+      },
+      {} as Record<string, WidgetPosition>,
+    );
+
+    return result;
+  }
+
+  private determineInitialPositions(): Record<string, WidgetPosition> {
+    return Object.entries(this._gridConfig.defaultElementParams).reduce(
+      (res, [key, info]) => {
+        res[key] = new WidgetPosition(key, info.position);
+        return res;
+      },
+      {} as Record<string, WidgetPosition>,
+    );
   }
 }

@@ -1,4 +1,4 @@
-interface WidgetPositionParams {
+export interface WidgetPositionParams {
   column: number;
   row: number;
   widthInCells: number;

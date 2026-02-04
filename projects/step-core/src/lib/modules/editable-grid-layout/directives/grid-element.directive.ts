@@ -12,6 +12,7 @@ import {
 import { WidgetsPositionsStateService } from '../injectables/widgets-positions-state.service';
 import { WidgetPosition } from '../types/widget-position';
 import { GridDimensionsService } from '../injectables/grid-dimensions.service';
+import { GRID_LAYOUT_CONFIG } from '../injectables/grid-layout-config.token';
 
 @Directive({
   selector: '[stepGridElement]',
@@ -41,7 +42,7 @@ export class GridElementDirective {
     const position = this.position();
     const isRenderComplete = this.isRenderComplete();
     if (isRenderComplete && !position) {
-      this.determineInitialPosition();
+      this.updatePositionIfRequired();
     }
   });
 
@@ -73,16 +74,22 @@ export class GridElementDirective {
     afterNextRender(() => this.isRenderComplete.set(true));
   }
 
-  private determineInitialPosition(): void {
+  private updatePositionIfRequired(): void {
     const element = this._elRef.nativeElement;
     const id = untracked(() => this.elementId());
     if (!id) {
       return;
     }
+    let position = this._positionsState.getPosition(id);
+    if (!!position) {
+      return;
+    }
     const column = this._gridDimensions.determineCellColumn(element.offsetLeft + this._gridDimensions.columnGap);
     const row = this._gridDimensions.determineCellRow(element.offsetTop + this._gridDimensions.rowGap);
+    const widthInCells = 1;
+    const heightInCells = 1;
 
-    const position = new WidgetPosition(id, { column, row, widthInCells: 1, heightInCells: 1 });
+    position = new WidgetPosition(id, { column, row, widthInCells, heightInCells });
     this._positionsState.updatePosition(position);
   }
 }

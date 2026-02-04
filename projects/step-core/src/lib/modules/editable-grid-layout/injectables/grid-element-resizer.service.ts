@@ -66,8 +66,8 @@ export class GridElementResizerService implements OnDestroy {
 
     const position = this.determineResizedPosition(element, event.clientX, event.clientY);
     if (position) {
-      const newWidth = this._gridDimensions.determineCellsWidth(position.widthInCells);
-      const newHeight = this._gridDimensions.determineCellsHeight(position.heightInCells);
+      const newWidth = this._gridDimensions.determineCellsWidth(position.widthInCells) - this._gridDimensions.columnGap;
+      const newHeight = this._gridDimensions.determineCellsHeight(position.heightInCells) - this._gridDimensions.rowGap;
       width = `${newWidth}px`;
       height = `${newHeight}px`;
     }

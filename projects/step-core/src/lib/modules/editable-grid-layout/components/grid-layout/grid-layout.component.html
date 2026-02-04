@@ -1,2 +1,11 @@
 <ng-content />
+@if (_gridEditable.editMode()) {
+  @for (hiddenWidget of hiddenWidgets(); track hiddenWidget) {
+    <section class="hidden-placeholder" [stepGridElement]="hiddenWidget">
+      <div class="drag-handle" stepGridDragHandle></div>
+      <step-grid-element-title />
+      <step-grid-resizer />
+    </section>
+  }
+}
 <div #preview class="preview"></div>

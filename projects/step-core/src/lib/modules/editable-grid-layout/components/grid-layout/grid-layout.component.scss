@@ -4,22 +4,20 @@ step-grid-layout {
   $cols-count: var(--style__cols-count);
 
   display: grid;
-  grid-template-columns: repeat($cols-count, calc((100% / $cols-count) - 0.5rem));
+  grid-template-columns: repeat($cols-count, calc((100% / $cols-count) - 1.5rem));
   grid-auto-rows: 14.6rem;
-  gap: 0.5rem;
+  row-gap: 2.4rem;
+  column-gap: 1.5rem;
   position: relative;
 
   .step-grid-element {
     position: relative;
 
     step-grid-resizer {
+      display: none;
       position: absolute;
       bottom: 0;
       right: 0;
-    }
-
-    .step-grid-drag-handle {
-      cursor: grab;
     }
   }
 
@@ -42,6 +40,35 @@ step-grid-layout {
   &.show-preview {
     .preview {
       display: block;
+    }
+  }
+
+  &.edit-mode .step-grid-element {
+    step-grid-resizer {
+      display: block;
+    }
+    .step-grid-drag-handle {
+      cursor: grab;
+    }
+  }
+
+  .hidden-placeholder {
+    border: dashed 0.1rem var.$black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    step-grid-element-title {
+      $size: 1.6rem;
+      font-size: $size;
+      position: absolute;
+      top: calc(50% - ($size / 2));
+    }
+
+    .drag-handle {
+      background: var.$gray-50;
+      min-height: 3rem;
+      width: 100%;
     }
   }
 }

@@ -67,8 +67,8 @@ export class GridElementDragService implements OnDestroy {
     if (position) {
       const newLeft = this._gridDimensions.determineCellsWidth(position.column - 1);
       const newTop = this._gridDimensions.determineCellsHeight(position.row - 1);
-      const newWidth = this._gridDimensions.determineCellsWidth(position.widthInCells);
-      const newHeight = this._gridDimensions.determineCellsHeight(position.heightInCells);
+      const newWidth = this._gridDimensions.determineCellsWidth(position.widthInCells) - this._gridDimensions.columnGap;
+      const newHeight = this._gridDimensions.determineCellsHeight(position.heightInCells) - this._gridDimensions.rowGap;
       left = `${newLeft}px`;
       top = `${newTop}px`;
       width = `${newWidth}px`;

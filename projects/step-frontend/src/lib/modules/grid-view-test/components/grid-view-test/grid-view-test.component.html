@@ -1,32 +1,72 @@
-<step-grid-layout>
-  <step-alt-report-widget stepGridElement="widgetOne">
-    <step-alt-report-widget-title>
-      <div stepGridDragHandle>WIDGET 1</div>
-    </step-alt-report-widget-title>
-    <step-alt-report-widget-content>
-      Content widget 1
-      <step-grid-resizer />
-    </step-alt-report-widget-content>
-  </step-alt-report-widget>
-  <step-alt-report-widget stepGridElement="widgetTwo">
-    <step-alt-report-widget-title>
-      <div stepGridDragHandle>WIDGET 2</div>
-    </step-alt-report-widget-title>
-    <step-alt-report-widget-content>
-      <pre>
+<section>
+  <div>
+    <step-label>Edit Mode</step-label>
+    <mat-slide-toggle color="primary" [(ngModel)]="editMode" />
+  </div>
+</section>
+<step-grid-layout [editMode]="editMode()">
+  @if (areErrorsVisible()) {
+    <step-alt-report-widget stepGridElement="errorsWidget">
+      <step-alt-report-widget-title>
+        <div stepGridDragHandle>
+          <step-grid-element-title />
+        </div>
+      </step-alt-report-widget-title>
+      <step-alt-report-widget-content>
+        Some inline errors
+        <step-grid-resizer />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  }
+  @if (areTestCasesVisible()) {
+    <step-alt-report-widget stepGridElement="testCases">
+      <step-alt-report-widget-title>
+        <div stepGridDragHandle>
+          <step-grid-element-title />
+        </div>
+      </step-alt-report-widget-title>
+      <step-alt-report-widget-content>
+        <pre>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre
-      >
-      <step-grid-resizer />
-    </step-alt-report-widget-content>
-  </step-alt-report-widget>
-  <step-alt-report-widget stepGridElement="widgetThree">
+        >
+        <step-grid-resizer />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+    <step-alt-report-widget stepGridElement="testCasesSummary">
+      <step-alt-report-widget-title>
+        <div stepGridDragHandle>
+          <step-grid-element-title />
+        </div>
+      </step-alt-report-widget-title>
+      <step-alt-report-widget-content>
+        Summary content
+        <step-grid-resizer />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  }
+  <step-alt-report-widget stepGridElement="keywordsSummary">
     <step-alt-report-widget-title>
-      <div stepGridDragHandle>WIDGET 3</div>
+      <div stepGridDragHandle>
+        <step-grid-element-title />
+      </div>
     </step-alt-report-widget-title>
     <step-alt-report-widget-content>
       <div>Data 1</div>
       <div>Data 2</div>
       <div>Data 3</div>
+      <step-grid-resizer />
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
+  <step-alt-report-widget stepGridElement="keywordsList">
+    <step-alt-report-widget-title>
+      <div stepGridDragHandle>
+        <step-grid-element-title />
+      </div>
+    </step-alt-report-widget-title>
+    <step-alt-report-widget-content>
+      <div>aaa</div>
+      <div>bbb</div>
+      <div>ccc</div>
       <step-grid-resizer />
     </step-alt-report-widget-content>
   </step-alt-report-widget>
