@@ -1,12 +1,15 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -24,7 +27,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -84,6 +87,7 @@ interface ProcessedBucketResponse {
   styleUrls: ['./table-dashlet.component.scss'],
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
+  standalone: true,
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
@@ -92,10 +96,13 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
+  showLoadingSpinnerWhileLoading = input<boolean>(false);
 
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
+
+  isLoading = signal<boolean>(true);
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
@@ -104,7 +111,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
-  tableIsLoading = true;
 
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];
@@ -128,20 +134,32 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
     this.prepareState();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.fetchBaseData().subscribe(() => this.updateTableData());
+    this.fetchBaseData()
+      .pipe(
+        switchMap(() => this.updateTableData()),
+        finalize(() => this.isLoading.set(false)),
+      )
+      .subscribe();
   }
 
-  refresh(blur?: boolean): Observable<any> {
-    return this.fetchBaseData().pipe(tap(() => this.updateTableData()));
+  public refresh(blur?: boolean): Observable<any> {
+    console.log('refreshing');
+    this.isLoading.set(true);
+    return this.fetchBaseData().pipe(
+      switchMap(() => this.updateTableData()),
+      finalize(() => this.isLoading.set(false)),
+    );
   }
 
-  refreshCompareData(): Observable<any> {
+  public refreshCompareData(): Observable<any> {
+    this.isLoading.set(true);
     return this.fetchData(true).pipe(
       tap((response) => {
         this.compareBuckets = response.buckets;
         this.truncated = response.truncated;
-        this.updateTableData();
       }),
+      switchMap(() => this.updateTableData()),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -213,12 +231,16 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   enableCompareMode(context: TimeSeriesContext) {
+    console.log('enabling compare mode in table dashlet');
     this.compareModeEnabled = true;
     this.compareContext = context;
     this.compareBuckets = this.baseBuckets;
     this.compareRequestOql = this.baseRequestOql;
     this.updateVisibleColumns();
-    this.updateTableData();
+    this.isLoading.set(true);
+    this.updateTableData()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe();
   }
 
   disableCompareMode() {
@@ -226,7 +248,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.compareContext = undefined;
     this.compareBuckets = [];
     this.updateVisibleColumns();
-    this.updateTableData();
+    this.isLoading.set(true);
+    this.updateTableData()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe();
   }
 
   updateVisibleColumns(): void {
@@ -372,10 +397,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private updateTableData() {
     const tableEntries = this.mergeBaseAndCompareData();
-    this.fetchLegendEntities(tableEntries).subscribe((updatedData) => {
-      this.tableData$.next(updatedData);
-      this.tableIsLoading = false;
-    });
+    return this.fetchLegendEntities(tableEntries).pipe(
+      tap((updatedData) => {
+        this.tableData$.next(updatedData);
+      }),
+    );
   }
 
   private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucketResponse {

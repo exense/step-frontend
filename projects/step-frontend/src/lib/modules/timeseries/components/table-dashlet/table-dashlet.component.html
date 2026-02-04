@@ -95,13 +95,12 @@
 </div>
 
 <div class="table-container">
-  <step-table
-    [dataSource]="tableDataSource"
-    [inProgress]="tableIsLoading"
-    matSort
-    class="ts-table"
-    [visibleColumns]="visibleColumnsIds"
-  >
+  @if (isLoading() && showLoadingSpinnerWhileLoading()) {
+    <div class="spinner-container">
+      <mat-spinner [diameter]="40" />
+    </div>
+  }
+  <step-table [dataSource]="tableDataSource" matSort class="ts-table" [visibleColumns]="visibleColumnsIds">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <div class="element-name">

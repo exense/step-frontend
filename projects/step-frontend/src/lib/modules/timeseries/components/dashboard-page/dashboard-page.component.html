@@ -41,8 +41,9 @@
 
 @if (timeRange() && dashboard()?.id && !isLoading()) {
   <step-timeseries-dashboard
+    #dashboardComponent
     [id]="dashboard()!.id!"
-    [timeRange]="timeRange()!"
+    [initialTimeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"
     [showExecutionLinks]="true"
