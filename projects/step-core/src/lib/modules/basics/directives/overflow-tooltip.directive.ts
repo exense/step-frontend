@@ -3,6 +3,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { OverflowIndicatorDirective } from './overflow-indicator.directive';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[matTooltip]',
   exportAs: 'matTooltip',
   host: {

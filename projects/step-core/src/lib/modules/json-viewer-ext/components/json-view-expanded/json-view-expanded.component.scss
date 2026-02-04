@@ -20,11 +20,12 @@
   &.additional-shift {
     padding-left: calc(var(--level, 0) * 1.5rem + 3rem);
   }
+  margin-left: 0.1rem;
   border-radius: 1rem;
   cursor: pointer;
   &:hover {
     border: solid 0.1rem var.$blue-600;
-    margin-left: -0.1rem;
+    margin-left: 0rem;
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
   }
@@ -49,7 +50,6 @@
 .name {
   white-space: nowrap;
   padding: 0.2rem 0;
-  user-select: none;
 }
 
 button.btn-more {

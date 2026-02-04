@@ -5,6 +5,7 @@ import {
   ElementRef,
   inject,
   input,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -37,11 +38,11 @@ const GAP = 1;
 export class ArtefactInlineFieldComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
 
-  private elPrefix = viewChild('elPrefix', { read: ElementRef<HTMLElement> });
-  private elLabel = viewChild('elLabel', { read: ElementRef<HTMLElement> });
-  private elValue = viewChild('elValue', { read: ElementRef<HTMLElement> });
-  private elIcon = viewChild('elIcon', { read: ElementRef<HTMLElement> });
-  private elSuffix = viewChild('elSuffix', { read: ElementRef<HTMLElement> });
+  private readonly elPrefix = viewChild('elPrefix', { read: ElementRef<HTMLElement> });
+  private readonly elLabel = viewChild('elLabel', { read: ElementRef<HTMLElement> });
+  private readonly elValue = viewChild('elValue', { read: ElementRef<HTMLElement> });
+  private readonly elIcon = viewChild('elIcon', { read: ElementRef<HTMLElement> });
+  private readonly elSuffix = viewChild('elSuffix', { read: ElementRef<HTMLElement> });
 
   readonly elementCount = computed(() => {
     const elPrefix = this.elPrefix();
@@ -66,17 +67,17 @@ export class ArtefactInlineFieldComponent {
   }
 
   getCount(): number {
-    return this.elementCount();
+    return untracked(() => this.elementCount());
   }
 
   getWidths(maxSubItemWidth?: number): WidthContainer {
-    const prefix = this.widthPrefix();
-    const label = this.widthLabel();
-    const value = this.widthValue();
-    const icon = this.widthIcon();
-    const suffix = this.widthSuffix();
+    const prefix = untracked(() => this.widthPrefix());
+    const label = untracked(() => this.widthLabel());
+    const value = untracked(() => this.widthValue());
+    const icon = untracked(() => this.widthIcon());
+    const suffix = untracked(() => this.widthSuffix());
 
-    const correctWidth = (val: number) => {
+    const correctWidth = (val: number): number => {
       if (!val || !maxSubItemWidth) {
         return val;
       }
@@ -98,20 +99,20 @@ export class ArtefactInlineFieldComponent {
   }
 
   getItem(): ArtefactInlineItem {
-    return this.item();
+    return untracked(() => this.item());
   }
 
   readonly item = input.required<ArtefactInlineItem>();
   readonly applyExplicitWidths = input(false);
 
-  protected explicitWidths = computed(() => {
+  protected readonly explicitWidths = computed(() => {
     const item = this.item() as ArtefactInlineItemExplicitWidths;
     const applyExplicitWidths = this.applyExplicitWidths();
     return applyExplicitWidths ? item?.explicitWidths : undefined;
   });
 
-  private label = computed(() => this.item()?.label);
-  private value = computed(() => this.item()?.value);
+  private readonly label = computed(() => this.item()?.label);
+  private readonly value = computed(() => this.item()?.value);
 
   protected readonly icon = computed(() => this.item()?.icon);
   protected readonly iconTooltip = computed(() => this.item()?.iconTooltip ?? '');

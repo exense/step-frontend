@@ -73,12 +73,12 @@ export class NavigatorService {
 
   navigateAfterLogin(): void {
     const emptyUrls = ['', '/', '/login'];
-    const url = this._location.path().split('?')[0];
-    if (emptyUrls.includes(url)) {
+    const baseUrl = this._location.path().split('?')[0];
+    if (emptyUrls.includes(baseUrl)) {
       this.navigateToHome();
       return;
     }
-    this._router.navigateByUrl(url, { skipLocationChange: true });
+    this._router.navigateByUrl(this._location.path(), { skipLocationChange: true });
   }
 
   forceActivateView(viewId: string): string {

@@ -16,6 +16,9 @@
     },
     "./styles/core-variables": {
       "sass": "./styles/_core-variables.scss"
+    },
+    "./step-lint" : {
+      "default": "./step-lint/index.js"
     }
   },
   "peerDependencies": {

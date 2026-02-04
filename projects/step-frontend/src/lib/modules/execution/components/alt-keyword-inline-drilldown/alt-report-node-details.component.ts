@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
@@ -114,5 +114,12 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     const artefactClass = this.artefactClass();
     const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
     return meta?.reportDetailsComponent;
+  });
+
+  protected readonly artefactHashContainer = computed(() => {
+    const reportNode = this.node();
+    const aggregatedNode = this.aggregatedNode();
+    const artefactHash = (aggregatedNode?.artefactHash || reportNode.artefactHash)!;
+    return { artefactHash };
   });
 }
