@@ -81,7 +81,6 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
     this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
     this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
-    this.registerMenuEntry('Grid View', 'grid-view', 'grid', { weight: 50, parentId: 'automation-root' });
     this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE } from '../../shared/view-mode';
-import { NumberSeparateThousandsPipe, STATUS_COLORS } from '@exense/step-core';
+import { GRID_LAYOUT_CONFIG, NumberSeparateThousandsPipe, STATUS_COLORS } from '@exense/step-core';
 import {
   ChartItemClickEvent,
   DoughnutChartItem,
@@ -26,7 +26,10 @@ import { Status } from '../../../_common/shared/status.enum';
 export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
   private _numberSeparateThousands = inject(NumberSeparateThousandsPipe);
+  private _gridLayoutConfig = inject(GRID_LAYOUT_CONFIG, { optional: true });
   protected readonly _mode = inject(VIEW_MODE);
+
+  protected readonly hasGrid = !!this._gridLayoutConfig;
 
   readonly title = input('');
   readonly disableChartItemClick = input(false);
@@ -38,9 +41,9 @@ export class AltReportNodeSummaryComponent {
   readonly totalTooltipInput = input<string | undefined>(undefined, { alias: 'totalTooltip' });
   readonly totalForecastTooltipInput = input<string | undefined>(undefined, { alias: 'totalForecastTooltip' });
 
-  private statusFilter = computed(() => new Set(this.statusFilterModel()));
+  private readonly statusFilter = computed(() => new Set(this.statusFilterModel()));
 
-  private availableStatuses = computed(() => {
+  private readonly availableStatuses = computed(() => {
     const summary = this.summary();
     const keysSet = new Set(Object.keys(summary.items));
     keysSet.add(Status.TECHNICAL_ERROR);
@@ -63,13 +66,13 @@ export class AltReportNodeSummaryComponent {
     return items;
   });
 
-  private summaryDistinct = toSignal(
+  private readonly summaryDistinct = toSignal(
     toObservable(this.summary).pipe(
       distinctUntilChanged((previous, current) => this.areSummariesEqual(previous, current)),
     ),
   );
 
-  private dictionary = computed(() => {
+  private readonly dictionary = computed(() => {
     const summary = this.summaryDistinct();
 
     if (!summary?.total && !summary?.countForecast) {
@@ -143,7 +146,7 @@ export class AltReportNodeSummaryComponent {
     return this.formatTotalTooltip(prefix, total);
   });
 
-  protected toggleChartItem(event: ChartItemClickEvent) {
+  protected toggleChartItem(event: ChartItemClickEvent): void {
     if (this.disableChartItemClick()) {
       return;
     }
@@ -152,7 +155,7 @@ export class AltReportNodeSummaryComponent {
     this.toggleStatusFilter(status, preventOtherSelection);
   }
 
-  protected toggleStatusFilter(status: Status, preventOtherSelection: boolean) {
+  protected toggleStatusFilter(status: Status, preventOtherSelection: boolean): void {
     if (this.disableChartItemClick()) {
       return;
     }

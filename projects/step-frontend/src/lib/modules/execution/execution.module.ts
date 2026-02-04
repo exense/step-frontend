@@ -36,6 +36,8 @@ import {
   editScheduledTaskRoute,
   MultipleProjectsService,
   SearchPaginatorComponent,
+  GridSettingsRegistryService,
+  EXECUTION_REPORT_GRID,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -348,6 +350,7 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
+    private _gridSettingsRegistry: GridSettingsRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -356,6 +359,7 @@ export class ExecutionModule {
       this.registerDashlets();
       this.registerRoutes();
       this.registerInfoBanners();
+      this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;
     }
   }
@@ -864,6 +868,72 @@ export class ExecutionModule {
   }
 
   private registerInfoBanners(): void {}
+
+  private registerGridLayout(): void {
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'errorsWidget',
+      title: 'Errors Widget',
+      widthInCells: 8,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'testCases',
+      title: 'Test Cases',
+      widthInCells: 6,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'testCasesSummary',
+      title: 'Summary: Test Cases',
+      widthInCells: 2,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'keywordsSummary',
+      title: 'Summary: Keyword Calls',
+      widthInCells: 2,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'executionTree',
+      title: 'Execution Tree',
+      widthInCells: 6,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'keywordsList',
+      title: 'Steps',
+      widthInCells: 6,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'performanceOverview',
+      title: 'Performance Overview (avg)',
+      widthInCells: 2,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'errors',
+      title: 'Errors',
+      widthInCells: 8,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      id: 'currentOperations',
+      title: 'Current operations',
+      widthInCells: 4,
+      heightInCells: 3,
+      weight: 1,
+    });
+  }
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';

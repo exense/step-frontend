@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
   ViewEncapsulation,
+  model,
 } from '@angular/core';
 import {
   catchError,
@@ -175,7 +176,9 @@ export class AltExecutionProgressComponent
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
-  private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
+  private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
+
+  readonly gridEditMode = model(false);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -200,7 +203,7 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
-  private execution = toSignal(this.execution$, { initialValue: undefined });
+  private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -209,7 +212,7 @@ export class AltExecutionProgressComponent
     shareReplay(1),
   );
 
-  protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
+  protected readonly isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
   /** Active execution's range selection data stream **/
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
@@ -238,7 +241,7 @@ export class AltExecutionProgressComponent
       }
     });
 
-  protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
     this.updateTimeRangeSelection(selection);
   }
 
@@ -254,8 +257,8 @@ export class AltExecutionProgressComponent
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
   );
-  protected isResolvedParametersVisible = signal(false);
-  protected isAgentsVisible = signal(false);
+  protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -423,7 +426,7 @@ export class AltExecutionProgressComponent
 
   readonly currentEntity = this.execution;
 
-  private setupNavigationHistoryChange() {
+  private setupNavigationHistoryChange(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

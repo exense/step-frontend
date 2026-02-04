@@ -1,7 +1,13 @@
-<step-alt-report-widget title="Current operations" [applyOverflow]="true">
+<step-alt-report-widget [applyOverflow]="true">
+  <step-alt-report-widget-title>
+    <div stepGridDragHandle>
+      <step-grid-element-title />
+    </div>
+  </step-alt-report-widget-title>
   <step-alt-report-widget-content>
     @for (operation of operations(); track operation.tid) {
       <step-operation [operation]="operation" />
     }
+    <step-grid-resizer />
   </step-alt-report-widget-content>
 </step-alt-report-widget>

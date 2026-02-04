@@ -1,0 +1,15 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+button.active {
+  background: var.$blue-10;
+
+  step-icon {
+    color: var.$dark-blue;
+  }
+}

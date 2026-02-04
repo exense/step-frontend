@@ -5,7 +5,7 @@ step-grid-layout {
 
   display: grid;
   grid-template-columns: repeat($cols-count, calc((100% / $cols-count) - 1.5rem));
-  grid-auto-rows: 14.6rem;
+  grid-auto-rows: 13rem;
   row-gap: 2.4rem;
   column-gap: 1.5rem;
   position: relative;
