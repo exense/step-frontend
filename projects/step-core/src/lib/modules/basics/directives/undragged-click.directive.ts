@@ -14,6 +14,8 @@ export class UndraggedClickDirective {
   private _guardService = inject(ClickGuardService);
   private _destroyRef = inject(DestroyRef);
 
+  private static readonly DEFAULT_DRAG_THRESHOLD = 8;
+
   readonly dragThreshold = input<number | undefined>(undefined, { alias: 'stepUndraggedClickThreshold' });
 
   readonly undraggedClick = output<MouseEvent>();
@@ -23,7 +25,7 @@ export class UndraggedClickDirective {
 
   private createGuard(): ClickGuard {
     return this._guardService.create({
-      dragThreshold: this.dragThreshold() ?? 0,
+      dragThreshold: this.dragThreshold() ?? UndraggedClickDirective.DEFAULT_DRAG_THRESHOLD,
     });
   }
 
