@@ -114,13 +114,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly editMode = input<boolean>(false);
   readonly showExecutionLinks = input<boolean>(false);
   readonly showLoadingSpinnerWhileLoading = input<boolean>(true);
-  
+
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
 
-  isLoading = signal<boolean>(false);
+  readonly isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -135,21 +135,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   cachedResponse?: TimeSeriesAPIResponse;
   showHigherResolutionWarning = false;
   collectionResolutionUsed: number = 0;
-
-  ngOnInit(): void {
-    if (!this.item || !this.context || !this.height) {
-      throw new Error('Missing input values');
-    }
-    this.prepareState(this.item);
-    this.createChart();
-  }
-
-  private createChart(): void {
-    this.fetchDataAndCreateChartSettings().subscribe((settings) => {
-      this._internalSettings.set(settings);
-      console.log(settings);
-    });
-  }
 
   firstEffectTriggered = false;
 
