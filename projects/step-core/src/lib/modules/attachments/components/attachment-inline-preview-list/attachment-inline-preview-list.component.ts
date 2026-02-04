@@ -1,52 +1,59 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
   inject,
   input,
+  linkedSignal,
   viewChild,
   viewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { ArtefactInlineItem } from '../../types/artefact-inline-item';
-import { ArtefactInlineFieldComponent } from '../artefact-inline-field/artefact-inline-field.component';
-import { StepBasicsModule, ElementSizeService, FareShareCalculator } from '../../../basics/step-basics.module';
-import { ArtefactInlineItemExplicitWidths } from '../../types/artefact-inline-item-explicit-widths';
+import { AttachmentMeta } from '../../../../client/step-client-module';
+import { ElementSizeService, FareShareCalculator, StepBasicsModule } from '../../../basics/step-basics.module';
+import { AttachmentInlinePreviewComponent } from '../attachment-inline-preview/attachment-inline-preview.component';
+import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
 
+const GAP = 5;
 const MIN_WIDTH = 100;
 const PADDINGS = 6;
-const GAP = 6;
 const CAP_ICON_SPACE = 20;
 const OFFSET = 15;
 
 @Component({
-  selector: 'step-artefact-inline-field-list',
-  templateUrl: './artefact-inline-field-list.component.html',
-  styleUrl: './artefact-inline-field-list.component.scss',
-  imports: [StepBasicsModule, ArtefactInlineFieldComponent],
+  selector: 'step-attachment-inline-preview-list',
+  imports: [StepBasicsModule, AttachmentInlinePreviewComponent],
+  templateUrl: './attachment-inline-preview-list.component.html',
+  styleUrl: './attachment-inline-preview-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class ArtefactInlineFieldListComponent {
+export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
 
-  private readonly renderedElements = viewChildren('items', { read: ArtefactInlineFieldComponent });
+  private readonly renderedElements = viewChildren('items', { read: AttachmentInlinePreviewComponent });
   private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
 
-  readonly isVertical = input(false);
-
-  readonly items = input([], {
-    transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],
+  readonly attachmentMetas = input([], {
+    transform: (value?: AttachmentMeta[]): AttachmentMetaWithExplicitWidth[] | undefined => {
+      if (!value?.length) {
+        return undefined;
+      }
+      return value.map((item) => ({ ...item, explicitWidth: MIN_WIDTH }));
+    },
   });
 
+  protected readonly attachments = linkedSignal(() => this.attachmentMetas());
+
   protected readonly displayItems = computed(() => {
-    const items = this.items();
+    const items = this.attachments() ?? [];
     const renderedElements = this.renderedElements() ?? [];
     let availableWidth = this._parentContainerSizes?.width?.();
     const listPrefixWidth = this.listPrefix()?.nativeElement?.offsetWidth ?? 0;
-    const isVertical = this.isVertical();
-    if (isVertical || !availableWidth || !renderedElements?.length) {
+
+    if (!availableWidth || !renderedElements?.length) {
       return items;
     }
 
@@ -55,8 +62,8 @@ export class ArtefactInlineFieldListComponent {
 
     if (elementsToDisplay.length === items.length) {
       const withContainers = renderedElements
-        .map((element) => element.getWidths())
-        .map((widths) => ({ totalWidth: widths?.total }));
+        .map((element) => element.getWidth())
+        .map((totalWidth) => ({ totalWidth }));
 
       const totalWidth = FareShareCalculator.calculateWidths(withContainers, GAP, PADDINGS);
 
@@ -73,41 +80,49 @@ export class ArtefactInlineFieldListComponent {
   });
 
   protected readonly showMoreButton = computed(() => {
-    const items = this.items();
+    const items = this.attachmentMetas() ?? [];
     const displayItems = this.displayItems();
     return displayItems.length < items.length;
   });
 
+  ngAfterViewInit(): void {
+    // force attachments to redraw, after initial rendering has been done
+    // and item's sizes were determined
+    this.attachments.update((items) => (!items ? items : [...items]));
+  }
+
   private determineElementsToDisplay(
-    renderedElements: readonly ArtefactInlineFieldComponent[],
+    renderedElements: readonly AttachmentInlinePreviewComponent[],
     availableWidth: number,
-  ): ArtefactInlineFieldComponent[] {
-    const result: ArtefactInlineFieldComponent[] = [];
+  ): AttachmentInlinePreviewComponent[] {
+    const result: AttachmentInlinePreviewComponent[] = [];
 
     let totalWidth = 0;
     for (let element of renderedElements) {
-      const widths = element.getWidths(MIN_WIDTH);
-      if (!widths?.total) {
+      let width = element.getWidth(MIN_WIDTH);
+      if (!width) {
         continue;
       }
 
       if (totalWidth !== 0) {
         totalWidth += GAP;
       }
-      totalWidth += widths.total + PADDINGS;
+      totalWidth += width + PADDINGS;
       if (totalWidth >= availableWidth) {
         break;
       }
       result.push(element);
     }
+
     return result;
   }
 
   private determineElementsWithWidths(
-    renderedElementsWithInitialWidths: ArtefactInlineFieldComponent[],
+    renderedElementsWithInitialWidths: AttachmentInlinePreviewComponent[],
     availableWidth: number,
-  ): ArtefactInlineItemExplicitWidths[] {
-    const totalCount = renderedElementsWithInitialWidths.reduce((res, item) => res + (item.getCount() ?? 0), 0);
+  ): AttachmentMetaWithExplicitWidth[] {
+    const totalCount = renderedElementsWithInitialWidths.length;
+
     const fairShareContext = new FareShareCalculator(MIN_WIDTH, GAP, availableWidth, totalCount, PADDINGS);
 
     let changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
@@ -115,35 +130,22 @@ export class ArtefactInlineFieldListComponent {
     if (isReallocated) {
       changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
     }
-
     return changedItems;
   }
 
   private createItemsWithReallocatedWidths(
-    elements: readonly ArtefactInlineFieldComponent[],
+    elements: readonly AttachmentInlinePreviewComponent[],
     context: FareShareCalculator,
-  ): ArtefactInlineItemExplicitWidths[] {
+  ): AttachmentMetaWithExplicitWidth[] {
     return elements.map((element) => {
-      const item = element.getItem();
-      const explicitWidths = element.getWidths();
+      const item = element.getAttachmentData();
+      let explicitWidth = element.getWidth(MIN_WIDTH);
       context.openContainer();
-      explicitWidths.prefix = context.applyFairShare(explicitWidths.prefix);
-      explicitWidths.label = context.applyFairShare(explicitWidths.label);
-      explicitWidths.value = context.applyFairShare(explicitWidths.value);
-      explicitWidths.icon = context.applyFairShare(explicitWidths.icon);
-      explicitWidths.suffix = context.applyFairShare(explicitWidths.suffix);
-      explicitWidths.total =
-        (explicitWidths.prefix ?? 0) +
-        (explicitWidths.label ?? 0) +
-        (explicitWidths.value ?? 0) +
-        (explicitWidths.icon ?? 0) +
-        (explicitWidths.suffix ?? 0);
-
-      const result: ArtefactInlineItemExplicitWidths = {
+      explicitWidth = context.applyFairShare(explicitWidth);
+      return {
         ...item,
-        explicitWidths,
+        explicitWidth,
       };
-      return result;
     });
   }
 }

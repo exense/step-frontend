@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   inject,
   input,
   Input,
@@ -9,7 +10,7 @@ import {
   output,
   signal,
   SimpleChanges,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import {
   AxesSettings,
@@ -81,7 +82,7 @@ const resolutionLabels: Record<string, string> = {
   ],
   standalone: true,
 })
-export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
+export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
@@ -101,18 +102,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _uPlotUtils = inject(UPlotUtilsService);
   protected _cd = inject(ChangeDetectorRef);
 
-  @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
-  @ViewChild('chart') chart!: TimeSeriesChartComponent;
-  _internalSettings = signal<TSChartSettings | undefined>(undefined);
+  readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
+  readonly chart = viewChild<TimeSeriesChartComponent>('chart');
+
+  readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
   _attributesByIds: Record<string, MetricAttribute> = {};
 
-  @Input() item!: DashboardItem;
-  @Input() context!: TimeSeriesContext;
-  @Input() height!: number;
-  @Input() editMode = false;
-  @Input() showExecutionLinks = false;
-  showLoadingSpinnerWhileLoading = input<boolean>(true);
-
+  readonly item = input.required<DashboardItem>();
+  readonly context = input.required<TimeSeriesContext>();
+  readonly height = input.required<number>();
+  readonly editMode = input<boolean>(false);
+  readonly showExecutionLinks = input<boolean>(false);
+  readonly showLoadingSpinnerWhileLoading = input<boolean>(true);
+  
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
@@ -149,45 +151,63 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
-      this.prepareState(cItem.currentValue);
+  firstEffectTriggered = false;
+
+
+  readonly itemChangeEffect = effect(() => {
+    const item = this.item();
+    if (this.firstEffectTriggered) {
+      this.prepareState(item);
       this.refresh(true).subscribe(() => {
         this._cd.markForCheck();
       });
     }
+    this.firstEffectTriggered = true;
+  });
+
+  ngOnInit(): void {
+    if (!this.item() || !this.context() || !this.height()) {
+      throw new Error('Missing input values');
+    }
+    this.prepareState(this.item());
+    this.createChart();
   }
 
-  private subscribeToMasterDashletChanges() {
+  private createChart(): void {
+    this.fetchDataAndCreateChartSettings().subscribe((settings) => {
+      this._internalSettings.set(settings);
+    });
+  }
+
+  private subscribeToMasterDashletChanges(): void {
     this.syncGroupSubscription?.unsubscribe();
     this.syncGroupSubscription = new Subscription();
-    if (this.item.masterChartId) {
-      let syncGroup = this.context.getSyncGroup(this.item.masterChartId);
+    if (this.item().masterChartId) {
+      let syncGroup = this.context().getSyncGroup(this.item().masterChartId!);
       this.syncGroupSubscription.add(
         syncGroup.onSeriesShow().subscribe((s) => {
-          this.chart.showSeries(s);
+          this.chart()!.showSeries(s);
         }),
       );
       this.syncGroupSubscription.add(
         syncGroup.onSeriesHide().subscribe((s) => {
-          this.chart.hideSeries(s);
+          this.chart()!.hideSeries(s);
         }),
       );
       this.syncGroupSubscription.add(
         syncGroup.onAllSeriesShow().subscribe(() => {
-          this.chart.showAllSeries();
+          this.chart()!.showAllSeries();
         }),
       );
       this.syncGroupSubscription.add(
         syncGroup.onAllSeriesHide().subscribe(() => {
-          this.chart.hideAllSeries();
+          this.chart()!.hideAllSeries();
         }),
       );
     }
   }
 
-  private prepareState(item: DashboardItem) {
+  private prepareState(item: DashboardItem): void {
     item.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
     this.groupingSelection = this.prepareGroupingAttributes(item);
     const initialAggregate = item.chartSettings!.primaryAxes!.aggregation;
@@ -210,27 +230,27 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   public refresh(blur?: boolean): Observable<any> {
     if (blur) {
-      this.chart?.setBlur(true);
+      this.chart()?.setBlur(true);
     }
     return this.fetchDataAndCreateChartSettings().pipe(tap((settings) => this._internalSettings.set(settings)));
   }
 
-  handleZoomReset() {
-    this.context.setChartsLockedState(false);
+  handleZoomReset(): void {
+    this.context().setChartsLockedState(false);
     this.zoomReset.emit();
   }
 
-  switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
+  switchAggregate(aggregate: ChartAggregation, params?: AggregateParams): void {
     this.selectedAggregate = aggregate;
-    this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
+    this.item().chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe(() => {
       this._cd.markForCheck();
     });
   }
 
-  switchRateUnit(unit: RateUnit) {
-    const primaryAggregation: MetricAggregation = this.item.chartSettings!.primaryAxes.aggregation;
-    const secondaryAggregation: MetricAggregation | undefined = this.item.chartSettings!.secondaryAxes?.aggregation;
+  switchRateUnit(unit: RateUnit): void {
+    const primaryAggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
+    const secondaryAggregation: MetricAggregation | undefined = this.item().chartSettings!.secondaryAxes?.aggregation;
     if (primaryAggregation.type === ChartAggregation.RATE) {
       primaryAggregation.params!['rateUnit'] = unit.unitKey;
     }
@@ -247,30 +267,30 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
   }
 
-  toggleGroupingAttribute(attribute: MetricAttributeSelection) {
+  toggleGroupingAttribute(attribute: MetricAttributeSelection): void {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe(() => {
       this._cd.markForCheck();
     });
   }
 
-  handleLockStateChange(locked: boolean) {
-    this.context.setChartsLockedState(locked);
+  handleLockStateChange(locked: boolean): void {
+    this.context().setChartsLockedState(locked);
   }
 
   openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item, context: this.context } })
+      .open(ChartDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
       .afterClosed()
       .subscribe((updatedItem) => {
         this.handleChartUpdate(updatedItem);
       });
   }
 
-  private handleChartUpdate(updatedItem: DashboardItem) {
+  private handleChartUpdate(updatedItem: DashboardItem): void {
     if (updatedItem) {
-      Object.assign(this.item, updatedItem);
-      this.prepareState(this.item);
+      Object.assign(this.item(), updatedItem);
+      this.prepareState(this.item());
       this.refresh(true).subscribe(() => {
         this._cd.markForCheck();
       });
@@ -286,7 +306,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (customSeriesColor) {
       return { color: customSeriesColor, type: MarkerType.SQUARE };
     }
-    return this.context.colorsPool.getSeriesColor(id);
+    return this.context().colorsPool.getSeriesColor(id);
   }
 
   /**
@@ -298,24 +318,24 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     request: FetchBucketsRequest,
   ): Observable<TSChartSettings> {
     let syncGroup: TimeSeriesSyncGroup | undefined;
-    if (this.item.masterChartId) {
-      syncGroup = this.context.getSyncGroup(this.item.masterChartId);
+    if (this.item().masterChartId) {
+      syncGroup = this.context().getSyncGroup(this.item().masterChartId!);
     }
-    const hasSteppedDisplay = this.item.metricKey === 'threadgroup';
-    const removeChartGaps = this.item.metricKey === 'threadgroup';
-    const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
+    const hasSteppedDisplay = this.item().metricKey === 'threadgroup';
+    const removeChartGaps = this.item().metricKey === 'threadgroup';
+    const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
-    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
+    const secondaryAxesAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const primaryAxes = this.item.chartSettings!.primaryAxes!;
+    const primaryAxes = this.item().chartSettings!.primaryAxes!;
     const primaryAggregation = primaryAxes.aggregation;
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
       if (groupDimensions.length === 0) {
-        labelItems = [this.context.getMetric(this.item.metricKey).displayName];
+        labelItems = [this.context().getMetric(this.item().metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
       const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
@@ -413,7 +433,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
           vals.map((v) =>
-            this.getAxesFormatFunction(this.item.chartSettings!.secondaryAxes!.aggregation, undefined)(v),
+            this.getAxesFormatFunction(this.item().chartSettings!.secondaryAxes!.aggregation, undefined)(v),
           ),
         grid: { show: false },
       });
@@ -472,7 +492,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
             enabled: true,
             zAxisLabel: this.getSecondAxesLabel(),
             yAxisUnit: yAxesUnit,
-            useExecutionLinks: this.showExecutionLinks,
+            useExecutionLinks: this.showExecutionLinks(),
             fetchExecutionsFn: fetchExecutionsFn,
           },
           showLegend: true,
@@ -491,7 +511,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private mergeLabelItems(items: (string | undefined)[]): string {
     if (items.length === 0) {
-      return this.item.metricKey;
+      return this.item().metricKey;
     }
     return items
       .map((i) => {
@@ -505,7 +525,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private getSecondAxesLabel(): string | undefined {
-    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation!;
+    const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
     switch (aggregation?.type) {
       case ChartAggregation.RATE:
         return 'Total Hits/' + aggregation.params?.['rateUnit'];
@@ -517,12 +537,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private getPrimaryPclValue(): number | undefined {
-    return this.item.chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM];
+    return this.item().chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM];
   }
 
   private getChartTitle(): string {
-    let title = this.item.name;
-    let aggregation: MetricAggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    let title = this.item().name;
+    let aggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
     let aggregationLabel;
     switch (aggregation.type) {
       case ChartAggregation.PERCENTILE:
@@ -538,7 +558,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     return `${title} (${aggregationLabel})`;
   }
 
-  private getRateUnit(aggregation: MetricAggregation) {
+  private getRateUnit(aggregation: MetricAggregation): string {
     return aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM] || 's';
   }
 
@@ -547,8 +567,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;
-    const start = this.context.getSelectedTimeRange().from;
-    const end = this.context.getSelectedTimeRange().to;
+    const start = this.context().getSelectedTimeRange().from;
+    const end = this.context().getSelectedTimeRange().to;
     if (start >= end) {
       throw new Error(`Invalid time range`);
     }
@@ -559,7 +579,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
     };
-    const customResolution = this.context.getChartsResolution();
+    const customResolution = this.context().getChartsResolution();
     if (customResolution) {
       request.intervalSize = customResolution;
     } else {
@@ -581,9 +601,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     );
   }
 
-  handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+  handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
     this.switchAggregate(change.aggregate!, change.params);
-    this.settingsMenuTrigger?.closeMenu();
+    this.settingsMenuTrigger()?.closeMenu();
   }
 
   private fetchLegendEntities(series: TSChartSeries[]): Observable<any> {
@@ -635,13 +655,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const masterChart = this.getMasterChart();
     if (masterChart) {
       if (masterChart.inheritGlobalGrouping) {
-        return this.context.getGroupDimensions();
+        return this.context().getGroupDimensions();
       } else {
         return masterChart.grouping;
       }
     } else {
-      if (this.item.inheritGlobalGrouping) {
-        return this.context.getGroupDimensions();
+      if (this.item().inheritGlobalGrouping) {
+        return this.context().getGroupDimensions();
       } else {
         return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
       }
@@ -684,7 +704,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private getRequiredPercentiles(): number[] {
     const aggregate: ChartAggregation = this.selectedAggregate;
-    const secondaryAggregate = this.item.chartSettings!.secondaryAxes?.aggregation.type;
+    const secondaryAggregate = this.item().chartSettings!.secondaryAxes?.aggregation.type;
     const percentilesToRequest: number[] = [];
     if (aggregate === ChartAggregation.MEDIAN || secondaryAggregate === ChartAggregation.MEDIAN) {
       percentilesToRequest.push(50);
@@ -694,7 +714,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
     if (secondaryAggregate === ChartAggregation.PERCENTILE) {
       percentilesToRequest.push(
-        this.item.chartSettings!.secondaryAxes?.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90,
+        this.item().chartSettings!.secondaryAxes?.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90,
       );
     }
     return percentilesToRequest;
@@ -726,7 +746,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
   }
 
-  private getPclWithDecimals(value: number) {
+  private getPclWithDecimals(value: number): string | number {
     if (Math.floor(value) === value) {
       return value.toFixed(1);
     } else {
@@ -739,11 +759,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   getContext(): TimeSeriesContext {
-    return this.context;
+    return this.context();
   }
 
   getItem(): DashboardItem {
-    return this.item;
+    return this.item();
   }
 
   protected readonly ChartAggregation = ChartAggregation;

@@ -1,11 +1,12 @@
 <div class="main-container">
   <div class="ranger-container">
-    @if (!rangerSettings) {
+    @if (!rangerSettings()) {
       <div class="ranger-skeleton"></div>
     } @else {
       <step-ts-ranger
-        [settings]="rangerSettings"
-        [syncKey]="context.id"
+        #rangerComponent
+        [settings]="rangerSettings()!"
+        [syncKey]="context().id"
         (chartLoaded)="rangerLoaded.emit()"
         (rangeChange)="onRangerSelectionChange($event)"
         (zoomReset)="onRangerZoomReset()"
