@@ -3,9 +3,9 @@
 :host {
   font-size: 1.4rem;
   display: grid;
-  gap: 1rem;
-  grid-template-rows: auto minmax(max-content, 1fr);
+  gap: 4rem;
   height: 100%;
+  align-content: start;
 }
 
 label {
@@ -34,8 +34,6 @@ step-alt-execution-tree-partial {
 }
 
 .tree-container {
-  margin-top: 2rem;
-
   & > .data-container {
     height: 100%;
   }
@@ -60,4 +58,9 @@ step-alt-execution-tree-partial {
 .grid {
   display: grid;
   gap: 2rem;
+}
+
+:host ::ng-deep step-alt-execution-tree-partial step-alt-execution-tree step-tree {
+  position: static;
+  padding-bottom: 0;
 }
