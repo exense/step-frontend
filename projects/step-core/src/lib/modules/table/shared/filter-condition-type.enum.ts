@@ -10,4 +10,5 @@ export enum FilterConditionType {
   DATE_RANGE,
   ARRAY,
   BOOLEAN_ARRAY,
+  IN,
 }
