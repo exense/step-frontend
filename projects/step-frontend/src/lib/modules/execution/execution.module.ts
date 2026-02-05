@@ -884,6 +884,8 @@ export class ExecutionModule {
       title: 'Test Cases',
       widthInCells: 6,
       heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -891,6 +893,8 @@ export class ExecutionModule {
       title: 'Summary: Test Cases',
       widthInCells: 2,
       heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -898,6 +902,8 @@ export class ExecutionModule {
       title: 'Summary: Keyword Calls',
       widthInCells: 2,
       heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -905,6 +911,8 @@ export class ExecutionModule {
       title: 'Execution Tree',
       widthInCells: 6,
       heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -912,6 +920,8 @@ export class ExecutionModule {
       title: 'Steps',
       widthInCells: 6,
       heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -919,6 +929,8 @@ export class ExecutionModule {
       title: 'Performance Overview (avg)',
       widthInCells: 2,
       heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
@@ -926,6 +938,7 @@ export class ExecutionModule {
       title: 'Errors',
       widthInCells: 8,
       heightInCells: 3,
+      minHeightInCells: 2,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {

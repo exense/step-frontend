@@ -6,6 +6,8 @@ export interface GridElementInfo {
   weight: number;
   widthInCells: number;
   heightInCells: number;
+  minWidthInCells?: number;
+  minHeightInCells?: number;
 }
 
 @Injectable({

@@ -71,6 +71,8 @@ export class GridLayoutComponent implements AfterViewInit {
     return !!isResize || !!isDrag;
   });
 
+  protected readonly invalidPreview = computed(() => this._gridElementDragService.dragNotApplied());
+
   private allWidgets = this._gridLayoutConfig.defaultElementParams.map((item) => item.id);
   private readonly renderedWidgets = contentChildren(GridElementDirective);
   private readonly renderedWidgetsIds = computed(() => {

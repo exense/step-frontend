@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { WidgetsPositionsStateService } from './widgets-positions-state.service';
 import { GridDimensionsService } from './grid-dimensions.service';
 import { gridElementId } from '../types/grid-element-id';
-import { WidgetPosition } from '../types/widget-position';
+import { PositionToApply } from '../types/position-to-apply';
 
 @Injectable()
 export class GridElementDragService implements OnDestroy {
@@ -24,6 +24,9 @@ export class GridElementDragService implements OnDestroy {
     return !!draggedElement;
   });
 
+  private readonly dragNotAppliedInternal = signal(false);
+  readonly dragNotApplied = this.dragNotAppliedInternal.asReadonly();
+
   ngOnDestroy(): void {
     this.stopDragMove?.();
     this.stopDragEnd?.();
@@ -37,6 +40,7 @@ export class GridElementDragService implements OnDestroy {
     if (!!untracked(() => this.draggedElement())) {
       return;
     }
+    this.dragNotAppliedInternal.set(false);
     this.draggedElement.set(element);
 
     const preview = this.previewElement;
@@ -63,8 +67,9 @@ export class GridElementDragService implements OnDestroy {
     let width = `${element.clientWidth}px`;
     let height = `${element.clientHeight}px`;
 
-    const position = this.determineDragPosition(element, event.clientX, event.clientY);
-    if (position) {
+    const result = this.determineDragPosition(element, event.clientX, event.clientY);
+    if (result) {
+      const position = result.position;
       const newLeft = this._gridDimensions.determineCellsWidth(position.column - 1);
       const newTop = this._gridDimensions.determineCellsHeight(position.row - 1);
       const newWidth = this._gridDimensions.determineCellsWidth(position.widthInCells) - this._gridDimensions.columnGap;
@@ -74,6 +79,8 @@ export class GridElementDragService implements OnDestroy {
       width = `${newWidth}px`;
       height = `${newHeight}px`;
     }
+
+    this.dragNotAppliedInternal.set(!result?.canBeApplied);
 
     preview.style.left = left;
     preview.style.top = top;
@@ -91,8 +98,9 @@ export class GridElementDragService implements OnDestroy {
       return;
     }
 
-    const position = this.determineDragPosition(element, event.clientX, event.clientY);
-    if (position) {
+    const result = this.determineDragPosition(element, event.clientX, event.clientY);
+    if (result?.canBeApplied) {
+      const position = result.position;
       if (position.id !== id) {
         this._widgetsPositions.swapPositions(id, position.id);
       } else {
@@ -105,9 +113,10 @@ export class GridElementDragService implements OnDestroy {
     this.stopDragEnd?.();
     this.stopDragEnd = undefined;
     this.draggedElement.set(undefined);
+    this.dragNotAppliedInternal.set(false);
   }
 
-  private determineDragPosition(element: HTMLElement, mouseX: number, mouseY: number): WidgetPosition | undefined {
+  private determineDragPosition(element: HTMLElement, mouseX: number, mouseY: number): PositionToApply | undefined {
     const id = gridElementId(element);
     if (!id) {
       return undefined;

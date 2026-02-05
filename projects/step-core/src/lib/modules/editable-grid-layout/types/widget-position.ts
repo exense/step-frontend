@@ -41,28 +41,6 @@ export class WidgetPosition implements WidgetPositionParams {
     return row >= this.topEdge && row <= this.bottomEdge && column >= this.leftEdge && column <= this.rightEdge;
   }
 
-  applyLimits(maxWidthInCells: number, maxHeightInCells?: number): void {
-    if (this.row <= 0) {
-      this.row = 1;
-    }
-
-    if (this.column <= 0) {
-      this.column = 1;
-    }
-
-    if (this.rightEdge > maxWidthInCells) {
-      const diff = Math.abs(maxWidthInCells - this.rightEdge);
-      this.widthInCells -= diff;
-    }
-
-    if (maxHeightInCells !== undefined) {
-      if (this.bottomEdge > maxHeightInCells) {
-        const diff = Math.abs(maxHeightInCells - this.bottomEdge);
-        this.heightInCells -= diff;
-      }
-    }
-  }
-
   clone(): WidgetPosition {
     return new WidgetPosition(this.id, this);
   }

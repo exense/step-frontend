@@ -7,6 +7,8 @@ import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { GridPersistencePositionsService } from './grid-persistence-positions.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, switchMap } from 'rxjs';
+import { GridElementInfo } from '@exense/step-core';
+import { PositionToApply } from '../types/position-to-apply';
 
 const EMPTY = 0;
 
@@ -94,7 +96,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
     }));
   }
 
-  correctPositionForDrag(elementId: string, position: WidgetPosition): WidgetPosition | undefined {
+  correctPositionForDrag(elementId: string, position: WidgetPosition): PositionToApply | undefined {
     // Erase information about original position to avoid conflicts for current element
     if (!this.clearElementPosition(elementId)) {
       return undefined;
@@ -106,11 +108,34 @@ export class WidgetsPositionsStateService implements OnDestroy {
         (pos) => pos.id !== elementId && pos.includesPoint(position.row, position.column),
       );
 
-      return otherWidgetPosition;
+      if (!otherWidgetPosition) {
+        return undefined;
+      }
+
+      const positionLimits = this.getElementLimits(elementId);
+      const otherPositionLimits = this.getElementLimits(otherWidgetPosition.id);
+
+      // check the possibility to swap
+      // to do it both widgets should fit to the limits of each other
+      const canBeApplied =
+        this.isFit({
+          width: positionLimits.minWidthInCells,
+          height: positionLimits.minHeightInCells,
+          availableWidth: otherWidgetPosition.widthInCells,
+          availableHeight: otherWidgetPosition.heightInCells,
+        }) &&
+        this.isFit({
+          width: otherPositionLimits.minWidthInCells,
+          height: otherPositionLimits.minHeightInCells,
+          availableWidth: position.widthInCells,
+          availableHeight: position.heightInCells,
+        });
+
+      return { canBeApplied, position: otherWidgetPosition };
     }
 
     const result = position.clone();
-    result.applyLimits(this._colCount);
+    this.applyEdgeLimits(result, this._colCount);
 
     // Determine width / height
     let row = 0;
@@ -146,7 +171,15 @@ export class WidgetsPositionsStateService implements OnDestroy {
     result.widthInCells = widthInCells;
     result.heightInCells = heightInCells;
 
-    return result;
+    const limits = this.getElementLimits(elementId);
+    const canBeApplied = this.isFit({
+      width: limits.minWidthInCells,
+      height: limits.minHeightInCells,
+      availableWidth: result.widthInCells,
+      availableHeight: result.heightInCells,
+    });
+
+    return { canBeApplied, position: result };
   }
 
   correctPositionForResize(elementId: string, position: WidgetPosition): WidgetPosition | undefined {
@@ -156,7 +189,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
     }
 
     const result = position.clone();
-    result.applyLimits(this._colCount);
+    this.applyEdgeLimits(result, this._colCount);
 
     let r: number;
     let c: number;
@@ -233,6 +266,10 @@ export class WidgetsPositionsStateService implements OnDestroy {
 
     result.widthInCells = newWidth;
     result.heightInCells = newHeight;
+
+    //apply min limits
+    const { minWidthInCells, minHeightInCells } = this.getElementLimits(elementId);
+    this.applyMinLimits(result, minWidthInCells, minHeightInCells);
 
     return result;
   }
@@ -397,5 +434,68 @@ export class WidgetsPositionsStateService implements OnDestroy {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
+  }
+
+  private getElementLimits(elementId: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
+    return this._gridConfig.defaultElementParamsMap?.[elementId] ?? {};
+  }
+
+  private applyEdgeLimits(pos: WidgetPosition, maxRightEdgeInCells?: number, maxBottomEdgeInCells?: number): void {
+    if (pos.row <= 0) {
+      pos.row = 1;
+    }
+
+    if (pos.column <= 0) {
+      pos.column = 1;
+    }
+
+    if (maxRightEdgeInCells !== undefined) {
+      if (pos.rightEdge > maxRightEdgeInCells) {
+        const diff = Math.abs(maxRightEdgeInCells - pos.rightEdge);
+        pos.widthInCells -= diff;
+      }
+    }
+
+    if (maxBottomEdgeInCells !== undefined) {
+      if (pos.bottomEdge > maxBottomEdgeInCells) {
+        const diff = Math.abs(maxBottomEdgeInCells - pos.bottomEdge);
+        pos.heightInCells -= diff;
+      }
+    }
+  }
+
+  private applyMinLimits(pos: WidgetPosition, minWidthInCells: number = 1, minHeightInCells: number = 1): void {
+    if (pos.row <= 0) {
+      pos.row = 1;
+    }
+
+    if (pos.column <= 0) {
+      pos.column = 1;
+    }
+
+    pos.widthInCells = Math.max(pos.widthInCells, minWidthInCells);
+    pos.heightInCells = Math.max(pos.heightInCells, minHeightInCells);
+  }
+
+  private isFit({
+    width,
+    height,
+    availableWidth,
+    availableHeight,
+  }: {
+    width?: number;
+    height?: number;
+    availableWidth?: number;
+    availableHeight?: number;
+  }): boolean {
+    let isWidthFit = true;
+    if (width !== undefined && availableWidth !== undefined) {
+      isWidthFit = width <= availableWidth;
+    }
+    let isHeightFit = true;
+    if (height !== undefined && availableHeight !== undefined) {
+      isHeightFit = height <= availableHeight;
+    }
+    return isWidthFit && isHeightFit;
   }
 }
