@@ -7,7 +7,7 @@ import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { GridPersistencePositionsService } from './grid-persistence-positions.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, switchMap } from 'rxjs';
-import { GridElementInfo } from '@exense/step-core';
+import { GridElementInfo } from '../../custom-registeries/custom-registries.module';
 import { PositionToApply } from '../types/position-to-apply';
 
 const EMPTY = 0;
