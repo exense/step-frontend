@@ -3,6 +3,20 @@
     <step-icon name="file-text" />
   </button>
 </step-btn-group>
+@if (!(_isSmallScreen$ | async)) {
+  <step-btn-group class="with-round-borders">
+    <button
+      type="button"
+      [class.active]="_executionsState.gridEditMode()"
+      mat-stroked-button
+      matTooltip="Edit grid"
+      matTooltipPosition="below"
+      (click)="toggleGridEdit()"
+    >
+      <step-icon name="grid" />
+    </button>
+  </step-btn-group>
+}
 <mat-menu #menu="matMenu">
   <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
   <button type="button" mat-menu-item (click)="_printService.printAll()">Print All</button>

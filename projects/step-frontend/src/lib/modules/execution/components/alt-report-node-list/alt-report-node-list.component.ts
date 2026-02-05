@@ -8,9 +8,6 @@ import { MatSort, SortDirection } from '@angular/material/sort';
   templateUrl: './alt-report-node-list.component.html',
   styleUrl: './alt-report-node-list.component.scss',
   encapsulation: ViewEncapsulation.None,
-  host: {
-    '[attr.title]': 'null',
-  },
   standalone: false,
 })
 export class AltReportNodeListComponent {
@@ -18,15 +15,12 @@ export class AltReportNodeListComponent {
   private _matSort = inject(MatSort, { optional: true });
 
   /** @Input() **/
-  readonly title = input('');
-
-  /** @Input() **/
   readonly mode = input<ViewMode>(ViewMode.VIEW);
 
   /** @Input() **/
   readonly sortByColumn = input<string | undefined>(undefined);
 
-  private sortInternal = signal<SortDirection>('desc');
+  private readonly sortInternal = signal<SortDirection>('desc');
 
   protected readonly sort = this.sortInternal.asReadonly();
 
@@ -43,7 +37,7 @@ export class AltReportNodeListComponent {
     this._matSort.sort({ id: sortByColumns, start: sort, disableClear: true });
   });
 
-  protected showSort = computed(() => {
+  protected readonly showSort = computed(() => {
     return this.sortByColumn() && this._matSort;
   });
 

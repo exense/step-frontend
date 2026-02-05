@@ -7,6 +7,9 @@ type FieldsAccessor = Mutable<Pick<ExecutionsPanelsService, 'panels' | 'customPa
 type EditablePanel = Mutable<ExecutionStepPanel>;
 type Panel = { id: string; label: string };
 
+/**
+ * @deprecated Relates to legacy execution's view
+ * **/
 @Injectable({
   providedIn: 'root',
 })
@@ -75,7 +78,7 @@ export class ExecutionsPanelsService {
     return !!this.getPanel(viewId, executionId)?.enabled;
   }
 
-  toggleShowPanel(viewId: string, executionId: string) {
+  toggleShowPanel(viewId: string, executionId: string): void {
     this.setShowPanel(viewId, !this.isShowPanel(viewId, executionId), executionId);
   }
 
@@ -92,7 +95,7 @@ export class ExecutionsPanelsService {
     return this.getPanel(viewId, executionId)?.label || '';
   }
 
-  updateObservable(viewId: string, executionId: string) {
+  updateObservable(viewId: string, executionId: string): void {
     if (this._panels$[executionId] && this._panels$[executionId][viewId]) {
       this._panels$[executionId][viewId].next(this._panels[executionId][viewId]);
     }

@@ -11,7 +11,7 @@ import {
 import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../_common/shared/status.enum';
-import { Signal } from '@angular/core';
+import { ModelSignal, Signal } from '@angular/core';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
@@ -28,4 +28,5 @@ export abstract class AltExecutionStateService {
   abstract readonly timeRange$: Observable<TimeRange | undefined>;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
   abstract selectFullRange(): void;
+  abstract readonly gridEditMode: ModelSignal<boolean>;
 }

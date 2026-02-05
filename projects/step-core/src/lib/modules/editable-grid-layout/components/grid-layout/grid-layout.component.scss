@@ -1,0 +1,78 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-grid-layout {
+  $cols-count: var(--style__cols-count);
+
+  display: grid;
+  grid-template-columns: repeat($cols-count, calc((100% / $cols-count) - 1.5rem));
+  grid-auto-rows: 13rem;
+  row-gap: 2.4rem;
+  column-gap: 1.5rem;
+  position: relative;
+
+  &.hidden {
+    visibility: hidden;
+  }
+
+  .step-grid-element {
+    position: relative;
+
+    step-grid-resizer {
+      display: none;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  }
+
+  .preview {
+    border-color: 0.1rem solid var.$blue-600;
+    background: var.$blue-50;
+    opacity: 0.5;
+    border-radius: 0.5rem;
+    position: absolute;
+    display: none;
+
+    $animation-duration: 0.2s;
+    transition:
+      top $animation-duration ease,
+      left $animation-duration ease,
+      width $animation-duration ease,
+      height $animation-duration ease;
+  }
+
+  &.show-preview {
+    .preview {
+      display: block;
+    }
+  }
+
+  &.edit-mode .step-grid-element {
+    step-grid-resizer {
+      display: block;
+    }
+    .step-grid-drag-handle {
+      cursor: grab;
+    }
+  }
+
+  .hidden-placeholder {
+    border: dashed 0.1rem var.$black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    step-grid-element-title {
+      $size: 1.6rem;
+      font-size: $size;
+      position: absolute;
+      top: calc(50% - ($size / 2));
+    }
+
+    .drag-handle {
+      background: var.$gray-50;
+      min-height: 3rem;
+      width: 100%;
+    }
+  }
+}

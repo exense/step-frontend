@@ -2,8 +2,10 @@ import { Component, ElementRef, inject, OnDestroy, OnInit, viewChild, ViewEncaps
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
+  EXECUTION_REPORT_GRID,
   ExecutionCustomPanelRegistryService,
   IS_SMALL_SCREEN,
+  provideGridLayoutConfig,
   ReportNode,
   TimeRange,
 } from '@exense/step-core';
@@ -34,6 +36,7 @@ import {
         return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
+    provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
@@ -45,9 +48,9 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
-  private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
-  private treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
-  private errors = viewChild('errors', { read: ElementRef });
+  private readonly treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+  private readonly treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
+  private readonly errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -109,7 +112,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
 
-  protected handleChartZooming(range: TimeRange) {
+  protected handleChartZooming(range: TimeRange): void {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
@@ -125,7 +128,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
 
   protected readonly ViewMode = ViewMode;
 
-  searchFor($event: string) {
+  searchFor($event: string): void {
     if (!this.treeWidget() || !this.treeWidgetContainer()) {
       return;
     }

@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
   ViewEncapsulation,
+  model,
 } from '@angular/core';
 import {
   catchError,
@@ -176,6 +177,8 @@ export class AltExecutionProgressComponent
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
+
+  readonly gridEditMode = model(false);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
