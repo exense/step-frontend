@@ -3,8 +3,9 @@
   <div
     class="json-node"
     [class.additional-shift]="node.isParentIconExist"
-    [style.--level]="node.level"
-    (click)="displayNode(node)"
+    [style.--style__padding-left]="node.level"
+    stepUndraggedClick
+    (undraggedClick)="displayNode(node)"
   >
     @if (node.name || node.icon) {
       <div class="name-container">

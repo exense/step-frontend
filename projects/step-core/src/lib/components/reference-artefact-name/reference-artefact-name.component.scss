@@ -68,7 +68,7 @@ step-reference-artefact-name {
 .selection-criteria {
   > div {
     padding-top: 1rem;
-    background-color: #f9fafb !important;
+    background: none;
     border-radius: 1rem;
 
     p {
@@ -77,7 +77,7 @@ step-reference-artefact-name {
 
     input,
     button {
-      background-color: #f9fafb !important;
+      background: none;
     }
   }
 }

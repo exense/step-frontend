@@ -10,6 +10,7 @@ import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { StreamingAttachmentStatusDirective } from '../../directives/streaming-attachment-status.directive';
 import { PreviewAttachmentMeta } from '../../types/preview-attachment-meta';
+import { UndraggedClickDirective } from '../../../basics/directives/undragged-click.directive';
 
 @Component({
   selector: 'step-attachment-preview',
@@ -23,10 +24,14 @@ import { PreviewAttachmentMeta } from '../../types/preview-attachment-meta';
       '(isStreamingFailed() || isStreamingInProgress() || showDownload()) && attachmentType() !== AttachmentType.SKIPPED',
     '[class.with-border]': 'withBorder()',
     '[class.has-pointer]': 'canOpenDetails()',
-    '(click)': 'open()',
+    '(undraggedClick)': 'open()',
     '[matTooltip]': 'attachmentTooltip()',
   },
   hostDirectives: [
+    {
+      directive: UndraggedClickDirective,
+      outputs: ['undraggedClick'],
+    },
     {
       directive: StreamingAttachmentStatusDirective,
       inputs: ['attachment'],
@@ -41,7 +46,7 @@ export class AttachmentPreviewComponent {
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
-  private streamingStatus = computed(() => this._streamingStatus.status());
+  private readonly streamingStatus = computed(() => this._streamingStatus.status());
 
   protected readonly isStreamingInProgress = computed(() => {
     const status = this.streamingStatus();

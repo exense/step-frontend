@@ -12,6 +12,7 @@ import { AltReportNodeDetailsStateService } from '../../services/alt-report-node
 import { filter, map, of, switchMap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNodeId?: string;
@@ -21,8 +22,6 @@ export interface AggregatedTreeNodeDialogData {
   searchStatusCount?: number;
   reportNodeChildren: ReportNode[];
 }
-
-const PREVIOUS_EXECUTIONS_TO_DISPLAY = 8;
 
 @Component({
   selector: 'step-aggregated-tree-node-dialog',
@@ -55,8 +54,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _controllerService = inject(AugmentedControllerService);
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
-
-  isScheduledExecution = toSignal(this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)));
 
   private isInitialLoad = true;
 
@@ -94,12 +91,12 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   protected readonly selectedReportNode = toSignal(this.reportNode$);
   protected readonly aggregatedNode = toSignal(this.aggregatedNode$);
-
-  protected readonly artefactHashContainer = computed(() => {
-    const selectedReportNode = this.selectedReportNode();
+  protected readonly historyHashContainer = computed<HashContainer | undefined>(() => {
     const aggregatedNode = this.aggregatedNode();
-    const artefactHash = (aggregatedNode?.artefactHash || selectedReportNode?.artefactHash)!;
-    return { artefactHash };
+    if (!aggregatedNode?.artefactHash) {
+      return undefined;
+    }
+    return { artefactHash: aggregatedNode.artefactHash };
   });
 
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
@@ -147,6 +144,4 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected navigateBack(): void {
     this._doc.defaultView?.history?.back?.();
   }
-
-  protected readonly PREVIOUS_EXECUTIONS_TO_DISPLAY = PREVIOUS_EXECUTIONS_TO_DISPLAY;
 }

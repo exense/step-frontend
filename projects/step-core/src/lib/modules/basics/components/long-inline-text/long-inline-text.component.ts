@@ -15,22 +15,19 @@ import { ElementSizeDirective } from '../../directives/element-size.directive';
 })
 export class LongInlineTextComponent {
   private _elementSize = inject(ElementSizeDirective, { self: true });
-  private fullValue = viewChild('fullValue', { read: ElementSizeDirective });
+  private readonly fullValue = viewChild('fullValue', { read: ElementSizeDirective });
 
   readonly text = input('', {
     transform: (value?: string) => value ?? '',
   });
 
-  private fullWidth = computed(() => this.fullValue()?.width?.());
-  private availableWidth = this._elementSize.width;
+  private readonly fullWidth = computed(() => this.fullValue()?.width?.());
+  private readonly availableWidth = this._elementSize.width;
 
   protected readonly cutValue = computed(() => {
     const fullWidth = this.fullWidth() ?? 0;
     const availableWidth = this.availableWidth();
-    if (!availableWidth) {
-      return false;
-    }
-    return availableWidth < fullWidth;
+    return availableWidth > 0 && availableWidth < fullWidth;
   });
 
   protected readonly suffix = computed(() => {

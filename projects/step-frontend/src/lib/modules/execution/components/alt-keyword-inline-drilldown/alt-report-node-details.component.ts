@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
@@ -46,7 +46,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   readonly showArtefact = input(false);
   readonly openTreeView = output();
 
-  private partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
+  private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
@@ -65,7 +65,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     }),
   );
 
-  searchFor($event: string) {
+  searchFor($event: string): void {
     if (!this.partialTree()) {
       return;
     }
@@ -73,7 +73,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     this.partialTree()!.focusAndSearch($event);
   }
 
-  private aggregatedNode = computed(() => {
+  private readonly aggregatedNode = computed(() => {
     const reportNode = this.node();
     const isTreeInitialized = this._treeState.isInitialized();
     if (!isTreeInitialized) {
@@ -114,5 +114,12 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     const artefactClass = this.artefactClass();
     const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
     return meta?.reportDetailsComponent;
+  });
+
+  protected readonly artefactHashContainer = computed(() => {
+    const reportNode = this.node();
+    const aggregatedNode = this.aggregatedNode();
+    const artefactHash = (aggregatedNode?.artefactHash || reportNode.artefactHash)!;
+    return { artefactHash };
   });
 }
