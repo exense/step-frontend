@@ -13,9 +13,8 @@ export const provideGridLayoutConfig = (gridId: string, params: GridElementInfo[
   provide: GRID_LAYOUT_CONFIG,
   useFactory: () => {
     const _gridSettingsRegistry = inject(GridSettingsRegistryService);
-    const defaultElementParams = [..._gridSettingsRegistry.getSettings(gridId), ...params].sort(
-      (a, b) => a.weight - b.weight,
-    );
+    const registeredElements = _gridSettingsRegistry.getSettings(gridId);
+    const defaultElementParams = [...registeredElements, ...params].sort((a, b) => a.weight - b.weight);
 
     const defaultElementParamsMap = defaultElementParams.reduce(
       (res, item) => {

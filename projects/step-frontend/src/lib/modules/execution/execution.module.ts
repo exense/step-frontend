@@ -933,7 +933,7 @@ export class ExecutionModule {
       title: 'Current operations',
       widthInCells: 4,
       heightInCells: 3,
-      weight: 1,
+      weight: 99,
     });
   }
 }

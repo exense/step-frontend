@@ -1,6 +1,3 @@
-<!--
-<section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
--->
 <step-grid-layout
   [editMode]="_state.gridEditMode()"
   [class.small-screen]="!!(_isSmallScreen$ | async)"
@@ -82,18 +79,10 @@
   }
   @if (_state.execution$ | async; as execution) {
     @for (panel of customPanels; track panel.type) {
-      <step-alt-panel [info]="panel" [execution]="execution" />
+      <step-alt-panel [stepGridElement]="panel.type" [info]="panel" [execution]="execution" />
     }
   }
-  <!--
-  @if (_mode === ViewMode.PRINT) {
-    <div class="print-footer"></div>
-  }
--->
 </step-grid-layout>
-<!--
-</section>
--->
 @if (_mode === ViewMode.PRINT) {
   <div class="print-overlay">
     <h2>Print in progress</h2>
