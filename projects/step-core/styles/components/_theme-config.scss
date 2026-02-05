@@ -116,7 +116,7 @@ $light-primary-text: var.$white;
   }
 
   @if not $mat-accent-palette {
-    $mat-accent-palette: mat.m2-define-palette(mat.$m2-pink-palette);
+    $mat-accent-palette: $mat-primary-palette;
   }
 
   @if not $mat-warn-palette {
