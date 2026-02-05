@@ -23,8 +23,8 @@ import { GridEditableService } from '../../injectables/grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from '../../injectables/grid-layout-config.token';
 import { GridElementDirective } from '../../directives/grid-element.directive';
 import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
-import { GridDragHandleDirective } from '../../directives/grid-drag-handle.directive';
 import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
+import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
 
 @Component({
   selector: 'step-grid-layout',
@@ -32,14 +32,15 @@ import { GridElementTitleComponent } from '../grid-element-title/grid-element-ti
     StepBasicsModule,
     GridElementDirective,
     GridResizerComponent,
-    GridDragHandleDirective,
     GridElementTitleComponent,
+    GridDragHandleComponent,
   ],
   templateUrl: './grid-layout.component.html',
   styleUrl: './grid-layout.component.scss',
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class.show-preview]': 'showPreview()',
+    '[class.is-resize]': 'isResize()',
     '[class.edit-mode]': '_gridEditable.editMode()',
     '[class.hidden]': '!isInitialised()',
     '[style.--style__cols-count]': '_colCount',
@@ -65,8 +66,10 @@ export class GridLayoutComponent implements AfterViewInit {
   private readonly preview = viewChild<ElementRef<HTMLDivElement>>('preview');
   protected readonly isInitialised = computed(() => this._widgetPositions.isInitialized());
 
+  protected readonly isResize = computed(() => this._gridElementResizer.resizeInProgress());
+
   protected readonly showPreview = computed(() => {
-    const isResize = this._gridElementResizer.resizeInProgress();
+    const isResize = this.isResize();
     const isDrag = this._gridElementDragService.dragInProgress();
     return !!isResize || !!isDrag;
   });

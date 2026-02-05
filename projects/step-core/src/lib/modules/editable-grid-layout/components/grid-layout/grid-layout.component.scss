@@ -17,11 +17,23 @@ step-grid-layout {
   .step-grid-element {
     position: relative;
 
+    step-grid-drag-handle {
+      display: none;
+      position: absolute;
+      background: var.$gray-400;
+      opacity: 0.1;
+      min-height: 3rem;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 5;
+    }
+
     step-grid-resizer {
       display: none;
       position: absolute;
-      bottom: 0;
-      right: 0;
+      bottom: 0.2rem;
+      right: 0.2rem;
     }
   }
 
@@ -54,7 +66,12 @@ step-grid-layout {
     }
   }
 
+  &.is-resize {
+    cursor: nwse-resize;
+  }
+
   &.edit-mode .step-grid-element {
+    step-grid-drag-handle,
     step-grid-resizer {
       display: block;
     }
@@ -76,10 +93,12 @@ step-grid-layout {
       top: calc(50% - ($size / 2));
     }
 
+    /*
     .drag-handle {
       background: var.$gray-50;
       min-height: 3rem;
       width: 100%;
     }
+    */
   }
 }

@@ -2,7 +2,7 @@
 @if (_gridEditable.editMode()) {
   @for (hiddenWidget of hiddenWidgets(); track hiddenWidget) {
     <section class="hidden-placeholder" [stepGridElement]="hiddenWidget">
-      <div class="drag-handle" stepGridDragHandle></div>
+      <step-grid-drag-handle />
       <step-grid-element-title />
       <step-grid-resizer />
     </section>
