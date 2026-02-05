@@ -12,16 +12,16 @@ export interface GridElementInfo {
   providedIn: 'root',
 })
 export class GridSettingsRegistryService {
-  private girdsSettings: Map<string, GridElementInfo[]> = new Map();
+  private girdSettings: Map<string, GridElementInfo[]> = new Map();
 
   register(gridId: string, gridElement: GridElementInfo): void {
-    if (!this.girdsSettings.has(gridId)) {
-      this.girdsSettings.set(gridId, []);
+    if (!this.girdSettings.has(gridId)) {
+      this.girdSettings.set(gridId, []);
     }
-    this.girdsSettings.get(gridId)!.push(gridElement);
+    this.girdSettings.get(gridId)!.push(gridElement);
   }
 
   getSettings(gridId: string): ReadonlyArray<GridElementInfo> {
-    return (this.girdsSettings.get(gridId) ?? []).map((item) => ({ ...item }));
+    return (this.girdSettings.get(gridId) ?? []).map((item) => ({ ...item }));
   }
 }

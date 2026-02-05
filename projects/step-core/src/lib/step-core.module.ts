@@ -79,7 +79,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
 import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
 import { ScreenInputTypePipe } from './pipes/screen-input-type.pipe';
 import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
-import { EDITABLE_GIRD_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
+import { EDITABLE_GRID_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
 
 @NgModule({
   declarations: [
@@ -155,7 +155,7 @@ import { EDITABLE_GIRD_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
     SEARCH_EXPORTS,
-    EDITABLE_GIRD_LAYOUT_EXPORTS,
+    EDITABLE_GRID_LAYOUT_EXPORTS,
     ClampFadeDirective,
   ],
   exports: [
@@ -227,7 +227,7 @@ import { EDITABLE_GIRD_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     IncludesStringPipe,
-    EDITABLE_GIRD_LAYOUT_EXPORTS,
+    EDITABLE_GRID_LAYOUT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,

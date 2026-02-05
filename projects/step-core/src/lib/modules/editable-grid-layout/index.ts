@@ -5,7 +5,7 @@ import { GridElementDirective } from './directives/grid-element.directive';
 import { GridElementTitleComponent } from './components/grid-element-title/grid-element-title.component';
 import { GridEditableDirective } from './directives/grid-editable.directive';
 
-export const EDITABLE_GIRD_LAYOUT_EXPORTS = [
+export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridLayoutComponent,
   GridResizerComponent,
   GridDragHandleDirective,

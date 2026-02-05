@@ -46,7 +46,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
     return Math.max(...positions.map((item) => item.bottomEdge));
   });
 
-  private readonly filedState = computed(() => {
+  private readonly fieldState = computed(() => {
     const positions = Object.values(this.positionsStateInternal());
     const fieldBottom = this.fieldBottom();
     if (!positions.length || !fieldBottom) {
@@ -239,7 +239,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
 
   findProperPosition(widthInCells: number, heightInCells: number): WidgetPositionParams {
     // First search for last widget
-    const field = untracked(() => this.filedState());
+    const field = untracked(() => this.fieldState());
     const widgetPositions = untracked(() => this.positionsStateInternal());
 
     let widgetId: string | undefined = undefined;
@@ -294,7 +294,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
   }
 
   private isCellTaken(row: number, column: number): boolean {
-    const field = untracked(() => this.filedState());
+    const field = untracked(() => this.fieldState());
     const index = this.getFieldIndex(row, column);
     if (index >= field.length) {
       return false;
@@ -318,8 +318,8 @@ export class WidgetsPositionsStateService implements OnDestroy {
     if (!originalPosition) {
       return false;
     }
-    const filed = untracked(() => this.filedState());
-    this.fillPosition(filed, originalPosition, true);
+    const field = untracked(() => this.fieldState());
+    this.fillPosition(field, originalPosition, true);
     return true;
   }
 
@@ -335,7 +335,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
     if (!positions.length || !hiddenWidgets?.length) {
       return originalPositions;
     }
-    const filed = untracked(() => this.filedState());
+    const field = untracked(() => this.fieldState());
     const fieldBottom = untracked(() => this.fieldBottom());
     const hiddenWidgetsNumIds = new Set(hiddenWidgets.map((idStr) => this.widgetIDs.getNumericIdByString(idStr)));
 
@@ -346,7 +346,7 @@ export class WidgetsPositionsStateService implements OnDestroy {
       let hiddenColCount = 0;
       for (let col = 1; col <= this._colCount; col++) {
         const index = this.getFieldIndex(row, col);
-        const widgetId = filed[index];
+        const widgetId = field[index];
         if (hiddenWidgetsNumIds.has(widgetId) || widgetId === EMPTY) {
           hiddenColCount++;
         }

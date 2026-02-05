@@ -73,6 +73,9 @@ export class GridDimensionsDirective implements GridDimensionsService {
   determineCellColumn(x: number): number {
     const { colWidth, columnGap } = untracked(() => this.gridDimensions());
     const size = colWidth + columnGap;
+    if (size === 0) {
+      return -1;
+    }
     let col = Math.floor(x / size);
     if (x % size !== 0) {
       col++;
@@ -83,6 +86,9 @@ export class GridDimensionsDirective implements GridDimensionsService {
   determineCellRow(y: number): number {
     const { rowHeight, rowGap } = untracked(() => this.gridDimensions());
     const size = rowHeight + rowGap;
+    if (size === 0) {
+      return -1;
+    }
     let row = Math.floor(y / size);
     if (y % size !== 0) {
       row++;
