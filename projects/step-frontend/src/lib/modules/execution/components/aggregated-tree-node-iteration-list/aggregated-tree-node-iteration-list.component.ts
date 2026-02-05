@@ -15,9 +15,7 @@ import {
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
-  arrayToRegex,
   AugmentedExecutionsService,
-  DateRange,
   DateUtilsService,
   FilterConditionFactoryService,
   ItemsPerPageService,
@@ -93,15 +91,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   private artefactHash = computed(() => this.node().artefactHash);
 
-  private dateRage = toSignal(
-    this._executionState.timeRange$.pipe(map((timeRange) => this._dateUtils.timeRange2DateRange(timeRange))),
-  );
-
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
     const resolvedPartialPath = this.resolvedPartialPath();
-    const dateRange = this.dateRage();
-    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath, dateRange);
+    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath);
   });
 
   private dataSource$ = toObservable(this.dataSource);
@@ -129,7 +122,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
       map((value) => (value ?? '').trim().toLowerCase()),
       takeUntilDestroyed(),
     )
-    .subscribe((search) => this.tableSearch()?.onSearch('name', search));
+    .subscribe((search) => untracked(() => this.tableSearch())?.onSearch?.('name', search));
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
@@ -144,11 +137,22 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private statusesSubscription = this.statusesCtrl.valueChanges
     .pipe(
       startWith(this.statusesCtrl.value),
-      map((statuses) => new Set(statuses)),
-      map((statuses) => arrayToRegex(Array.from(statuses) as string[])),
+      map((statuses) => Array.from(statuses)),
       takeUntilDestroyed(),
     )
-    .subscribe((statuses) => this.tableSearch()?.onSearch('status', { value: statuses, regex: true }));
+    .subscribe((statuses) =>
+      untracked(() => this.tableSearch())?.onSearch?.(
+        'status',
+        this._filterConditionFactory.inFilterCondition(statuses),
+      ),
+    );
+
+  private timeRangeSubscription = this._executionState.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
+    const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
+    const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+    const isForce = !!timeRange?.isManualChange;
+    untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce });
+  });
 
   protected readonly showCountWarning = computed(() => {
     const initialStatus = this.initialStatus();
@@ -197,11 +201,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(statuses);
   }
 
-  private getReportNodeDataSource(
-    artefactHash?: string,
-    resolvedPartialPath?: string,
-    dateRange?: DateRange,
-  ): TableDataSource<ReportNode> {
+  private getReportNodeDataSource(artefactHash?: string, resolvedPartialPath?: string): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
       filters = filters ?? {};
@@ -210,10 +210,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     if (resolvedPartialPath) {
       filters = filters ?? {};
       filters['path'] = { value: `^${resolvedPartialPath}`, regex: true };
-    }
-    if (dateRange) {
-      filters = filters ?? {};
-      filters['executionTime'] = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
     }
     return this._dataSourceFactory.createDataSource(
       AugmentedExecutionsService.REPORTS_TABLE_ID,
