@@ -17,7 +17,7 @@ export interface ActiveExecution {
   readonly execution$: Observable<Execution>;
   readonly autoRefreshModel: AutoRefreshModel;
   readonly timeRangeSelectionChange$: Observable<TimeRangePickerSelection>;
-  performanceTabSettings: PerformanceTabSettings;
+  readonly performanceTabSettings: PerformanceTabSettings;
 
   updateTimeRange(timeRangeSelection: TimeRangePickerSelection): void;
   getTimeRangeSelection(): TimeRangePickerSelection;
@@ -42,8 +42,8 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.setupExecutionRefresh();
   }
   private timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
-  timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
-  performanceTabSettings: PerformanceTabSettings = { resolution: 0, compareModeEnabled: false };
+  readonly timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
+  readonly performanceTabSettings: PerformanceTabSettings = { resolution: 0, compareModeEnabled: false };
 
   private executionInternal$ = new BehaviorSubject<Execution | undefined>(undefined);
 
