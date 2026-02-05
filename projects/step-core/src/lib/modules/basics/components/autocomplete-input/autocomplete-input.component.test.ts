@@ -57,6 +57,11 @@ describe('AutocompleteInputComponent', () => {
     await fixture.whenStable();
   });
 
+  const wait = async (ms: number) => {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+    await fixture.whenStable();
+  };
+
   it('Render options', async () => {
     const autoComplete = await loader.getHarness(MatAutocompleteHarness);
     await autoComplete.focus();
@@ -66,16 +71,19 @@ describe('AutocompleteInputComponent', () => {
 
     await autoComplete.clear();
     await autoComplete.enterText('aa');
+    await wait(350);
     labels = await getOptionsLabels(autoComplete);
     expect(labels).toEqual(ITEMS.map((item) => item.value).filter((item) => item.includes('aa')));
 
     await autoComplete.clear();
     await autoComplete.enterText('bb');
+    await wait(350);
     labels = await getOptionsLabels(autoComplete);
     expect(labels).toEqual(ITEMS.map((item) => item.value).filter((item) => item.includes('bb')));
 
     await autoComplete.clear();
     await autoComplete.enterText('cc');
+    await wait(350);
     labels = await getOptionsLabels(autoComplete);
     expect(labels).toEqual(ITEMS.map((item) => item.value).filter((item) => item.includes('cc')));
   });

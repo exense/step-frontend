@@ -33,6 +33,11 @@ describe('PopoverComponent', () => {
     await fixture.whenStable();
   });
 
+  const wait = async (ms: number) => {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+    await fixture.whenStable();
+  };
+
   it('Hover mode and popover content', async () => {
     const popover = await loader.getHarness(PopoverHarness);
     const popoverIcon = await popover.getTriggerContent('step-icon');
@@ -47,12 +52,14 @@ describe('PopoverComponent', () => {
     expect(contentItems.length).toBe(0);
 
     await popover.mouseEnter();
+    await wait(350);
     contentItems = await popover.getPopoverContent('.popover-content');
     expect(contentItems.length).toBe(1);
     const content = await contentItems[0].text();
     expect(content).toEqual('Test test test');
 
     await popover.mouseLeave();
+    await wait(450);
     contentItems = await popover.getPopoverContent('.popover-content');
     expect(contentItems.length).toBe(0);
   });
@@ -89,14 +96,17 @@ describe('PopoverComponent', () => {
     expect(isOpened).toBeFalsy();
 
     await popover.mouseEnter();
+    await wait(350);
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeTruthy();
 
     await popover.mouseLeave();
+    await wait(450);
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeFalsy();
 
     await popover.mouseEnter();
+    await wait(350);
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeTruthy();
     await popover.click();

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ResourceLabelComponent } from './resource-label.component';
 import { AugmentedResourcesService, provideTestStepApi, Resource } from '../../../../client/step-client-module';
-import { StepBasicsModule } from '../../step-basics.module';
+import { CommonModule } from '@angular/common';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
@@ -11,7 +11,8 @@ describe('ResourceLabelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StepBasicsModule],
+      imports: [CommonModule],
+      declarations: [ResourceLabelComponent],
       providers: [provideTestStepApi()],
     }).compileComponents();
     fixture = TestBed.createComponent(ResourceLabelComponent);
