@@ -8,6 +8,7 @@ export interface GridElementInfo {
   heightInCells: number;
   minWidthInCells?: number;
   minHeightInCells?: number;
+  defaultVisibility?: boolean;
 }
 
 @Injectable({
@@ -17,6 +18,9 @@ export class GridSettingsRegistryService {
   private girdSettings: Map<string, GridElementInfo[]> = new Map();
 
   register(gridId: string, gridElement: GridElementInfo): void {
+    if (gridElement.defaultVisibility === undefined) {
+      gridElement.defaultVisibility = true;
+    }
     if (!this.girdSettings.has(gridId)) {
       this.girdSettings.set(gridId, []);
     }

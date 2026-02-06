@@ -18,6 +18,10 @@ step-grid-layout {
   .step-grid-element {
     position: relative;
 
+    &.element-hidden {
+      display: none;
+    }
+
     step-grid-drag-handle {
       display: none;
       position: absolute;

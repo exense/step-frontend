@@ -36,7 +36,7 @@ import {
         return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
-    provideGridLayoutConfig(EXECUTION_REPORT_GRID),
+    ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,

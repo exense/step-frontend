@@ -7,6 +7,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   signal,
   untracked,
   viewChild,
@@ -18,7 +19,6 @@ import { GridDimensionsDirective } from '../../directives/grid-dimensions.direct
 import { GridElementResizerService } from '../../injectables/grid-element-resizer.service';
 import { GridElementDragService } from '../../injectables/grid-element-drag.service';
 import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
-import { GridEditableDirective } from '../../directives/grid-editable.directive';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from '../../injectables/grid-layout-config.token';
 import { GridElementDirective } from '../../directives/grid-element.directive';
@@ -26,6 +26,7 @@ import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
 import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
 import { GridBackgroundComponent } from '../grid-background/grid-background.component';
+import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
 
 @Component({
   selector: 'step-grid-layout',
@@ -47,14 +48,8 @@ import { GridBackgroundComponent } from '../grid-background/grid-background.comp
     '[class.hidden]': '!isInitialised()',
     '[style.--style__cols-count]': '_colCount',
   },
-  hostDirectives: [
-    GridDimensionsDirective,
-    {
-      directive: GridEditableDirective,
-      inputs: ['editMode'],
-    },
-  ],
-  providers: [WidgetsPositionsStateService, GridElementResizerService, GridElementDragService],
+  hostDirectives: [GridDimensionsDirective],
+  providers: [GridElementResizerService, GridElementDragService],
 })
 export class GridLayoutComponent implements AfterViewInit {
   protected readonly _colCount = inject(GRID_COLUMN_COUNT);
@@ -62,11 +57,18 @@ export class GridLayoutComponent implements AfterViewInit {
   private _gridLayoutConfig = inject(GRID_LAYOUT_CONFIG);
   private _gridElementResizer = inject(GridElementResizerService);
   private _gridElementDragService = inject(GridElementDragService);
+  private _widgetsPersistenceState = inject(WidgetsPersistenceStateService);
   private _widgetPositions = inject(WidgetsPositionsStateService);
+
+  readonly editMode = input<boolean>(false);
+  private effectSyncEditMode = effect(() => {
+    const isEditMode = this.editMode();
+    this._widgetPositions.setEditMode(isEditMode);
+  });
 
   private readonly isRenderComplete = signal(false);
   private readonly preview = viewChild<ElementRef<HTMLDivElement>>('preview');
-  protected readonly isInitialised = computed(() => this._widgetPositions.isInitialized());
+  protected readonly isInitialised = computed(() => this._widgetsPersistenceState.isInitialized());
 
   protected readonly isResize = computed(() => this._gridElementResizer.resizeInProgress());
 
@@ -95,7 +97,7 @@ export class GridLayoutComponent implements AfterViewInit {
     const hiddenWidgets = this.hiddenWidgets();
     const isRenderComplete = this.isRenderComplete();
     if (isRenderComplete) {
-      this._widgetPositions.setHiddenWidgets(hiddenWidgets);
+      this._widgetPositions.setNotRenderedWidgets(hiddenWidgets);
     }
   });
 

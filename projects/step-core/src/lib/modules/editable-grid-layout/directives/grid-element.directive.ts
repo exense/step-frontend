@@ -1,21 +1,11 @@
-import {
-  afterNextRender,
-  computed,
-  Directive,
-  effect,
-  ElementRef,
-  inject,
-  input,
-  signal,
-  untracked,
-} from '@angular/core';
+import { afterNextRender, computed, Directive, ElementRef, inject, input, signal } from '@angular/core';
 import { WidgetsPositionsStateService } from '../injectables/widgets-positions-state.service';
-import { WidgetPosition } from '../types/widget-position';
 
 @Directive({
   selector: '[stepGridElement]',
   host: {
     class: 'step-grid-element',
+    '[class.element-hidden]': 'isHidden()',
     '[attr.data-grid-element-id]': 'elementId()',
     '[style.grid-column]': 'gridColumn()',
     '[style.grid-row]': 'gridRow()',
@@ -35,13 +25,9 @@ export class GridElementDirective {
     return positions[elementId];
   });
 
-  private effectInitializePosition = effect(() => {
+  protected readonly isHidden = computed(() => {
     const position = this.position();
-    const isRenderComplete = this.isRenderComplete();
-    const isPositionStateInitialized = this._positionsState.isInitialized();
-    if (isRenderComplete && isPositionStateInitialized && !position) {
-      this.updatePositionIfRequired();
-    }
+    return !position;
   });
 
   protected readonly gridColumn = computed(() => {
@@ -70,19 +56,5 @@ export class GridElementDirective {
 
   constructor() {
     afterNextRender(() => this.isRenderComplete.set(true));
-  }
-
-  private updatePositionIfRequired(): void {
-    const id = untracked(() => this.elementId());
-    if (!id) {
-      return;
-    }
-    let position = this._positionsState.getPosition(id);
-    if (!!position) {
-      return;
-    }
-    const positionParams = this._positionsState.findProperPosition(1, 1);
-    position = new WidgetPosition(id, positionParams);
-    this._positionsState.updatePosition(position);
   }
 }
