@@ -1,4 +1,4 @@
-import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
@@ -30,6 +30,15 @@ export class WidgetsPositionsStateService implements OnDestroy {
 
   private readonly positionsState$ = toObservable(this.positionsStateInternal);
 
+  private readonly extraRows = signal(0);
+
+  private effectResetExtraRows = effect(() => {
+    const isEditMode = this._gridEditable.editMode();
+    if (!isEditMode) {
+      this.extraRows.set(0);
+    }
+  });
+
   readonly positions = computed(() => {
     const positions = this.positionsStateInternal();
     const hiddenWidgets = this.hiddenWidgets();
@@ -40,12 +49,14 @@ export class WidgetsPositionsStateService implements OnDestroy {
     return this.realignPositionsWithHiddenWidgets(positions, hiddenWidgets);
   });
 
-  private readonly fieldBottom = computed(() => {
+  readonly fieldBottom = computed(() => {
     const positions = Object.values(this.positionsStateInternal());
+    const extraRows = this.extraRows();
     if (!positions.length) {
       return 0;
     }
-    return Math.max(...positions.map((item) => item.bottomEdge));
+    const bottom = Math.max(...positions.map((item) => item.bottomEdge));
+    return bottom + extraRows;
   });
 
   private readonly fieldState = computed(() => {
@@ -74,10 +85,15 @@ export class WidgetsPositionsStateService implements OnDestroy {
   }
 
   updatePosition(position: WidgetPosition): void {
-    this.positionsStateInternal.update((value) => ({
-      ...value,
-      [position.id]: position,
-    }));
+    const fieldBottomBeforeUpdate = untracked(() => this.fieldBottom());
+    const positionsState = untracked(() => this.positionsStateInternal());
+    const newPositionsState = { ...positionsState, [position.id]: position };
+    const fileBottomAfterUpdate = Math.max(...Object.values(newPositionsState).map((item) => item.bottomEdge));
+
+    this.positionsStateInternal.set(newPositionsState);
+    if (fileBottomAfterUpdate === fieldBottomBeforeUpdate) {
+      this.extraRows.set(0);
+    }
   }
 
   swapPositions(aElementId: string, bElementId: string): void {
@@ -315,6 +331,31 @@ export class WidgetsPositionsStateService implements OnDestroy {
 
   setHiddenWidgets(widgetsIds: string[]): void {
     this.hiddenWidgets.set(widgetsIds);
+  }
+
+  insertAfterRow(row: number): void {
+    const positions = untracked(() => this.positionsStateInternal());
+    let hasChanges = false;
+    const updatedPositions = Object.values(positions).reduce(
+      (res, position) => {
+        if (position.row <= row) {
+          return res;
+        }
+        hasChanges = true;
+        const updatedPosition = position.clone();
+        updatedPosition.row++;
+        res[updatedPosition.id] = updatedPosition;
+        return res;
+      },
+      {} as Record<string, WidgetPosition>,
+    );
+
+    if (hasChanges) {
+      this.positionsStateInternal.update((value) => ({ ...value, ...updatedPositions }));
+      return;
+    }
+
+    this.extraRows.update((value) => value + 1);
   }
 
   private initialize(): void {

@@ -1,3 +1,6 @@
+@if (_gridEditable.editMode()) {
+  <step-grid-background />
+}
 <ng-content />
 @if (_gridEditable.editMode()) {
   @for (hiddenWidget of hiddenWidgets(); track hiddenWidget) {

@@ -1,13 +1,14 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use '../grid-sizes' as sizes;
 
 step-grid-layout {
   $cols-count: var(--style__cols-count);
 
   display: grid;
-  grid-template-columns: repeat($cols-count, calc((100% / $cols-count) - 1.5rem));
-  grid-auto-rows: 13rem;
-  row-gap: 2.4rem;
-  column-gap: 1.5rem;
+  grid-template-columns: repeat($cols-count, sizes.columnWidth($cols-count));
+  grid-auto-rows: sizes.$row-height;
+  row-gap: sizes.$row-gap;
+  column-gap: sizes.$column-gap;
   position: relative;
 
   &.hidden {
@@ -20,7 +21,7 @@ step-grid-layout {
     step-grid-drag-handle {
       display: none;
       position: absolute;
-      background: var.$gray-400;
+      background: var.$gray-450;
       opacity: 0.1;
       min-height: 3rem;
       top: 0;
@@ -85,6 +86,7 @@ step-grid-layout {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background: var.$white;
 
     step-grid-element-title {
       $size: 1.6rem;
@@ -92,13 +94,5 @@ step-grid-layout {
       position: absolute;
       top: calc(50% - ($size / 2));
     }
-
-    /*
-    .drag-handle {
-      background: var.$gray-50;
-      min-height: 3rem;
-      width: 100%;
-    }
-    */
   }
 }

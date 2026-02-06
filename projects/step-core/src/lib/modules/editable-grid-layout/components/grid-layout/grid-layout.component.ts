@@ -25,6 +25,7 @@ import { GridElementDirective } from '../../directives/grid-element.directive';
 import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
 import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
+import { GridBackgroundComponent } from '../grid-background/grid-background.component';
 
 @Component({
   selector: 'step-grid-layout',
@@ -34,6 +35,7 @@ import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.co
     GridResizerComponent,
     GridElementTitleComponent,
     GridDragHandleComponent,
+    GridBackgroundComponent,
   ],
   templateUrl: './grid-layout.component.html',
   styleUrl: './grid-layout.component.scss',

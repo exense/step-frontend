@@ -25,3 +25,4 @@ export * from './directives/grid-editable.directive';
 export * from './directives/grid-dimensions.directive';
 export * from './injectables/grid-layout-config.token';
 export * from './components/grid-element-title/grid-element-title.component';
+export * from './components/grid-background/grid-background.component';
