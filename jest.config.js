@@ -10,4 +10,5 @@ module.exports = {
   ],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
+  testEnvironment: '@happy-dom/jest-environment',
 };
