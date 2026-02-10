@@ -13,7 +13,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { AggregatedReportViewRequest, AugmentedExecutionsService, ReportNode } from '@exense/step-core';
-import { catchError, combineLatest, finalize, map, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, filter, finalize, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
@@ -24,6 +24,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { Router } from '@angular/router';
+import {Status} from "../../../_common/shared/status.enum";
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
@@ -111,6 +112,15 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private setupTree(): void {
     combineLatest([this._executionState.executionId$, this._executionState.timeRange$, this.reportNode$])
       .pipe(
+        filter(([_, range, reportNode]) => {
+          if (!range) {
+            return false;
+          }
+          if (range.isManualChange) {
+            return true;
+          }
+          return reportNode?.status === Status.RUNNING;
+        }),
         switchMap(([executionId, range, reportNode]) => {
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
