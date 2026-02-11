@@ -19,6 +19,7 @@ export class HistoryCellComponent {
     const resultStatus = execution.status === 'RUNNING' ? 'RUNNING' : execution.result!;
     const color = this._statusColors[resultStatus];
     return {
+      tooltipLinkLabel: 'Current execution',
       statusSlices: [
         {
           color: color,
