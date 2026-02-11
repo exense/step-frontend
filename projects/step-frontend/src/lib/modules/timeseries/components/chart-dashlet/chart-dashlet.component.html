@@ -1,12 +1,7 @@
 <div>
-  @if (!_internalSettings()) {
+  @if (!_internalSettings() || (isLoading() && showLoadingSpinnerWhileLoading())) {
     <step-chart-skeleton [height]="height()" />
   } @else {
-    @if (isLoading() && showLoadingSpinnerWhileLoading()) {
-      <div class="spinner-container">
-        <mat-spinner [diameter]="40" />
-      </div>
-    }
     <step-timeseries-chart
       #chart
       (zoomReset)="handleZoomReset()"

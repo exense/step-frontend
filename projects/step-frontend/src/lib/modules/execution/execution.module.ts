@@ -119,7 +119,7 @@ import { AltExecutionTreePartialTabComponent } from './components/alt-execution-
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -295,6 +295,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    ChartSkeletonComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -641,7 +642,9 @@ export class ExecutionModule {
                 },
                 canActivate: [
                   () => {
+                    // eslint-disable-next-line step-lint/underscore-injectable
                     const ctx = inject(AggregatedReportViewTreeStateContextService);
+                    // eslint-disable-next-line step-lint/underscore-injectable
                     const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
                     ctx.setState(treeState);
                     return true;
@@ -676,7 +679,9 @@ export class ExecutionModule {
               path: 'tree',
               canActivate: [
                 () => {
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const treeState = inject(AGGREGATED_TREE_TAB_STATE);
                   ctx.setState(treeState);
                   return true;
@@ -700,7 +705,9 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const treeState = inject(AggregatedReportViewTreeStateService);
                   ctx.setState(treeState);
                   return true;

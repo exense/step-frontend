@@ -27,13 +27,14 @@ import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { sign } from 'chart.js/helpers';
+import { ChartSkeletonComponent } from '../../../chart';
 
 @Component({
   selector: 'step-execution-time-selection',
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TSRangerComponent],
+  imports: [COMMON_IMPORTS, TSRangerComponent, ChartSkeletonComponent],
   standalone: true,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {
@@ -50,7 +51,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   private _timeSeriesService = inject(TimeSeriesService);
   private _destroyRef = inject(DestroyRef);
 
-  isLoading = signal<boolean>(false);
+  readonly isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     const context = this.context();

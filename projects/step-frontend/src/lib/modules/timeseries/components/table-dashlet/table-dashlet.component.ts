@@ -20,6 +20,7 @@ import {
   DashboardItem,
   FetchBucketsRequest,
   MetricAttribute,
+  TableIndicatorMode,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
   TimeSeriesAPIResponse,
@@ -35,6 +36,7 @@ import { TableEntryFormatPipe } from './table-entry-format.pipe';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ChartSkeletonComponent } from '../../modules/chart';
 
 interface TableColumn {
   id: string;
@@ -86,23 +88,23 @@ interface ProcessedBucketResponse {
   templateUrl: './table-dashlet.component.html',
   styleUrls: ['./table-dashlet.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
+  imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip, ChartSkeletonComponent],
   standalone: true,
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
 
-  @Input() item!: DashboardItem;
-  @Input() context!: TimeSeriesContext;
-  @Input() editMode = false;
-  showLoadingSpinnerWhileLoading = input<boolean>(false);
+  readonly item = input.required<DashboardItem>();
+  readonly context = input.required<TimeSeriesContext>();
+  readonly editMode = input<boolean>(false);
+  readonly showLoadingSpinnerWhileLoading = input<boolean>(false);
 
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
 
-  isLoading = signal<boolean>(true);
+  readonly isLoading = signal<boolean>(true);
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
@@ -163,9 +165,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     );
   }
 
-  private prepareState() {
-    this.item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    this.columnsDefinition = this.item.tableSettings!.columns!.map((column: ColumnSelection) => {
+  private prepareState(): void {
+    this.item().attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
+    this.columnsDefinition = this.item().tableSettings!.columns!.map((column: ColumnSelection) => {
       return {
         id: column.column!,
         label: this.getColumnLabel(column),
@@ -217,7 +219,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
   }
 
-  private getPclWithDecimals(value: number) {
+  private getPclWithDecimals(value: number): string | number {
     if (Math.floor(value) === value) return value.toFixed(1);
     return value;
   }
@@ -230,7 +232,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
   }
 
-  enableCompareMode(context: TimeSeriesContext) {
+  enableCompareMode(context: TimeSeriesContext): void {
     console.log('enabling compare mode in table dashlet');
     this.compareModeEnabled = true;
     this.compareContext = context;
@@ -243,7 +245,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .subscribe();
   }
 
-  disableCompareMode() {
+  disableCompareMode(): void {
     this.compareModeEnabled = false;
     this.compareContext = undefined;
     this.compareBuckets = [];
@@ -272,20 +274,21 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onColumnVisibilityChange(column: TableColumn): void {
     let columnDefinition = this.columnsDefinition.find((c) => c.id === column.id)!;
     columnDefinition.isVisible = !columnDefinition.isVisible;
-    this.item.tableSettings!.columns.find((c) => c.column === column.id)!.selected = columnDefinition.isVisible;
+    this.item().tableSettings!.columns.find((c) => c.column === column.id)!.selected = columnDefinition.isVisible;
     // update the chart settings
     this.updateVisibleColumns();
   }
 
-  onColumnPclValueChange(column: TableColumn, value: string) {
+  onColumnPclValueChange(column: TableColumn, value: string): void {
     const oldValue = column.pclValue;
     let parsedNumber: number = parseFloat(value);
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
     if (validPclValue) {
       column.pclValue = parsedNumber;
-      this.item.tableSettings!.columns.find((c) => c.column === column.id)!.aggregation!.params!['pclValue'] =
+      this.item().tableSettings!.columns.find((c) => c.column === column.id)!.aggregation!.params!['pclValue'] =
         parsedNumber;
       this.prepareState();
+      // eslint-disable-next-line step-lint/rx-nested-subscription
       this.refresh(true).subscribe(() => {
         if (this.compareModeEnabled) {
           this.refreshCompareData().subscribe();
@@ -298,11 +301,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private getGroupDimensions(context: TimeSeriesContext): string[] {
-    return this.item.inheritGlobalGrouping ? context.getGroupDimensions() : this.item.grouping;
+    return this.item().inheritGlobalGrouping ? context.getGroupDimensions() : this.item().grouping;
   }
 
-  private fetchData(compareData: boolean) {
-    const context = compareData ? this.compareContext! : this.context;
+  private fetchData(compareData: boolean): Observable<ProcessedBucketResponse> {
+    const context = compareData ? this.compareContext! : this.context();
     const oql = this.composeRequestFilter(context);
     if (compareData) {
       this.compareRequestOql = oql;
@@ -357,7 +360,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       const baseBucket: ProcessedBucket = baseBucketsByIds[keyword];
       const compareBucket: ProcessedBucket = compareBucketsByIds[keyword];
       const hasOnlyCompareData = !!compareBucket && !baseBucket;
-      const labelItems = this.getGroupDimensions(hasOnlyCompareData ? this.compareContext! : this.context).map(
+      const labelItems = this.getGroupDimensions(hasOnlyCompareData ? this.compareContext! : this.context()).map(
         (a) => (baseBucket || compareBucket).attributes[a],
       );
       return {
@@ -367,8 +370,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         compare: compareBucket,
         groupingLabels: labelItems,
         // can use the same sync group because it is shared
-        isSelected: this.context
-          .getSyncGroup(this.item.id)
+        isSelected: this.context()
+          .getSyncGroup(this.item().id)
           .seriesShouldBeVisible(baseBucket?.seriesKey || compareBucket?.seriesKey),
         stroke: baseBucketsByIds[keyword]?.stroke || compareBucketsByIds[keyword]?.stroke,
         countDiff: this.percentageBetween(baseBucket?.count, compareBucket?.count),
@@ -395,7 +398,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return entries;
   }
 
-  private updateTableData() {
+  private updateTableData(): Observable<TableEntry[]> {
     const tableEntries = this.mergeBaseAndCompareData();
     return this.fetchLegendEntities(tableEntries).pipe(
       tap((updatedData) => {
@@ -406,7 +409,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucketResponse {
     this.showHigherResolutionWarning = response.higherResolutionUsed;
-    const syncGroup = context.getSyncGroup(this.item.id);
+    const syncGroup = context.getSyncGroup(this.item().id);
     const buckets = response.matrix.map((series, i) => {
       if (series.length != 1) {
         // we should have just one bucket
@@ -431,17 +434,17 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return { buckets, truncated };
   }
 
-  onAllSeriesCheckboxClick(checked: boolean) {
-    this.context.getSyncGroup(this.item.id).setAllSeriesChecked(checked);
+  onAllSeriesCheckboxClick(checked: boolean): void {
+    this.context().getSyncGroup(this.item().id).setAllSeriesChecked(checked);
 
     this.tableData$.getValue().forEach((entry) => {
       entry.isSelected = checked;
     });
   }
 
-  onKeywordToggle(entry: TableEntry, selected: boolean) {
+  onKeywordToggle(entry: TableEntry, selected: boolean): void {
     const seriesKey = (entry.base?.seriesKey || entry.compare?.seriesKey)!;
-    let syncGroup = this.context.getSyncGroup(this.item.id);
+    let syncGroup = this.context().getSyncGroup(this.item().id);
     if (selected) {
       syncGroup.showSeries(seriesKey);
     } else {
@@ -454,6 +457,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this._matDialog
       .open(TableDashletSettingsComponent, { data: { item: this.item, context: this.context } })
       .afterClosed()
+      // eslint-disable-next-line step-lint/rx-nested-subscription
       .subscribe((updatedItem: DashboardItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
@@ -473,7 +477,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
-    const baseDimensions = this.getGroupDimensions(this.context);
+    const baseDimensions = this.getGroupDimensions(this.context());
     const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
     const entitiesByTypes: Record<string, Set<string>> = {};
     data.forEach((entry) => {
@@ -571,7 +575,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .build();
   }
 
-  percentageBetween(x: number | undefined, y: number | undefined) {
+  private percentageBetween(x: number | undefined, y: number | undefined): number | undefined {
     if (x === undefined || y === undefined || x === 0) {
       return undefined;
     } else {
@@ -580,7 +584,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   getItem(): DashboardItem {
-    return this.item;
+    return this.item();
   }
   getContext(): TimeSeriesContext {
     throw new Error('Method not implemented.');
@@ -589,6 +593,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   getType(): 'TABLE' | 'CHART' {
     return 'TABLE';
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }
 
 const ColumnsValueFunctions: Record<string, any> = {

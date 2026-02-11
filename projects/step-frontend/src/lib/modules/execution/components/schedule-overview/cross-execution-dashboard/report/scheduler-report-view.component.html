@@ -14,19 +14,21 @@
       <step-alt-report-widget-content class="widget-content">
         @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
           @if (_state.executionsChartLoading()) {
-            <ng-container *ngTemplateOutlet="loadingSpinner" />
+            <ng-container *ngTemplateOutlet="skeleton" />
           }
-          <step-timeseries-chart
-            [settings]="executionsChartSettings"
-            (zoomChange)="handleMainChartZoom($event)"
-            [height]="340"
-          >
-            <ng-template tooltipContent let-data let-reposition="reposition">
-              <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />
-            </ng-template>
-          </step-timeseries-chart>
+          <div [class.hidden]="_state.executionsChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
+            <step-timeseries-chart
+              [settings]="executionsChartSettings"
+              (zoomChange)="handleMainChartZoom($event)"
+              [height]="340"
+            >
+              <ng-template tooltipContent let-data let-reposition="reposition">
+                <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />
+              </ng-template>
+            </step-timeseries-chart>
+          </div>
         } @else {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
+          <ng-container *ngTemplateOutlet="skeleton" />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
@@ -48,50 +50,52 @@
           />
         </div>
         @if (reportNodesChartType() === 'keywords') {
-          @if (_state.keywordsCountChartLoading()) {
-            <ng-container *ngTemplateOutlet="loadingSpinner" />
-          }
           @if (_state.keywordsChartSettings$ | async; as settings) {
-            <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
-              <ng-template tooltipContent let-data>
-                <div class="ts-tooltip">
-                  <div
-                    class="link-item"
-                    (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
-                    title="See Execution"
-                  >
-                    <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                    <span class="link-icon"></span>
+            <div [class.hidden]="_state.keywordsCountChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
+              <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
+                <ng-template tooltipContent let-data>
+                  <div class="ts-tooltip">
+                    <div
+                      class="link-item"
+                      (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
+                      title="See Execution"
+                    >
+                      <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
+                      <span class="link-icon"></span>
+                    </div>
                   </div>
-                </div>
-              </ng-template>
-            </step-timeseries-chart>
+                </ng-template>
+              </step-timeseries-chart>
+            </div>
+          } @else {
+            <ng-container *ngTemplateOutlet="skeleton" />
           }
         } @else if (reportNodesChartType() === 'testcases') {
-          @if (_state.testCasesCountChartLoading()) {
-            <ng-container *ngTemplateOutlet="loadingSpinner" />
-          }
           @if (_state.testCasesChartSettings$ | async; as testCasesData) {
             @if (_state.testCasesCountChartLoading()) {
-              <ng-container *ngTemplateOutlet="loadingSpinner" />
+              <ng-container *ngTemplateOutlet="skeleton" />
             }
-            <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
-              <ng-template tooltipContent let-data>
-                <div class="ts-tooltip">
-                  <div
-                    class="link-item"
-                    (click)="jumpToExecution(testCasesData.lastExecutions[data.idx!].id!)"
-                    title="See Execution"
-                  >
-                    <span>{{ testCasesData.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                    <span class="link-icon"></span>
+            <div [class.hidden]="_state.testCasesCountChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
+              <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
+                <ng-template tooltipContent let-data>
+                  <div class="ts-tooltip">
+                    <div
+                      class="link-item"
+                      (click)="jumpToExecution(testCasesData.lastExecutions[data.idx!].id!)"
+                      title="See Execution"
+                    >
+                      <span>{{ testCasesData.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
+                      <span class="link-icon"></span>
+                    </div>
                   </div>
-                </div>
-              </ng-template>
-            </step-timeseries-chart>
+                </ng-template>
+              </step-timeseries-chart>
+            </div>
+          } @else {
+            <ng-container *ngTemplateOutlet="skeleton" />
           }
         } @else {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
+          <ng-container *ngTemplateOutlet="skeleton" />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
@@ -130,5 +134,11 @@
     <div class="spinner-container">
       <mat-spinner [diameter]="40" />
     </div>
+  }
+</ng-template>
+
+<ng-template #skeleton>
+  @if (_state.lastRefreshTrigger() !== 'auto') {
+    <step-chart-skeleton />
   }
 </ng-template>

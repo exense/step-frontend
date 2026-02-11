@@ -1,9 +1,9 @@
 <div class="header-container">
   <span class="uplot title">
-    {{ item.name }}
+    {{ item().name }}
   </span>
   <div class="settings-container">
-    @if (editMode) {
+    @if (editMode()) {
       <div class="edit-buttons">
         <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
           <step-icon name="chevron-left"></step-icon>
@@ -19,7 +19,7 @@
         </button>
       </div>
     }
-    @if (!editMode) {
+    @if (!editMode()) {
       <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
         <step-icon name="filter"></step-icon>
       </button>
@@ -96,90 +96,99 @@
 
 <div class="table-container">
   @if (isLoading() && showLoadingSpinnerWhileLoading()) {
-    <div class="spinner-container">
-      <mat-spinner [diameter]="40" />
-    </div>
-  }
-  <step-table [dataSource]="tableDataSource" matSort class="ts-table" [visibleColumns]="visibleColumnsIds">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <div class="element-name">
-          <mat-checkbox
-            color="primary"
-            (click)="$event.stopPropagation()"
-            [(ngModel)]="allSeriesChecked"
-            (change)="onAllSeriesCheckboxClick($event.checked)"
-          >
-          </mat-checkbox>
-          <span>Name</span>
-        </div>
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div class="color-cell">
-          <mat-checkbox
-            color="primary"
-            [(ngModel)]="element.isSelected"
-            (ngModelChange)="onKeywordToggle(element, $event)"
-          >
-            <div class="element-name">
-              <span>{{ element | tableEntryFormat }}</span>
-              <step-marker [color]="element.stroke.color" [markerType]="element.stroke.type" />
-            </div>
-          </mat-checkbox>
-        </div>
-      </td>
-    </ng-container>
-    @for (column of columnsDefinition; track column.id) {
-      <!--    Base Column-->
-      <ng-container [matColumnDef]="column.id">
+    <step-chart-skeleton />
+  } @else {
+    <step-table
+      [dataSource]="tableDataSource"
+      matSort
+      class="ts-table"
+      [visibleColumns]="visibleColumnsIds"
+      [indicatorMode]="TableIndicatorMode.NONE"
+    >
+      <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <div>
-            <div class="no-text-wrap">{{ column.label }}</div>
-            <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+          <div class="element-name">
+            <mat-checkbox
+              color="primary"
+              (click)="$event.stopPropagation()"
+              [(ngModel)]="allSeriesChecked"
+              (change)="onAllSeriesCheckboxClick($event.checked)"
+            >
+            </mat-checkbox>
+            <span>Name</span>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <div class="flex justify-between">
+          <div class="color-cell">
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="element.isSelected"
+              (ngModelChange)="onKeywordToggle(element, $event)"
+            >
+              <div class="element-name">
+                <span>{{ element | tableEntryFormat }}</span>
+                <step-marker [color]="element.stroke.color" [markerType]="element.stroke.type" />
+              </div>
+            </mat-checkbox>
+          </div>
+        </td>
+      </ng-container>
+      @for (column of columnsDefinition; track column.id) {
+        <!--    Base Column-->
+        <ng-container [matColumnDef]="column.id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             <div>
-              {{ column?.mapValue(element.base) }}
+              <div class="no-text-wrap">{{ column.label }}</div>
+              @if (compareModeEnabled) {
+                <div class="subtitle">Base</div>
+              }
             </div>
-          </div>
-        </td>
-      </ng-container>
-      <!--    Compare Column-->
-      <ng-container [matColumnDef]="column.id + COMPARE_COLUMN_ID_SUFFIX">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <div>
-            <div class="no-text-wrap">{{ column.label }}</div>
-            <div *ngIf="compareModeEnabled" class="subtitle compare-value">
-              <span>Compare</span>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="flex justify-between">
+              <div>
+                {{ column?.mapValue(element.base) }}
+              </div>
             </div>
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <div class="flex justify-between">
-            <div class="compare-value">{{ column.mapValue(element.compare) }}</div>
-          </div>
-        </td>
-      </ng-container>
-      <!--    Diff Column-->
-      <ng-container [matColumnDef]="column.id + DIFF_COLUMN_ID_SUFFIX">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
-          <div class="no-text-wrap">Diff %</div>
-        </th>
-        <td mat-cell *matCellDef="let element" class="right-separator">
-          <div class="compare-diff">{{ column.mapDiffValue(element) | comparePercentage }}</div>
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
+        <!--    Compare Column-->
+        <ng-container [matColumnDef]="column.id + COMPARE_COLUMN_ID_SUFFIX">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <div>
+              <div class="no-text-wrap">{{ column.label }}</div>
+              @if (compareModeEnabled) {
+                <div class="subtitle compare-value">
+                  <span>Compare</span>
+                </div>
+              }
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="flex justify-between">
+              <div class="compare-value">{{ column.mapValue(element.compare) }}</div>
+            </div>
+          </td>
+        </ng-container>
+        <!--    Diff Column-->
+        <ng-container [matColumnDef]="column.id + DIFF_COLUMN_ID_SUFFIX">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
+            <div class="no-text-wrap">Diff %</div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="right-separator">
+            <div class="compare-diff">{{ column.mapDiffValue(element) | comparePercentage }}</div>
+          </td>
+        </ng-container>
+      }
+    </step-table>
+    @if (truncated) {
+      <div class="truncated">
+        <step-icon
+          name="alert-circle"
+          matTooltip="Maximum number of series reached, excess series can’t be shown"
+          matTooltipPosition="below"
+        />
+      </div>
     }
-  </step-table>
-  @if (truncated) {
-    <div class="truncated">
-      <step-icon
-        name="alert-circle"
-        matTooltip="Maximum number of series reached, excess series can’t be shown"
-        matTooltipPosition="below"
-      />
-    </div>
   }
 </div>

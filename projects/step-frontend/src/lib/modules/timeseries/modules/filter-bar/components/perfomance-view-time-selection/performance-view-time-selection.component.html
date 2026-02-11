@@ -1,7 +1,7 @@
 <div class="main-container">
   <div class="ranger-container">
-    @if (!rangerSettings()) {
-      <div class="ranger-skeleton"></div>
+    @if (!rangerSettings() || (showSpinnerWhileLoading() && isLoading())) {
+      <step-chart-skeleton [height]="70" [noPadding]="true" />
     } @else {
       <step-ts-ranger
         #rangerComponent
@@ -11,11 +11,6 @@
         (rangeChange)="onRangerSelectionChange($event)"
         (zoomReset)="onRangerZoomReset()"
       />
-      @if (showSpinnerWhileLoading() && isLoading()) {
-        <div class="spinner-container">
-          <mat-spinner [diameter]="28" />
-        </div>
-      }
     }
   </div>
 </div>
