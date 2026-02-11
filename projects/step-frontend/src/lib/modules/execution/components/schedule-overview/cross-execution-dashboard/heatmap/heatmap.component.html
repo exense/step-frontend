@@ -31,7 +31,7 @@
               [style.min-width.px]="cellSize()"
               [style.max-width.px]="cellSize()"
               [style.height.px]="rowHeight()"
-              [style.background-color]="row.cells?.[col.id]?.color || emptyColor"
+              [style.background-color]="row.cells[col.id].color || emptyColor"
               tabindex="0"
               [attr.aria-label]="(col.label || col.id) + ' for ' + row.label"
               (click)="handleCellClick(row, col)"
@@ -46,7 +46,7 @@
                       [link]="'/executions/' + col.id"
                       linkLabel="See execution"
                       [statuses]="[]"
-                      [timestamp]="row.cells?.[col.id]?.timestamp"
+                      [timestamp]="row.cells[col.id] && row.cells[col.id].timestamp"
                     />
                   </div>
                 </ng-template>
@@ -55,7 +55,7 @@
           }
         </tr>
       }
-      @for (row of fillerRows(); track $index) {
+      @for (row of fillerRows(); track row) {
         <tr class="content-row">
           <td [colSpan]="columns().length + 1">&nbsp;</td>
         </tr>
