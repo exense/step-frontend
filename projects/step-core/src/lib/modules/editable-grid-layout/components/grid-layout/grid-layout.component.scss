@@ -27,7 +27,7 @@ step-grid-layout {
       position: absolute;
       background: var.$gray-450;
       opacity: 0.1;
-      min-height: 3rem;
+      min-height: 6rem;
       top: 0;
       left: 0;
       width: 100%;
@@ -96,7 +96,7 @@ step-grid-layout {
       $size: 1.6rem;
       font-size: $size;
       position: absolute;
-      top: calc(50% - ($size / 2));
+      top: max(calc(50% - ($size / 2)), 8rem);
     }
   }
 }

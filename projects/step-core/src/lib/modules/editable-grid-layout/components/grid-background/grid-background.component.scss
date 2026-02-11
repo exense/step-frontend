@@ -10,6 +10,7 @@ step-grid-background {
   top: 0;
   left: 0;
   right: 0;
+  padding-bottom: sizes.$row-height;
 
   .grid-measure {
     &.vertical-cols {
@@ -30,8 +31,22 @@ step-grid-background {
       position: relative;
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: repeat($rows-count, 2.4rem);
-      row-gap: 13rem;
+      grid-template-rows: repeat($rows-count, sizes.$row-gap);
+      row-gap: sizes.$row-height;
+    }
+  }
+
+  .grid-measure-row {
+    position: relative;
+    & > section {
+      display: none;
+      position: absolute;
+      background: var.$blue-50;
+      opacity: 0.5;
+      top: sizes.$row-gap;
+      left: 0;
+      width: 100%;
+      height: sizes.$row-height;
     }
   }
 
@@ -40,8 +55,12 @@ step-grid-background {
     background: var.$gray-50;
   }
 
+  .grid-measure-row:has(button:hover) > section {
+    display: block;
+  }
+
   .grid-measure-row button {
     margin-top: -0.8rem;
-    margin-left: -1.1rem;
+    margin-left: -1.5rem;
   }
 }

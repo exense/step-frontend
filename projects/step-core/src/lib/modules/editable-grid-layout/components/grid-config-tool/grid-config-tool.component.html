@@ -1,0 +1,37 @@
+@if (!isEdit()) {
+  <step-btn-group class="with-round-borders">
+    <button type="button" mat-stroked-button matTooltip="Edit grid" matTooltipPosition="below" (click)="startEdit()">
+      <step-icon name="grid" />
+    </button>
+  </step-btn-group>
+} @else {
+  <step-btn-group class="with-round-borders">
+    <step-popover
+      #popover
+      [mode]="PopoverMode.CLICK"
+      [whiteBackground]="true"
+      [noPadding]="true"
+      xPosition="before"
+      yPosition="above"
+    >
+      <button type="button" class="active" mat-stroked-button matTooltip="Edit grid" matTooltipPosition="below">
+        <step-icon name="grid" />
+      </button>
+      <step-popover-content>
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Grid settings</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <section></section>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button type="button" mat-button (click)="popover.closePopover()">Close</button>
+            <button type="button" mat-button (click)="reset()">Reset</button>
+            <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+          </mat-card-actions>
+        </mat-card>
+      </step-popover-content>
+    </step-popover>
+  </step-btn-group>
+}

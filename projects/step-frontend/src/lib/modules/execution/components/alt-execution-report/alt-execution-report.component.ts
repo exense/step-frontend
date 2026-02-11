@@ -2,10 +2,8 @@ import { Component, ElementRef, inject, OnDestroy, OnInit, viewChild, ViewEncaps
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
-  EXECUTION_REPORT_GRID,
   ExecutionCustomPanelRegistryService,
   IS_SMALL_SCREEN,
-  provideGridLayoutConfig,
   ReportNode,
   TimeRange,
 } from '@exense/step-core';
@@ -36,7 +34,6 @@ import {
         return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
-    ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,

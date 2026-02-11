@@ -7,7 +7,6 @@ import {
   effect,
   ElementRef,
   inject,
-  input,
   signal,
   untracked,
   viewChild,
@@ -59,12 +58,6 @@ export class GridLayoutComponent implements AfterViewInit {
   private _gridElementDragService = inject(GridElementDragService);
   private _widgetsPersistenceState = inject(WidgetsPersistenceStateService);
   private _widgetPositions = inject(WidgetsPositionsStateService);
-
-  readonly editMode = input<boolean>(false);
-  private effectSyncEditMode = effect(() => {
-    const isEditMode = this.editMode();
-    this._widgetPositions.setEditMode(isEditMode);
-  });
 
   private readonly isRenderComplete = signal(false);
   private readonly preview = viewChild<ElementRef<HTMLDivElement>>('preview');

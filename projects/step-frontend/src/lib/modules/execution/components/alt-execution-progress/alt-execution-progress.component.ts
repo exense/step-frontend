@@ -9,7 +9,6 @@ import {
   signal,
   viewChild,
   ViewEncapsulation,
-  model,
 } from '@angular/core';
 import {
   catchError,
@@ -37,10 +36,12 @@ import {
   DateUtilsService,
   EntityRefService,
   Execution,
+  EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
+  provideGridLayoutConfig,
   ReloadableDirective,
   ReportNode,
   smartSwitchMap,
@@ -149,6 +150,7 @@ interface RefreshParams {
       useExisting: forwardRef(() => AltExecutionProgressComponent),
     },
     AggregatedTreeDataLoaderService,
+    ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   standalone: false,
 })
@@ -177,8 +179,6 @@ export class AltExecutionProgressComponent
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
-
-  readonly gridEditMode = model(false);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },

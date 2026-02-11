@@ -58,6 +58,14 @@ export class GridDimensionsDirective implements GridDimensionsService {
     return untracked(() => this.gridDimensions()).rowGap;
   }
 
+  get columnWidth(): number {
+    return untracked(() => this.gridDimensions()).colWidth;
+  }
+
+  get rowHeight(): number {
+    return untracked(() => this.gridDimensions()).rowHeight;
+  }
+
   determineCellsWidth(colIndex: number): number {
     const { colWidth, columnGap } = untracked(() => this.gridDimensions());
     const size = colWidth + columnGap;

@@ -1,8 +1,4 @@
-<step-grid-layout
-  [editMode]="_state.gridEditMode()"
-  [class.small-screen]="!!(_isSmallScreen$ | async)"
-  [class.print]="_mode === ViewMode.PRINT"
->
+<step-grid-layout [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
   @if (_state.errors$ | async; as errors) {
     <step-alt-execution-errors-widget
       stepGridElement="errorsWidget"
