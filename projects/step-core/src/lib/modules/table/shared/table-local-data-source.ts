@@ -17,6 +17,7 @@ import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
 import { TableRequestData, TableParameters, StepDataSourceReloadOptions } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
+import { InFilterCondition } from './in-filter-condition';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 import { Mutable } from '../../basics/step-basics.module';
@@ -176,8 +177,31 @@ export class TableLocalDataSource<T, S extends TableLocalDataSourceSetupResult =
 
     const predicates = Object.entries(search)
       .map(([column, value]) => {
-        // ignore complicated remote filters fol local data sources
-        if (!value || value instanceof FilterCondition) {
+        if (!value) {
+          return undefined;
+        }
+
+        if (value instanceof FilterCondition) {
+          // Support InFilterCondition for local datasource (used for execution report TC list)
+          if (value instanceof InFilterCondition) {
+            const rawValues = (value.getSearchValue?.() as string[] | undefined) ?? value.sourceObject ?? [];
+            const values = rawValues.map((entry) => (entry ?? '').toString().trim()).filter((entry) => !!entry);
+            if (values.length === 0) {
+              return undefined;
+            }
+
+            const predicate = this._config?.searchPredicates?.[column];
+            if (predicate) {
+              return (item: T) => values.some((entry) => predicate(item, entry));
+            }
+
+            const normalized = new Set(values.map((entry) => entry.toLowerCase()));
+            return (item: T) => {
+              const itemValue = isSimpleType(item) ? ((item as any) || '').toString() : this.getItemValue(item, column);
+              return normalized.has(itemValue.trim().toLowerCase());
+            };
+          }
+          // ignore complicated remote filters for local data sources
           return undefined;
         }
 

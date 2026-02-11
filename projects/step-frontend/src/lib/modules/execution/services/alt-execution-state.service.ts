@@ -5,13 +5,12 @@ import {
   Operation,
   ReportNode,
   TableDataSource,
-  TimeRange,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
 import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../_common/shared/status.enum';
-import { ModelSignal, Signal } from '@angular/core';
+import { TimeRangeExt } from '../shared/time-range-ext';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
@@ -25,7 +24,7 @@ export abstract class AltExecutionStateService {
   abstract readonly testCases$: Observable<AggregatedReportView[] | undefined>;
   abstract readonly testCasesDataSource$: Observable<TableDataSource<AggregatedReportView>>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
-  abstract readonly timeRange$: Observable<TimeRange | undefined>;
+  abstract readonly timeRange$: Observable<TimeRangeExt | undefined>;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
   abstract selectFullRange(): void;
 }
