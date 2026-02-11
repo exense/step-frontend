@@ -67,7 +67,7 @@ export class ExecutionListComponent implements OnDestroy {
   });
 
   private errorStatusesSet = new Set(ERROR_STATUSES);
-  private statusFilter = viewChild('statusFilter', { read: MultiLevelArrayFilterComponent });
+  private readonly statusFilter = viewChild('statusFilter', { read: MultiLevelArrayFilterComponent });
   private statusFilter$ = toObservable(this.statusFilter);
   private statusFilterValue$ = this.statusFilter$.pipe(
     switchMap((statusFilter) => {
@@ -78,7 +78,7 @@ export class ExecutionListComponent implements OnDestroy {
       return ctrl.valueChanges.pipe(startWith(ctrl.value));
     }),
   );
-  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+  private readonly statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
 
   protected readonly isErrorFilterApplied = computed(() => {
     const statusFilterValue = this.statusFilterValue() ?? [];
@@ -96,8 +96,8 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   protected refreshTable(): void {
-    // this.dataSource.reload({ hideProgress: true, isForce: false });
-    // this.reloadRunningExecutionsCount$.next();
+    this.dataSource.reload({ hideProgress: true, isForce: false });
+    this.reloadRunningExecutionsCount$.next();
   }
 
   protected handleRunningStatusClick(): void {

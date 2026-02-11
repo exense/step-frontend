@@ -46,7 +46,7 @@ export class HistoryNodesComponent {
     return pastNodes.slice(-(count - 1));
   });
 
-  private padArrayWithNull(array: HistoryNodeItem[], size: number): HistoryNodeItem[] {
+  private padArrayWithNull(array: HistoryNodeItem[], size: number): (HistoryNodeItem | null)[] {
     const padCount = Math.max(0, size - (array?.length ?? 0));
     return Array(padCount).fill(null).concat(array);
   }

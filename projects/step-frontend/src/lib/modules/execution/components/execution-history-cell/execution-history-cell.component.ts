@@ -32,32 +32,23 @@ export class HistoryCellComponent {
 
   protected readonly historyNodes: Signal<HistoryNodeItem[]> = computed(() => {
     const execution = this.execution()!;
-    return (execution?.historyResults || []).reverse().map((e) => {
-      const color = this._statusColors[e.result];
-      return {
-        link: `/executions/${e.id!}`,
-        tooltipLink: `/executions/${e.id!}`,
-        tooltipLinkLabel: 'See execution',
-        statusSlices: [
-          {
-            color: color,
-            label: e.result,
-            count: 1,
-          },
-        ],
-      };
-    });
-  });
-
-  protected readonly historyItems: Signal<TreeNodePieChartSlice[]> = computed(() => {
-    let execution = this.execution();
-    return (execution?.historyResults || []).map((i) => {
-      const color = this._statusColors[i.result];
-      return {
-        color: color,
-        label: i.result,
-        count: 1,
-      };
-    });
+    return (execution?.historyResults || [])
+      .slice()
+      .reverse()
+      .map((e) => {
+        const color = this._statusColors[e.result];
+        return {
+          link: `/executions/${e.id!}`,
+          tooltipLink: `/executions/${e.id!}`,
+          tooltipLinkLabel: 'See execution',
+          statusSlices: [
+            {
+              color: color,
+              label: e.result,
+              count: 1,
+            },
+          ],
+        };
+      });
   });
 }

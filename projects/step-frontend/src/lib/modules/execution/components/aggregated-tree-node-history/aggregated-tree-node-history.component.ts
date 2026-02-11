@@ -101,7 +101,7 @@ export class AggregatedTreeNodeHistoryComponent {
                 previousExecutions: allExecutions.slice(0, -1), // remove the current execution
                 currentExecution: {
                   execution: currentExecution,
-                  statusSlices: slices[currentExecution.id!],
+                  statusSlices: slices[currentExecution.id!] || [],
                   statusesCount: Object.fromEntries(
                     (slices[currentExecution.id!] || []).map((s) => [s.label, s.count]),
                   ),
@@ -123,10 +123,10 @@ export class AggregatedTreeNodeHistoryComponent {
         },
         pastNodes: data.previousExecutions.map((item) => {
           return {
-            statusSlices: item?.statusSlices,
-            timestamp: item?.execution?.startTime,
+            statusSlices: item.statusSlices,
+            timestamp: item.execution.startTime,
             tooltipLinkLabel: 'See Execution',
-            tooltipLink: '/executions/' + item?.execution.id,
+            tooltipLink: '/executions/' + item.execution.id,
           };
         }),
       } as { currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] };

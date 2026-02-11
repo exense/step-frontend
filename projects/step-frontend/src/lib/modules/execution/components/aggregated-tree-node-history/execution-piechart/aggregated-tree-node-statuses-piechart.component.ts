@@ -28,7 +28,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private chart?: Chart | undefined;
 
-  protected navigateToLink() {
+  protected navigateToLink(): void {
     let link = this.link();
     if (link) {
       this._router.navigateByUrl(link);
@@ -101,9 +101,6 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
           elements: { arc: arcStyle },
         },
       }) as Chart;
-      // canvasElement.nativeElement.width = this.size();
-      // canvasElement.nativeElement.height = this.size();
-      console.log(size);
     }
   });
 
