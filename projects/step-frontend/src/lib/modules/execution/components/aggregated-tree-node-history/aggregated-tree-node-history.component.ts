@@ -121,12 +121,12 @@ export class AggregatedTreeNodeHistoryComponent {
           timestamp: data.currentExecution.execution.startTime!,
           tooltipLinkLabel: 'Current Execution',
         },
-        pastNodes: data.previousExecutions.map((item) => {
+        pastNodes: data.previousExecutions.map((item: ExecutionItem | null) => {
           return {
-            statusSlices: item.statusSlices,
-            timestamp: item.execution.startTime,
+            statusSlices: item?.statusSlices,
+            timestamp: item?.execution.startTime,
             tooltipLinkLabel: 'See Execution',
-            tooltipLink: '/executions/' + item.execution.id,
+            tooltipLink: '/executions/' + item?.execution.id,
           };
         }),
       } as { currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] };
@@ -144,12 +144,5 @@ export class AggregatedTreeNodeHistoryComponent {
 
   private fetchLastExecutionsByTask(beforeTime: number, taskId: string): Observable<Execution[]> {
     return this._executionService.getLastExecutionsByTaskId(taskId, this.previousExecutionsCount(), 0, beforeTime);
-  }
-
-  private padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
-    const padCount = Math.max(0, size - (array?.length ?? 0));
-    return Array(padCount)
-      .fill(null)
-      .concat(array ?? []);
   }
 }
