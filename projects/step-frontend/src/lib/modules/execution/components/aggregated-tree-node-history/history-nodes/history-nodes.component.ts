@@ -26,14 +26,14 @@ export interface HistoryNodeItem {
   imports: [StepBasicsModule, AggregatedTreeNodeStatusesPiechartComponent, StatusDistributionTooltipComponent],
 })
 export class HistoryNodesComponent {
-  nodesCount = input.required<number>();
-  showTimestamps = input<boolean>();
-  showTooltip = input<boolean>(false);
-  pastNodes = input.required<HistoryNodeItem[]>();
-  currentNode = input.required<HistoryNodeItem>();
-  nodesSize = input<number>(20);
+  readonly nodesCount = input.required<number>();
+  readonly showTimestamps = input<boolean>();
+  readonly showTooltip = input<boolean>(false);
+  readonly pastNodes = input.required<HistoryNodeItem[]>();
+  readonly currentNode = input.required<HistoryNodeItem>();
+  readonly nodesSize = input<number>(20);
 
-  paddedPastExecutions = computed(() => {
+  protected readonly paddedPastExecutions = computed(() => {
     const pastNodes = this.pastNodes();
     const count = this.nodesCount();
 
@@ -44,11 +44,6 @@ export class HistoryNodesComponent {
     }
 
     return pastNodes.slice(-(count - 1));
-  });
-
-  logEffect = effect(() => {
-    console.log(this.pastNodes());
-    console.log(this.paddedPastExecutions());
   });
 
   private padArrayWithNull(array: HistoryNodeItem[], size: number): HistoryNodeItem[] {

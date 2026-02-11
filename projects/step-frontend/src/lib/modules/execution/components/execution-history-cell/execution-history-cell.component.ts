@@ -14,7 +14,7 @@ export class HistoryCellComponent {
 
   readonly execution = input.required<Execution>();
 
-  readonly currentNode: Signal<HistoryNodeItem> = computed(() => {
+  protected readonly currentNode: Signal<HistoryNodeItem> = computed(() => {
     const execution = this.execution()!;
     const resultStatus = execution.status === 'RUNNING' ? 'RUNNING' : execution.result!;
     const color = this._statusColors[resultStatus];
@@ -29,12 +29,14 @@ export class HistoryCellComponent {
     };
   });
 
-  readonly historyNodes: Signal<HistoryNodeItem[]> = computed(() => {
+  protected readonly historyNodes: Signal<HistoryNodeItem[]> = computed(() => {
     const execution = this.execution()!;
     return (execution?.historyResults || []).reverse().map((e) => {
       const color = this._statusColors[e.result];
       return {
         link: `/executions/${e.id!}`,
+        tooltipLink: `/executions/${e.id!}`,
+        tooltipLinkLabel: 'See execution',
         statusSlices: [
           {
             color: color,
@@ -46,7 +48,7 @@ export class HistoryCellComponent {
     });
   });
 
-  historyItems: Signal<TreeNodePieChartSlice[]> = computed(() => {
+  protected readonly historyItems: Signal<TreeNodePieChartSlice[]> = computed(() => {
     let execution = this.execution();
     return (execution?.historyResults || []).map((i) => {
       const color = this._statusColors[i.result];
