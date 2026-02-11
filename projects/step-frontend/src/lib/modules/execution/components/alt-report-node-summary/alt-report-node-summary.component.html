@@ -1,4 +1,12 @@
-<step-alt-report-widget [title]="title()">
+<step-alt-report-widget>
+  <step-alt-report-widget-title>
+    @if (hasGrid) {
+      <step-grid-drag-handle />
+      <step-grid-element-title />
+    } @else {
+      {{ title() }}
+    }
+  </step-alt-report-widget-title>
   <step-alt-report-widget-content>
     @if (chartSettings(); as chartSettings) {
       <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
@@ -24,6 +32,9 @@
           />
         }
       </section>
+    }
+    @if (hasGrid) {
+      <step-grid-resizer />
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>

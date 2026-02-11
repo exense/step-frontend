@@ -16,9 +16,9 @@
   align-items: flex-start;
   padding-top: 0.2rem;
   padding-bottom: 0.2rem;
-  padding-left: calc(var(--level, 0) * 1.5rem);
+  padding-left: calc(var(--style__padding-left, 0) * 1.5rem);
   &.additional-shift {
-    padding-left: calc(var(--level, 0) * 1.5rem + 3rem);
+    padding-left: calc(var(--style__padding-left, 0) * 1.5rem + 3rem);
   }
   margin-left: 0.1rem;
   border-radius: 1rem;

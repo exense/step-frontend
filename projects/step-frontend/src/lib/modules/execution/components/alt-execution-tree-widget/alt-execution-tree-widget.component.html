@@ -1,4 +1,8 @@
-<step-alt-report-widget title="Execution tree" [applyOverflow]="true">
+<step-alt-report-widget [applyOverflow]="true">
+  <step-alt-report-widget-title>
+    <step-grid-drag-handle />
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
     <step-btn-group class="with-round-borders shrink collapse-buttons">
       <button
@@ -41,5 +45,6 @@
       [applyVirtualScrollFrom]="150"
       [showSpinnerWhileTreeInitialize]="true"
     />
+    <step-grid-resizer />
   </step-alt-report-widget-content>
 </step-alt-report-widget>

@@ -1,0 +1,22 @@
+<section class="grid-measure vertical-cols">
+  @for (item of verticalCols(); track item) {
+    <div class="grid-measure-column"></div>
+  }
+</section>
+<section class="grid-measure horizontal-rows">
+  @for (item of horizontalRows(); track item) {
+    <div class="grid-measure-row">
+      <section></section>
+      <button
+        type="button"
+        mat-icon-button
+        color="primary"
+        matTooltip="Insert row"
+        matTooltipPosition="right"
+        (click)="insertAfterRow(item)"
+      >
+        <step-icon name="plus" />
+      </button>
+    </div>
+  }
+</section>

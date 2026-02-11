@@ -8,5 +8,5 @@ import { Operation } from '@exense/step-core';
   standalone: false,
 })
 export class AltReportCurrentOperationsComponent {
-  operations = input<Operation[]>();
+  readonly operations = input<Operation[]>();
 }

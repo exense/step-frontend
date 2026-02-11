@@ -1,4 +1,8 @@
-<step-alt-report-widget [title]="title()" [applyOverflow]="true">
+<step-alt-report-widget [applyOverflow]="true">
+  <step-alt-report-widget-title>
+    <step-grid-drag-handle />
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
   @if (showSort()) {
     <step-alt-report-widget-sort>
       <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" (click)="toggleSort()" />
@@ -21,5 +25,6 @@
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <ng-content />
+    <step-grid-resizer />
   </step-alt-report-widget-content>
 </step-alt-report-widget>

@@ -1,4 +1,5 @@
-import { Component, input, ViewEncapsulation } from '@angular/core';
+import { Component, computed, contentChild, input, ViewEncapsulation } from '@angular/core';
+import { AltReportWidgetTitleDirective } from '../../directives/alt-report-widget-title.directive';
 
 @Component({
   selector: 'step-alt-report-widget',
@@ -12,6 +13,12 @@ import { Component, input, ViewEncapsulation } from '@angular/core';
   standalone: false,
 })
 export class AltReportWidgetComponent {
+  private readonly titleDirective = contentChild(AltReportWidgetTitleDirective);
+  protected readonly hasTitleLayout = computed(() => {
+    const titleDirective = this.titleDirective();
+    return !!titleDirective;
+  });
+
   /** @Input() **/
   readonly title = input<string>();
 

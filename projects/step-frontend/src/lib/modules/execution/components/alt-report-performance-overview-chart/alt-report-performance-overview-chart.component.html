@@ -1,4 +1,8 @@
-<step-alt-report-widget title="Performance Overview (avg)">
+<step-alt-report-widget>
+  <step-alt-report-widget-title>
+    <step-grid-drag-handle />
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
     @if (_mode === ViewMode.VIEW) {
       <button
@@ -24,5 +28,6 @@
         [class.print]="_mode === ViewMode.PRINT"
       />
     }
+    <step-grid-resizer />
   </step-alt-report-widget-content>
 </step-alt-report-widget>

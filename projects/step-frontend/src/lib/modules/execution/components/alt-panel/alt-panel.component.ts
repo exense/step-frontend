@@ -8,24 +8,18 @@ import { Execution, ExecutionCustomPanelItemInfo } from '@exense/step-core';
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class]': 'className()',
-    '[style.--colSpan]': 'colSpan()',
   },
   standalone: false,
 })
 export class AltPanelComponent {
-  /** @Input() **/
   readonly info = input.required<ExecutionCustomPanelItemInfo>();
-
-  /** @Input() **/
   readonly execution = input.required<Execution>();
 
-  protected readonly title = computed(() => this.info().label);
   protected readonly type = computed(() => this.info().type);
 
-  private metadata = computed(() => this.info().metadata);
+  private readonly metadata = computed(() => this.info().metadata);
   protected readonly className = computed(() => {
     const customClass = this.metadata()?.cssClassName;
     return ['widget', customClass].filter((item) => !!item).join(' ');
   });
-  protected readonly colSpan = computed(() => this.metadata()?.colSpan ?? 1);
 }

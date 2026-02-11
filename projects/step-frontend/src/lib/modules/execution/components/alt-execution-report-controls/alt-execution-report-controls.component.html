@@ -3,6 +3,9 @@
     <step-icon name="file-text" />
   </button>
 </step-btn-group>
+@if (!(_isSmallScreen$ | async)) {
+  <step-grid-config-tool />
+}
 <mat-menu #menu="matMenu">
   <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
   <button type="button" mat-menu-item (click)="_printService.printAll()">Print All</button>

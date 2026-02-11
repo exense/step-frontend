@@ -5,13 +5,11 @@ import {
   Operation,
   ReportNode,
   TableDataSource,
-  TimeRange,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
 import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../_common/shared/status.enum';
-import { Signal } from '@angular/core';
 import { TimeRangeExt } from '../shared/time-range-ext';
 
 export abstract class AltExecutionStateService {

@@ -2,38 +2,43 @@
 
 @mixin single-col-view {
   min-width: 60rem;
-  grid-template-columns: 100%;
+  grid-template-columns: 1fr !important;
+  grid-auto-rows: auto;
+
+  .step-grid-element {
+    grid-column: 1 / 2 !important;
+    grid-area: unset !important;
+  }
+
+  step-alt-report-widget {
+    min-height: 44rem !important;
+  }
 }
 
 step-alt-execution-report {
   position: relative;
 
-  & > section {
-    display: grid;
-    grid-template-rows: auto;
-    row-gap: 2.4rem;
-    column-gap: 1.5rem;
+  step-alt-report-node-list {
+    height: 100%;
+  }
+
+  step-alt-report-widget {
+    height: 100%;
+    min-height: unset;
+  }
+
+  & > step-grid-layout {
     margin-bottom: 2rem;
 
     &:not(.print) {
       &.small-screen {
         @include single-col-view;
       }
-
-      &:not(.small-screen) {
-        width: 100%;
-        grid-template-columns: repeat(4, 1fr);
-
-        .widget {
-          grid-column: span var(--colSpan, 1);
-        }
-      }
     }
 
     &.print {
       @include single-col-view;
       width: 100%;
-      grid-template-rows: auto;
     }
   }
 

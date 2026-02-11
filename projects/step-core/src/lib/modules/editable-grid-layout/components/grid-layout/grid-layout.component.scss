@@ -1,0 +1,102 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use '../grid-sizes' as sizes;
+
+step-grid-layout {
+  $cols-count: var(--style__cols-count);
+
+  display: grid;
+  grid-template-columns: repeat($cols-count, sizes.columnWidth($cols-count));
+  grid-auto-rows: sizes.$row-height;
+  row-gap: sizes.$row-gap;
+  column-gap: sizes.$column-gap;
+  position: relative;
+
+  &.hidden {
+    visibility: hidden;
+  }
+
+  .step-grid-element {
+    position: relative;
+
+    &.element-hidden {
+      display: none;
+    }
+
+    step-grid-drag-handle {
+      display: none;
+      position: absolute;
+      background: var.$gray-450;
+      opacity: 0.1;
+      min-height: 6rem;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 5;
+    }
+
+    step-grid-resizer {
+      display: none;
+      position: absolute;
+      bottom: 0.2rem;
+      right: 0.2rem;
+    }
+  }
+
+  .preview {
+    border-style: solid;
+    border-width: 0.1rem;
+    background: var.$blue-50;
+    border-color: var.$blue-600;
+    opacity: 0.5;
+    border-radius: 0.5rem;
+    position: absolute;
+    display: none;
+
+    $animation-duration: 0.2s;
+    transition:
+      top $animation-duration ease,
+      left $animation-duration ease,
+      width $animation-duration ease,
+      height $animation-duration ease;
+
+    &.preview-invalid {
+      background: var.$red-50;
+      border-color: var.$red-650;
+    }
+  }
+
+  &.show-preview {
+    .preview {
+      display: block;
+    }
+  }
+
+  &.is-resize {
+    cursor: nwse-resize;
+  }
+
+  &.edit-mode .step-grid-element {
+    step-grid-drag-handle,
+    step-grid-resizer {
+      display: block;
+    }
+    .step-grid-drag-handle {
+      cursor: grab;
+    }
+  }
+
+  .hidden-placeholder {
+    border: dashed 0.1rem var.$black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var.$white;
+
+    step-grid-element-title {
+      $size: 1.6rem;
+      font-size: $size;
+      position: absolute;
+      top: max(calc(50% - ($size / 2)), 8rem);
+    }
+  }
+}

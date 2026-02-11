@@ -1,0 +1,6 @@
+step-icon {
+  transform: rotateX(180deg);
+  &:hover {
+    cursor: nwse-resize;
+  }
+}
