@@ -7,7 +7,6 @@
 } @else {
   <step-btn-group class="with-round-borders">
     <step-popover
-      #popover
       [mode]="PopoverMode.CLICK"
       [whiteBackground]="true"
       [noPadding]="true"
@@ -23,11 +22,16 @@
             <mat-card-title>Grid settings</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <section></section>
+            <section class="settings">
+              <mat-label>Add widget</mat-label>
+              <button type="button" mat-icon-button [disabled]="!canAdd()" [matMenuTriggerFor]="menu">
+                <step-icon name="plus"/>
+              </button>
+            </section>
           </mat-card-content>
           <mat-card-actions align="end">
-            <button type="button" mat-button (click)="popover.closePopover()">Close</button>
             <button type="button" mat-button (click)="reset()">Reset</button>
+            &nbsp;
             <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
           </mat-card-actions>
         </mat-card>
@@ -35,3 +39,8 @@
     </step-popover>
   </step-btn-group>
 }
+<mat-menu #menu="matMenu">
+  @for(item of widgetsToAdd(); track item.id){
+    <button type="button" mat-menu-item (click)="addWidget(item.id)">{{item.title}}</button>
+  }
+</mat-menu>

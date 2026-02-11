@@ -130,10 +130,6 @@ export class WidgetsPositionsStateService
     return this._utils.correctPositionForResize(elementId, position);
   }
 
-  findProperPosition(widthInCells: number, heightInCells: number): WidgetPositionParams {
-    return this._utils.findProperPosition(widthInCells, heightInCells);
-  }
-
   setNotRenderedWidgets(widgetsIds: string[]): void {
     this.notRenderedWidgets.set(widgetsIds);
   }
@@ -195,7 +191,7 @@ export class WidgetsPositionsStateService
       return;
     }
     const info = this._gridConfig.defaultElementParamsMap[id];
-    const positionParams = this.findProperPosition(info.widthInCells, info.heightInCells);
+    const positionParams = this._utils.findProperPosition(info.widthInCells, info.heightInCells);
     const position = new WidgetPosition(info.id, positionParams);
     this.updatePosition(position);
   }
@@ -209,7 +205,7 @@ export class WidgetsPositionsStateService
       if (!info) {
         continue;
       }
-      const positionParams = this.findProperPosition(info.widthInCells, info.heightInCells);
+      const positionParams = this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
       const position = new WidgetPosition(info.id, positionParams);
       this.updatePosition(position);
     }

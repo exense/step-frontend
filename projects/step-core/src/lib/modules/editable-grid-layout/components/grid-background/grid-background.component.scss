@@ -5,6 +5,7 @@ step-grid-background {
   $cols-count: var(--style__cols-count);
   $cols-count-1: calc(var(--style__cols-count) - 1);
   $rows-count: var(--style__rows-count);
+  background: var.$gray-25;
 
   position: absolute;
   top: 0;
@@ -43,16 +44,16 @@ step-grid-background {
       position: absolute;
       background: var.$blue-50;
       opacity: 0.5;
-      top: sizes.$row-gap;
-      left: 0;
-      width: 100%;
-      height: sizes.$row-height;
+      top: 0.9rem;
+      left: 1.5rem;
+      right: 0;
+      height: 0.5rem;
     }
   }
 
   .grid-measure-row,
   .grid-measure-column {
-    background: var.$gray-50;
+    background: var.$white;
   }
 
   .grid-measure-row:has(button:hover) > section {

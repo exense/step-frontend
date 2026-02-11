@@ -271,6 +271,31 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
   findProperPosition(widthInCells: number, heightInCells: number): WidgetPositionParams {
     const field = this.context.getField();
+    const position = new WidgetPosition('_dummy_', {row: 0, column: 0, widthInCells, heightInCells});
+    let result: WidgetPositionParams | undefined = undefined;
+    for (let index = 0; index < field.length; index++) {
+      if (field[index] !== EMPTY) {
+        continue;
+      }
+      const {row, column} = this.getFieldCoordinates(index);
+      position.row = row;
+      position.column = column;
+      if (this.isPositionEmpty(field, position)) {
+        result = {
+          row,
+          column,
+          widthInCells,
+          heightInCells,
+        };
+        break;
+      }
+    }
+    result = result ?? this.findProperPositionAtEnd(widthInCells, heightInCells);
+    return result;
+  }
+
+  findProperPositionAtEnd(widthInCells: number, heightInCells: number): WidgetPositionParams {
+    const field = this.context.getField();
     const widgetPositions = this.context.getWidgetPositions();
 
     // First search for last widget
@@ -318,6 +343,21 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     return true;
   }
 
+  private isPositionEmpty(field: Uint8Array, position: WidgetPosition): boolean {
+    for (let r = position.topEdge; r <= position.bottomEdge; r++) {
+      for (let c = position.leftEdge; c <= position.rightEdge; c++) {
+        if (c > this._colCount) {
+          return false;
+        }
+        const index = this.getFieldIndex(r, c);
+        if (field[index] !== 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   private isCellTaken(row: number, column: number): boolean {
     const field = this.context.getField();
     const index = this.getFieldIndex(row, column);
@@ -329,6 +369,12 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
   private getFieldIndex(row: number, column: number): number {
     return (row - 1) * this._colCount + (column - 1);
+  }
+
+  private getFieldCoordinates(index: number): {row: number, column: number} {
+    const row = Math.floor(index / this._colCount) + 1;
+    const column = (index % this._colCount) + 1;
+    return {row, column};
   }
 
   private getElementLimits(elementId: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
