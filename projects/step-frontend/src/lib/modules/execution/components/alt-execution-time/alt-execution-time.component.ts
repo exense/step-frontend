@@ -55,11 +55,15 @@ export class AltExecutionTimeComponent {
     let endTime = this.endTimeInput();
     const duration = this.durationInput();
 
+    if (endTime === null) {
+      endTime = undefined;
+    }
+
     if (endTime !== undefined) {
       return endTime;
     }
 
-    if (startTime !== undefined && duration !== undefined) {
+    if (startTime !== undefined && duration !== undefined && duration !== null) {
       return startTime + duration;
     }
 
