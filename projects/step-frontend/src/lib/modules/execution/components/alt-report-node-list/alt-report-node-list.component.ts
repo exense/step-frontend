@@ -31,17 +31,30 @@ export class AltReportNodeListComponent {
   protected readonly sort = this.sortInternal.asReadonly();
 
   protected toggleSort(): void {
-    this.sortInternal.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
+    const nextSort = this.sort() === 'asc' ? 'desc' : 'asc';
+    this.sortInternal.set(nextSort);
+    this.applySort(nextSort, true);
   }
 
   private effectApplySort = effect(() => {
-    const sort = this.sort();
+    this.applySort(this.sort());
+  });
+
+  private applySort(sort: SortDirection, emitEvent = false): void {
     const sortByColumns = this.sortByColumn();
     if (!sortByColumns || !this._matSort) {
       return;
     }
-    this._matSort.sort({ id: sortByColumns, start: sort, disableClear: true });
-  });
+
+    const activeChanged = this._matSort.active !== sortByColumns;
+    const directionChanged = this._matSort.direction !== sort;
+    this._matSort.active = sortByColumns;
+    this._matSort.direction = sort;
+
+    if (emitEvent && (activeChanged || directionChanged)) {
+      this._matSort.sortChange.emit({ active: sortByColumns, direction: sort });
+    }
+  }
 
   protected showSort = computed(() => {
     return this.sortByColumn() && this._matSort;
