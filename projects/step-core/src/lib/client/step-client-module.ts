@@ -11,6 +11,7 @@ import {
 import { BaseHttpRequest } from './generated/core/BaseHttpRequest';
 import { OPEN_API_CONFIG_PROVIDER } from './generated/open-api-config.provider';
 import { lazyLoadedMainInterceptor } from './augmented/interceptros/lazy-loaded.interceptor';
+import { TableRemoteDataSourceFactoryService } from './table';
 
 export * from './generated/core/BaseHttpRequest';
 export { ApiError } from './generated/core/ApiError';
@@ -29,5 +30,19 @@ export const provideStepApi = (...features: HttpFeature<HttpFeatureKind>[]) =>
     {
       provide: BaseHttpRequest,
       useExisting: StepHttpRequestService,
+    },
+  ]);
+
+export const provideTestStepApi = () =>
+  makeEnvironmentProviders([
+    provideHttpClient(withInterceptorsFromDi()),
+    OPEN_API_CONFIG_PROVIDER,
+    {
+      provide: BaseHttpRequest,
+      useExisting: StepHttpRequestService,
+    },
+    {
+      provide: TableRemoteDataSourceFactoryService,
+      useValue: null,
     },
   ]);

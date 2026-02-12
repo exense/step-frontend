@@ -95,25 +95,15 @@
 
 @if (_interactiveSession.hasExecutionParameters()) {
   <step-btn-group class="with-borders">
-    <step-popover [mode]="PopoverMode.HOVER">
-      <button
-        type="button"
-        mat-stroked-button
-        [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
-        (click)="toggleTargetParameterSelection()"
-        matTooltipPosition="below"
-      >
-        <step-icon name="sliders" />
-      </button>
-      <step-popover-content>
-        Advanced: Set target execution parameters so the editor can display the right Keyword or Plan version (See
-        <a
-          href="https://step.dev/knowledgebase/devops/automation-packages-overview/#deploy-multiple-versions-of-the-same-automation-package"
-          target="_blank"
-          >Automation Packages: Versions</a
-        >).
-      </step-popover-content>
-    </step-popover>
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Set target execution parameters"
+      [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
+      (click)="toggleTargetParameterSelection()"
+    >
+      <step-icon name="sliders" />
+    </button>
     <span
       class="interactive-trigger"
       #targetExecutionParameterTrigger
@@ -169,6 +159,14 @@
 <mat-menu #targetExecutionParameterMenu="matMenu" class="execution-menu">
   <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
+      <span
+        ><b>Target Execution Parameters (advanced)</b><br />Display the right Keyword or Plan version in the editor<br />(See
+        <a
+          href="https://step.dev/knowledgebase/devops/automation-packages-overview/#deploy-multiple-versions-of-the-same-automation-package"
+          target="_blank"
+          >Automation Packages: Versions</a
+        >).</span
+      >
       @if (_interactiveSession.hasExecutionParameters()) {
         <step-custom-forms
           #interactiveSessionCustomForm
