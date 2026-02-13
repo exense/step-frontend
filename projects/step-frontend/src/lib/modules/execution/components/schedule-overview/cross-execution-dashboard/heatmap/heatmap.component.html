@@ -55,7 +55,8 @@
           }
         </tr>
       }
-      @for (row of fillerRows(); track row) {
+      <!--    eslint-disable-next-line step-lint/track-is-item-field-->
+      @for (row of fillerRows(); track $index) {
         <tr class="content-row">
           <td [colSpan]="columns().length + 1">&nbsp;</td>
         </tr>

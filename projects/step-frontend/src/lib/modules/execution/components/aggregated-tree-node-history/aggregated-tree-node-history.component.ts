@@ -127,7 +127,7 @@ export class AggregatedTreeNodeHistoryComponent {
               statusSlices: item.statusSlices,
               timestamp: item.execution.startTime,
               tooltipLinkLabel: 'See Execution',
-              tooltipLink: '/executions/' + item.execution.id,
+              tooltipLink: '/executions/' + item.execution.id!,
             };
           }),
         };
