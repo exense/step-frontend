@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
-import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
+import {GridPoint, WidgetPosition, WidgetPositionParams} from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
@@ -122,8 +122,8 @@ export class WidgetsPositionsStateService
     }));
   }
 
-  correctPositionForDrag(elementId: string, position: WidgetPosition): PositionToApply | undefined {
-    return this._utils.correctPositionForDrag(elementId, position);
+  correctPositionForDrag(elementId: string, position: WidgetPosition, dragPoint: GridPoint): PositionToApply | undefined {
+    return this._utils.correctPositionForDrag(elementId, position, dragPoint);
   }
 
   correctPositionForResize(elementId: string, position: WidgetPosition): WidgetPosition | undefined {

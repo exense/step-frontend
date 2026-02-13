@@ -4,6 +4,7 @@ import { WidgetsPositionsStateService } from './widgets-positions-state.service'
 import { GridDimensionsService } from './grid-dimensions.service';
 import { gridElementId } from '../types/grid-element-id';
 import { PositionToApply } from '../types/position-to-apply';
+import {GridPoint} from '../types/widget-position';
 
 @Injectable()
 export class GridElementDragService implements OnDestroy {
@@ -27,6 +28,8 @@ export class GridElementDragService implements OnDestroy {
   private readonly dragNotAppliedInternal = signal(false);
   readonly dragNotApplied = this.dragNotAppliedInternal.asReadonly();
 
+  private xDragOffset = 0;
+
   ngOnDestroy(): void {
     this.stopDragMove?.();
     this.stopDragEnd?.();
@@ -36,10 +39,11 @@ export class GridElementDragService implements OnDestroy {
     this.previewElement = previewElement;
   }
 
-  dragStart(element: HTMLElement): void {
+  dragStart(element: HTMLElement, event: MouseEvent): void {
     if (!!untracked(() => this.draggedElement())) {
       return;
     }
+    this.xDragOffset = event.clientX - element.getBoundingClientRect().x;
     this.dragNotAppliedInternal.set(false);
     this.draggedElement.set(element);
 
@@ -108,6 +112,7 @@ export class GridElementDragService implements OnDestroy {
       }
     }
 
+    this.xDragOffset = 0;
     this.stopDragMove?.();
     this.stopDragMove = undefined;
     this.stopDragEnd?.();
@@ -128,13 +133,27 @@ export class GridElementDragService implements OnDestroy {
     }
 
     const gridRect = this._elementRef.nativeElement.getBoundingClientRect();
-    const column = this._gridDimensions.determineCellColumn(mouseX - gridRect.x);
+    const column = Math.max(this._gridDimensions.determineCellColumn(mouseX - gridRect.x - this.xDragOffset), 1);
     const row = this._gridDimensions.determineCellRow(mouseY - gridRect.y);
+
+    const dragPoint: GridPoint = {
+      column: this._gridDimensions.determineCellColumn(mouseX - gridRect.x),
+      row
+    };
 
     const position = originalPosition.clone();
     position.column = column;
     position.row = row;
 
-    return this._widgetsPositions.correctPositionForDrag(id, position);
+
+    console.log('DRAG MOVE', id, JSON.stringify(position), JSON.stringify(dragPoint));
+
+    const result = this._widgetsPositions.correctPositionForDrag(id, position, dragPoint);
+    if (result) {
+      console.log('DRAG MOVE RESULT', result.canBeApplied, JSON.stringify(result.position));
+    } else {
+      console.log('DRAG MOVE RESULT', 'NONE');
+    }
+    return result;
   }
 }

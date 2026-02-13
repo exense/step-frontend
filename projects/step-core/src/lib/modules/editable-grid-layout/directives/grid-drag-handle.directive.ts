@@ -22,6 +22,6 @@ export class GridDragHandleDirective {
     }
     event.preventDefault();
     event.stopPropagation();
-    this._gridElementDrag.dragStart(this._gridElement._elRef.nativeElement);
+    this._gridElementDrag.dragStart(this._gridElement._elRef.nativeElement, event);
   }
 }

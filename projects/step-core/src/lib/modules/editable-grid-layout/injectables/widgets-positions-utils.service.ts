@@ -1,6 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
-import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
+import {GridPoint, WidgetPosition, WidgetPositionParams} from '../types/widget-position';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { GridElementInfo } from '../../custom-registeries/custom-registries.module';
 import { WidgetIDs } from '../types/widget-ids';
@@ -28,16 +28,16 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     this.widgetIDs.destroy();
   }
 
-  correctPositionForDrag(elementId: string, position: WidgetPosition): PositionToApply | undefined {
+  correctPositionForDrag(elementId: string, position: WidgetPosition, dragPoint: GridPoint): PositionToApply | undefined {
     // Erase information about original position to avoid conflicts for current element
     if (!this.clearElementPosition(elementId)) {
       return undefined;
     }
 
     //If position is taken by other widget, return other's widgets original position
-    if (this.isCellTaken(position.row, position.column)) {
+    if (this.isCellTaken(dragPoint.row, dragPoint.column)) {
       const otherWidgetPosition = Object.values(this.context.getWidgetPositions()).find(
-        (pos) => pos.id !== elementId && pos.includesPoint(position.row, position.column),
+        (pos) => pos.id !== elementId && pos.includesPoint(dragPoint.row, dragPoint.column),
       );
 
       if (!otherWidgetPosition) {
@@ -74,17 +74,35 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     let column = 0;
     let heightInCells = 0;
     let widthInCells = 0;
+    let canBeApplied = true;
     for (let r = result.topEdge; r <= result.bottomEdge; r++) {
       row = r;
+      // Correct column first
+      for (let c = result.leftEdge; c <= dragPoint.column; c++) {
+        column = c;
+        if (!this.isCellTaken(row, column)) {
+          break;
+        }
+      }
+      if (column > this._colCount) {
+        canBeApplied = false;
+        break;
+      }
+      if (result.column !== column) {
+        result.column = column;
+        this.applyEdgeLimits(result, this._colCount);
+      }
+
       let widthInCellPerRow = 0;
       for (let c = result.leftEdge; c <= result.rightEdge; c++) {
         column = c;
         if (this.isCellTaken(row, column)) {
+          column--;
           break;
         }
         widthInCellPerRow++;
       }
-      widthInCells = Math.max(widthInCells, widthInCellPerRow);
+      widthInCells = widthInCells === 0 ? widthInCellPerRow : Math.min(widthInCells, widthInCellPerRow);
       if (this.isCellTaken(row, column)) {
         if (heightInCells === 0) {
           heightInCells = result.heightInCells;
@@ -92,19 +110,24 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         if (widthInCells === 0) {
           widthInCells = result.widthInCells;
         }
+        canBeApplied = false;
         break;
       }
       heightInCells++;
     }
 
     if (heightInCells <= 0 || widthInCells <= 0) {
-      return undefined;
+      return {canBeApplied: false, position};
     }
     result.widthInCells = widthInCells;
     result.heightInCells = heightInCells;
 
+    if (!canBeApplied) {
+      return {canBeApplied, position: result};
+    }
+
     const limits = this.getElementLimits(elementId);
-    const canBeApplied = this.isFit({
+    canBeApplied = this.isFit({
       width: limits.minWidthInCells,
       height: limits.minHeightInCells,
       availableWidth: result.widthInCells,

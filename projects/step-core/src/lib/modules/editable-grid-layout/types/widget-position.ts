@@ -1,6 +1,9 @@
-export interface WidgetPositionParams {
+export interface GridPoint {
   column: number;
   row: number;
+}
+
+export interface WidgetPositionParams extends GridPoint {
   widthInCells: number;
   heightInCells: number;
 }
