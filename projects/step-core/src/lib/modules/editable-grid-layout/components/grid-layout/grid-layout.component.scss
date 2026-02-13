@@ -29,7 +29,7 @@ step-grid-layout {
       top: 0;
       left: 0;
       width: 100%;
-      z-index: 5;
+      z-index: 11;
 
       & > section {
         position: absolute;
@@ -54,6 +54,7 @@ step-grid-layout {
       position: absolute;
       bottom: 0.2rem;
       right: 0.2rem;
+      z-index: 11;
     }
   }
 
@@ -97,6 +98,17 @@ step-grid-layout {
     }
     .step-grid-drag-handle {
       cursor: grab;
+    }
+
+    &::after {
+      content: " ";
+      position: absolute;
+      display: block;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 10;
     }
   }
 
