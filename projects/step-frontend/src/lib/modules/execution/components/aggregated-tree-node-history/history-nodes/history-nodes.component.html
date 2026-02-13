@@ -1,0 +1,71 @@
+<div class="container">
+  <div class="previous-executions-container" [style.--style__nodeSize.px]="nodesSize()">
+    <!--    eslint-disable-next-line step-lint/track-is-item-field-->
+    @for (node of paddedPastExecutions(); track $index) {
+      @if (showTooltip() && node) {
+        <ng-container
+          *ngTemplateOutlet="nodeItemWithPopover; context: { item: node, last: $last, isCurrentExecution: false }"
+        ></ng-container>
+      } @else {
+        <ng-container
+          *ngTemplateOutlet="nodeItem; context: { item: node, last: $last, isCurrentExecution: false }"
+        ></ng-container>
+      }
+    }
+  </div>
+
+  @if (showTooltip()) {
+    <ng-container
+      *ngTemplateOutlet="nodeItemWithPopover; context: { item: currentNode(), last: false, isCurrentExecution: true }"
+    ></ng-container>
+  } @else {
+    <ng-container
+      *ngTemplateOutlet="nodeItem; context: { item: currentNode(), last: false, isCurrentExecution: true }"
+    ></ng-container>
+  }
+</div>
+
+<ng-template #nodeItemWithPopover let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
+  <step-popover [noPadding]="true">
+    <ng-container
+      *ngTemplateOutlet="nodeItem; context: { item: item, last: last, isCurrentExecution: isCurrentExecution }"
+    ></ng-container>
+
+    <step-popover-content>
+      <step-status-distribution-tooltip
+        [statuses]="item.statusSlices"
+        [linkLabel]="item?.tooltipLinkLabel"
+        [link]="item?.tooltipLink"
+        [timestamp]="item?.timestamp"
+      />
+    </step-popover-content>
+  </step-popover>
+</ng-template>
+
+<ng-template #nodeItem let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
+  <div
+    class="history-item-container"
+    [class.highlight]="isCurrentExecution"
+    [class.connect-line]="!isCurrentExecution"
+    [style.--style__nodeSize.px]="nodesSize()"
+    [class.arrow]="last && !isCurrentExecution"
+  >
+    @if (item) {
+      <step-aggregated-tree-node-statuses-piechart
+        [size]="nodesSize()"
+        [slices]="item.statusSlices"
+        [highlight]="isCurrentExecution"
+        [link]="item.link"
+      />
+
+      @if (showTimestamps()) {
+        <div class="timestamp">
+          <div>{{ item.timestamp | date: 'dd.MM' }}</div>
+          <div>{{ item.timestamp | date: 'HH:mm' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-piechart" [style.width.px]="nodesSize()" [style.height.px]="nodesSize()"></div>
+    }
+  </div>
+</ng-template>

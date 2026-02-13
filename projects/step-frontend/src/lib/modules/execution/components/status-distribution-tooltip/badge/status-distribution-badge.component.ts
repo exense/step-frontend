@@ -1,12 +1,13 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { STATUS_COLORS } from '@exense/step-core';
+import { STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
 import { Status } from '../../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-status-distribution-badge',
   templateUrl: './status-distribution-badge.component.html',
   styleUrls: ['./status-distribution-badge.component.scss'],
-  standalone: false,
+  imports: [StepBasicsModule],
+  standalone: true,
 })
 export class StatusDistributionBadgeComponent {
   private _statusColors = inject(STATUS_COLORS);
