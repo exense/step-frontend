@@ -1,3 +1,5 @@
+import { StatusDistributionItem } from '../../../../status-distribution-tooltip/status-distribution-tooltip.component';
+
 export interface HeatmapColumn {
   id: string;
   label?: string;
@@ -12,7 +14,7 @@ export interface HeatMapCell {
   color: string;
   link?: string;
   timestamp: number;
-  statusesCount: Record<string, number>;
+  statuses: StatusDistributionItem[];
 }
 
 export interface HeatMapColor {

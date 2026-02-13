@@ -14,10 +14,6 @@ export interface HistoryNodeItem {
   tooltipLink?: string;
 }
 
-// interface HistoryNodeItemInternal extends HistoryNodeItem{
-//   statusesCount?: Record<string, number>;
-// }
-
 @Component({
   selector: 'step-history-nodes',
   templateUrl: './history-nodes.component.html',
@@ -39,7 +35,7 @@ export class HistoryNodesComponent {
 
     if (count <= 0) return [];
 
-    if (pastNodes.length < count) {
+    if (pastNodes.length < count - 1) {
       return this.padArrayWithNull(pastNodes, count - 1); // one element is the current node
     }
 

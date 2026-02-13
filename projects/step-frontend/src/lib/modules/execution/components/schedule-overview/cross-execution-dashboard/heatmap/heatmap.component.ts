@@ -46,8 +46,8 @@ export class HeatmapComponent {
   protected readonly pageSize = signal(this.defaultPage?.pageSize ?? 10);
   protected readonly page = signal(this.defaultPage?.pageIndex ?? 0);
 
-  private paginator = viewChild(PaginatorComponent);
-  private container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
+  private readonly paginator = viewChild(PaginatorComponent);
+  private readonly container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
 
   readonly cellClick = output<{ row: HeatMapRow; column: HeatmapColumn }>();
 
@@ -75,13 +75,13 @@ export class HeatmapComponent {
     this.paginator()?.firstPage();
   });
 
-  protected filteredRows = computed(() => {
+  protected readonly filteredRows = computed(() => {
     const list = this.rows() ?? [];
     const q = (this.searchValue?.() ?? '').trim().toLowerCase();
     return q ? list.filter((r) => (r.label ?? '').toLowerCase().includes(q)) : list;
   });
 
-  protected fillerRows = computed(() => {
+  protected readonly fillerRows = computed(() => {
     let pageSize = this.pageSize();
     let filteredRows = this.filteredRows();
     if (filteredRows.length < pageSize) {
@@ -91,7 +91,7 @@ export class HeatmapComponent {
     }
   });
 
-  protected filteredAndPaginatedRows = computed(() => {
+  protected readonly filteredAndPaginatedRows = computed(() => {
     const filtered = this.filteredRows();
     const rawPage = this.page();
     const pageSize = this.pageSize();
@@ -114,7 +114,7 @@ export class HeatmapComponent {
     }
   }
 
-  handlePageChange(page: StepPageEvent) {
+  protected handlePageChange(page: StepPageEvent): void {
     if (page.pageSize !== this.pageSize()) {
       page.pageIndex = 0;
     }

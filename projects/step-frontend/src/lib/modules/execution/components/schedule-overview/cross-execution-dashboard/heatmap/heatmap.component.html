@@ -45,7 +45,7 @@
                     <step-status-distribution-tooltip
                       [link]="'/executions/' + col.id"
                       linkLabel="See execution"
-                      [statuses]="[]"
+                      [statuses]="row.cells![col.id].statuses"
                       [timestamp]="row.cells[col.id] && row.cells[col.id].timestamp"
                     />
                   </div>

@@ -1,6 +1,6 @@
 <div class="container">
-  <div class="previous-executions-container" [style.--nodeSize.px]="nodesSize()">
-    @for (node of paddedPastExecutions(); track $index) {
+  <div class="previous-executions-container" [style.--style__nodeSize.px]="nodesSize()">
+    @for (node of paddedPastExecutions(); track node) {
       @if (showTooltip() && node) {
         <ng-container
           *ngTemplateOutlet="nodeItemWithPopover; context: { item: node, last: $last, isCurrentExecution: false }"
@@ -46,7 +46,7 @@
     class="history-item-container"
     [class.highlight]="isCurrentExecution"
     [class.connect-line]="!isCurrentExecution"
-    [style.--size.px]="nodesSize()"
+    [style.--style__nodeSize.px]="nodesSize()"
     [class.arrow]="last && !isCurrentExecution"
   >
     @if (item) {
@@ -59,8 +59,8 @@
 
       @if (showTimestamps()) {
         <div class="timestamp">
-          <div>{{ item?.timestamp | date: 'dd.MM' }}</div>
-          <div>{{ item?.timestamp! | date: 'HH:mm' }}</div>
+          <div>{{ item.timestamp | date: 'dd.MM' }}</div>
+          <div>{{ item.timestamp | date: 'HH:mm' }}</div>
         </div>
       }
     } @else {

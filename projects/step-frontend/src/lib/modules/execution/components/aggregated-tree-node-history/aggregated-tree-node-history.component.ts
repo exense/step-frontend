@@ -22,7 +22,7 @@ interface ExecutionItem {
 }
 
 interface HistoryChainData {
-  previousExecutions: (ExecutionItem | null)[];
+  previousExecutions: ExecutionItem[];
   currentExecution: ExecutionItem;
 }
 
@@ -113,25 +113,26 @@ export class AggregatedTreeNodeHistoryComponent {
       }),
     );
 
-  newData: Observable<{ currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] }> = this.historyArtefactsData$.pipe(
-    map((data) => {
-      return {
-        currentNode: {
-          statusSlices: data.currentExecution.statusSlices,
-          timestamp: data.currentExecution.execution.startTime!,
-          tooltipLinkLabel: 'Current Execution',
-        },
-        pastNodes: data.previousExecutions.map((item: ExecutionItem | null) => {
-          return {
-            statusSlices: item?.statusSlices,
-            timestamp: item?.execution.startTime,
-            tooltipLinkLabel: 'See Execution',
-            tooltipLink: '/executions/' + item?.execution.id,
-          };
-        }),
-      } as { currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] };
-    }),
-  );
+  protected newData: Observable<{ currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] }> =
+    this.historyArtefactsData$.pipe(
+      map((data) => {
+        return {
+          currentNode: {
+            statusSlices: data.currentExecution.statusSlices,
+            timestamp: data.currentExecution.execution.startTime!,
+            tooltipLinkLabel: 'Current Execution',
+          },
+          pastNodes: data.previousExecutions.map((item: ExecutionItem) => {
+            return {
+              statusSlices: item.statusSlices,
+              timestamp: item.execution.startTime,
+              tooltipLinkLabel: 'See Execution',
+              tooltipLink: '/executions/' + item.execution.id,
+            };
+          }),
+        };
+      }),
+    );
 
   private fetchLastExecutionsByPlan(beforeTime: number, planId: string): Observable<Execution[]> {
     return this._executionService.findByCritera({
