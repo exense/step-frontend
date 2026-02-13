@@ -24,7 +24,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { Router } from '@angular/router';
-import {Status} from "../../../_common/shared/status.enum";
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
@@ -61,6 +61,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly showDetailsButton = input(false);
 
   private isFirstLoad = signal(true);
+  private lastLoadedReportNodeId?: string;
   private loadInProgress = signal(false);
   protected showSpinner = computed(() => {
     const isFirstLoad = this.isFirstLoad();
@@ -116,12 +117,19 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           if (!range) {
             return false;
           }
+          if (this.lastLoadedReportNodeId !== reportNode?.id) {
+            return true;
+          }
+          if (this.isFirstLoad()) {
+            return true;
+          }
           if (range.isManualChange) {
             return true;
           }
           return reportNode?.status === Status.RUNNING;
         }),
         switchMap(([executionId, range, reportNode]) => {
+          this.lastLoadedReportNodeId = reportNode?.id;
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
