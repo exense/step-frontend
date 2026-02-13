@@ -79,7 +79,6 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       rotation: (startAngle * Math.PI) / 180,
       circumference,
     } as const;
-    console.log(size);
     if (this.chart) {
       // update in place
       this.chart.data.labels = data.labels as any;
