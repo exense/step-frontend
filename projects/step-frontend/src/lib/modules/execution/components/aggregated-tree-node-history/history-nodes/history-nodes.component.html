@@ -1,6 +1,7 @@
 <div class="container">
   <div class="previous-executions-container" [style.--style__nodeSize.px]="nodesSize()">
-    @for (node of paddedPastExecutions(); track node) {
+    <!--    eslint-disable-next-line step-lint/track-is-item-field-->
+    @for (node of paddedPastExecutions(); track $index) {
       @if (showTooltip() && node) {
         <ng-container
           *ngTemplateOutlet="nodeItemWithPopover; context: { item: node, last: $last, isCurrentExecution: false }"
