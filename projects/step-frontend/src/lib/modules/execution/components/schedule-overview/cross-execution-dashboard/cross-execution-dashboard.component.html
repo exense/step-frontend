@@ -50,13 +50,13 @@
   <div class="controls">
     <step-autorefresh-toggle
       [interval]="_state.refreshInterval()"
-      (refresh)="triggerRefresh()"
+      (refresh)="_state.triggerRefresh()"
       (intervalChange)="handleRefreshIntervalChange($event)"
     />
     @if (_state.activeTimeRangeSelection()) {
       <div class="range-picker">
         <step-time-range-picker
-          (selectionChange)="handleTimeRangeChange($event)"
+          (selectionChange)="_state.updateTimeRangeSelection($event)"
           [selectOptions]="timeRangeOptions"
           [activeSelection]="_state.activeTimeRangeSelection()!"
           [activeTimeRange]="(_state.timeRange$ | async) || undefined"

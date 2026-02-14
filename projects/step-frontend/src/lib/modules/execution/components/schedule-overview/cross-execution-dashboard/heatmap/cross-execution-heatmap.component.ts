@@ -66,6 +66,8 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
   readonly defaultDateRange = input<DateRange>();
 
+  readonly isLoading = signal<boolean>(false);
+
   protected readonly dashletTitle = computed(() => {
     let heatmapType = this.heatmapType();
     const lastExecutionLabel = ` (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
@@ -114,6 +116,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
   protected switchType(newType: HeatMapChartType) {
     this.heatmapType.set(newType);
+    this._state.lastRefreshTrigger.set('manual');
   }
 
   readonly heatMapData$: Observable<HeatmapDataResponse> = combineLatest([
@@ -122,6 +125,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     this.heatmapType$,
   ]).pipe(
     switchMap(([executions, timeRange, heatmapType]) => {
+      this.isLoading.set(true);
       const isKeywordsHeatmap = heatmapType === 'keywords';
 
       const executionIdAttribute = 'eId';
@@ -200,7 +204,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
               });
             });
           });
-
+          this.isLoading.set(false);
           return { data: this.convertToTableData(executions, Object.values(itemsMap)), truncated: false };
         }),
       );

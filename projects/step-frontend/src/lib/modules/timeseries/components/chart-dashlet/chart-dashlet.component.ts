@@ -4,6 +4,7 @@ import {
   effect,
   inject,
   input,
+  Input,
   OnChanges,
   OnInit,
   output,
@@ -79,6 +80,7 @@ const resolutionLabels: Record<string, string> = {
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],
+  standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -111,11 +113,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly height = input.required<number>();
   readonly editMode = input<boolean>(false);
   readonly showExecutionLinks = input<boolean>(false);
+  readonly showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+
+  readonly isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -132,6 +137,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   collectionResolutionUsed: number = 0;
 
   firstEffectTriggered = false;
+
 
   readonly itemChangeEffect = effect(() => {
     const item = this.item();
@@ -479,6 +485,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           truncated: response.truncated,
         };
       }),
+      tap(() => this.isLoading.set(false)),
     );
   }
 
@@ -541,6 +548,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private fetchDataAndCreateChartSettings(): Observable<TSChartSettings> {
+    this.isLoading.set(true);
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;
