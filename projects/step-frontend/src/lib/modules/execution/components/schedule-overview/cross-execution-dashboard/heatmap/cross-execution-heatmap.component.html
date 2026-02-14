@@ -1,7 +1,9 @@
 <step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
   <step-alt-report-widget-content class="widget-content">
     @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
-      <step-chart-skeleton />
+      <div class="spinner-container">
+        <mat-spinner [diameter]="32" />
+      </div>
     } @else {}
     <div [class.hidden]="isLoading() && _state.lastRefreshTrigger() !== 'auto'">
       @if (defaultDateRange(); as dateRange) {
