@@ -298,7 +298,6 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
     AggregatedTreeNodeStatusesPiechartComponent,
-    AggregatedTreeNodeStatusesPiechartComponent,
     HistoryNodesComponent,
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
