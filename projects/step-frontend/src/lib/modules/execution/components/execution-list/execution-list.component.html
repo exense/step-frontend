@@ -90,7 +90,13 @@
 
     <ng-container matColumnDef="history">
       <th mat-header-cell *matHeaderCellDef>
-        <step-drag-column-caption>History</step-drag-column-caption>
+        <step-drag-column-caption
+          >History
+          <step-icon
+            name="help-circle"
+            matTooltip="Shows the results of prior plan executions. Each circle represents one execution."
+          />
+        </step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element" class="description-cell">
         <step-history-cell [execution]="element" />
