@@ -9,7 +9,7 @@ import { DOCUMENT } from '@angular/common';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltReportNodeDetailsStateService } from '../../services/alt-report-node-details-state.service';
-import { filter, map, of, switchMap } from 'rxjs';
+import {filter, map, of, switchMap, tap} from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
@@ -56,6 +56,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected readonly _activatedRoute = inject(ActivatedRoute);
 
   private isInitialLoad = true;
+  private lastReportNode?: ReportNode;
 
   private aggregatedNode$ = this._executionState.timeRange$.pipe(
     switchMap(() => this._treeState.isInitialized$),
@@ -70,11 +71,17 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   );
 
   private reportNode$ = this._executionState.timeRange$.pipe(
-    map(() => this._data.reportNodeId),
-    switchMap((reportNodeId) => {
+    map((range) => ({ range, reportNodeId: this._data.reportNodeId })),
+    switchMap(({ range, reportNodeId }) => {
       if (!reportNodeId) {
         this.isInitialLoad = false;
         return of(undefined);
+      }
+
+      const isManualChange = !!range?.isManualChange;
+      const hasSameNode = this.lastReportNode?.id === reportNodeId;
+      if (!isManualChange && hasSameNode && this.lastReportNode?.status !== Status.RUNNING) {
+        return of(this.lastReportNode);
       }
 
       let reportNode: ReportNode | undefined = undefined;
@@ -83,9 +90,15 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
       }
       this.isInitialLoad = false;
       if (reportNode) {
+        this.lastReportNode = reportNode;
         return of(reportNode);
       }
-      return this._controllerService.getReportNode(reportNodeId);
+
+      return this._controllerService.getReportNode(reportNodeId).pipe(
+       tap((node) => {
+          this.lastReportNode = node;
+        }),
+      );
     }),
   );
 
