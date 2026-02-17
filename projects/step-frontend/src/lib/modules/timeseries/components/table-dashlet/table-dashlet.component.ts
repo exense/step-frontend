@@ -145,7 +145,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   public refresh(blur?: boolean): Observable<any> {
-    console.log('refreshing');
     this.isLoading.set(true);
     return this.fetchBaseData().pipe(
       switchMap(() => this.updateTableData()),
