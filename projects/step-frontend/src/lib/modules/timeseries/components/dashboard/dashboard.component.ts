@@ -629,7 +629,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
 
     this.compareModeChangesSubscription = compareModeContext.settingsChange$.subscribe((x) => {
-      console.log('settings have changed', x);
       this.dashlets.forEach((d) => {
         if (d.getType() === 'TABLE') {
           (d as TableDashletComponent).refreshCompareData().subscribe();
