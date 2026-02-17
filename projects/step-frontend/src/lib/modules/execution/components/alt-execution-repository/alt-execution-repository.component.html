@@ -17,5 +17,8 @@
         <span>{{ item.value }}</span>
       }
     </section>
+    @if (azureDevopsQueryParams(); as queryParams) {
+      <a class="azure-devops-link" routerLink="/azure-devops" [queryParams]="queryParams">Show in Azure DevOps plugin</a>
+    }
   </step-popover-content>
 </step-popover>
