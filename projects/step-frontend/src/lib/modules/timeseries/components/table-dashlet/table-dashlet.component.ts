@@ -232,7 +232,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   enableCompareMode(context: TimeSeriesContext): void {
-    console.log('enabling compare mode in table dashlet');
     this.compareModeEnabled = true;
     this.compareContext = context;
     this.compareBuckets = this.baseBuckets;
