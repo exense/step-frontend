@@ -37,6 +37,7 @@ import { SeriesStroke } from '../../modules/_common/types/time-series/series-str
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ChartSkeletonComponent } from '../../modules/chart';
+import { isInProgress } from 'ng-packagr/lib/graph/select';
 
 interface TableColumn {
   id: string;
@@ -593,6 +594,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly isInProgress = isInProgress;
 }
 
 const ColumnsValueFunctions: Record<string, any> = {

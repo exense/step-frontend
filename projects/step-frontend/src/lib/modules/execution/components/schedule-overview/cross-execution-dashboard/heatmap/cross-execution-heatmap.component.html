@@ -2,7 +2,7 @@
   <step-alt-report-widget-content class="widget-content">
     @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
       <div class="spinner-container">
-        <mat-spinner [diameter]="32" />
+        <mat-spinner />
       </div>
     } @else {}
     <div [class.hidden]="isLoading() && _state.lastRefreshTrigger() !== 'auto'">
@@ -31,7 +31,7 @@
             }
           } @else {
             <div class="spinner-container">
-              <mat-spinner [diameter]="32" />
+              <mat-spinner />
             </div>
           }
         </div>
