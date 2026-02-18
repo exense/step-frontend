@@ -76,6 +76,7 @@ const convertFilter = (field: string, searchValue: SearchValue): Array<TableRequ
 };
 
 const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
+  const columns = req.columns ?? [];
   const result: TableRequestData = {
     skip: req.start || 0,
     limit: req.length || 10,
@@ -96,10 +97,10 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
       field: column,
       direction: order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
     }));
-  } else {
+  } else if (columns.length > 0) {
     result.sort = [
       {
-        field: req.columns[0],
+        field: columns[0],
         direction: SortDirection.ASCENDING,
       },
     ];
@@ -324,8 +325,11 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._requestColumnsMap[key] = value;
   }
 
-  reload(reloadOptions?: StepDataSourceReloadOptions) {
-    let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
+  reload(reloadOptions?: StepDataSourceReloadOptions): void {
+    let val = this._request$.value;
+    if (!val?.request) {
+      val = { request: convertTableRequest(this.createInternalRequestObject()) };
+    }
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;
     val.isForce = reloadOptions?.isForce;
