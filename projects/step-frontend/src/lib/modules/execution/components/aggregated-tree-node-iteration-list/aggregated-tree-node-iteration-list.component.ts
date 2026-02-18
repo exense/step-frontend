@@ -119,10 +119,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     .pipe(
       startWith(this.searchCtrl.value),
       debounceTime(200),
-      map((value) => (value ?? '').trim().toLowerCase()),
+      map((value) => this._filterConditionFactory.reportNodeFilterCondition((value ?? '').trim())),
       takeUntilDestroyed(),
     )
-    .subscribe((search) => untracked(() => this.tableSearch())?.onSearch?.('name', search));
+    .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
