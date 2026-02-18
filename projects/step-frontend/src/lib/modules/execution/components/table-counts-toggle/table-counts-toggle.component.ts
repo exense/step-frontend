@@ -1,7 +1,9 @@
 import { Component, computed, input, output } from '@angular/core';
+import { StepCommonModule } from '../../../_common/step-common.module';
 
 @Component({
   selector: 'step-table-counts-toggle',
+  imports: [StepCommonModule],
   template: `
     <button
       type="button"
@@ -13,7 +15,7 @@ import { Component, computed, input, output } from '@angular/core';
       <step-icon name="loader" />
     </button>
   `,
-  standalone: false,
+  standalone: true,
 })
 export class TableCountsToggleComponent {
   readonly enabled = input(false);

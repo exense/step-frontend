@@ -276,7 +276,6 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     AggregatedTreeNodeHistoryComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
     ExecutionHistorySectionComponent,
-    TableCountsToggleComponent,
   ],
   imports: [
     StepCommonModule,
@@ -299,6 +298,7 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    TableCountsToggleComponent,
   ],
   exports: [
     ExecutionListComponent,
