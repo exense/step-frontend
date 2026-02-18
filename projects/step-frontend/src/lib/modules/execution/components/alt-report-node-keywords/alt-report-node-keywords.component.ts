@@ -1,4 +1,4 @@
-import { Component, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedScreenService,
   ItemsPerPageService,
@@ -57,6 +57,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   protected tableSearch = viewChild('table', { read: TableSearch });
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
+  protected readonly calculateCounts = signal(false);
 
   private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
@@ -65,6 +66,10 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected openDetails(node: ReportNode): void {
     this._dialogs.openIterationDetails(node);
+  }
+
+  protected toggleCountsCalculation(): void {
+    this.calculateCounts.update((value) => !value);
   }
 
   override setupSearchFilter(): void {

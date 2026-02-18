@@ -10,6 +10,7 @@
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
+    [calculateCounts]="calculateCounts()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
     class="paddingless no-border hide-header no-highlight special-selection"
   >
@@ -50,6 +51,21 @@
           </button>
         </step-btn-group>
       </td>
+    </ng-container>
+    <ng-container *stepTablePaginatorContent>
+      <button
+        type="button"
+        mat-icon-button
+        [color]="calculateCounts() ? 'primary' : undefined"
+        [matTooltip]="
+          calculateCounts()
+            ? 'Click to disable loading the total number of steps to enhance performance.'
+            : 'Click to load the total number of steps. Note: this may slow down performance for large numbers of steps'
+        "
+        (click)="toggleCountsCalculation()"
+      >
+        <step-icon name="loader" />
+      </button>
     </ng-container>
   </step-table>
 </step-alt-report-node-list>
