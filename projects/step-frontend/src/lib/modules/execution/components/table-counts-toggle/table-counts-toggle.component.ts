@@ -24,7 +24,8 @@ export class TableCountsToggleComponent {
 
   protected readonly tooltipText = computed(() => {
     const itemsLabel = this.itemsLabel();
-    if (this.enabled()) {
+    const isEnabled = this.enabled();
+    if (isEnabled) {
       return `Click to disable loading the total number of ${itemsLabel} to enhance performance.`;
     }
     return `Click to load the total number of ${itemsLabel}. Note: this may slow down performance for large numbers of ${itemsLabel}`;
