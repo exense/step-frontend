@@ -1,0 +1,14 @@
+<form (submit)="handleSubmit()" [formGroup]="form">
+  <step-modal-window title="Add preset">
+    <div step-modal-window-body>
+      <step-form-field [showRequiredMarker]="true">
+        <step-label>Preset name</step-label>
+        <input type="text" formControlName="name"/>
+      </step-form-field>
+    </div>
+    <div step-modal-window-buttons>
+      <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+      <button type="submit" mat-flat-button color="primary">Save</button>
+    </div>
+  </step-modal-window>
+</form>

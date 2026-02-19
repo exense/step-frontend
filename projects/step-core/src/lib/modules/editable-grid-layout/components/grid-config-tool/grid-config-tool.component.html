@@ -23,6 +23,19 @@
           </mat-card-header>
           <mat-card-content>
             <section class="settings">
+              <step-form-field class="preset">
+                <step-label>Preset:</step-label>
+                <mat-select [ngModel]="selectedPresetId()" (ngModelChange)="handlePresetSelection($event)">
+                  @for(preset of presets(); track preset.key){
+                    <mat-option [value]="preset.key">{{preset.value}}</mat-option>
+                  }
+                </mat-select>
+                <step-suffix class="button-suffix">
+                  <button type="button" mat-stroked-button (click)="removePreset()" [disabled]="isProtected()">
+                    <step-icon name="trash"/>
+                  </button>
+                </step-suffix>
+              </step-form-field>
               <mat-label>Add widget</mat-label>
               <button type="button" mat-icon-button [disabled]="!canAdd()" [matMenuTriggerFor]="menu">
                 <step-icon name="plus"/>
@@ -32,7 +45,9 @@
           <mat-card-actions align="end">
             <button type="button" mat-button (click)="reset()">Reset</button>
             &nbsp;
-            <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+            <button type="button" mat-flat-button color="primary" (click)="save()" [disabled]="isProtected()">Save</button>
+            &nbsp;
+            <button type="button" mat-flat-button color="primary" (click)="saveAsNew()">Save As New</button>
           </mat-card-actions>
         </mat-card>
       </step-popover-content>

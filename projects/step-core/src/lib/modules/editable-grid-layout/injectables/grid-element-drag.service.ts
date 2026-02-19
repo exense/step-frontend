@@ -145,15 +145,7 @@ export class GridElementDragService implements OnDestroy {
     position.column = column;
     position.row = row;
 
-
-    console.log('DRAG MOVE', id, JSON.stringify(position), JSON.stringify(dragPoint));
-
     const result = this._widgetsPositions.correctPositionForDrag(id, position, dragPoint);
-    if (result) {
-      console.log('DRAG MOVE RESULT', result.canBeApplied, JSON.stringify(result.position));
-    } else {
-      console.log('DRAG MOVE RESULT', 'NONE');
-    }
     return result;
   }
 }
