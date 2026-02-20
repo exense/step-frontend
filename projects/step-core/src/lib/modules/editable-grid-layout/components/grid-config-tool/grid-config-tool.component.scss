@@ -7,14 +7,3 @@ button.active {
     color: var.$dark-blue;
   }
 }
-
-.settings {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 1rem;
-  align-items: center;
-
-  .preset {
-    grid-column: 1 / 3;
-  }
-}

@@ -13,6 +13,23 @@ step-grid-background {
   right: 0;
   padding-bottom: sizes.$row-height;
 
+  .grid-cells {
+    display: grid;
+    position: absolute;
+    grid-template-columns: repeat($cols-count-1, sizes.columnWidth($cols-count-1));
+    grid-auto-rows: sizes.$row-height;
+    row-gap: sizes.$row-gap;
+    column-gap: sizes.$column-gap;
+    width: 100%;
+
+    .grid-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+  }
+
   .grid-measure {
     &.vertical-cols {
       position: absolute;
@@ -42,7 +59,6 @@ step-grid-background {
     & > section {
       display: none;
       position: absolute;
-      background: var.$blue-50;
       opacity: 0.5;
       top: 0.9rem;
       left: 1.5rem;
@@ -56,12 +72,24 @@ step-grid-background {
     background: var.$white;
   }
 
-  .grid-measure-row:has(button:hover) > section {
+  .grid-measure-row:has(button.add-row:hover) > section {
     display: block;
+    background: var.$blue-50;
   }
 
-  .grid-measure-row button {
+  .grid-measure-row:has(button.remove-row:hover) > section {
+    display: block;
+    background: var.$red-50;
+  }
+
+  .grid-measure-row button.add-row {
     margin-top: -0.8rem;
     margin-left: -1.5rem;
+  }
+
+  .grid-measure-row button.remove-row {
+    position: absolute;
+    margin-top: -0.8rem;
+    right: -1.5rem;
   }
 }

@@ -1,0 +1,8 @@
+<button type="button" mat-icon-button color="primary" [matMenuTriggerFor]="menu" matTooltip="Add widget" matTooltipPosition="below">
+  <step-icon name="plus"/>
+</button>
+<mat-menu #menu="matMenu">
+  @for(item of widgets(); track item.id){
+    <button type="button" mat-menu-item (click)="addWidget(item.id)" [disabled]="item.isVisible">{{item.title}}</button>
+  }
+</mat-menu>

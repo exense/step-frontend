@@ -356,6 +356,18 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     return { row: lastWidgetPosition.row, column, widthInCells, heightInCells };
   }
 
+  isRowEmpty(row: number): boolean {
+    if (row === 0) {
+      return false;
+    }
+    for (let c = 1; c <= this._colCount; c++) {
+      if (this.isCellTaken(row, c)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private clearElementPosition(elementId: string): boolean {
     const originalPosition = this.context.getWidgetPositions()[elementId];
     if (!originalPosition) {

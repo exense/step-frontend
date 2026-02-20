@@ -1,8 +1,7 @@
-import {Component, computed, inject, linkedSignal, untracked} from '@angular/core';
+import {Component, computed, effect, inject, linkedSignal, untracked, viewChild} from '@angular/core';
 import { GridEditableService } from '../../injectables/grid-editable.service';
-import {DialogsService, PopoverMode, StepBasicsModule} from '../../../basics/step-basics.module';
+import {DialogsService, PopoverComponent, PopoverMode, StepBasicsModule} from '../../../basics/step-basics.module';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
-import {WidgetsVisibilityStateService} from '../../injectables/widgets-visibility-state.service';
 import {MatDialog} from '@angular/material/dialog';
 import {NewPresetDialogComponent, NewPresetDialogData} from '../new-preset-dialog/new-preset-dialog.component';
 import {filter, of, switchMap} from 'rxjs';
@@ -17,8 +16,9 @@ export class GridConfigToolComponent {
   private _gridEditable = inject(GridEditableService);
   private _widgetPersistence = inject(WidgetsPersistenceStateService);
   private _matDialog = inject(MatDialog);
-  private _widgetsVisibility = inject(WidgetsVisibilityStateService);
   private _dialogs = inject(DialogsService);
+
+  private gridSettingsPopover = viewChild('gridSettingsPopover', {read: PopoverComponent});
 
   protected readonly selectedPresetId = linkedSignal(() => {
     const preset = this._widgetPersistence.selectedPreset();
@@ -31,14 +31,12 @@ export class GridConfigToolComponent {
   protected readonly presets = this._widgetPersistence.gridPresets;
   protected readonly isEdit = this._gridEditable.editMode;
 
-  protected readonly widgetsToAdd = computed(() => {
-    const widgets = this._widgetsVisibility.visibilityInfo();
-    return widgets.filter((item) => !item.isVisible);
-  });
-
-  protected readonly canAdd = computed(() => {
-    const widgetsToAdd = this.widgetsToAdd();
-    return widgetsToAdd.length > 0;
+  private effectShowPopoverOnEditStart = effect(() => {
+    const isEdit = this.isEdit();
+    const gridSettingsPopover = this.gridSettingsPopover();
+    if (isEdit && gridSettingsPopover) {
+      gridSettingsPopover.openPopover();
+    }
   });
 
   protected startEdit(): void {
@@ -101,10 +99,6 @@ export class GridConfigToolComponent {
       .subscribe(() => {
         this._gridEditable.setEditMode(false);
       });
-  }
-
-  protected addWidget(id: string): void {
-    this._widgetsVisibility.show(id);
   }
 
   protected readonly PopoverMode = PopoverMode;

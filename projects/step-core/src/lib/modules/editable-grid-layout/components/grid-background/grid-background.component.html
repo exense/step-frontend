@@ -1,10 +1,17 @@
+<section class="grid-cells">
+  @if(addCellCoordinates(); as coords) {
+    <div class="grid-cell" [style.grid-area]="coords">
+      <step-grid-add-widget/>
+    </div>
+  }
+</section>
 <section class="grid-measure vertical-cols">
   @for (item of verticalCols(); track item) {
     <div class="grid-measure-column"></div>
   }
 </section>
 <section class="grid-measure horizontal-rows">
-  @for (item of horizontalRows(); track item) {
+  @for (item of horizontalRows(); track item.index) {
     <div class="grid-measure-row">
       <section></section>
       <button
@@ -13,10 +20,24 @@
         color="primary"
         matTooltip="Insert row"
         matTooltipPosition="right"
-        (click)="insertAfterRow(item)"
+        class="add-row"
+        (click)="insertAfterRow(item.index)"
       >
         <step-icon name="plus" />
       </button>
+      @if(item.isEmpty) {
+        <button
+            type="button"
+            mat-icon-button
+            color="warn"
+            matTooltip="Remove row"
+            matTooltipPosition="left"
+            class="remove-row"
+            (click)="removeRow(item.index)"
+        >
+          <step-icon name="minus" />
+        </button>
+      }
     </div>
   }
 </section>

@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
-import {GridPoint, WidgetPosition, WidgetPositionParams} from '../types/widget-position';
+import {GridPoint, WidgetPosition} from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
@@ -45,14 +45,22 @@ export class WidgetsPositionsStateService
     }
   });
 
-  readonly fieldBottom = computed(() => {
+  readonly widgetsBottom = computed(() => {
     const positions = Object.values(this.positionsStateInternal());
-    const extraRows = this.extraRows();
     if (!positions.length) {
       return 0;
     }
     const bottom = Math.max(...positions.map((item) => item.bottomEdge));
-    return bottom + extraRows;
+    return bottom;
+  })
+
+  readonly fieldBottom = computed(() => {
+    const widgetsBottom = this.widgetsBottom();
+    const extraRows = this.extraRows();
+    if (!widgetsBottom) {
+      return 0;
+    }
+    return widgetsBottom + extraRows;
   });
 
   readonly positions = computed(() => {
@@ -134,6 +142,31 @@ export class WidgetsPositionsStateService
     this.notRenderedWidgets.set(widgetsIds);
   }
 
+  removeRow(row: number): void {
+    const positions = untracked(() => this.positionsStateInternal());
+    let hasChanges = false;
+    const updatedPositions = Object.values(positions).reduce(
+      (res, position) => {
+        if (position.row < row) {
+          return res;
+        }
+        hasChanges = true;
+        const updatedPosition = position.clone();
+        updatedPosition.row--;
+        res[updatedPosition.id] = updatedPosition;
+        return res;
+      },
+      {} as Record<string, WidgetPosition>,
+    );
+
+    if (hasChanges) {
+      this.positionsStateInternal.update((value) => ({ ...value, ...updatedPositions }));
+      return;
+    }
+
+    this.extraRows.update((value) => value - 1);
+  }
+
   insertAfterRow(row: number): void {
     const positions = untracked(() => this.positionsStateInternal());
     let hasChanges = false;
@@ -191,9 +224,13 @@ export class WidgetsPositionsStateService
       return;
     }
     const info = this._gridConfig.defaultElementParamsMap[id];
-    const positionParams = this._utils.findProperPosition(info.widthInCells, info.heightInCells);
+    const positionParams = this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
     const position = new WidgetPosition(info.id, positionParams);
     this.updatePosition(position);
+  }
+
+  isEmptyRow(row: number): boolean {
+    return this._utils.isRowEmpty(row)
   }
 
   private determineInitialPositions(widgetIds: string[]): void {

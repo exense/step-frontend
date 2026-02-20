@@ -10,6 +10,7 @@
       [mode]="PopoverMode.CLICK"
       [whiteBackground]="true"
       [noPadding]="true"
+      #gridSettingsPopover
       xPosition="before"
       yPosition="above"
     >
@@ -36,10 +37,6 @@
                   </button>
                 </step-suffix>
               </step-form-field>
-              <mat-label>Add widget</mat-label>
-              <button type="button" mat-icon-button [disabled]="!canAdd()" [matMenuTriggerFor]="menu">
-                <step-icon name="plus"/>
-              </button>
             </section>
           </mat-card-content>
           <mat-card-actions align="end">
@@ -54,8 +51,3 @@
     </step-popover>
   </step-btn-group>
 }
-<mat-menu #menu="matMenu">
-  @for(item of widgetsToAdd(); track item.id){
-    <button type="button" mat-menu-item (click)="addWidget(item.id)">{{item.title}}</button>
-  }
-</mat-menu>

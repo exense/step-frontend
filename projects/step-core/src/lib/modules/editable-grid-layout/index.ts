@@ -27,3 +27,4 @@ export * from './injectables/grid-layout-config.provider';
 export * from './components/grid-element-title/grid-element-title.component';
 export * from './components/grid-background/grid-background.component';
 export * from './components/grid-config-tool/grid-config-tool.component';
+export * from './components/grid-add-widget/grid-add-widget.component';
