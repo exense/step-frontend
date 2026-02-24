@@ -1,35 +1,35 @@
 @if (keywordInputs(); as inputs) {
-  <section class="json-container">
+  <section class="json-container title-inline-action">
     <div class="container-title">
-      <step-icon name="log-in" />
       Inputs
+      <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
+        <step-icon name="copy" />
+      </button>
     </div>
     <step-json-view-expanded
       [data]="inputs"
+      [columns]="2"
       [limit]="7"
       labelExpand="Expand all inputs"
       labelCollapse="Collapse inputs"
     />
-    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
-      <step-icon name="copy" />
-    </button>
   </section>
 }
 @if (keywordOutputs(); as outputs) {
-  <section class="json-container">
+  <section class="json-container title-inline-action">
     <div class="container-title">
-      <step-icon name="log-out" />
       Outputs
+      <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
+        <step-icon name="copy" />
+      </button>
     </div>
     <step-json-view-expanded
       [data]="outputs"
+      [columns]="2"
       [limit]="7"
       labelExpand="Expand all outputs"
       labelCollapse="Collapse outputs"
     />
-    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
-      <step-icon name="copy" />
-    </button>
   </section>
 }
 @if (failedChildren(); as children) {
@@ -52,11 +52,8 @@
   }
 }
 @if (measuresDataSource(); as measuresDataSource) {
-  <section class="data-container">
-    <div class="container-title">
-      <step-icon name="stopwatch" />
-      Measurements
-    </div>
+  <section class="data-container measurements-section">
+    <div class="container-title">Measurements</div>
     <div>
       <step-table [dataSource]="measuresDataSource" matSort>
         <ng-container matColumnDef="begin">
@@ -96,10 +93,7 @@
 @if (node(); as node) {
   @if (node.tokenId || node.agentUrl) {
     <section class="data-container tech-details">
-      <div class="container-title">
-        <step-icon name="routing" />
-        Routing
-      </div>
+      <div class="container-title">Routing</div>
       <div class="tech-details-content">
         @if (node.agentUrl) {
           <span>Agent:</span>

@@ -1,15 +1,19 @@
 @if (outputItems(); as outputs) {
-  <section class="json-container">
+  <section class="json-container title-inline-action">
+    <div class="container-title">
+      Outputs
+      <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
+        <step-icon name="copy" />
+      </button>
+    </div>
     <step-json-view-expanded
       [data]="outputs"
+      [columns]="2"
       [limit]="7"
       [iconsDictionary]="itemIcons"
       labelExpand="Expand all outputs"
       labelCollapse="Collapse outputs"
     />
-    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
-      <step-icon name="copy" />
-    </button>
   </section>
 }
 @if (node()?.error) {

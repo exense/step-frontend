@@ -14,6 +14,7 @@ import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive'
   imports: [StepBasicsModule, ClampFadeDirective],
   host: {
     '[class.collapsable]': 'hasCollapseButton()',
+    '[class.two-columns]': 'columns() === 2',
   },
 })
 export class JsonViewExpandedComponent {
@@ -26,6 +27,7 @@ export class JsonViewExpandedComponent {
   readonly labelExpand = input('Expand');
   readonly labelCollapse = input('Collapse');
   readonly displayLines = input<number | null>(null);
+  readonly columns = input(1);
 
   private jsonParsed = computed(() => {
     const iconsDictionary = this.iconsDictionary();

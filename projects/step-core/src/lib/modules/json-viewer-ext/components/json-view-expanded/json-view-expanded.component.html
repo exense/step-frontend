@@ -2,6 +2,8 @@
 @for (node of items(); track node.id) {
   <div
     class="json-node"
+    [class.two-column]="columns() === 2"
+    [class.full-row]="columns() === 2 && node.level > 0"
     [class.additional-shift]="node.isParentIconExist"
     [style.--level]="node.level"
     stepUndraggedClick

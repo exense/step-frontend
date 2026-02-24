@@ -13,17 +13,21 @@
   </section>
 }
 @if (inputs(); as inputs) {
-  <section class="json-container">
+  <section class="json-container title-inline-action">
+    <div class="container-title">
+      Inputs
+      <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInputs()">
+        <step-icon name="copy" />
+      </button>
+    </div>
     <step-json-view-expanded
       [data]="inputs"
+      [columns]="2"
       [limit]="7"
       [iconsDictionary]="inputIcons"
       labelExpand="Expand all inputs"
       labelCollapse="Collapse inputs"
     />
-    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInputs()">
-      <step-icon name="copy" />
-    </button>
   </section>
 }
 @if (node()?.error) {

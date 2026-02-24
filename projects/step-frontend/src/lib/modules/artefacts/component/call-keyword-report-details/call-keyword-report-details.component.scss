@@ -1,0 +1,13 @@
+:host {
+  .title-inline-action {
+    padding-right: 0;
+
+    > .container-title > button {
+      position: static;
+    }
+  }
+
+  .measurements-section {
+    gap: 0;
+  }
+}
