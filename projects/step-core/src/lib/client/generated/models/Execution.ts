@@ -7,6 +7,7 @@ import type { ExecutionParameters } from './ExecutionParameters';
 import type { ExecutiontTaskParameters } from './ExecutiontTaskParameters';
 import type { ImportResult } from './ImportResult';
 import type { ReportExport } from './ReportExport';
+import { ExecutionResultSnapshot } from './ExecutionResultSnapshot';
 
 export type Execution = {
   customFields?: Record<string, any>;
@@ -47,4 +48,5 @@ export type Execution = {
   resolvedPlanRootNodeId?: string;
   agentsInvolved?: string;
   id?: string;
+  historyResults: ExecutionResultSnapshot[];
 };

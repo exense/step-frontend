@@ -1,8 +1,8 @@
 <div class="container">
-  @for (statusItem of distribution(); track statusItem.status) {
+  @for (statusItem of distribution(); track statusItem.label) {
     <step-status-distribution-badge
       [count]="statusItem.count"
-      [status]="statusItem.status"
+      [status]="statusItem.label"
       [percentage]="statusItem.percentage"
     />
   }

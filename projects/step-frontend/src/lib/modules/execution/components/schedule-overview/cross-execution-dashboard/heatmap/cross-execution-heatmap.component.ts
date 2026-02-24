@@ -26,6 +26,7 @@ import {
   HeatMapRow,
 } from './types/heatmap-types';
 import { HEATMAP_STORE_ALL, heatmapPersistenceConfigProvider } from './injectables/heatmap-persistence-config.provider';
+import { StatusDistributionItem } from '../../../status-distribution-tooltip/status-distribution-tooltip.component';
 
 interface ItemWithExecutionsStatuses {
   key: string; // keyword or testcase
@@ -56,10 +57,10 @@ const HEATMAP_MAX_SERIES_COUNT = 10000;
 })
 export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
-  readonly _state = inject(CrossExecutionDashboardState);
-  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  protected readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
-  readonly DateFormat = DateFormat;
+  protected readonly DateFormat = DateFormat;
   private _timeSeriesService = inject(TimeSeriesService);
   private _colors = inject(STATUS_COLORS);
 
@@ -72,7 +73,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     return (heatmapType === 'keywords' ? 'Keyword statuses' : 'Test cases statuses') + lastExecutionLabel;
   });
 
-  readonly tabs: Tab<'testcases' | 'keywords'>[] = [
+  protected readonly tabs: Tab<'testcases' | 'keywords'>[] = [
     {
       id: 'testcases',
       label: 'Test Cases',
@@ -83,7 +84,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     },
   ];
 
-  readonly HEATMAP_STATUS_COLORS: Record<HeatmapStatus, string> = {
+  protected readonly HEATMAP_STATUS_COLORS: Record<HeatmapStatus, string> = {
     VETOED: this._colors.TECHNICAL_ERROR,
     TECHNICAL_ERROR: this._colors.TECHNICAL_ERROR,
     IMPORT_ERROR: this._colors.TECHNICAL_ERROR,
@@ -95,7 +96,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     UNKNOWN: this._colors.UNKNOW,
   };
 
-  readonly legendColors: HeatMapColor[] = [
+  protected readonly legendColors: HeatMapColor[] = [
     { hex: this.HEATMAP_STATUS_COLORS.PASSED, label: 'Passed' },
     { hex: this.HEATMAP_STATUS_COLORS.FAILED, label: 'Failed' },
     { hex: this.HEATMAP_STATUS_COLORS.TECHNICAL_ERROR, label: 'Technical Error' },
@@ -105,18 +106,18 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
   private FALLBACK_COLOR = this._colors.NORUN;
 
-  readonly heatmapType = signal<HeatMapChartType | undefined>(undefined);
+  protected readonly heatmapType = signal<HeatMapChartType | undefined>(undefined);
 
   private readonly heatmapType$ = toObservable(this.heatmapType).pipe(
     filter((t): t is HeatMapChartType => !!t),
     distinctUntilChanged(),
   );
 
-  protected switchType(newType: HeatMapChartType) {
+  protected switchType(newType: HeatMapChartType): void {
     this.heatmapType.set(newType);
   }
 
-  readonly heatMapData$: Observable<HeatmapDataResponse> = combineLatest([
+  protected readonly heatMapData$: Observable<HeatmapDataResponse> = combineLatest([
     this._state.lastExecutionsSorted$,
     this._state.timeRange$,
     this.heatmapType$,
@@ -222,17 +223,20 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
         for (const execution of executions) {
           const executionId = execution.id!;
-          const statusCounts = item.statusesByExecutions?.[executionId] || {};
+          const statusCounts: Record<string, number> = item.statusesByExecutions?.[executionId] || {};
           const statuses = Object.keys(statusCounts);
           let total = 0;
           for (const st of statuses) total += statusCounts[st] || 0;
 
           if (!total) {
-            values[executionId] = { color: this.FALLBACK_COLOR, timestamp: execution.startTime!, statusesCount: {} };
+            values[executionId] = { color: this.FALLBACK_COLOR, timestamp: execution.startTime!, statuses: [] };
             continue;
           }
 
+          const distributionItems: StatusDistributionItem[] = [];
+
           let combinedColor: RGB = { r: 0, g: 0, b: 0 };
+
           for (const st of statuses) {
             const count = statusCounts[st] || 0;
             if (!count) continue;
@@ -242,11 +246,17 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
               this.FALLBACK_COLOR;
             const statusRgb = HeatmapColorUtils.hexToRgb(statusHex);
             combinedColor = HeatmapColorUtils.addColor(combinedColor, statusRgb, count / total);
+            distributionItems.push({
+              color: statusHex,
+              count: count,
+              label: st,
+            });
           }
+
           values[executionId] = {
             color: HeatmapColorUtils.rgbToHex(combinedColor),
             timestamp: execution.startTime!,
-            statusesCount: statusCounts,
+            statuses: distributionItems,
           };
         }
 
@@ -264,9 +274,9 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     });
   }
 
-  private formatExecutionHeader(ms: number) {
+  private formatExecutionHeader(ms: number): string {
     const d = new Date(ms);
-    const pad = (n: any) => String(n).padStart(2, '0');
+    const pad = (n: number): string => String(n).padStart(2, '0');
     return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 

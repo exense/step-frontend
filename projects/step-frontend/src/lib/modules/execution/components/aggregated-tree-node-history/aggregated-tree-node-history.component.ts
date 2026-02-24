@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import {
   BucketAttributes,
   Execution,
@@ -12,6 +12,8 @@ import { combineLatestWith, map, Observable, switchMap, take } from 'rxjs';
 import { TreeNodePieChartSlice } from './execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { Status } from '../../../_common/shared/status.enum';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { sign } from 'chart.js/helpers';
+import { HistoryNodeItem } from './history-nodes/history-nodes.component';
 
 interface ExecutionItem {
   execution: Execution;
@@ -20,7 +22,7 @@ interface ExecutionItem {
 }
 
 interface HistoryChainData {
-  previousExecutions: (ExecutionItem | null)[];
+  previousExecutions: ExecutionItem[];
   currentExecution: ExecutionItem;
 }
 
@@ -96,10 +98,10 @@ export class AggregatedTreeNodeHistoryComponent {
             }));
             return this._executionState.execution$.pipe(
               map((currentExecution) => ({
-                previousExecutions: this.padArrayWithNull(allExecutions.slice(0, -1), this.previousExecutionsCount()), // remove the current execution
+                previousExecutions: allExecutions.slice(0, -1), // remove the current execution
                 currentExecution: {
                   execution: currentExecution,
-                  statusSlices: slices[currentExecution.id!],
+                  statusSlices: slices[currentExecution.id!] || [],
                   statusesCount: Object.fromEntries(
                     (slices[currentExecution.id!] || []).map((s) => [s.label, s.count]),
                   ),
@@ -108,6 +110,27 @@ export class AggregatedTreeNodeHistoryComponent {
             );
           }),
         );
+      }),
+    );
+
+  protected newData: Observable<{ currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] }> =
+    this.historyArtefactsData$.pipe(
+      map((data) => {
+        return {
+          currentNode: {
+            statusSlices: data.currentExecution.statusSlices,
+            timestamp: data.currentExecution.execution.startTime!,
+            tooltipLinkLabel: 'Current Execution',
+          },
+          pastNodes: data.previousExecutions.map((item: ExecutionItem) => {
+            return {
+              statusSlices: item.statusSlices,
+              timestamp: item.execution.startTime,
+              tooltipLinkLabel: 'See Execution',
+              tooltipLink: '/executions/' + item.execution.id!,
+            };
+          }),
+        };
       }),
     );
 
@@ -122,12 +145,5 @@ export class AggregatedTreeNodeHistoryComponent {
 
   private fetchLastExecutionsByTask(beforeTime: number, taskId: string): Observable<Execution[]> {
     return this._executionService.getLastExecutionsByTaskId(taskId, this.previousExecutionsCount(), 0, beforeTime);
-  }
-
-  private padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
-    const padCount = Math.max(0, size - (array?.length ?? 0));
-    return Array(padCount)
-      .fill(null)
-      .concat(array ?? []);
   }
 }
