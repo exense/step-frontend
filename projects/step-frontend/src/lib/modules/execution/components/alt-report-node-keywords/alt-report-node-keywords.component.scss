@@ -6,6 +6,10 @@ step-alt-report-node-keywords {
   gap: 1rem;
   flex: 1;
 
+  step-artefact-inline-details.shift-rows {
+    max-width: 100%;
+  }
+
   step-table {
     --mat-table-row-item-container-height: 3rem;
     flex: 1;
@@ -20,24 +24,79 @@ step-alt-report-node-keywords {
     }
   }
 
-  .details-trigger {
+  .data-cell > .details-trigger {
     cursor: pointer;
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
+    width: 100%;
 
     .artefact-header {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
       height: 2rem;
-      margin: 0 0.5rem 0.2rem 0;
+      margin: 0 0 0.2rem 0;
+
+      .execution-time {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+
+        .date {
+          min-width: 7ch;
+        }
+
+        .duration {
+          min-width: 6ch;
+          text-align: left;
+          color: var.$gray-500;
+          font-weight: 400;
+        }
+      }
+
       .name {
         font-weight: 500;
+        font-size: 1.2rem;
         white-space: nowrap;
-        line-height: 1.5;
+        line-height: 1.2;
         align-self: center;
       }
+    }
+  }
+
+  step-table tr:hover .data-cell > .details-trigger .artefact-header,
+  step-table
+    tr:hover
+    .data-cell
+    > .details-trigger
+    .execution-report-node-inline-details
+    > step-artefact-inline-field-list:first-of-type
+    > section.list {
+    background: var.$gray-100;
+    border-radius: 1.6rem;
+    margin-left: -0.4rem;
+    padding-left: 0.4rem;
+  }
+
+  step-table tr:hover .actions > button {
+    background: var.$gray-100;
+    border-radius: 1.6rem;
+  }
+
+  step-artefact-inline-field {
+    .field-label {
+      color: var.$gray-500;
+      font-weight: 400;
+    }
+
+    .field-value {
+      color: var.$blue-700;
+      font-weight: 700;
     }
   }
 

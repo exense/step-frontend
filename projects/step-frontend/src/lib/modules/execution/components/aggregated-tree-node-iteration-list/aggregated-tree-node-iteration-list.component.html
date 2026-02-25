@@ -32,7 +32,7 @@
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
-    class="paddingless no-border hide-header no-highlight special-selection"
+    class="paddingless no-border hide-header no-highlight"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
@@ -46,12 +46,12 @@
           >
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="artefact-header">
-                <step-alt-execution-time
-                  class="special-selection"
-                  [startTime]="element.executionTime"
-                  [duration]="element.duration"
-                  [timeOnly]="true"
-                />
+                <div class="execution-time">
+                  <span class="date">{{ element.executionTime | date: 'HH:mm:ss' }}</span>
+                  @if (element.duration !== undefined && element.duration !== null) {
+                    <span class="duration">{{ element.duration }}ms</span>
+                  }
+                </div>
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>
