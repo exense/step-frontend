@@ -10,6 +10,7 @@
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
+    [calculateCounts]="calculateCounts()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
     class="paddingless no-border hide-header no-highlight special-selection"
   >
@@ -50,6 +51,9 @@
           </button>
         </step-btn-group>
       </td>
+    </ng-container>
+    <ng-container *stepTablePaginatorContent>
+      <step-table-counts-toggle [enabled]="calculateCounts()" itemsLabel="steps" (toggle)="toggleCountsCalculation()" />
     </ng-container>
   </step-table>
 </step-alt-report-node-list>
