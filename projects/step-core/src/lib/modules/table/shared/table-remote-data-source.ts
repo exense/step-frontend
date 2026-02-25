@@ -292,6 +292,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       filter,
       calculateCounts,
       isForce: isForceOptions,
+      hideProgress,
+      immediateHideProgress,
     } = (reqOrOptions || {}) as TableGetDataOptions;
 
     const tableRequest = this.createInternalRequestObject({ search, filter, params });
@@ -317,7 +319,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.calculateCounts = calculateCounts;
     }
 
-    this.getTableData(tableRequest, isForceOptions);
+    const request = convertTableRequest(tableRequest);
+    this._request$.next({ request, isForce: isForceOptions, hideProgress, immediateHideProgress });
   }
 
   setColumnMap(key: string, value: string): void {

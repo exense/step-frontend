@@ -289,7 +289,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     request.page = options?.page || request.page;
     request.sort = options?.sort || request.sort;
     request.search = options?.search || request.search;
-    this._request$.next({ request, isForce: true });
+    this._request$.next({ request, isForce: options?.isForce ?? true });
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions): void {
