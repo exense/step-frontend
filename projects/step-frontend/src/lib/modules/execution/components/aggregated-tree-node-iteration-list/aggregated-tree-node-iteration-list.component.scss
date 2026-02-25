@@ -26,11 +26,12 @@ step-table {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
     .name {
       font-weight: 500;
       white-space: nowrap;
-      line-height: 2;
-      align-self: baseline;
+      line-height: 1.5;
+      align-self: center;
     }
   }
 }

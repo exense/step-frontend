@@ -4,6 +4,12 @@
 
     > .container-title > button {
       position: static;
+      --mat-icon-button-state-layer-color: transparent;
+      --mat-icon-button-ripple-color: transparent;
+
+      &::before {
+        background-color: transparent !important;
+      }
     }
   }
 }

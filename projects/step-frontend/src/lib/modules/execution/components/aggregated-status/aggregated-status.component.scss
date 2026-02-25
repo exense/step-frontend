@@ -4,6 +4,10 @@
   display: flex;
   white-space: nowrap;
   gap: 0.5rem;
+
+  .status-group > step-icon {
+    padding-top: 2px;
+  }
 }
 
 .status-group {
@@ -29,10 +33,10 @@
   border-style: solid;
   border-width: 0.1rem;
   border-radius: 1rem;
-  padding: 0.1rem 0.4rem;
+  padding: 0 0.3rem;
   font-weight: 600;
-  font-size: 1.1rem;
-  background: var.$light-blue-gray;
+  font-size: .9rem;
+  background: var.$white;
 
   &:not(:first-child) {
     border-left: none;
@@ -44,4 +48,5 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+
 }

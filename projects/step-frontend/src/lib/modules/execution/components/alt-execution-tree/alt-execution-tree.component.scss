@@ -13,6 +13,7 @@
       background: $color;
 
       &:after {
+        @include common.special-selection-item;
         background: $color;
       }
     }
@@ -21,7 +22,7 @@
       display: block;
       position: absolute;
       height: 3rem;
-      top: 0.8rem;
+      top: 0.4rem;
       left: 4rem;
       right: 0;
       background: $color;
@@ -86,10 +87,11 @@ step-alt-execution-tree {
         border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
         height: 3rem;
-        &:after {
-          @include common.special-selection-item;
-        }
       }
+    }
+
+    &:hover {
+      @include highlight-node(var.$gray-50);
     }
 
     &.tree-node-selected {

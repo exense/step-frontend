@@ -60,7 +60,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       children.push(afterContainer);
     }
 
-    const iconClassName = ['larger-icon'];
+    const iconClassName: string[] = [];
     const statuses = Object.keys(item?.countByStatus ?? {}) as Status[];
     const priorityStatus = chooseStatusWithMostPriority(...statuses);
     if (priorityStatus) {
