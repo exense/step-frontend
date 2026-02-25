@@ -43,7 +43,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useClass: TableMemoryStorageService,
     },
     TablePersistenceStateService,
-    tablePersistenceConfigProvider('keywords', STORE_ALL),
+    tablePersistenceConfigProvider('keywords', { ...STORE_ALL, storeSort: false }),
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
