@@ -40,7 +40,6 @@ export class AltReportNodeListComponent {
   protected toggleSort(): void {
     const nextSort = this.sort() === 'asc' ? 'desc' : 'asc';
     this.sortInternal.set(nextSort);
-    this.updateExecutionSort(nextSort);
   }
 
   private effectSyncExecutionSort = effect(() => {
@@ -51,6 +50,10 @@ export class AltReportNodeListComponent {
 
   private effectApplySort = effect(() => {
     this.applySort(this.sort(), true);
+  });
+
+  private effectPersistExecutionSort = effect(() => {
+    this.updateExecutionSort(this.sort());
   });
 
   private updateExecutionSort(sort: SortDirection): void {
