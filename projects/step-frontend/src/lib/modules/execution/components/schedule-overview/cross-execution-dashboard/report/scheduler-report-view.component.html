@@ -103,9 +103,6 @@
   <div class="row">
     <step-alt-report-widget class="flex-grow-1" title="Errors">
       <step-alt-report-widget-content class="widget-content">
-        @if (_state.errorsTableLoading()) {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
-        }
         <step-alt-execution-errors
           [dataSource]="_state.errorsDataSource"
           [statusFilterItems]="availableErrorTypes()"

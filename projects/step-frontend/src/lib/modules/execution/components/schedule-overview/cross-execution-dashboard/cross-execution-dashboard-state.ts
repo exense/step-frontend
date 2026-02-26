@@ -69,8 +69,8 @@ export abstract class CrossExecutionDashboardState {
   readonly onTimeSelectionChanged = new Subject<TimeRange>();
 
   // view settings
-  activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
-  refreshInterval = signal<number>(0);
+  readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+  readonly refreshInterval = signal<number>(0);
 
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
@@ -79,16 +79,15 @@ export abstract class CrossExecutionDashboardState {
   abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
 
-  executionsChartLoading = signal<boolean>(false);
-  summaryWidgetLoading = signal<boolean>(false);
-  testCasesCountChartLoading = signal<boolean>(false);
-  keywordsCountChartLoading = signal<boolean>(false);
-  errorsTableLoading = signal<boolean>(false);
-  successRateValueLoading = signal<boolean>(false);
-  averageDurationValueLoading = signal<boolean>(false);
-  totalExecutionsValueLoading = signal<boolean>(false);
+  readonly executionsChartLoading = signal<boolean>(false);
+  readonly summaryWidgetLoading = signal<boolean>(false);
+  readonly testCasesCountChartLoading = signal<boolean>(false);
+  readonly keywordsCountChartLoading = signal<boolean>(false);
+  readonly successRateValueLoading = signal<boolean>(false);
+  readonly averageDurationValueLoading = signal<boolean>(false);
+  readonly totalExecutionsValueLoading = signal<boolean>(false);
 
-  public updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+  public updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
     this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set(selection);
     this.onTimeSelectionChanged.next(this.convertSelectionToTimeRange(selection));
@@ -102,7 +101,7 @@ export abstract class CrossExecutionDashboardState {
     filter((value): value is TimeRangePickerSelection => value != null),
   );
 
-  public triggerRefresh() {
+  public triggerRefresh(): void {
     this.lastRefreshTrigger.set('auto');
     this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
     this.fetchLastExecutionTrigger$.next();
@@ -127,7 +126,7 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
-  private convertSelectionToTimeRange(rangeSelection: TimeRangePickerSelection) {
+  private convertSelectionToTimeRange(rangeSelection: TimeRangePickerSelection): TimeRange {
     switch (rangeSelection.type) {
       case 'FULL':
         throw new Error('Full range is not supported');
@@ -166,7 +165,7 @@ export abstract class CrossExecutionDashboardState {
   readonly summaryData$: Observable<ReportNodeSummary> = this.executionsDurationTimeSeriesData.pipe(
     map((response) => {
       let total = 0;
-      const items: { [key: string]: number } = {};
+      const items: Record<string, number> = {};
       response.matrixKeys.forEach((keyAttributes, i) => {
         let bucket: BucketResponse = response.matrix[i][0];
         items[keyAttributes['result'] as string] = bucket.count;
@@ -486,7 +485,10 @@ export abstract class CrossExecutionDashboardState {
     let filterItem = this.getDashboardFilter();
     // this is working only with searchEntities for now. extend it if needed
     const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter }, hideProgress: false });
+    this.errorsDataSource.reload({
+      request: { timeRange: timeRange, ...filter },
+      hideProgress: this.lastRefreshTrigger() === 'auto',
+    });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {
