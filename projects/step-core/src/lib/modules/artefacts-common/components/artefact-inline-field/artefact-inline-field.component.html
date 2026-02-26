@@ -19,7 +19,7 @@
   @if (prefix(); as prefix) {
     <span #elPrefix class="field-prefix">{{ prefix }}</span>
   }
-  <section class="field-content" (click)="displayValue($event)">
+  <section class="field-content" stepUndraggedClick (undraggedClick)="displayValue($event)">
     @if (icon(); as icon) {
       <step-icon #elIcon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
     }

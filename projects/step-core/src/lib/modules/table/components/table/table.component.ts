@@ -47,7 +47,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
-import { TableSearch } from '../../services/table-search';
+import { TableSearch, TableSearchParams } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
 import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
@@ -87,6 +87,9 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
 interface SearchData {
   search: Record<string, SearchValue>;
   resetPagination: boolean;
+  isForce: boolean;
+  hideProgress?: boolean;
+  immediateHideProgress?: boolean;
 }
 
 enum EmptyState {
@@ -391,6 +394,7 @@ export class TableComponent<T>
   private search$ = new BehaviorSubject<SearchData>({
     search: this._tableState.getSearch(),
     resetPagination: true,
+    isForce: true,
   });
   private filter$ = toObservable(this.filter);
   private tableParams$ = toObservable(this.tableParams);
@@ -464,7 +468,7 @@ export class TableComponent<T>
       searchWithTimeStamp: this.search$.pipe(timestamp()),
     }).pipe(
       map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
-        const { search, resetPagination } = searchWithTimeStamp.value;
+        const { search, resetPagination, isForce, hideProgress, immediateHideProgress } = searchWithTimeStamp.value;
         let page = pageWithTimeStamp.value;
         // Change has been triggered, by search. In that case reset page to first one
         const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
@@ -472,17 +476,36 @@ export class TableComponent<T>
           page = this.createPageInitialValue();
           this.page!.firstPage();
         }
-        return { page, search };
+        return { page, search, isForce, hideProgress, immediateHideProgress };
       }),
     );
 
     combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$, this.calculateCounts$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([{ page, search }, sort, filter, params, staticFilters, calculateCounts]) => {
-        this._tableState.saveState(search, page, sort);
-        const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
-        tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params, calculateCounts });
-      });
+      .subscribe(
+        ([
+          { page, search, isForce, hideProgress, immediateHideProgress },
+          sort,
+          filter,
+          params,
+          staticFilters,
+          calculateCounts,
+        ]) => {
+          this._tableState.saveState(search, page, sort);
+          const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
+          tableDataSource.getTableData({
+            page,
+            sort,
+            isForce,
+            hideProgress,
+            immediateHideProgress,
+            search: mergedSearch,
+            filter,
+            params,
+            calculateCounts,
+          });
+        },
+      );
 
     tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
@@ -599,28 +622,38 @@ export class TableComponent<T>
 
   private setupExternalSearchChangeHandle(): void {
     this._tableState.externalSearchChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((externalSearch) => {
-      this.search$.next({ search: externalSearch, resetPagination: true });
+      this.search$.next({ search: externalSearch, resetPagination: true, isForce: true });
     });
   }
 
-  onSearch(column: string, searchValue: SearchValue, resetPagination?: boolean): void;
-  onSearch(column: string, value: string, regex?: boolean, resetPagination?: boolean): void;
+  onSearch(column: string, searchValue: SearchValue, params?: TableSearchParams): void;
+  onSearch(column: string, value: string, regex?: boolean, params?: TableSearchParams): void;
   onSearch(
     column: string,
     searchValue: string | SearchValue,
-    regexOrResetPagination: boolean = true,
-    resetPaginationParam: boolean = true,
+    regexOrParams?: boolean | TableSearchParams,
+    params?: TableSearchParams,
   ): void {
     const search = { ...this.search$.value.search };
     let searchCol: SearchValue;
     let regex: boolean;
     let resetPagination: boolean;
+    let isForce: boolean;
+    let hideProgress: boolean | undefined;
+    let immediateHideProgress: boolean | undefined;
     if (typeof searchValue === 'string') {
-      regex = regexOrResetPagination;
-      resetPagination = resetPaginationParam;
+      regex = (regexOrParams as boolean | undefined) ?? true;
+      resetPagination = params?.resetPagination ?? true;
+      isForce = params?.isForce ?? true;
+      hideProgress = params?.hideProgress;
+      immediateHideProgress = params?.immediateHideProgress;
       searchCol = regex ? { value: searchValue, regex } : searchValue;
     } else {
-      resetPagination = regexOrResetPagination;
+      const searchParams = regexOrParams as TableSearchParams | undefined;
+      resetPagination = searchParams?.resetPagination ?? true;
+      isForce = searchParams?.isForce ?? true;
+      hideProgress = searchParams?.hideProgress;
+      immediateHideProgress = searchParams?.immediateHideProgress;
       searchCol = searchValue;
     }
     type RegexSearchValue = { regex?: boolean; value: string };
@@ -630,7 +663,7 @@ export class TableComponent<T>
       }
     }
     search[column] = searchCol;
-    this.search$.next({ search, resetPagination });
+    this.search$.next({ search, resetPagination, isForce, hideProgress, immediateHideProgress });
   }
 
   getSearchValue$(column: string): Observable<SearchValue | undefined> {

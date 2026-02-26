@@ -50,8 +50,8 @@
               (openTreeView)="handleOpenTreeView(reportNode!)"
             />
           } @else {
-            <div class="iteration-list">
-              @if (aggregatedNode(); as aggregatedNode) {
+            @if (aggregatedNode(); as aggregatedNode) {
+              <div class="iteration-list">
                 <step-aggregated-tree-node-iteration-list
                   [node]="aggregatedNode!"
                   [resolvedPartialPath]="resolvedPartialPath"
@@ -60,32 +60,12 @@
                   (showDetails)="handleOpenDetails($event)"
                   (openTreeView)="handleOpenTreeView($event)"
                 />
+              </div>
+              @if (historyHashContainer(); as historyHashContainer) {
+                <step-execution-history-section [artefactHashContainer]="historyHashContainer" />
               }
-            </div>
-          }
-        </div>
-        <div class="history">
-          <div class="title">
-            @if (isScheduledExecution()) {
-              Schedule Execution History
-              <step-icon
-                class="help-icon"
-                matTooltip="Shows the results of this step in previous executions of the same schedule. Each circle represents one scheduled plan execution. If the step was executed multiple times within a plan, the success and failure ratio is displayed as a pie chart."
-                name="help-circle"
-              />
-            } @else {
-              Execution History
-              <step-icon
-                class="help-icon"
-                matTooltip="Shows the results of this step in previous plan executions. Each circle represents one plan execution. If the step was executed multiple times within a plan, the success and failure ratio is displayed as a pie chart."
-                name="help-circle"
-              />
             }
-          </div>
-          <step-aggregated-tree-node-history
-            [artefactHashContainer]="artefactHashContainer()"
-            [previousExecutionsCount]="PREVIOUS_EXECUTIONS_TO_DISPLAY"
-          />
+          }
         </div>
       </div>
     }

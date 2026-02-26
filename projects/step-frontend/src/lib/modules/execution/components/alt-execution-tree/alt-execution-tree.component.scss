@@ -101,6 +101,11 @@ step-alt-execution-tree {
     flex-direction: column;
   }
 
+  .step-tree-node-container .tree-node .node-content,
+  .step-tree-node-container .tree-node .node-content > .node-icon {
+    cursor: default;
+  }
+
   step-tree-node-name {
     width: 100%;
     max-width: 100%;

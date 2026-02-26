@@ -9,9 +9,10 @@ import { DOCUMENT } from '@angular/common';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltReportNodeDetailsStateService } from '../../services/alt-report-node-details-state.service';
-import { filter, map, of, switchMap } from 'rxjs';
+import { filter, map, of, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNodeId?: string;
@@ -21,8 +22,6 @@ export interface AggregatedTreeNodeDialogData {
   searchStatusCount?: number;
   reportNodeChildren: ReportNode[];
 }
-
-const PREVIOUS_EXECUTIONS_TO_DISPLAY = 8;
 
 @Component({
   selector: 'step-aggregated-tree-node-dialog',
@@ -56,9 +55,8 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
 
-  isScheduledExecution = toSignal(this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)));
-
   private isInitialLoad = true;
+  private lastReportNode?: ReportNode;
 
   private aggregatedNode$ = this._executionState.timeRange$.pipe(
     switchMap(() => this._treeState.isInitialized$),
@@ -73,11 +71,17 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   );
 
   private reportNode$ = this._executionState.timeRange$.pipe(
-    map(() => this._data.reportNodeId),
-    switchMap((reportNodeId) => {
+    map((range) => ({ range, reportNodeId: this._data.reportNodeId })),
+    switchMap(({ range, reportNodeId }) => {
       if (!reportNodeId) {
         this.isInitialLoad = false;
         return of(undefined);
+      }
+
+      const isManualChange = !!range?.isManualChange;
+      const hasSameNode = this.lastReportNode?.id === reportNodeId;
+      if (!isManualChange && hasSameNode && this.lastReportNode?.status !== Status.RUNNING) {
+        return of(this.lastReportNode);
       }
 
       let reportNode: ReportNode | undefined = undefined;
@@ -86,20 +90,26 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
       }
       this.isInitialLoad = false;
       if (reportNode) {
+        this.lastReportNode = reportNode;
         return of(reportNode);
       }
-      return this._controllerService.getReportNode(reportNodeId);
+
+      return this._controllerService.getReportNode(reportNodeId).pipe(
+        tap((node) => {
+          this.lastReportNode = node;
+        }),
+      );
     }),
   );
 
   protected readonly selectedReportNode = toSignal(this.reportNode$);
   protected readonly aggregatedNode = toSignal(this.aggregatedNode$);
-
-  protected readonly artefactHashContainer = computed(() => {
-    const selectedReportNode = this.selectedReportNode();
+  protected readonly historyHashContainer = computed<HashContainer | undefined>(() => {
     const aggregatedNode = this.aggregatedNode();
-    const artefactHash = (aggregatedNode?.artefactHash || selectedReportNode?.artefactHash)!;
-    return { artefactHash };
+    if (!aggregatedNode?.artefactHash) {
+      return undefined;
+    }
+    return { artefactHash: aggregatedNode.artefactHash };
   });
 
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
@@ -147,6 +157,4 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected navigateBack(): void {
     this._doc.defaultView?.history?.back?.();
   }
-
-  protected readonly PREVIOUS_EXECUTIONS_TO_DISPLAY = PREVIOUS_EXECUTIONS_TO_DISPLAY;
 }

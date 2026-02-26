@@ -3,6 +3,7 @@
     data-step-testid="execution-table"
     [dataSource]="dataSource"
     [staticFilters]="tableFilters()"
+    [calculateCounts]="calculateCounts()"
     matSort
     matSortActive="executionTime"
     matSortDirection="desc"
@@ -113,6 +114,13 @@
         <step-column-settings />
       </th>
       <td mat-cell *matCellDef></td>
+    </ng-container>
+    <ng-container *stepTablePaginatorContent>
+      <step-table-counts-toggle
+        [enabled]="calculateCounts()"
+        itemsLabel="executions"
+        (toggle)="toggleCountsCalculation()"
+      />
     </ng-container>
   </step-table>
 </step-drag-drop-container>

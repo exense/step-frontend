@@ -76,6 +76,7 @@ const convertFilter = (field: string, searchValue: SearchValue): Array<TableRequ
 };
 
 const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
+  const columns = req.columns ?? [];
   const result: TableRequestData = {
     skip: req.start || 0,
     limit: req.length || 10,
@@ -96,10 +97,10 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
       field: column,
       direction: order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
     }));
-  } else {
+  } else if (columns.length > 0) {
     result.sort = [
       {
-        field: req.columns[0],
+        field: columns[0],
         direction: SortDirection.ASCENDING,
       },
     ];
@@ -276,15 +277,25 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(options?: TableGetDataOptions): void;
-  getTableData(req: TableRequestInternal): void;
-  getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
+  getTableData(req: TableRequestInternal, isForce?: boolean): void;
+  getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined, isForce?: boolean): void {
     if (reqOrOptions instanceof TableRequestInternal) {
       const req = convertTableRequest(reqOrOptions);
-      this._request$.next({ request: req, isForce: true });
+      this._request$.next({ request: req, isForce });
       return;
     }
 
-    let { page, sort, search, params, filter, calculateCounts } = (reqOrOptions || {}) as TableGetDataOptions;
+    let {
+      page,
+      sort,
+      search,
+      params,
+      filter,
+      calculateCounts,
+      isForce: isForceOptions,
+      hideProgress,
+      immediateHideProgress,
+    } = (reqOrOptions || {}) as TableGetDataOptions;
 
     const tableRequest = this.createInternalRequestObject({ search, filter, params });
 
@@ -309,15 +320,19 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       tableRequest.calculateCounts = calculateCounts;
     }
 
-    this.getTableData(tableRequest);
+    const request = convertTableRequest(tableRequest);
+    this._request$.next({ request, isForce: isForceOptions, hideProgress, immediateHideProgress });
   }
 
   setColumnMap(key: string, value: string): void {
     this._requestColumnsMap[key] = value;
   }
 
-  reload(reloadOptions?: StepDataSourceReloadOptions) {
-    let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
+  reload(reloadOptions?: StepDataSourceReloadOptions): void {
+    let val = this._request$.value;
+    if (!val?.request) {
+      val = { request: convertTableRequest(this.createInternalRequestObject()) };
+    }
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;
     val.isForce = reloadOptions?.isForce;

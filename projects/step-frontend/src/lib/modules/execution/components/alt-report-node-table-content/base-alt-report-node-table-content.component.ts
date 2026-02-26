@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, inject, Signal } from '@angular/core';
 import {
-  arrayToRegex,
   DateUtilsService,
   FilterConditionFactoryService,
   ItemsPerPageService,
@@ -8,6 +7,8 @@ import {
   TableSearch,
   DateRange,
   ArtefactClass,
+  FilterCondition,
+  TableSearchParams,
 } from '@exense/step-core';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
@@ -42,6 +43,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   protected abstract tableSearch: Signal<TableSearch | undefined>;
 
   readonly dataSource$ = this._state.datasource$;
+  private hasAppliedDateRangeFilter = false;
 
   private isRemoteDataSource$ = this.dataSource$.pipe(map((dataSource) => dataSource instanceof TableRemoteDataSource));
 
@@ -70,11 +72,11 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   protected setupStatusesFilter(): void {
     this._state.selectedStatuses$
       .pipe(
-        map((statuses) => arrayToRegex(Array.from(statuses))),
+        map((statuses) => Array.from(statuses)),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((statuses) => {
-        this.tableSearch()?.onSearch?.('status', { value: statuses, regex: true });
+        this.tableSearch()?.onSearch?.('status', this._filterConditionFactory.inFilterCondition(statuses));
       });
   }
 
@@ -93,22 +95,32 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
         map(([range, isRemote]) => {
+          let searchValue: string | FilterCondition<unknown>;
           if (isRemote) {
             // Remote dataSource test case
             const dateRange: DateRange = this._dateUtils.timeRange2DateRange(range)!;
-            return this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+            searchValue = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+          } else {
+            // Local dataSource test case
+            searchValue = range ? `${range.from}|${range.to}` : '';
           }
-          // Local dataSource test case
-          return range ? `${range.from}|${range.to}` : '';
+          const isManualChange = !!range?.isManualChange;
+          return { searchValue, isManualChange };
         }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((searchValue) => {
+      .subscribe(({ searchValue, isManualChange }) => {
+        const isInitialDateRangeLoad = !this.hasAppliedDateRangeFilter;
+        const hideProgress = !isInitialDateRangeLoad && !isManualChange;
+        const isForce = isInitialDateRangeLoad || isManualChange;
+        // TODO TableSearch resets query!!!
+        const params: TableSearchParams = { resetPagination: false, isForce, hideProgress };
         if (typeof searchValue === 'string') {
-          this.tableSearch()?.onSearch?.('executionTime', searchValue, true, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, true, params);
         } else {
-          this.tableSearch()?.onSearch?.('executionTime', searchValue, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, params);
         }
+        this.hasAppliedDateRangeFilter = true;
       });
   }
 }
