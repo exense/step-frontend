@@ -1,7 +1,7 @@
 <step-grid-layout [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
   @if (_state.errors$ | async; as errors) {
     <step-alt-execution-errors-widget
-      stepGridElement="errorsWidget"
+      *stepGridItem="'errorsWidget'"
       [errors]="errors"
       (showDetails)="scrollToErrorsSection()"
       (searchFor)="searchFor($event)"
@@ -10,13 +10,13 @@
   @if (hasTestCases$ | async) {
     @if (_state.testCases$ | async) {
       <step-alt-report-nodes-testcases
-        stepGridElement="testCases"
+        *stepGridItem="'testCases'"
         (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
       />
     }
     @if (_testCasesState.summary$ | async; as testCasesSummary) {
       <step-alt-report-node-summary
-        stepGridElement="testCasesSummary"
+        *stepGridItem="'testCasesSummary'"
         totalTooltip="Total number of test cases"
         totalForecastTooltip="Forecast number of test cases"
         [summary]="testCasesSummary"
@@ -27,7 +27,7 @@
   }
   @if (_keywordsState.summary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary
-      stepGridElement="keywordsSummary"
+      *stepGridItem="'keywordsSummary'"
       totalTooltip="Total number of keyword calls"
       totalForecastTooltip="Forecast number of keyword calls"
       [summary]="keywordsSummary"
@@ -36,27 +36,26 @@
     />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget stepGridElement="executionTree" #treeWidget class="widget" />
+    <step-alt-execution-tree-widget *stepGridItem="'executionTree'" #treeWidget class="widget" />
   }
   @if (_mode === ViewMode.VIEW) {
     <step-alt-report-node-keywords
-      stepGridElement="keywordsList"
+      *stepGridItem="'keywordsList'"
       class="keywords"
       (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
     />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
-      stepGridElement="performanceOverview"
+      *stepGridItem="'performanceOverview'"
       [executionId]="executionId"
       [isFullRange]="(_state.timeRangeSelection$ | async)?.type === 'FULL'"
       (timeRangeChange)="handleChartZooming($event)"
       (fullRange)="_state.selectFullRange()"
     />
   }
-  <step-alt-report-widget stepGridElement="errors" #errors>
+  <step-alt-report-widget *stepGridItem="'errors'" #errors>
     <step-alt-report-widget-title>
-      <step-grid-drag-handle />
       <step-grid-element-title />
     </step-alt-report-widget-title>
     <step-alt-report-widget-content>
@@ -66,17 +65,18 @@
         [showExecutionsMenu]="false"
         (searchFor)="searchFor($event)"
       />
-      <step-grid-resizer />
     </step-alt-report-widget-content>
   </step-alt-report-widget>
   @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations stepGridElement="currentOperations" [operations]="currentOperations" />
+    <step-alt-report-current-operations *stepGridItem="'currentOperations'" [operations]="currentOperations" />
   }
+  <!--
   @if (_state.execution$ | async; as execution) {
     @for (panel of customPanels; track panel.type) {
       <step-alt-panel [stepGridElement]="panel.type" [info]="panel" [execution]="execution" />
     }
   }
+-->
 </step-grid-layout>
 @if (_mode === ViewMode.PRINT) {
   <div class="print-overlay">

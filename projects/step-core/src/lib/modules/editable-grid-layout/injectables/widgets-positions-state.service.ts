@@ -1,17 +1,15 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
-import {GridPoint, WidgetPosition} from '../types/widget-position';
+import { GridPoint, WidgetPosition } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
 import { GridEditableService } from './grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { PositionToApply } from '../types/position-to-apply';
-import { VisibilityInfo, WidgetsVisibilityStateService } from './widgets-visibility-state.service';
 import { WidgetsPositionsUtilsService } from './widgets-positions-utils.service';
 import { WidgetPositionsUtilsContext } from '../types/widget-positions-utils-context';
+import { v4 } from 'uuid';
 
 @Injectable()
-export class WidgetsPositionsStateService
-  implements WidgetsVisibilityStateService, WidgetPositionsUtilsContext, GridEditableService
-{
+export class WidgetsPositionsStateService implements WidgetPositionsUtilsContext, GridEditableService {
   private _gridConfig = inject(GRID_LAYOUT_CONFIG);
   private _colCount = inject(GRID_COLUMN_COUNT);
   private _utils = inject(WidgetsPositionsUtilsService).withContext(this);
@@ -23,18 +21,9 @@ export class WidgetsPositionsStateService
     this.editModeInternal.set(value);
   }
 
-  private readonly notRenderedWidgets = signal<string[]>([]);
+  private readonly notRenderedWidgetTypes = signal<string[]>([]);
   private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
   readonly positionsState = this.positionsStateInternal.asReadonly();
-
-  readonly visibilityInfo = computed(() => {
-    const positionsState = this.positionsState();
-    return this._gridConfig.defaultElementParams.map((item) => {
-      const { id, title } = item;
-      const isVisible = !!positionsState[id];
-      return { id, title, isVisible } as VisibilityInfo;
-    });
-  });
 
   private readonly extraRows = signal(0);
 
@@ -52,7 +41,7 @@ export class WidgetsPositionsStateService
     }
     const bottom = Math.max(...positions.map((item) => item.bottomEdge));
     return bottom;
-  })
+  });
 
   readonly fieldBottom = computed(() => {
     const widgetsBottom = this.widgetsBottom();
@@ -65,7 +54,7 @@ export class WidgetsPositionsStateService
 
   readonly positions = computed(() => {
     const positions = this.positionsStateInternal();
-    const notRenderedWidgets = this.notRenderedWidgets();
+    const notRenderedWidgets = this.notRenderedWidgetTypes();
     const isEditMode = this.editMode();
     if (isEditMode) {
       return positions;
@@ -102,6 +91,10 @@ export class WidgetsPositionsStateService
     return untracked(() => this.positionsStateInternal())[elementId];
   }
 
+  getWidgetType(widgetId: string): string {
+    return this._utils.getWidgetType(widgetId);
+  }
+
   updatePosition(position: WidgetPosition): void {
     const fieldBottomBeforeUpdate = untracked(() => this.fieldBottom());
     const positionsState = untracked(() => this.positionsStateInternal());
@@ -121,8 +114,8 @@ export class WidgetsPositionsStateService
     if (!positionA || !positionB) {
       return;
     }
-    const newPositionA = new WidgetPosition(aElementId, positionB);
-    const newPositionB = new WidgetPosition(bElementId, positionA);
+    const newPositionA = new WidgetPosition(aElementId, positionA.widgetType, positionB);
+    const newPositionB = new WidgetPosition(bElementId, positionB.widgetType, positionA);
     this.positionsStateInternal.update((value) => ({
       ...value,
       [newPositionA.id]: newPositionA,
@@ -130,7 +123,11 @@ export class WidgetsPositionsStateService
     }));
   }
 
-  correctPositionForDrag(elementId: string, position: WidgetPosition, dragPoint: GridPoint): PositionToApply | undefined {
+  correctPositionForDrag(
+    elementId: string,
+    position: WidgetPosition,
+    dragPoint: GridPoint,
+  ): PositionToApply | undefined {
     return this._utils.correctPositionForDrag(elementId, position, dragPoint);
   }
 
@@ -138,8 +135,8 @@ export class WidgetsPositionsStateService
     return this._utils.correctPositionForResize(elementId, position);
   }
 
-  setNotRenderedWidgets(widgetsIds: string[]): void {
-    this.notRenderedWidgets.set(widgetsIds);
+  setNotRenderedWidgets(widgetTypes: string[]): void {
+    this.notRenderedWidgetTypes.set(widgetTypes);
   }
 
   removeRow(row: number): void {
@@ -192,7 +189,7 @@ export class WidgetsPositionsStateService
     this.extraRows.update((value) => value + 1);
   }
 
-  initializePositions(positions: WidgetPosition[], idsToAllocate: string[]): void {
+  initializePositions(positions: WidgetPosition[], typesToAllocate: string[]): void {
     const positionsMap = positions.reduce(
       (res, item) => {
         res[item.id] = item;
@@ -201,15 +198,11 @@ export class WidgetsPositionsStateService
       {} as Record<string, WidgetPosition>,
     );
     this.positionsStateInternal.set(positionsMap);
-    this.determineInitialPositions(idsToAllocate);
+    this.determineInitialPositions(typesToAllocate);
   }
 
-  isVisible(id: string): boolean {
-    return !!this.getPosition(id);
-  }
-
-  hide(id: string): void {
-    if (!this.isVisible(id)) {
+  remove(id: string): void {
+    if (!this.getPosition(id)) {
       return;
     }
     this.positionsStateInternal.update((value) => {
@@ -219,31 +212,32 @@ export class WidgetsPositionsStateService
     });
   }
 
-  show(id: string): void {
-    if (this.isVisible(id)) {
-      return;
-    }
-    const info = this._gridConfig.defaultElementParamsMap[id];
+  add(widgetType: string): void {
+    const info = this._gridConfig.defaultElementParamsMap[widgetType];
     const positionParams = this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
-    const position = new WidgetPosition(info.id, positionParams);
+    const id = v4();
+    const position = new WidgetPosition(id, info.widgetType, positionParams);
     this.updatePosition(position);
   }
 
   isEmptyRow(row: number): boolean {
-    return this._utils.isRowEmpty(row)
+    return this._utils.isRowEmpty(row);
   }
 
-  private determineInitialPositions(widgetIds: string[]): void {
-    for (const id of widgetIds) {
-      if (!!this.getPosition(id)) {
+  private determineInitialPositions(typesToAllocate: string[]): void {
+    for (const widgetType of typesToAllocate) {
+      /*
+      if (!!this.getPosition(widgetType)) {
         continue;
       }
-      const info = this._gridConfig.defaultElementParamsMap[id];
+*/
+      const info = this._gridConfig.defaultElementParamsMap[widgetType];
       if (!info) {
         continue;
       }
       const positionParams = this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
-      const position = new WidgetPosition(info.id, positionParams);
+      const id = v4();
+      const position = new WidgetPosition(id, info.widgetType, positionParams);
       this.updatePosition(position);
     }
   }

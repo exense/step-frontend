@@ -873,59 +873,64 @@ export class ExecutionModule {
 
   private registerGridLayout(): void {
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'errorsWidget',
+      widgetType: 'errorsWidget',
       title: 'Errors Widget',
       widthInCells: 8,
       heightInCells: 1,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'testCases',
+      widgetType: 'testCases',
       title: 'Test Cases',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,
       minHeightInCells: 3,
       weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'testCasesSummary',
+      widgetType: 'testCasesSummary',
       title: 'Summary: Test Cases',
       widthInCells: 2,
       heightInCells: 3,
       minWidthInCells: 2,
       minHeightInCells: 3,
       weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'keywordsSummary',
+      widgetType: 'keywordsSummary',
       title: 'Summary: Keyword Calls',
       widthInCells: 2,
       heightInCells: 3,
       minWidthInCells: 2,
       minHeightInCells: 3,
       weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'executionTree',
+      widgetType: 'executionTree',
       title: 'Execution Tree',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,
       minHeightInCells: 3,
       weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'keywordsList',
+      widgetType: 'keywordsList',
       title: 'Steps',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,
       minHeightInCells: 3,
       weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'performanceOverview',
+      widgetType: 'performanceOverview',
       title: 'Performance Overview (avg)',
       widthInCells: 2,
       heightInCells: 3,
@@ -934,7 +939,7 @@ export class ExecutionModule {
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'errors',
+      widgetType: 'errors',
       title: 'Errors',
       widthInCells: 8,
       heightInCells: 3,
@@ -942,7 +947,7 @@ export class ExecutionModule {
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
-      id: 'currentOperations',
+      widgetType: 'currentOperations',
       title: 'Current operations',
       widthInCells: 4,
       heightInCells: 3,

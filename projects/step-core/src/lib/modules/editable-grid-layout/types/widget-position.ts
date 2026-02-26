@@ -16,6 +16,7 @@ export class WidgetPosition implements WidgetPositionParams {
 
   constructor(
     public readonly id: string,
+    public readonly widgetType: string,
     params: WidgetPositionParams,
   ) {
     this.column = params.column;
@@ -45,6 +46,6 @@ export class WidgetPosition implements WidgetPositionParams {
   }
 
   clone(): WidgetPosition {
-    return new WidgetPosition(this.id, this);
+    return new WidgetPosition(this.id, this.widgetType, this);
   }
 }

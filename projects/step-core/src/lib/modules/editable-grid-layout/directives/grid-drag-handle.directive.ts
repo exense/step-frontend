@@ -1,7 +1,7 @@
 import { Directive, inject, untracked } from '@angular/core';
 import { GridElementDragService } from '../injectables/grid-element-drag.service';
 import { GridEditableService } from '../injectables/grid-editable.service';
-import { GridElementDirective } from './grid-element.directive';
+import { GridElementComponent } from '../components/grid-element/grid-element.component';
 
 @Directive({
   selector: '[stepGridDragHandle]',
@@ -11,7 +11,7 @@ import { GridElementDirective } from './grid-element.directive';
   },
 })
 export class GridDragHandleDirective {
-  private _gridElement = inject(GridElementDirective);
+  private _gridElement = inject(GridElementComponent);
   private _gridElementDrag = inject(GridElementDragService);
   private _gridEditable = inject(GridEditableService);
 

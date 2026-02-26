@@ -8,6 +8,7 @@ import {
   ElementRef,
   inject,
   signal,
+  TemplateRef,
   untracked,
   viewChild,
   ViewEncapsulation,
@@ -20,22 +21,31 @@ import { GridElementDragService } from '../../injectables/grid-element-drag.serv
 import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from '../../injectables/grid-layout-config.token';
-import { GridElementDirective } from '../../directives/grid-element.directive';
 import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
 import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
 import { GridBackgroundComponent } from '../grid-background/grid-background.component';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
+import { GridElementComponent } from '../grid-element/grid-element.component';
+import { GridItemDirective } from '../../directives/grid-item.directive';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { first, forkJoin, switchMap } from 'rxjs';
+
+interface GridItem {
+  widgetId: string;
+  widgetType: string;
+  templateRef?: TemplateRef<any>;
+}
 
 @Component({
   selector: 'step-grid-layout',
   imports: [
     StepBasicsModule,
-    GridElementDirective,
     GridResizerComponent,
     GridElementTitleComponent,
     GridDragHandleComponent,
     GridBackgroundComponent,
+    GridElementComponent,
   ],
   templateUrl: './grid-layout.component.html',
   styleUrl: './grid-layout.component.scss',
@@ -73,24 +83,55 @@ export class GridLayoutComponent implements AfterViewInit {
 
   protected readonly invalidPreview = computed(() => this._gridElementDragService.dragNotApplied());
 
-  private allWidgets = this._gridLayoutConfig.defaultElementParams.map((item) => item.id);
-  private readonly renderedWidgets = contentChildren(GridElementDirective);
-  private readonly renderedWidgetsIds = computed(() => {
-    const renderedWidgets = this.renderedWidgets();
-    const ids = renderedWidgets.map((item) => untracked(() => item.elementId()));
+  private allWidgetTypes = this._gridLayoutConfig.defaultElementParams.map((item) => item.widgetType);
+
+  private readonly contentWidgets = contentChildren(GridItemDirective);
+  private readonly contentWidgets$ = toObservable(this.contentWidgets);
+  private readonly gridTemplateItems$ = this.contentWidgets$.pipe(
+    switchMap((widgets) => {
+      const items = widgets.map((widget) => widget.item$.pipe(first()));
+      return forkJoin(items);
+    }),
+  );
+
+  private readonly gridTemplateItems = toSignal(this.gridTemplateItems$, { initialValue: [] });
+  protected readonly gridItems = computed(() => {
+    const gridTemplateItems = this.gridTemplateItems();
+    const templateDictionary = gridTemplateItems.reduce(
+      (res, item) => {
+        res[item.widgetType] = item.templateRef;
+        return res;
+      },
+      {} as Record<string, TemplateRef<any>>,
+    );
+    const widgetPositons = Object.values(this._widgetPositions.positions());
+
+    const gridItems = widgetPositons.map((position) => {
+      const widgetId = position.id;
+      const widgetType = position.widgetType;
+      const templateRef = templateDictionary[widgetType];
+      return { widgetId, widgetType, templateRef } as GridItem;
+    });
+
+    return gridItems.filter((item) => !!item);
+  });
+
+  private readonly contentWidgetTypes = computed(() => {
+    const items = this.gridTemplateItems();
+    const ids = items.map((item) => item.widgetType);
     return new Set(ids);
   });
 
-  protected readonly hiddenWidgets = computed(() => {
-    const renderedWidgetsIds = this.renderedWidgetsIds();
-    return this.allWidgets.filter((id) => !renderedWidgetsIds.has(id));
+  protected readonly hiddenWidgetTypes = computed(() => {
+    const renderedWidgetsTypes = this.contentWidgetTypes();
+    return this.allWidgetTypes.filter((widgetType) => !renderedWidgetsTypes.has(widgetType));
   });
 
   private effectHiddenWidgetsChange = effect(() => {
-    const hiddenWidgets = this.hiddenWidgets();
+    const hiddenWidgetTypes = this.hiddenWidgetTypes();
     const isRenderComplete = this.isRenderComplete();
     if (isRenderComplete) {
-      this._widgetPositions.setNotRenderedWidgets(hiddenWidgets);
+      this._widgetPositions.setNotRenderedWidgets(hiddenWidgetTypes);
     }
   });
 

@@ -1,8 +1,8 @@
 import { Component, inject, untracked } from '@angular/core';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
-import { GridElementDirective } from '../../directives/grid-element.directive';
 import { GridElementResizerService } from '../../injectables/grid-element-resizer.service';
 import { GridEditableService } from '../../injectables/grid-editable.service';
+import { GridElementComponent } from '../grid-element/grid-element.component';
 
 @Component({
   selector: 'step-grid-resizer',
@@ -14,7 +14,7 @@ import { GridEditableService } from '../../injectables/grid-editable.service';
   },
 })
 export class GridResizerComponent {
-  private _gridElement = inject(GridElementDirective);
+  private _gridElement = inject(GridElementComponent);
   private _gridElementResizer = inject(GridElementResizerService);
   private _gridEditable = inject(GridEditableService);
 

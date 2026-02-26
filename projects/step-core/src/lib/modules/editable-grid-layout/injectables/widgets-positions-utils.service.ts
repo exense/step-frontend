@@ -1,6 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
-import {GridPoint, WidgetPosition, WidgetPositionParams} from '../types/widget-position';
+import { GridPoint, WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { GridElementInfo } from '../../custom-registeries/custom-registries.module';
 import { WidgetIDs } from '../types/widget-ids';
@@ -14,7 +14,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
   private _gridConfig = inject(GRID_LAYOUT_CONFIG);
   private _colCount = inject(GRID_COLUMN_COUNT);
 
-  private widgetIDs = new WidgetIDs(this._gridConfig.defaultElementParams.map((item) => item.id));
+  private widgetIDs = new WidgetIDs(this._gridConfig.defaultElementParams.map((item) => item.widgetType));
 
   private context!: WidgetPositionsUtilsContext;
 
@@ -28,7 +28,15 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     this.widgetIDs.destroy();
   }
 
-  correctPositionForDrag(elementId: string, position: WidgetPosition, dragPoint: GridPoint): PositionToApply | undefined {
+  getWidgetType(id: string): string {
+    return this.widgetIDs.getWidgetType(id);
+  }
+
+  correctPositionForDrag(
+    elementId: string,
+    position: WidgetPosition,
+    dragPoint: GridPoint,
+  ): PositionToApply | undefined {
     // Erase information about original position to avoid conflicts for current element
     if (!this.clearElementPosition(elementId)) {
       return undefined;
@@ -117,13 +125,13 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     }
 
     if (heightInCells <= 0 || widthInCells <= 0) {
-      return {canBeApplied: false, position};
+      return { canBeApplied: false, position };
     }
     result.widthInCells = widthInCells;
     result.heightInCells = heightInCells;
 
     if (!canBeApplied) {
-      return {canBeApplied, position: result};
+      return { canBeApplied, position: result };
     }
 
     const limits = this.getElementLimits(elementId);
@@ -231,16 +239,19 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
   realignPositionsWithHiddenWidgets(
     originalPositions: Record<string, WidgetPosition>,
-    notRenderedWidgets: string[],
+    notRenderedWidgetTypes: string[],
   ): Record<string, WidgetPosition> {
     const field = this.context.getField();
     const fieldBottom = this.context.getFieldBottom();
 
     const positions = Object.values(originalPositions);
-    if (!positions.length || !notRenderedWidgets?.length) {
+    if (!positions.length || !notRenderedWidgetTypes?.length) {
       return originalPositions;
     }
-    const hiddenWidgetsNumIds = new Set(notRenderedWidgets.map((idStr) => this.widgetIDs.getNumericIdByString(idStr)));
+    const hiddenWidgetsNumIds = notRenderedWidgetTypes.reduce((res, widgetType) => {
+      this.widgetIDs.getNumericIdsByType(widgetType).forEach((id) => res.add(id));
+      return res;
+    }, new Set<number>());
 
     // This arrays show, how many rows are skipped above each row
     const hiddenRowsState: number[] = new Array(fieldBottom);
@@ -263,7 +274,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
     const result = positions.reduce(
       (res, position) => {
-        const idNum = this.widgetIDs.getNumericIdByString(position.id);
+        const idNum = this.widgetIDs.getNumericId(position);
         if (hiddenWidgetsNumIds.has(idNum)) {
           return res;
         }
@@ -282,7 +293,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
   }
 
   fillPosition(field: Uint8Array, position: WidgetPosition, isClear?: boolean): void {
-    const fillValue = isClear ? EMPTY : this.widgetIDs.getNumericIdByString(position.id);
+    const fillValue = isClear ? EMPTY : this.widgetIDs.getNumericId(position);
 
     for (let r = position.topEdge; r <= position.bottomEdge; r++) {
       for (let c = position.leftEdge; c <= position.rightEdge; c++) {
@@ -294,13 +305,13 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
   findProperPosition(widthInCells: number, heightInCells: number): WidgetPositionParams {
     const field = this.context.getField();
-    const position = new WidgetPosition('_dummy_', {row: 0, column: 0, widthInCells, heightInCells});
+    const position = new WidgetPosition('_dummy_', '_dummy_', { row: 0, column: 0, widthInCells, heightInCells });
     let result: WidgetPositionParams | undefined = undefined;
     for (let index = 0; index < field.length; index++) {
       if (field[index] !== EMPTY) {
         continue;
       }
-      const {row, column} = this.getFieldCoordinates(index);
+      const { row, column } = this.getFieldCoordinates(index);
       position.row = row;
       position.column = column;
       if (this.isPositionEmpty(field, position)) {
@@ -406,10 +417,10 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     return (row - 1) * this._colCount + (column - 1);
   }
 
-  private getFieldCoordinates(index: number): {row: number, column: number} {
+  private getFieldCoordinates(index: number): { row: number; column: number } {
     const row = Math.floor(index / this._colCount) + 1;
     const column = (index % this._colCount) + 1;
-    return {row, column};
+    return { row, column };
   }
 
   private getElementLimits(elementId: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {

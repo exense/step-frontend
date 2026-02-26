@@ -5,6 +5,8 @@ import { GridElementDirective } from './directives/grid-element.directive';
 import { GridElementTitleComponent } from './components/grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from './components/grid-drag-handle/grid-drag-handle.component';
 import { GridConfigToolComponent } from './components/grid-config-tool/grid-config-tool.component';
+import { GridElementComponent } from './components/grid-element/grid-element.component';
+import { GridItemDirective } from './directives/grid-item.directive';
 
 export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridLayoutComponent,
@@ -12,13 +14,17 @@ export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridDragHandleDirective,
   GridDragHandleComponent,
   GridElementDirective,
+  GridElementComponent,
   GridElementTitleComponent,
   GridConfigToolComponent,
+  GridItemDirective,
 ];
 
 export * from './components/grid-layout/grid-layout.component';
 export * from './components/grid-resizer/grid-resizer.component';
+export * from './components/grid-element/grid-element.component';
 export * from './directives/grid-element.directive';
+export * from './directives/grid-item.directive';
 export * from './directives/grid-drag-handle.directive';
 export * from './components/grid-drag-handle/grid-drag-handle.component';
 export * from './directives/grid-dimensions.directive';

@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, timer } from 'rxjs';
 import { GridSessionStorageService } from './grid-session-storage.service';
-import {WidgetStatePreset} from '../types/widget-state-preset';
-import {KeyValue} from '@angular/common';
+import { WidgetStatePreset } from '../types/widget-state-preset';
+import { KeyValue } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -11,14 +11,10 @@ export class GridPersistenceService {
   private _storage = inject(GridSessionStorageService);
 
   save(gridId: string, preset: WidgetStatePreset): Observable<void> {
-    const presetToSave = {
-      ...preset,
-      widgets: preset.widgets.map((state) => (state.isVisible ? state : { id: state.id, isVisible: false }))
-    } as WidgetStatePreset;
-    const presetJson = JSON.stringify(presetToSave);
+    const presetJson = JSON.stringify(preset);
     const gridPresetKey = `${gridId}_preset_${preset.id}`;
     this._storage.setItem(gridPresetKey, presetJson);
-    this.saveGridPreset(gridId, {key: preset.id, value: preset.name});
+    this.saveGridPreset(gridId, { key: preset.id, value: preset.name });
     return timer(100).pipe(map(() => {}));
   }
 
@@ -39,19 +35,18 @@ export class GridPersistenceService {
   }
 
   getGridPresets(gridId: string): Observable<KeyValue<string, string>[]> {
-    return timer(250)
-      .pipe(
-        map(() => gridId),
-        map((gridId) => this.loadGridPresets(gridId)),
-        map((presets) => Object.entries(presets).map(([key, value]) => ({key, value}))),
-      )
+    return timer(250).pipe(
+      map(() => gridId),
+      map((gridId) => this.loadGridPresets(gridId)),
+      map((presets) => Object.entries(presets).map(([key, value]) => ({ key, value }))),
+    );
   }
 
   getGridSelectedPreset(gridId: string): Observable<string | undefined> {
     return timer(250).pipe(
       map(() => gridId),
-      map((gridId) => this._storage.getItem(`${gridId}_selectedPreset`) ?? undefined)
-    )
+      map((gridId) => this._storage.getItem(`${gridId}_selectedPreset`) ?? undefined),
+    );
   }
 
   setGridSelectedPreset(gridId: string, presetId: string): Observable<void> {
@@ -90,7 +85,7 @@ export class GridPersistenceService {
     try {
       result = JSON.parse(json) as T;
     } catch (e) {
-        result = undefined;
+      result = undefined;
     }
     return result;
   }

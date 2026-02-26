@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export interface GridElementInfo {
-  id: string;
+  widgetType: string;
   title: string;
   weight: number;
   widthInCells: number;
@@ -9,6 +9,7 @@ export interface GridElementInfo {
   minWidthInCells?: number;
   minHeightInCells?: number;
   defaultVisibility?: boolean;
+  denyDuplicates?: boolean;
 }
 
 @Injectable({
