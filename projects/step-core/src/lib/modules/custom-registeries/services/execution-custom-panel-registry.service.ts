@@ -6,7 +6,7 @@ import { CustomRegistryType } from '../shared/custom-registry-type.enum';
 import { GridElementInfo, GridSettingsRegistryService } from './grid-settings-registry.service';
 import { EXECUTION_REPORT_GRID } from '../../execution-common/types/execution-report-grid';
 
-export interface ExecutionCustomPanelMetadata extends Omit<GridElementInfo, 'widgetType' | 'title' | 'denyDuplicates'> {
+export interface ExecutionCustomPanelMetadata extends Omit<GridElementInfo, 'widgetType' | 'title'> {
   cssClassName?: string;
 }
 
@@ -33,13 +33,14 @@ export class ExecutionCustomPanelRegistryService extends BaseRegistryService {
     const item: ExecutionCustomPanelRegistryItem = { type, label, component, metadata };
     this._customRegistry.register(this.registryType, type, item);
     if (metadata) {
-      const { weight, widthInCells, heightInCells } = metadata;
+      const { weight, widthInCells, heightInCells, denyDuplicates } = metadata;
       this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
         widgetType: type,
         title: label,
         weight,
         widthInCells,
         heightInCells,
+        denyDuplicates,
       });
     }
   }
