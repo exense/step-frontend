@@ -172,6 +172,7 @@ import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggreg
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 
 @NgModule({
@@ -301,6 +302,7 @@ import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-ti
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    TableCountsToggleComponent,
   ],
   exports: [
     ExecutionListComponent,

@@ -88,6 +88,8 @@ interface SearchData {
   search: Record<string, SearchValue>;
   resetPagination: boolean;
   isForce: boolean;
+  hideProgress?: boolean;
+  immediateHideProgress?: boolean;
 }
 
 enum EmptyState {
@@ -466,7 +468,7 @@ export class TableComponent<T>
       searchWithTimeStamp: this.search$.pipe(timestamp()),
     }).pipe(
       map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
-        const { search, resetPagination, isForce } = searchWithTimeStamp.value;
+        const { search, resetPagination, isForce, hideProgress, immediateHideProgress } = searchWithTimeStamp.value;
         let page = pageWithTimeStamp.value;
         // Change has been triggered, by search. In that case reset page to first one
         const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
@@ -474,17 +476,36 @@ export class TableComponent<T>
           page = this.createPageInitialValue();
           this.page!.firstPage();
         }
-        return { page, search, isForce };
+        return { page, search, isForce, hideProgress, immediateHideProgress };
       }),
     );
 
     combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$, this.calculateCounts$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([{ page, search, isForce }, sort, filter, params, staticFilters, calculateCounts]) => {
-        this._tableState.saveState(search, page, sort);
-        const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
-        tableDataSource.getTableData({ page, sort, isForce, search: mergedSearch, filter, params, calculateCounts });
-      });
+      .subscribe(
+        ([
+          { page, search, isForce, hideProgress, immediateHideProgress },
+          sort,
+          filter,
+          params,
+          staticFilters,
+          calculateCounts,
+        ]) => {
+          this._tableState.saveState(search, page, sort);
+          const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
+          tableDataSource.getTableData({
+            page,
+            sort,
+            isForce,
+            hideProgress,
+            immediateHideProgress,
+            search: mergedSearch,
+            filter,
+            params,
+            calculateCounts,
+          });
+        },
+      );
 
     tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
@@ -618,15 +639,21 @@ export class TableComponent<T>
     let regex: boolean;
     let resetPagination: boolean;
     let isForce: boolean;
+    let hideProgress: boolean | undefined;
+    let immediateHideProgress: boolean | undefined;
     if (typeof searchValue === 'string') {
       regex = (regexOrParams as boolean | undefined) ?? true;
       resetPagination = params?.resetPagination ?? true;
       isForce = params?.isForce ?? true;
+      hideProgress = params?.hideProgress;
+      immediateHideProgress = params?.immediateHideProgress;
       searchCol = regex ? { value: searchValue, regex } : searchValue;
     } else {
       const searchParams = regexOrParams as TableSearchParams | undefined;
       resetPagination = searchParams?.resetPagination ?? true;
       isForce = searchParams?.isForce ?? true;
+      hideProgress = searchParams?.hideProgress;
+      immediateHideProgress = searchParams?.immediateHideProgress;
       searchCol = searchValue;
     }
     type RegexSearchValue = { regex?: boolean; value: string };
@@ -636,7 +663,7 @@ export class TableComponent<T>
       }
     }
     search[column] = searchCol;
-    this.search$.next({ search, resetPagination, isForce });
+    this.search$.next({ search, resetPagination, isForce, hideProgress, immediateHideProgress });
   }
 
   getSearchValue$(column: string): Observable<SearchValue | undefined> {

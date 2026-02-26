@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedExecutionsService,
   DateFormat,
@@ -58,8 +58,9 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
 
   readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
   readonly defaultDateRange = input<DateRange>();
+  protected readonly calculateCounts = signal(false);
 
-  protected tableFilters = computed(() => {
+  protected readonly tableFilters = computed(() => {
     const filters = this.hiddenFilters();
     const range = this.defaultDateRange();
     if (!range) {
@@ -84,6 +85,10 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
   refreshTable(): void {
     this.dataSource!.reload({ hideProgress: true });
     this.reloadRunningExecutionsCount$.next();
+  }
+
+  protected toggleCountsCalculation(): void {
+    this.calculateCounts.update((value) => !value);
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;

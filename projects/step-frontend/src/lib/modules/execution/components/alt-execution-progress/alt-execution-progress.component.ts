@@ -372,7 +372,7 @@ export class AltExecutionProgressComponent
       filter((pair) => pair[0] === pair[1]),
       takeUntilDestroyed(),
     )
-    .subscribe(() => this.keywordsDataSource.reload({ isForce: false }));
+    .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
