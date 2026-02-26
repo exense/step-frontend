@@ -23,9 +23,6 @@ step-grid-background {
     width: 100%;
 
     .grid-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       z-index: 5;
     }
   }
@@ -80,6 +77,8 @@ step-grid-background {
   .grid-measure-row:has(button.remove-row:hover) > section {
     display: block;
     background: var.$red-50;
+    height: sizes.$row-height;
+    top: sizes.$row-gap;
   }
 
   .grid-measure-row button.add-row {

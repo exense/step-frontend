@@ -1,13 +1,6 @@
-<button
-  type="button"
-  mat-icon-button
-  color="primary"
-  [matMenuTriggerFor]="menu"
-  matTooltip="Add widget"
-  matTooltipPosition="below"
->
+<div [matMenuTriggerFor]="menu" matTooltip="Add widget" matTooltipPosition="below">
   <step-icon name="plus" />
-</button>
+</div>
 <mat-menu #menu="matMenu">
   @for (item of widgets(); track item.widgetType) {
     <button type="button" mat-menu-item (click)="addWidget(item.widgetType)" [disabled]="!item.canBeAdded">
