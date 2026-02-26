@@ -7,7 +7,7 @@
   matSortActive="count"
   matSortDirection="desc"
   [visibleColumns]="displayColumns()"
-  [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
+  [indicatorMode]="TableIndicatorMode.SPINNER"
 >
   <ng-container matColumnDef="errorMessage" stepSearchCol>
     <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
@@ -20,7 +20,9 @@
           <mat-menu #menu="matMenu" class="error-wide-menu">
             <ng-template matMenuContent>
               @if (!element?.executionIds?.length) {
-                <div class="error-empty-executions"><step-icon name="alert-triangle" /> Current time range is too large to display details.</div>
+                <div class="error-empty-executions">
+                  <step-icon name="alert-triangle" /> Current time range is too large to display details.
+                </div>
               } @else {
                 <step-error-details-menu
                   [executionIds]="element.executionIds"

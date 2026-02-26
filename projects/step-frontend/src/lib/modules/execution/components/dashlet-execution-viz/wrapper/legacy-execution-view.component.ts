@@ -3,11 +3,14 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   input,
   OnInit,
   Signal,
   signal,
+  untracked,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
@@ -17,6 +20,9 @@ import { TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../.
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, pairwise } from 'rxjs';
 import { AuthService, DashboardsService, DashboardView, Execution, TimeRange } from '@exense/step-core';
+import { DashboardComponent } from '../../../../timeseries/components/dashboard/dashboard.component';
+import { convertPickerSelectionToTimeRange } from '../../../shared/convert-picker-selection';
+import { ExecutionDashboardComponent } from '../../../../timeseries/components/execution-page/execution-dashboard.component';
 
 @Component({
   selector: 'step-legacy-execution-view',
@@ -25,14 +31,28 @@ import { AuthService, DashboardsService, DashboardView, Execution, TimeRange } f
   standalone: false,
 })
 export class LegacyExecutionViewComponent implements OnInit {
-  execution = input.required<Execution>();
-
   private _router: Router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _dashboardService = inject(DashboardsService);
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
+
+  private dashboardComponent = viewChild('dashboardComponent', { read: ExecutionDashboardComponent });
+
+  execution = input.required<Execution>();
+
+  executionChangeEffect = effect(() => {
+    // handle autorefresh
+    let execution = this.execution();
+    if (!execution) return;
+
+    untracked(() => {
+      let timeRangeSelection = this.activeTimeRangeSelection();
+      const timeRange = convertPickerSelectionToTimeRange(timeRangeSelection!, execution);
+      this.dashboardComponent()?.updateFullTimeRange(timeRange!, { actionType: 'auto' });
+    });
+  });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -48,14 +68,9 @@ export class LegacyExecutionViewComponent implements OnInit {
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
     const pickerSelection = this.activeTimeRangeSelection();
-    if (pickerSelection) {
-      const execution = this.execution();
-      const end = execution.endTime || new Date().getTime();
-      if (pickerSelection.type === 'FULL') {
-        return { from: execution.startTime!, to: end };
-      } else {
-        return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection, end);
-      }
+    const execution = this.execution();
+    if (pickerSelection && execution) {
+      return convertPickerSelectionToTimeRange(pickerSelection, this.execution());
     } else {
       return undefined;
     }
@@ -113,13 +128,10 @@ export class LegacyExecutionViewComponent implements OnInit {
     );
   }
 
-  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
+  handleTimeRangeSelectionChange(pickerSelection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(pickerSelection);
-  }
-
-  triggerRefresh() {
-    let rangeSelection = this.activeTimeRangeSelection()!;
-    this.activeTimeRangeSelection.set({ ...rangeSelection });
+    let timeRange = convertPickerSelectionToTimeRange(pickerSelection, this.execution());
+    this.dashboardComponent()?.updateFullTimeRange(timeRange!, { actionType: 'manual' });
   }
 
   private subscribeToUrlNavigation() {

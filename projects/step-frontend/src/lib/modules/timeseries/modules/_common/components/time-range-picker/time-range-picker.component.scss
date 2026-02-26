@@ -150,6 +150,7 @@
 
   &.compact-btn {
     height: 40px;
+    min-width: unset;
     padding: 0 4px;
     width: 40px;
     display: flex;
