@@ -1,0 +1,11 @@
+@use 'projects/step-core/styles/core-mixins' as m;
+
+:host {
+  @include m.skeleton-background;
+  min-height: 5rem;
+  width: 100%;
+}
+
+div {
+  @include m.skeleton-content;
+}

@@ -98,6 +98,7 @@ step-alt-execution-progress {
     }
 
     .range-picker {
+      min-width: 26rem;
       grid-area: ranger;
       justify-self: flex-end;
       display: flex;
@@ -107,6 +108,7 @@ step-alt-execution-progress {
     }
 
     .controls {
+      min-width: 21rem;
       grid-area: controls;
       justify-self: flex-end;
       display: flex;
