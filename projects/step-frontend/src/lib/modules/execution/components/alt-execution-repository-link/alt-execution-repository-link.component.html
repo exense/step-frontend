@@ -1,7 +1,7 @@
-@if (planLink(); as planLink) {
-  <a class="plan-link" [routerLink]="planLink" matTooltip="Navigate to plan" matTooltipPosition="right">
+@if (planLink()) {
+  <button type="button" class="plan-link" mat-icon-button matTooltip="Navigate to plan" matTooltipPosition="right" (click)="openPlan()">
     <step-icon name="external-link" />
-  </a>
+  </button>
 }
 @if (automationPackageLinkParams(); as params) {
   <a

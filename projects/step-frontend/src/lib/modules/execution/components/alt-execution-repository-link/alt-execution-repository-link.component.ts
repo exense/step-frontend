@@ -1,5 +1,15 @@
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
-import { CommonEntitiesUrlsService, Execution } from '@exense/step-core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { CommonEntitiesUrlsService, ControllerService, Execution } from '@exense/step-core';
+import { catchError, map, of, switchMap } from 'rxjs';
+import {
+  AltExecutionPlanRepositoryLinkDialogComponent,
+  AltExecutionPlanRepositoryLinkDialogData,
+  AltExecutionPlanRepositoryLinkDialogResult,
+} from '../alt-execution-plan-repository-link-dialog/alt-execution-plan-repository-link-dialog.component';
 
 @Component({
   selector: 'step-alt-execution-repository-link',
@@ -11,6 +21,10 @@ import { CommonEntitiesUrlsService, Execution } from '@exense/step-core';
 })
 export class AltExecutionRepositoryLinkComponent {
   private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
+  private _controllerService = inject(ControllerService);
+  private _router = inject(Router);
+  private _dialog = inject(MatDialog);
+  private _window = inject(DOCUMENT).defaultView;
 
   readonly execution = input.required<Execution>();
 
@@ -30,6 +44,37 @@ export class AltExecutionRepositoryLinkComponent {
     return this._commonEntitiesUrl.planEditorUrl(execution.planId);
   });
 
+  private readonly repositoryLink$ = toObservable(this.execution).pipe(
+    map((execution) => {
+      const repository = execution.executionParameters?.repositoryObject;
+      if (
+        !execution.planId ||
+        !repository ||
+        repository.repositoryID === 'Artifact' ||
+        repository.repositoryParameters?.['wrapPlans'] === 'true' ||
+        repository.repositoryID === 'local'
+      ) {
+        return undefined;
+      }
+
+      return repository;
+    }),
+    switchMap((repository) => {
+      if (!repository) {
+        return of(undefined);
+      }
+
+      return this._controllerService.getArtefactLinks(repository).pipe(
+        map((artefactLinks) => artefactLinks.links?.[0]?.url?.trim() || undefined),
+        catchError(() => of(undefined)),
+      );
+    }),
+  );
+
+  protected readonly repositoryLink = toSignal(this.repositoryLink$, {
+    initialValue: undefined as string | undefined,
+  });
+
   protected readonly automationPackageLinkParams = computed(() => {
     const execution = this.execution();
 
@@ -45,4 +90,42 @@ export class AltExecutionRepositoryLinkComponent {
 
     return undefined;
   });
+
+  protected openPlan(): void {
+    const planLink = this.planLink();
+    if (!planLink) {
+      return;
+    }
+
+    const repository = this.execution().executionParameters?.repositoryObject;
+    const repositoryLink = this.repositoryLink();
+    const isLocalRepository = repository?.repositoryID === 'local';
+
+    if (!isLocalRepository && repository?.repositoryID && repositoryLink) {
+      this._dialog
+        .open<
+          AltExecutionPlanRepositoryLinkDialogComponent,
+          AltExecutionPlanRepositoryLinkDialogData,
+          AltExecutionPlanRepositoryLinkDialogResult
+        >(AltExecutionPlanRepositoryLinkDialogComponent, {
+          data: {
+            repositoryId: repository.repositoryID,
+          },
+        })
+        .afterClosed()
+        .subscribe((result) => {
+          if (result === 'repository') {
+            this._window?.open(repositoryLink, '_blank');
+            return;
+          }
+          if (result === 'step') {
+            this._router.navigateByUrl(planLink);
+          }
+        });
+
+      return;
+    }
+
+    this._router.navigateByUrl(planLink);
+  }
 }
