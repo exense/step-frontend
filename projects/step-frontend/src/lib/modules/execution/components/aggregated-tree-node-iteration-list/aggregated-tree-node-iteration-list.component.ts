@@ -69,11 +69,11 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   readonly statuses = REPORT_NODE_STATUS;
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
-  private matSort = viewChild(MatSort);
+  private readonly matSort = viewChild(MatSort);
 
-  protected sort = signal<SortDirection>('desc');
+  protected readonly sort = signal<SortDirection>('desc');
 
   private effectSort = effect(() => {
     const sort = this.sort();
@@ -87,9 +87,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   readonly resolvedPartialPath = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
-  readonly openTreeView = output<ReportNode>();
-
-  private artefactHash = computed(() => this.node().artefactHash);
+  private readonly artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -111,7 +109,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly searchCtrl = this._fb.control('');
 
-  private searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
+  private readonly searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
     initialValue: this.searchCtrl.value,
   });
 
@@ -131,7 +129,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  private readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;

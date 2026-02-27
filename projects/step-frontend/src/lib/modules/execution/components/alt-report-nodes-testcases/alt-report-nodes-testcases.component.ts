@@ -49,10 +49,8 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
   showAllOperations = false;
-
-  readonly openTestCaseInTreeView = output<ReportNode>();
 
   onSearchFor(item: AggregatedReportView, message: string): void {
     this.showIterations(item, { searchFor: message });
