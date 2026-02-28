@@ -4,7 +4,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CommonEntitiesUrlsService, ControllerService, Execution } from '@exense/step-core';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, of, startWith, switchMap } from 'rxjs';
 import {
   AltExecutionPlanRepositoryLinkDialogComponent,
   AltExecutionPlanRepositoryLinkDialogData,
@@ -44,21 +44,22 @@ export class AltExecutionRepositoryLinkComponent {
     return this._commonEntitiesUrl.planEditorUrl(execution.planId);
   });
 
-  private readonly repositoryLink$ = toObservable(this.execution).pipe(
-    map((execution) => {
-      const repository = execution.executionParameters?.repositoryObject;
-      if (
-        !execution.planId ||
-        !repository ||
-        repository.repositoryID === 'Artifact' ||
-        repository.repositoryParameters?.['wrapPlans'] === 'true' ||
-        repository.repositoryID === 'local'
-      ) {
-        return undefined;
-      }
+  protected readonly externalLinkRepository = computed(() => {
+    const execution = this.execution();
+    const repository = execution.executionParameters?.repositoryObject;
+    if (
+      !execution.planId ||
+      !repository ||
+      repository.repositoryID === 'Artifact' ||
+      repository.repositoryParameters?.['wrapPlans'] === 'true' ||
+      repository.repositoryID === 'local'
+    ) {
+      return undefined;
+    }
+    return repository;
+  });
 
-      return repository;
-    }),
+  private readonly repositoryLink$ = toObservable(this.externalLinkRepository).pipe(
     switchMap((repository) => {
       if (!repository) {
         return of(undefined);
@@ -67,6 +68,7 @@ export class AltExecutionRepositoryLinkComponent {
       return this._controllerService.getArtefactLinks(repository).pipe(
         map((artefactLinks) => artefactLinks.links?.[0]?.url?.trim() || undefined),
         catchError(() => of(undefined)),
+        startWith(undefined),
       );
     }),
   );
@@ -97,11 +99,10 @@ export class AltExecutionRepositoryLinkComponent {
       return;
     }
 
-    const repository = this.execution().executionParameters?.repositoryObject;
+    const repository = this.externalLinkRepository();
     const repositoryLink = this.repositoryLink();
-    const isLocalRepository = repository?.repositoryID === 'local';
 
-    if (!isLocalRepository && repository?.repositoryID && repositoryLink) {
+    if (repository?.repositoryID && repositoryLink) {
       this._dialog
         .open<
           AltExecutionPlanRepositoryLinkDialogComponent,
