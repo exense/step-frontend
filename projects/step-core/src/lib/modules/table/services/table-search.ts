@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 export interface TableSearchParams {
   resetPagination?: boolean;
   isForce?: boolean;
+  hideProgress?: boolean;
+  immediateHideProgress?: boolean;
 }
 
 export abstract class TableSearch {
