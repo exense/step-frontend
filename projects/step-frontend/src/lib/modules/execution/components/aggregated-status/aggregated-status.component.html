@@ -1,9 +1,11 @@
 @if (singleStatus(); as singleStatus) {
-  <step-status
-    [status]="singleStatus.status"
-    [iconMode]="true"
-    (stepStrategyClick)="handleClick(singleStatus, $event)"
-  />
+  @if (singleStatus.status !== Status.PASSED) {
+    <step-status
+      [status]="singleStatus.status"
+      [iconMode]="true"
+      (stepStrategyClick)="handleClick(singleStatus, $event)"
+    />
+  }
 } @else if (isEmptyStatus()) {
   <div class="status-group">
     <step-icon name="out-of-scope" [matTooltip]="emptyStatusMessage()" matTooltipPosition="below" />

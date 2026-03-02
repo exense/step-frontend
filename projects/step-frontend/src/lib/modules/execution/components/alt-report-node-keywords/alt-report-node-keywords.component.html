@@ -27,7 +27,9 @@
                   }
                 </div>
                 <step-report-node-icon [node]="element" />
-                <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+                @if (element.status !== 'PASSED') {
+                  <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+                }
                 <span class="name">{{ element.name }}</span>
               </div>
             </ng-container>

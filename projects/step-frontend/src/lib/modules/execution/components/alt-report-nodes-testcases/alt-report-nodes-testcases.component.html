@@ -27,7 +27,12 @@
             </div>
           </div>
           @if (element | aggregatedReportViewDurationValue; as duration) {
-            <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
+            <span class="duration">
+              @if (element | isAverageDuration) {
+                Ø
+              }
+              {{ duration | duration }}
+            </span>
           }
         </section>
       </td>
