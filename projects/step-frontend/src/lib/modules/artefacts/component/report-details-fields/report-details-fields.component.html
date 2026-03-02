@@ -1,0 +1,12 @@
+@if (configurationItems().length) {
+  <section class="fields-container">
+    <div class="container-title">Configuration</div>
+    <step-artefact-inline-field-list [items]="configurationItems()" [isVertical]="true" />
+  </section>
+}
+@if (resultItems().length) {
+  <section class="fields-container">
+    <div class="container-title">Result</div>
+    <step-artefact-inline-field-list [items]="resultItems()" [isVertical]="true" />
+  </section>
+}

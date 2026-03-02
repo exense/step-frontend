@@ -1,7 +1,7 @@
 @if (outputItems(); as outputs) {
   <section class="json-container title-inline-action">
     <div class="container-title">
-      Outputs
+      Result
       <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
         <step-icon name="copy" />
       </button>
@@ -11,8 +11,8 @@
       [columns]="2"
       [limit]="7"
       [iconsDictionary]="itemIcons"
-      labelExpand="Expand all outputs"
-      labelCollapse="Collapse outputs"
+      labelExpand="Expand all result"
+      labelCollapse="Collapse result"
     />
   </section>
 }

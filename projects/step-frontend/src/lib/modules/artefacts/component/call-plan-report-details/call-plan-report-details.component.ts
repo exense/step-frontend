@@ -20,7 +20,7 @@ export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<CallPlanArtefact>
 > {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);
-  private artefact = computed(() => this.node()?.resolvedArtefact);
+  private readonly artefact = computed(() => this.node()?.resolvedArtefact);
 
   protected readonly searchCriteria = computed(() => {
     const artefact = this.artefact();
@@ -62,7 +62,7 @@ export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
   ];
 
   protected readonly inputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-in', tooltip: 'Input', levels: 0 },
+    { key: '*', icon: 'log-in', tooltip: 'Configuration', levels: 0 },
   ];
 
   protected copySearchCriteria(): void {

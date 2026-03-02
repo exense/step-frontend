@@ -4,6 +4,7 @@
 step-table {
   --mat-table-row-item-container-height: 3rem;
   flex: 1;
+  font-size: 1.3rem;
 
   td {
     vertical-align: top;
@@ -58,7 +59,7 @@ step-artefact-inline-details.shift-rows {
 
     .name {
       font-weight: 500;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       white-space: nowrap;
       line-height: 1.2;
       align-self: center;

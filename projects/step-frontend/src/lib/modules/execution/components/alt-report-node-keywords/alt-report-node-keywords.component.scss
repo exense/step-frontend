@@ -5,6 +5,7 @@ step-alt-report-node-keywords {
   flex-direction: column;
   gap: 1rem;
   flex: 1;
+  font-size: 1.3rem;
 
   step-artefact-inline-details.shift-rows {
     max-width: 100%;
@@ -61,7 +62,7 @@ step-alt-report-node-keywords {
 
       .name {
         font-weight: 500;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         white-space: nowrap;
         line-height: 1.2;
         align-self: center;

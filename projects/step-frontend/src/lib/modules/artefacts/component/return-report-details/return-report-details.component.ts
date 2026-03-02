@@ -22,7 +22,7 @@ import { ReturnArtefact } from '../../types/return.artefact';
 export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ReturnArtefact>> {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
-  protected outputItems = computed(() => {
+  protected readonly outputItems = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     let result: Record<string, unknown> | undefined = undefined;
     if (!artefact?.output?.value) {
@@ -47,7 +47,7 @@ export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<Rep
   });
 
   protected readonly itemIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-out', tooltip: 'Output', levels: 0 },
+    { key: '*', icon: 'log-out', tooltip: 'Result', levels: 0 },
   ];
 
   protected copyOutput(): void {
