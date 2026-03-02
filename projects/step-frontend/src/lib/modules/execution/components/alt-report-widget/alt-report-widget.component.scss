@@ -6,6 +6,7 @@ step-alt-report-widget {
   display: flex;
   flex-direction: column;
   break-inside: avoid;
+  font-size: 1.3rem;
 
   @media screen {
     min-height: 44rem;
@@ -45,6 +46,14 @@ step-alt-report-widget {
 
   mat-card-content {
     padding-bottom: 0 !important;
+    font-size: 1.3rem;
+  }
+
+  step-icon,
+  mat-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 1.6rem;
   }
 
   &.overflow-content step-alt-report-widget-content {
