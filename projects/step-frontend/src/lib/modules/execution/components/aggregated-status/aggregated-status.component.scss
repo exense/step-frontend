@@ -10,6 +10,10 @@
   }
 }
 
+:host.hidden-single-passed {
+  display: none;
+}
+
 .status-group {
   display: flex;
   white-space: nowrap;

@@ -14,6 +14,9 @@ export interface StatusItem {
   selector: 'step-aggregated-status',
   templateUrl: './aggregated-status.component.html',
   styleUrl: './aggregated-status.component.scss',
+  host: {
+    '[class.hidden-single-passed]': 'isSinglePassedHidden()',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
@@ -52,6 +55,11 @@ export class AggregatedStatusComponent {
   });
 
   protected readonly isEmptyStatus = computed(() => !this.allStatusItems().length);
+
+  protected readonly isSinglePassedHidden = computed(() => {
+    const singleStatus = this.singleStatus();
+    return singleStatus?.status === Status.PASSED;
+  });
 
   protected readonly emptyStatusMessage = computed(() => {
     const isEmptyStatus = this.isEmptyStatus();
