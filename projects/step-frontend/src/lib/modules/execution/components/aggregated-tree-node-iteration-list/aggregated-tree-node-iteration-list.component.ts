@@ -131,7 +131,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  protected readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private statusesSubscription = this.statusesCtrl.valueChanges
@@ -198,6 +198,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   protected toggleFilterNonPassed(): void {
     const isFilteredByNonPassed = this.isFilteredByNonPassed();
     const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
+    this.statusesCtrl.setValue(statuses);
+  }
+
+  protected handleStatusChange(statuses: Status[]): void {
     this.statusesCtrl.setValue(statuses);
   }
 

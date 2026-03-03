@@ -1,0 +1,21 @@
+<step-form-field>
+  <step-select
+    [ngModel]="statuses()"
+    (ngModelChange)="handleStatusChange($event)"
+    [items]="items()"
+    [multiple]="true"
+    [emptyPlaceholder]="emptyPlaceholder()"
+  />
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-flat-button
+      [color]="isErrorFilterActive() ? 'primary' : undefined"
+      [matTooltip]="isErrorFilterActive() ? 'Clear' : errorFilterTooltip()"
+      matTooltipPosition="below"
+      (click)="onToggleErrorStatuses()"
+    >
+      <step-icon name="filter-errors" />
+    </button>
+  </step-suffix>
+</step-form-field>

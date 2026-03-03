@@ -170,6 +170,7 @@ import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggreg
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { ReportNodeStatusFilterControlComponent } from './components/report-node-status-filter-control/report-node-status-filter-control.component';
 
 @NgModule({
   declarations: [
@@ -227,6 +228,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeStatusFilterComponent,
+    ReportNodeStatusFilterControlComponent,
     AltReportNodeArtefactFilterComponent,
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,

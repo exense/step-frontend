@@ -1,21 +1,7 @@
-<step-form-field>
-  <step-select
-    [ngModel]="statuses()"
-    (ngModelChange)="handleStatusChange($event)"
-    [items]="_state.statuses"
-    [multiple]="true"
-    emptyPlaceholder="Status"
-  />
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-flat-button
-      [color]="_state.isFilteredByErrorStatuses() ? 'primary' : undefined"
-      [matTooltip]="_state.isFilteredByErrorStatuses() ? 'Clear' : 'Filter for all error statuses'"
-      matTooltipPosition="below"
-      (click)="_state.toggleErrorStatuses()"
-    >
-      <step-icon name="filter-errors" />
-    </button>
-  </step-suffix>
-</step-form-field>
+<step-report-node-status-filter-control
+  [statuses]="statuses()"
+  [items]="_state.statuses"
+  [isErrorFilterActive]="_state.isFilteredByErrorStatuses()"
+  (statusesChange)="handleStatusChange($event)"
+  (toggleErrorStatuses)="_state.toggleErrorStatuses()"
+/>
