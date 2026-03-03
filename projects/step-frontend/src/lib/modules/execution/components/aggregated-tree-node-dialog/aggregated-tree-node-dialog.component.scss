@@ -24,18 +24,26 @@ step-aggregated-tree-node-dialog {
   }
 
   step-modal-window {
+    .mat-mdc-dialog-title {
+      padding: 0 !important;
+    }
+
+    .mat-mdc-dialog-content.mat-mdc-dialog-content {
+      padding-right: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .mat-mdc-dialog-actions.mdc-dialog__actions {
+      padding: 1.4rem !important;
+    }
+
     div[mat-dialog-content] {
-      height: calc(100% - 15rem);
+      height: calc(100% - 12.2rem);
+      min-height: calc(100% - 12.2rem)!important;
       div[step-modal-window-body] {
         font-size: 1.4rem;
         height: 100%;
       }
-    }
-  }
-
-  &.is-report {
-    step-modal-window h1.mat-mdc-dialog-title {
-      padding-left: 0.9rem !important;
     }
   }
 

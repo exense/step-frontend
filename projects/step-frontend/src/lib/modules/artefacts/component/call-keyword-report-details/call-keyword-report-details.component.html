@@ -96,12 +96,12 @@
       <div class="container-title">Routing</div>
       <div class="tech-details-content">
         @if (node.agentUrl) {
-          <span>Agent:</span>
-          <a [href]="node.agentUrl" target="_blank">{{ node.agentUrl }}</a>
+          <span class="key">Agent:</span>
+          <a class="value" [href]="node.agentUrl" target="_blank">{{ node.agentUrl }}</a>
         }
         @if (node.tokenId) {
-          <span>Token ID:</span>
-          <span>{{ node.tokenId }}</span>
+          <span class="key">Token ID:</span>
+          <span class="value">{{ node.tokenId }}</span>
         }
       </div>
     </section>

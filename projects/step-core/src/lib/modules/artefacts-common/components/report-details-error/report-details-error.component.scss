@@ -1,0 +1,12 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+step-icon {
+  @include core.step-icon-size(1.6rem);
+  align-self: center;
+}
