@@ -35,11 +35,11 @@ step-alt-report-node-keywords {
     .artefact-header {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: .4rem;
       width: 100%;
       box-sizing: border-box;
       height: 2rem;
-      margin: 0 0 0.2rem 0;
+      margin: 0 .5rem .2rem 0;
 
       .execution-time {
         display: flex;
@@ -98,7 +98,7 @@ step-alt-report-node-keywords {
 
     .field-value {
       color: var.$blue-700;
-      font-weight: 700;
+      font-weight: 400;
     }
   }
 
