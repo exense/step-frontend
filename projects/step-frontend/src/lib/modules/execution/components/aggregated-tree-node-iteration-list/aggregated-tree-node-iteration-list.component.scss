@@ -126,6 +126,10 @@ button.details-trigger {
   & > button {
     width: 2rem;
     height: 2rem;
+
+    step-icon {
+      @include core.step-icon-size(1.6rem);
+    }
   }
 }
 
