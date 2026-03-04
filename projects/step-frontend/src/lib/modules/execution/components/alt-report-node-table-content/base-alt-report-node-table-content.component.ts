@@ -111,8 +111,8 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
       )
       .subscribe(({ searchValue, isManualChange }) => {
         const isInitialDateRangeLoad = this.initialDateRangeLoadPending;
-        const hideProgress = !isInitialDateRangeLoad && !isManualChange;
         const isForce = isInitialDateRangeLoad || isManualChange;
+        const hideProgress = !isForce;
         // TODO TableSearch resets query!!!
         const params: TableSearchParams = { resetPagination: false, isForce, hideProgress };
         if (typeof searchValue === 'string') {

@@ -155,7 +155,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
     const isManualChange = !!timeRange?.isManualChange;
     const isForce = isInitialTimeRangeLoad || isManualChange;
-    const hideProgress = !isInitialTimeRangeLoad && !isManualChange;
+    const hideProgress = !isForce;
     untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
     this.initialTimeRangeLoadPending = false;
   });
