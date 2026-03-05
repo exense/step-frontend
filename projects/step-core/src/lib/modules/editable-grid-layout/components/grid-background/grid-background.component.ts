@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation
 import { WidgetsPositionsStateService } from '../../injectables/widgets-positions-state.service';
 import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
-import {GridAddWidgetComponent} from '../grid-add-widget/grid-add-widget.component';
+import { GridAddWidgetComponent } from '../grid-add-widget/grid-add-widget.component';
 
 interface Row {
   index: number;
@@ -38,12 +38,12 @@ export class GridBackgroundComponent {
     const size = this.rowsCount() * colCount;
     // First cell in the last row
     const addCellIndex = widgetsBottom * colCount;
-    return this.createArray(size, (index) => ({index, hasAddButton: index === addCellIndex}) as Cell);
+    return this.createArray(size, (index) => ({ index, hasAddButton: index === addCellIndex }) as Cell);
   });
 
   protected readonly addCellCoordinates = computed(() => {
     const widgetsBottom = this._widgetPositionState.widgetsBottom();
-    if (!widgetsBottom) {
+    if (widgetsBottom < 0) {
       return undefined;
     }
     const rowStart = widgetsBottom + 1;
@@ -51,7 +51,7 @@ export class GridBackgroundComponent {
     const colStart = 1;
     const colEnd = colStart + 1;
     return `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
-  })
+  });
 
   protected readonly verticalCols = computed(() => {
     const size = this._colCount;
@@ -63,7 +63,7 @@ export class GridBackgroundComponent {
     const size = this.rowsCount();
     return this.createArray<Row>(size, (index) => ({
       index,
-      isEmpty: index < size - 1 ? this._widgetPositionState.isEmptyRow(index + 1) : false
+      isEmpty: index < size - 1 ? this._widgetPositionState.isEmptyRow(index + 1) : false,
     }));
   });
 
@@ -75,7 +75,7 @@ export class GridBackgroundComponent {
     this._widgetPositionState.removeRow(rowIndex + 1);
   }
 
-  private createArray<T = number>(size: number, itemFactory: ((index: number) => T) = (index) => index as T ): T[] {
+  private createArray<T = number>(size: number, itemFactory: (index: number) => T = (index) => index as T): T[] {
     const result = new Array(size);
     for (let i = 0; i < size; i++) {
       result[i] = itemFactory(i);

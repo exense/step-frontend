@@ -38,7 +38,7 @@ export class WidgetsPersistenceStateService {
     if (!selectedPreset) {
       return;
     }
-    this.initializePositions(selectedPreset.widgets);
+    this.initializePositions(selectedPreset);
     queueMicrotask(() => {
       const positions = untracked(() => this._widgetsPositions.positionsState());
       this.lastSavedPositions.set(positions);
@@ -143,14 +143,18 @@ export class WidgetsPersistenceStateService {
     );
   }
 
-  private initializePositions(widgetStates?: WidgetState[]): void {
-    const usedWidgetTypes: Set<string> = new Set((widgetStates ?? []).map((state) => state.widgetType));
-    const typesToAllocate = this.ALL_WIDGET_TYPE_IDS.filter(
-      (widgetType) =>
-        this._gridConfig.defaultElementParamsMap[widgetType].defaultVisibility && !usedWidgetTypes.has(widgetType),
-    );
+  private initializePositions(preset?: WidgetStatePreset): void {
+    let typesToAllocate: string[] = [];
+    let usedWidgetTypes = new Set<string>();
+    if (preset?.id === 'default') {
+      usedWidgetTypes = new Set((preset?.widgets ?? []).map((state) => state.widgetType));
+      typesToAllocate = this.ALL_WIDGET_TYPE_IDS.filter(
+        (widgetType) =>
+          this._gridConfig.defaultElementParamsMap[widgetType].defaultVisibility && !usedWidgetTypes.has(widgetType),
+      );
+    }
 
-    const positions = (widgetStates ?? []).map(
+    const positions = (preset?.widgets ?? []).map(
       (widgetState) => new WidgetPosition(widgetState.id, widgetState.widgetType, widgetState.position!),
     );
 

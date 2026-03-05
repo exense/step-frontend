@@ -42,6 +42,8 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return undefined;
     }
 
+    const elementPosition = this.context.getWidgetPositions()[elementId];
+
     //If position is taken by other widget, return other's widgets original position
     if (this.isCellTaken(dragPoint.row, dragPoint.column)) {
       const otherWidgetPosition = Object.values(this.context.getWidgetPositions()).find(
@@ -52,8 +54,8 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         return undefined;
       }
 
-      const positionLimits = this.getElementLimits(elementId);
-      const otherPositionLimits = this.getElementLimits(otherWidgetPosition.id);
+      const positionLimits = this.getElementLimits(elementPosition.widgetType);
+      const otherPositionLimits = this.getElementLimits(otherWidgetPosition.widgetType);
 
       // check the possibility to swap
       // to do it both widgets should fit to the limits of each other
@@ -134,7 +136,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return { canBeApplied, position: result };
     }
 
-    const limits = this.getElementLimits(elementId);
+    const limits = this.getElementLimits(elementPosition.widgetType);
     canBeApplied = this.isFit({
       width: limits.minWidthInCells,
       height: limits.minHeightInCells,
@@ -231,7 +233,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     result.heightInCells = newHeight;
 
     //apply min limits
-    const { minWidthInCells, minHeightInCells } = this.getElementLimits(elementId);
+    const { minWidthInCells, minHeightInCells } = this.getElementLimits(position.widgetType);
     this.applyMinLimits(result, minWidthInCells, minHeightInCells);
 
     return result;
@@ -423,8 +425,8 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     return { row, column };
   }
 
-  private getElementLimits(elementId: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
-    return this._gridConfig.defaultElementParamsMap?.[elementId] ?? {};
+  private getElementLimits(widgetType: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
+    return this._gridConfig.defaultElementParamsMap?.[widgetType] ?? {};
   }
 
   private applyEdgeLimits(pos: WidgetPosition, maxRightEdgeInCells?: number, maxBottomEdgeInCells?: number): void {
