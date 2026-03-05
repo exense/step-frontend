@@ -1,15 +1,12 @@
-import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { CommonEntitiesUrlsService, ControllerService, Execution } from '@exense/step-core';
-import { catchError, of, startWith, switchMap } from 'rxjs';
-import {
-  AltExecutionPlanRepositoryLinkDialogComponent,
-  AltExecutionPlanRepositoryLinkDialogData,
-  AltExecutionPlanRepositoryLinkDialogResult,
-} from '../alt-execution-plan-repository-link-dialog/alt-execution-plan-repository-link-dialog.component';
+import { CommonEntitiesUrlsService, ControllerService, Execution, PopoverMode } from '@exense/step-core';
+import { catchError, map, of, startWith, switchMap } from 'rxjs';
+
+interface RepositoryLinkItem {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'step-alt-execution-repository-link',
@@ -22,11 +19,9 @@ import {
 export class AltExecutionRepositoryLinkComponent {
   private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
   private _controllerService = inject(ControllerService);
-  private _router = inject(Router);
-  private _dialog = inject(MatDialog);
-  private _window = inject(DOCUMENT).defaultView;
 
   readonly execution = input.required<Execution>();
+  protected readonly PopoverMode = PopoverMode;
 
   protected readonly planLink = computed(() => {
     const execution = this.execution();
@@ -59,22 +54,32 @@ export class AltExecutionRepositoryLinkComponent {
     return repository;
   });
 
-  private readonly repositoryLink$ = toObservable(this.externalLinkRepository).pipe(
+  private readonly repositoryLinks$ = toObservable(this.externalLinkRepository).pipe(
     switchMap((repository) => {
       if (!repository) {
-        return of(undefined);
+        return of([]);
       }
 
       return this._controllerService.getArtefactLinks(repository).pipe(
-        map((artefactLinks) => artefactLinks.links?.[0]?.url?.trim() || undefined),
-        catchError(() => of(undefined)),
-        startWith(undefined),
+        map((artefactLinks) =>
+          (artefactLinks.links ?? [])
+            .filter((link) => !!link.url && `${link.url}`.trim() !== '')
+            .map((link) => {
+              const url = link.url!.trim();
+              return {
+                url,
+                label: link.description || url,
+              } as RepositoryLinkItem;
+            }),
+        ),
+        catchError(() => of([])),
+        startWith([]),
       );
     }),
   );
 
-  protected readonly repositoryLink = toSignal(this.repositoryLink$, {
-    initialValue: undefined as string | undefined,
+  protected readonly repositoryLinks = toSignal(this.repositoryLinks$, {
+    initialValue: [] as RepositoryLinkItem[],
   });
 
   protected readonly automationPackageLinkParams = computed(() => {
@@ -92,41 +97,4 @@ export class AltExecutionRepositoryLinkComponent {
 
     return undefined;
   });
-
-  protected openPlan(): void {
-    const planLink = this.planLink();
-    if (!planLink) {
-      return;
-    }
-
-    const repository = this.externalLinkRepository();
-    const repositoryLink = this.repositoryLink();
-
-    if (repository?.repositoryID && repositoryLink) {
-      this._dialog
-        .open<
-          AltExecutionPlanRepositoryLinkDialogComponent,
-          AltExecutionPlanRepositoryLinkDialogData,
-          AltExecutionPlanRepositoryLinkDialogResult
-        >(AltExecutionPlanRepositoryLinkDialogComponent, {
-          data: {
-            repositoryId: repository.repositoryID,
-          },
-        })
-        .afterClosed()
-        .subscribe((result) => {
-          if (result === 'repository') {
-            this._window?.open(repositoryLink, '_blank');
-            return;
-          }
-          if (result === 'step') {
-            this._router.navigateByUrl(planLink);
-          }
-        });
-
-      return;
-    }
-
-    this._router.navigateByUrl(planLink);
-  }
 }
