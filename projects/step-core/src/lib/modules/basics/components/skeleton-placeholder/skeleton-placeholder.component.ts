@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'step-skeleton-placeholder',
@@ -6,5 +6,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   templateUrl: './skeleton-placeholder.component.html',
   styleUrl: './skeleton-placeholder.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class SkeletonPlaceholderComponent {}

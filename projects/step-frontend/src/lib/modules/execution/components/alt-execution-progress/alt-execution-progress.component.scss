@@ -155,6 +155,13 @@ step-alt-execution-progress {
         border-bottom-left-radius: 1.7rem;
       }
     }
+
+    step-skeleton-placeholder {
+      min-height: 3.7rem;
+      & > div {
+        margin: 0;
+      }
+    }
   }
 
   .main {
