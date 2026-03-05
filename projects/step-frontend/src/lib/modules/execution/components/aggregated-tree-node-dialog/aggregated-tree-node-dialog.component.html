@@ -44,11 +44,7 @@
       <div class="panel-container">
         <div class="main-content">
           @if (selectedReportNode(); as reportNode) {
-            <step-alt-report-node-details
-              [node]="reportNode"
-              [showArtefact]="true"
-              (openTreeView)="handleOpenTreeView(reportNode!)"
-            />
+            <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
           } @else {
             @if (aggregatedNode(); as aggregatedNode) {
               <div class="iteration-list">
@@ -58,7 +54,6 @@
                   [initialStatus]="initialSearchStatus"
                   [initialStatusCount]="initialSearchStatusCount"
                   (showDetails)="handleOpenDetails($event)"
-                  (openTreeView)="handleOpenTreeView($event)"
                 />
               </div>
               @if (historyHashContainer(); as historyHashContainer) {
