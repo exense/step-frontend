@@ -1,0 +1,94 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use '../grid-sizes' as sizes;
+
+step-grid-background {
+  $cols-count: var(--style__cols-count);
+  $cols-count-1: calc(var(--style__cols-count) - 1);
+  $rows-count: var(--style__rows-count);
+  background: var.$gray-25;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: sizes.$row-height;
+
+  .grid-cells {
+    display: grid;
+    position: absolute;
+    grid-template-columns: repeat($cols-count-1, sizes.columnWidth($cols-count-1));
+    grid-auto-rows: sizes.$row-height;
+    row-gap: sizes.$row-gap;
+    column-gap: sizes.$column-gap;
+    width: 100%;
+
+    .grid-cell {
+      z-index: 5;
+    }
+  }
+
+  .grid-measure {
+    &.vertical-cols {
+      position: absolute;
+      top: -(sizes.$row-gap);
+      left: -(sizes.$column-gap);
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat($cols-count, sizes.$column-gap);
+      grid-template-rows: 1fr;
+      column-gap: sizes.columnWidth($cols-count-1);
+    }
+
+    &.horizontal-rows {
+      top: -(sizes.$row-gap);
+      left: -(sizes.$column-gap);
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat($rows-count, sizes.$row-gap);
+      row-gap: sizes.$row-height;
+    }
+  }
+
+  .grid-measure-row {
+    position: relative;
+    & > section {
+      display: none;
+      position: absolute;
+      opacity: 0.5;
+      top: 0.9rem;
+      left: 1.5rem;
+      right: 0;
+      height: 0.5rem;
+    }
+  }
+
+  .grid-measure-row,
+  .grid-measure-column {
+    background: var.$white;
+  }
+
+  .grid-measure-row:has(button.add-row:hover) > section {
+    display: block;
+    background: var.$blue-50;
+  }
+
+  .grid-measure-row:has(button.remove-row:hover) > section {
+    display: block;
+    background: var.$red-50;
+    height: sizes.$row-height;
+    top: sizes.$row-gap;
+  }
+
+  .grid-measure-row button.add-row {
+    margin-top: -0.8rem;
+    margin-left: -1.5rem;
+  }
+
+  .grid-measure-row button.remove-row {
+    position: absolute;
+    margin-top: -0.8rem;
+    right: -1.5rem;
+  }
+}
