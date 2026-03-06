@@ -876,7 +876,7 @@ export class ExecutionModule {
   private registerGridLayout(): void {
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'errorsWidget',
-      title: 'Errors Widget',
+      title: 'Error Summary',
       widthInCells: 8,
       heightInCells: 1,
       weight: 1,

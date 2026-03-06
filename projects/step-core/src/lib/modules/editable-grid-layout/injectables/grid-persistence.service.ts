@@ -15,11 +15,11 @@ export class GridPersistenceService {
     const gridPresetKey = `${gridId}_preset_${preset.id}`;
     this._storage.setItem(gridPresetKey, presetJson);
     this.saveGridPreset(gridId, { key: preset.id, value: preset.name });
-    return timer(100).pipe(map(() => {}));
+    return timer(50).pipe(map(() => {}));
   }
 
   load(gridId: string, presetKey: string): Observable<WidgetStatePreset | undefined> {
-    return timer(250).pipe(
+    return timer(200).pipe(
       map(() => `${gridId}_preset_${presetKey}`),
       map((gridPresetKey) => this._storage.getItem(gridPresetKey)),
       map((paramsJson) => {
@@ -35,7 +35,7 @@ export class GridPersistenceService {
   }
 
   getGridPresets(gridId: string): Observable<KeyValue<string, string>[]> {
-    return timer(250).pipe(
+    return timer(200).pipe(
       map(() => gridId),
       map((gridId) => this.loadGridPresets(gridId)),
       map((presets) => Object.entries(presets).map(([key, value]) => ({ key, value }))),
@@ -43,7 +43,7 @@ export class GridPersistenceService {
   }
 
   getGridSelectedPreset(gridId: string): Observable<string | undefined> {
-    return timer(250).pipe(
+    return timer(200).pipe(
       map(() => gridId),
       map((gridId) => this._storage.getItem(`${gridId}_selectedPreset`) ?? undefined),
     );
@@ -51,14 +51,14 @@ export class GridPersistenceService {
 
   setGridSelectedPreset(gridId: string, presetId: string): Observable<void> {
     this._storage.setItem(`${gridId}_selectedPreset`, presetId);
-    return timer(100).pipe(map(() => {}));
+    return timer(50).pipe(map(() => {}));
   }
 
   removeGridPreset(gridId: string, presetKey: string): Observable<void> {
     const presets = this.loadGridPresets(gridId);
     delete presets[presetKey];
     this.saveGridPresets(gridId, presets);
-    return timer(100).pipe(map(() => {}));
+    return timer(50).pipe(map(() => {}));
   }
 
   private saveGridPreset(gridId: string, preset: KeyValue<string, string>): void {

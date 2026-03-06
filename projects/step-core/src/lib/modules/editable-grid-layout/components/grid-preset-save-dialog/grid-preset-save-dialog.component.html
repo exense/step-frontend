@@ -1,0 +1,22 @@
+<form [formGroup]="saveForm" (submit)="handleSubmit()">
+  <step-modal-window [title]="dialogTitle">
+    <div step-modal-window-body>
+      <mat-radio-group formControlName="saveType">
+        <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="_dialogData.isProtected"
+          >Save & override</mat-radio-button
+        >
+        <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary">Save as new</mat-radio-button>
+      </mat-radio-group>
+      @if (saveType() === SaveType.SAVE_AS_NEW) {
+        <step-form-field>
+          <step-label>Preset Name</step-label>
+          <input type="text" formControlName="name" />
+        </step-form-field>
+      }
+    </div>
+    <div step-modal-window-buttons>
+      <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+      <button type="submit" mat-flat-button color="primary">Save</button>
+    </div>
+  </step-modal-window>
+</form>

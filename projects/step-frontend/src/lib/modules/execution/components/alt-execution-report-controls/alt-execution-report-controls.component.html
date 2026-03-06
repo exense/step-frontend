@@ -4,7 +4,7 @@
   </button>
 </step-btn-group>
 @if (!(_isSmallScreen$ | async)) {
-  <step-grid-config-tool />
+  <step-grid-control-tool hintEditGrid="Edit report layout" />
 }
 <mat-menu #menu="matMenu">
   <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
