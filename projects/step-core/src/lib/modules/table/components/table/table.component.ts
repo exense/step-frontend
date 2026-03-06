@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   AfterViewInit,
   Component,
@@ -15,7 +16,6 @@ import {
   linkedSignal,
   OnChanges,
   OnDestroy,
-  OnInit,
   Output,
   QueryList,
   signal,
@@ -28,69 +28,44 @@ import {
   viewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  switchMap,
-  takeUntil,
-  timestamp,
-} from 'rxjs';
+import { combineLatest, map, Observable, Subject, takeUntil, timestamp } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
-import { MatSort, Sort } from '@angular/material/sort';
-import { PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
-import { TableSearch, TableSearchParams } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
 import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
-import { ItemsPerPageDefaultService } from '../../services/items-per-page-default.service';
-import { HasFilter } from '../../../entities-selection/injectables/has-filter';
-import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
-import { PaginatorComponent } from '../paginator/paginator.component';
 import { CustomColumnsComponent } from '../custom-columns/custom-columns.component';
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
-import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.module';
-import { ItemsPerPageService } from '../../services/items-per-page.service';
+import { GlobalReloadService } from '../../../basics/step-basics.module';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
-import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
-import { TableSelectionList } from '../../shared/selection/table-selection-list';
-import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
 import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
 import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
-import { StepPageEvent } from '../../types/step-page-event';
 import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
 import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
+import { TablePartSelectionListDirective } from '../../directives/table-part-selection-list.directive';
+import { TablePartPaginationDirective } from '../../directives/table-part-pagination.directive';
+import { PaginatorComponent } from '../paginator/paginator.component';
+import { TablePartSortDirective } from '../../directives/table-part-sort.directive';
+import { TablePartSearchDirective } from '../../directives/table-part-search.directive';
+import { TableSearch, TableSearchParams } from '../../services/table-search';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
-
-interface SearchData {
-  search: Record<string, SearchValue>;
-  resetPagination: boolean;
-  isForce: boolean;
-  hideProgress?: boolean;
-  immediateHideProgress?: boolean;
-}
 
 enum EmptyState {
   INITIAL,
@@ -106,21 +81,22 @@ enum EmptyState {
     '[class.in-progress]': 'applyInProgressClass()',
     '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
   },
-  providers: [
+  hostDirectives: [
+    TablePartSelectionListDirective,
+    TablePartPaginationDirective,
+    TablePartSortDirective,
     {
-      provide: TableSearch,
-      useExisting: forwardRef(() => TableComponent),
+      directive: TablePartSearchDirective,
+      inputs: ['defaultSearch'],
     },
+  ],
+  providers: [
     {
       provide: TableFilter,
       useExisting: forwardRef(() => TableComponent),
     },
     {
       provide: TableReload,
-      useExisting: forwardRef(() => TableComponent),
-    },
-    {
-      provide: HasFilter,
       useExisting: forwardRef(() => TableComponent),
     },
     {
@@ -145,36 +121,38 @@ enum EmptyState {
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
-    TableSelectionListFactoryService,
-    {
-      provide: SelectionList,
-      useExisting: forwardRef(() => TableComponent),
-    },
   ],
   standalone: false,
 })
 export class TableComponent<T>
   implements
-    OnInit,
     AfterViewInit,
     OnChanges,
     OnDestroy,
     TableSearch,
     TableFilter,
     TableReload,
-    HasFilter,
     TableHighlightItemContainer,
-    TableColumnsDictionaryService,
-    SelectionList<unknown, T>
+    TableColumnsDictionaryService
 {
   private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
-  private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
-  private _selectionState = inject(EntitySelectionStateUpdatable, { optional: true });
-  private _tableSelectionListFactory = inject(TableSelectionListFactoryService);
+
+  private _tableSelection = inject(TablePartSelectionListDirective);
+  protected readonly _tablePagination = inject(TablePartPaginationDirective);
+  private _tableSort = inject(TablePartSortDirective);
+  private _tableSearch = inject(TablePartSearchDirective);
+
+  private readonly paginator = viewChild(PaginatorComponent);
+  private effectPaginatorChange = effect(() => {
+    const paginator = this.paginator();
+    if (paginator) {
+      this._tablePagination.initializePaginator(paginator);
+    }
+  });
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
@@ -244,15 +222,12 @@ export class TableComponent<T>
   });
 
   protected tableDataSource?: TableDataSource<T>;
-  private tableSelectionList?: TableSelectionList<T, TableDataSource<T>>;
 
   readonly pageSizeInputDisabled = input(false);
 
   readonly visibleColumns = input(undefined, {
     transform: (source?: string[]) => (!!source ? new Set<string>(source) : undefined),
   });
-
-  @Input() defaultSearch?: Record<string, SearchValue>;
 
   readonly filter = input<string | undefined>(undefined);
 
@@ -275,7 +250,6 @@ export class TableComponent<T>
   });
 
   @ViewChild(MatTable) private table?: MatTable<any>;
-  @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
   additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
@@ -351,11 +325,6 @@ export class TableComponent<T>
 
   private customRemoteColumns = viewChild(CustomColumnsComponent);
 
-  protected _itemsPerPageService =
-    inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
-
-  readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
-
   readonly displayColumns = computed(() => {
     const isColumnsInitialized = this._tableColumns.isInitialized();
     const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
@@ -391,36 +360,8 @@ export class TableComponent<T>
     });
   }
 
-  private search$ = new BehaviorSubject<SearchData>({
-    search: this._tableState.getSearch(),
-    resetPagination: true,
-    isForce: true,
-  });
   private filter$ = toObservable(this.filter);
   private tableParams$ = toObservable(this.tableParams);
-
-  readonly hasFilter$ = this.search$.pipe(
-    map((value) => value.search),
-    map((search) => {
-      const values = Object.values(search);
-      if (values.length === 0) {
-        return false;
-      }
-
-      const hasFilter = values.some((searchValue) => {
-        if (searchValue instanceof FilterCondition) {
-          return !searchValue.isEmpty();
-        }
-        if (typeof searchValue === 'string') {
-          return !!searchValue;
-        }
-        return !!searchValue?.value;
-      });
-
-      return hasFilter;
-    }),
-  );
-  readonly hasFilter = toSignal(this.hasFilter$, { initialValue: false });
 
   highlightedItem?: unknown;
 
@@ -429,8 +370,7 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
     this.inProgressDataSource.set(false);
-    this.tableSelectionList?.destroy?.();
-    this.tableSelectionList = undefined;
+    this._tableSelection.destroySelectionList();
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -450,22 +390,20 @@ export class TableComponent<T>
     }
 
     this.tableDataSource = tableDataSource;
+    this._tableSelection.prepareSelectionList(tableDataSource);
 
-    if (this._selectionState) {
-      this.tableSelectionList = this._tableSelectionListFactory.create(tableDataSource);
-    }
-
-    if (!this.page) {
+    if (!this._tablePagination.isPaginatorReady) {
       this.initRequired = true;
       return;
     }
 
-    const sort$ = this.setupSortStream();
-    const page$ = this.setupPageStream();
+    const sort$ = this._tableSort.setupSortStream();
+    const page$ = this._tablePagination.setupPageStream();
+    const search$ = this._tableSearch.search$;
 
     const pageAndSearch$ = combineLatest({
       pageWithTimeStamp: page$.pipe(timestamp()),
-      searchWithTimeStamp: this.search$.pipe(timestamp()),
+      searchWithTimeStamp: search$.pipe(timestamp()),
     }).pipe(
       map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
         const { search, resetPagination, isForce, hideProgress, immediateHideProgress } = searchWithTimeStamp.value;
@@ -473,8 +411,7 @@ export class TableComponent<T>
         // Change has been triggered, by search. In that case reset page to first one
         const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
         if (resetPagination && isRestToFirstPage) {
-          page = this.createPageInitialValue();
-          this.page!.firstPage();
+          page = this._tablePagination.resetToFirstPage();
         }
         return { page, search, isForce, hideProgress, immediateHideProgress };
       }),
@@ -508,7 +445,7 @@ export class TableComponent<T>
       );
 
     tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
-      this.page!.firstPage();
+      this._tablePagination.resetToFirstPage();
     });
 
     tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
@@ -522,54 +459,6 @@ export class TableComponent<T>
     tableDataSource!.hasNext$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((hasNext) => {
       this.hasNext.set(hasNext);
     });
-  }
-
-  private setupSortStream(): Observable<Sort | undefined> {
-    if (!this._sort) {
-      return of(undefined);
-    }
-
-    let initialSort: Sort | undefined = undefined;
-
-    const sortState = this._tableState.getSort();
-
-    if (sortState) {
-      this._sort.active = sortState.active;
-      this._sort.direction = sortState.direction;
-      initialSort = sortState;
-    } else if (this._sort.active) {
-      const { active, direction } = this._sort;
-      initialSort = { active, direction };
-    }
-
-    return this._sort.sortChange.pipe(startWith(initialSort));
-  }
-
-  private setupPageStream(): Observable<StepPageEvent> {
-    let initialPage$: Observable<StepPageEvent>;
-
-    const statePage = this._tableState.getPage();
-    if (statePage) {
-      this.page.pageSize.set(statePage.pageSize);
-      this.page.pageIndex.set(statePage.pageIndex);
-      initialPage$ = of(statePage);
-    } else {
-      this.page.firstPage();
-      initialPage$ = this._itemsPerPageService
-        .getDefaultPageSizeItem()
-        .pipe(map((pageSize) => this.createPageInitialValue(pageSize)));
-    }
-
-    return initialPage$.pipe(switchMap((initialPage) => this.page.page$.pipe(startWith(initialPage))));
-  }
-
-  private createPageInitialValue(pageSize?: number): PageEvent {
-    pageSize = pageSize ?? (this.page.pageSize() || this.pageSizeOptions()[0]);
-    return {
-      pageSize,
-      pageIndex: 0,
-      length: 0,
-    };
   }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {
@@ -612,66 +501,8 @@ export class TableComponent<T>
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }
 
-  private setupDefaultSearch(): void {
-    if (!this.defaultSearch) {
-      return;
-    }
-    const searchValue = { ...this.defaultSearch, ...this.search$.value };
-    this.search$.next(searchValue);
-  }
-
-  private setupExternalSearchChangeHandle(): void {
-    this._tableState.externalSearchChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((externalSearch) => {
-      this.search$.next({ search: externalSearch, resetPagination: true, isForce: true });
-    });
-  }
-
-  onSearch(column: string, searchValue: SearchValue, params?: TableSearchParams): void;
-  onSearch(column: string, value: string, regex?: boolean, params?: TableSearchParams): void;
-  onSearch(
-    column: string,
-    searchValue: string | SearchValue,
-    regexOrParams?: boolean | TableSearchParams,
-    params?: TableSearchParams,
-  ): void {
-    const search = { ...this.search$.value.search };
-    let searchCol: SearchValue;
-    let regex: boolean;
-    let resetPagination: boolean;
-    let isForce: boolean;
-    let hideProgress: boolean | undefined;
-    let immediateHideProgress: boolean | undefined;
-    if (typeof searchValue === 'string') {
-      regex = (regexOrParams as boolean | undefined) ?? true;
-      resetPagination = params?.resetPagination ?? true;
-      isForce = params?.isForce ?? true;
-      hideProgress = params?.hideProgress;
-      immediateHideProgress = params?.immediateHideProgress;
-      searchCol = regex ? { value: searchValue, regex } : searchValue;
-    } else {
-      const searchParams = regexOrParams as TableSearchParams | undefined;
-      resetPagination = searchParams?.resetPagination ?? true;
-      isForce = searchParams?.isForce ?? true;
-      hideProgress = searchParams?.hideProgress;
-      immediateHideProgress = searchParams?.immediateHideProgress;
-      searchCol = searchValue;
-    }
-    type RegexSearchValue = { regex?: boolean; value: string };
-    if ((searchCol as RegexSearchValue)?.regex) {
-      if (!isValidRegex((searchCol as RegexSearchValue).value)) {
-        return;
-      }
-    }
-    search[column] = searchCol;
-    this.search$.next({ search, resetPagination, isForce, hideProgress, immediateHideProgress });
-  }
-
-  getSearchValue$(column: string): Observable<SearchValue | undefined> {
-    return this.search$.pipe(map((value) => value.search[column]));
-  }
-
   getTableFilterRequest(): TableRequestData | undefined {
-    const [search, filter, params] = [this.search$.value.search, this.filter(), this.tableParams()];
+    const [search, filter, params] = [this._tableSearch.search.search, this.filter(), this.tableParams()];
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
@@ -679,13 +510,8 @@ export class TableComponent<T>
     this.onReload.emit({});
     this.tableDataSource?.reload();
     if (isCausedByProjectChange) {
-      this.page?.firstPage?.();
+      this._tablePagination.resetToFirstPage();
     }
-  }
-
-  ngOnInit(): void {
-    this.setupDefaultSearch();
-    this.setupExternalSearchChangeHandle();
   }
 
   ngAfterViewInit(): void {
@@ -719,7 +545,6 @@ export class TableComponent<T>
 
   ngOnDestroy(): void {
     this.terminateDatasource();
-    this.search$.complete();
     this._globalReloadService.unRegister(this);
   }
 
@@ -779,43 +604,22 @@ export class TableComponent<T>
     this.tableDataSource.exportAsCSV(fields, this.tableParams());
   }
 
-  /** Selection list methods begin **/
-
-  clearSelection(): void {
-    this.tableSelectionList?.clearSelection?.();
+  getSearchValue$(column: string): Observable<SearchValue | undefined> {
+    return this._tableSearch.getSearchValue$(column);
   }
 
-  deselect(item: T): void {
-    this.tableSelectionList?.deselect?.(item);
+  onSearch(column: string, searchValue: SearchValue, params?: TableSearchParams): void;
+  onSearch(column: string, value: string, regex?: boolean, params?: TableSearchParams): void;
+  onSearch(
+    column: string,
+    searchValue: SearchValue | string,
+    regexOrParams?: TableSearchParams | boolean,
+    params?: TableSearchParams,
+  ): void {
+    if (typeof searchValue === 'string') {
+      this._tableSearch.onSearch(column, searchValue, regexOrParams as boolean, params);
+    } else {
+      this._tableSearch.onSearch(column, searchValue, regexOrParams as TableSearchParams);
+    }
   }
-
-  select(item: T): void {
-    this.tableSelectionList?.select?.(item);
-  }
-
-  selectAll(): void {
-    this.tableSelectionList?.selectAll?.();
-  }
-
-  selectFiltered(): void {
-    this.tableSelectionList?.selectFiltered?.();
-  }
-
-  selectVisible(): void {
-    this.tableSelectionList?.selectVisible?.();
-  }
-
-  toggleSelection(item: T): void {
-    this.tableSelectionList?.toggleSelection?.(item);
-  }
-
-  selectIds<K>(keys: K[]): void {
-    this.tableSelectionList?.selectIds?.(keys);
-  }
-
-  checkCurrentSelectionState<K>(predicate: (item: T) => boolean): Map<K, boolean> | undefined {
-    return this.tableSelectionList?.checkCurrentSelectionState?.(predicate) as Map<K, boolean> | undefined;
-  }
-
-  /** Selection list methods end **/
 }

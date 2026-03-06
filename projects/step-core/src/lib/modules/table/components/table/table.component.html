@@ -71,7 +71,7 @@
     [length]="totalFiltered()"
     [hasNext]="hasNext()"
     [usePagesCount]="calculateCounts()"
-    [pageSizeOptions]="pageSizeOptions()"
+    [pageSizeOptions]="_tablePagination.pageSizeOptions()"
   >
     @if (tablePaginatorContent(); as paginatorContent) {
       <ng-container *ngTemplateOutlet="paginatorContent.templateRef" />
