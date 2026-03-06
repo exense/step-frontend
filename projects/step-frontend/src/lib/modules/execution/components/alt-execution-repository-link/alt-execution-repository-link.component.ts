@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { CommonEntitiesUrlsService, ControllerService, Execution, PopoverMode } from '@exense/step-core';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, filter, map, of, shareReplay, startWith, switchMap, take } from 'rxjs';
 
 interface RepositoryLinkItem {
   label: string;
@@ -55,11 +55,9 @@ export class AltExecutionRepositoryLinkComponent {
   });
 
   private readonly repositoryLinks$ = toObservable(this.externalLinkRepository).pipe(
+    filter((repository) => !!repository),
+    take(1),
     switchMap((repository) => {
-      if (!repository) {
-        return of([]);
-      }
-
       return this._controllerService.getArtefactLinks(repository).pipe(
         map((artefactLinks) =>
           (artefactLinks.links ?? [])
@@ -73,9 +71,10 @@ export class AltExecutionRepositoryLinkComponent {
             }),
         ),
         catchError(() => of([])),
-        startWith([]),
       );
     }),
+    startWith([]),
+    shareReplay(1),
   );
 
   protected readonly repositoryLinks = toSignal(this.repositoryLinks$, {
