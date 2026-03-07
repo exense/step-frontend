@@ -170,8 +170,11 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
 import { HistoryCellComponent } from './components/execution-history-cell/execution-history-cell.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import {
+  StatusDistributionBadgeComponent
+} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 
 @NgModule({
   declarations: [
@@ -297,6 +300,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    TableCountsToggleComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
     HistoryNodesComponent,
     StatusDistributionBadgeComponent,

@@ -172,6 +172,11 @@
         [fullRangeLabel]="(fullTimeRangeLabel | async)!"
       />
     </div>
+  } @else {
+    <step-skeleton-placeholder class="title" />
+    <step-skeleton-placeholder class="sub-title" />
+    <step-skeleton-placeholder class="controls" />
+    <step-skeleton-placeholder class="range-picker" />
   }
 </section>
 

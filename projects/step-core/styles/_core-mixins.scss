@@ -1,12 +1,14 @@
 @use 'components/theme-config';
 @use 'components/report-node-status';
 @use 'components/step-table';
+@use 'components/step-skeleton';
 @use 'core-variables' as var;
 
 @forward 'components/theme-config';
 @forward 'components/report-node-status';
 @forward 'components/report-node';
 @forward 'components/step-table';
+@forward 'components/step-skeleton';
 @forward 'components/step-icon';
 @forward 'components/step-inputs' show step-form-field-vertical-layout;
 @forward 'components/step-buttons' show button-round;

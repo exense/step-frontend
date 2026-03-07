@@ -43,6 +43,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   protected abstract tableSearch: Signal<TableSearch | undefined>;
 
   readonly dataSource$ = this._state.datasource$;
+  private initialDateRangeLoadPending = true;
 
   private isRemoteDataSource$ = this.dataSource$.pipe(map((dataSource) => dataSource instanceof TableRemoteDataSource));
 
@@ -109,13 +110,17 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ searchValue, isManualChange }) => {
+        const isInitialDateRangeLoad = this.initialDateRangeLoadPending;
+        const isForce = isInitialDateRangeLoad || isManualChange;
+        const hideProgress = !isForce;
         // TODO TableSearch resets query!!!
-        const params: TableSearchParams = { resetPagination: false, isForce: isManualChange };
+        const params: TableSearchParams = { resetPagination: false, isForce, hideProgress };
         if (typeof searchValue === 'string') {
           this.tableSearch()?.onSearch?.('executionTime', searchValue, true, params);
         } else {
           this.tableSearch()?.onSearch?.('executionTime', searchValue, params);
         }
+        this.initialDateRangeLoadPending = false;
       });
   }
 }
