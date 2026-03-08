@@ -97,6 +97,8 @@
 <div class="table-container">
   <step-table
     [dataSource]="tableDataSource"
+    [noResultsPlaceholder]="'No data'"
+    [inProgress]="isLoading()"
     matSort
     class="ts-table"
     [visibleColumns]="visibleColumnsIds"

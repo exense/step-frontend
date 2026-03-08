@@ -28,7 +28,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -93,8 +93,8 @@ interface ProcessedBucketResponse {
   standalone: true,
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
-  readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
-  readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
+  protected readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
+  protected readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
 
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
@@ -112,7 +112,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _cd = inject(ChangeDetectorRef);
 
-  tableData$ = new BehaviorSubject<TableEntry[]>([]);
+  tableData$ = new Subject<TableEntry[]>();
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
 
   columnsDefinition: TableColumn[] = [];
@@ -436,9 +436,15 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onAllSeriesCheckboxClick(checked: boolean): void {
     this.context().getSyncGroup(this.item().id).setAllSeriesChecked(checked);
 
-    this.tableData$.getValue().forEach((entry) => {
-      entry.isSelected = checked;
-    });
+    this.tableDataSource?.allData$.subscribe(allData => {
+      console.log('did it once');
+      allData.forEach((entry) => {
+        entry.isSelected = checked;
+      });
+    })
+    // this.tableData$.getValue().forEach((entry) => {
+    //   entry.isSelected = checked;
+    // });
   }
 
   onKeywordToggle(entry: TableEntry, selected: boolean): void {

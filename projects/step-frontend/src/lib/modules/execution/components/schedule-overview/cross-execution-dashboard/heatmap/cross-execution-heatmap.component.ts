@@ -66,7 +66,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
   readonly defaultDateRange = input<DateRange>();
 
-  readonly isLoading = signal<boolean>(false);
+  readonly isLoading = signal<boolean>(true);
 
   protected readonly dashletTitle = computed(() => {
     let heatmapType = this.heatmapType();
@@ -204,8 +204,9 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
               });
             });
           });
+          const data = { data: this.convertToTableData(executions, Object.values(itemsMap)), truncated: false };
           this.isLoading.set(false);
-          return { data: this.convertToTableData(executions, Object.values(itemsMap)), truncated: false };
+          return data;
         }),
       );
     }),

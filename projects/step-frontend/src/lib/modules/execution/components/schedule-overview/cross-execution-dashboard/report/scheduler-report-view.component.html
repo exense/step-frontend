@@ -72,7 +72,7 @@
           }
         } @else if (reportNodesChartType() === 'testcases') {
           @if (_state.testCasesChartSettings$ | async; as testCasesData) {
-            @if (_state.testCasesCountChartLoading()) {
+            @if (_state.testCasesCountChartLoading() && _state.lastRefreshTrigger() !== 'auto') {
               <ng-container *ngTemplateOutlet="skeleton" />
             }
             <div [class.hidden]="_state.testCasesCountChartLoading() && _state.lastRefreshTrigger() !== 'auto'">

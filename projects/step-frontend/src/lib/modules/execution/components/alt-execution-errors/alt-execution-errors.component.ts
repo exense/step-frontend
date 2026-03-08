@@ -51,16 +51,19 @@ export class AltExecutionErrorsComponent {
 
   protected readonly dataSource = computed(() => {
     const data = this.dataSourceInput();
+    console.log(data);
     if (!data) {
       return [] as TimeSeriesErrorEntry[];
     }
     if (data instanceof TableLocalDataSource || data instanceof TableRemoteDataSource) {
+      console.log('we got here');
       return data;
     }
     if (data instanceof Array) {
       return this._timeSeriesApi.createErrorsLocalDataSource(data);
     }
     const data$ = (data as Observable<TimeSeriesErrorEntry[] | undefined>).pipe(map((items) => items ?? []));
+
     return this._timeSeriesApi.createErrorsLocalDataSource(data$);
   });
 
