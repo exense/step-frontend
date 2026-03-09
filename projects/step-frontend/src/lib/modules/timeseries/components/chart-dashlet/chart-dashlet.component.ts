@@ -32,7 +32,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -485,7 +485,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           truncated: response.truncated,
         };
       }),
-      tap(() => this.isLoading.set(false)),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 

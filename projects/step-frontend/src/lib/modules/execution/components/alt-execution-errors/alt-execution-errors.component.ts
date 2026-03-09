@@ -51,12 +51,10 @@ export class AltExecutionErrorsComponent {
 
   protected readonly dataSource = computed(() => {
     const data = this.dataSourceInput();
-    console.log(data);
     if (!data) {
       return [] as TimeSeriesErrorEntry[];
     }
     if (data instanceof TableLocalDataSource || data instanceof TableRemoteDataSource) {
-      console.log('we got here');
       return data;
     }
     if (data instanceof Array) {

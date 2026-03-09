@@ -28,7 +28,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, finalize, forkJoin, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -436,15 +436,12 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onAllSeriesCheckboxClick(checked: boolean): void {
     this.context().getSyncGroup(this.item().id).setAllSeriesChecked(checked);
 
-    this.tableDataSource?.allData$.subscribe(allData => {
-      console.log('did it once');
-      allData.forEach((entry) => {
-        entry.isSelected = checked;
-      });
+    this.tableDataSource?.allData$.pipe(take(1))
+      .subscribe(allData => {
+        allData.forEach((entry) => {
+          entry.isSelected = checked;
+        });
     })
-    // this.tableData$.getValue().forEach((entry) => {
-    //   entry.isSelected = checked;
-    // });
   }
 
   onKeywordToggle(entry: TableEntry, selected: boolean): void {
@@ -460,12 +457,12 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   openSettings(): void {
     this._matDialog
-      .open(TableDashletSettingsComponent, { data: { item: this.item, context: this.context } })
+      .open(TableDashletSettingsComponent, { data: { item: this.item(), context: this.context } })
       .afterClosed()
       // eslint-disable-next-line step-lint/rx-nested-subscription
       .subscribe((updatedItem: DashboardItem) => {
         if (updatedItem) {
-          Object.assign(this.item, updatedItem);
+          Object.assign(this.item(), updatedItem);
           this.prepareState();
           this.refresh(true).subscribe();
           this._cd.markForCheck();
