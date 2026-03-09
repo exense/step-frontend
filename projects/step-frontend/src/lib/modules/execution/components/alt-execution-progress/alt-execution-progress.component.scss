@@ -98,6 +98,7 @@ step-alt-execution-progress {
     }
 
     .range-picker {
+      min-width: 26rem;
       grid-area: ranger;
       justify-self: flex-end;
       display: flex;
@@ -107,6 +108,7 @@ step-alt-execution-progress {
     }
 
     .controls {
+      min-width: 21rem;
       grid-area: controls;
       justify-self: flex-end;
       display: flex;
@@ -151,6 +153,13 @@ step-alt-execution-progress {
         padding-left: 0.5rem;
         border-top-left-radius: 1.7rem;
         border-bottom-left-radius: 1.7rem;
+      }
+    }
+
+    step-skeleton-placeholder {
+      min-height: 3.7rem;
+      & > div {
+        margin: 0;
       }
     }
   }

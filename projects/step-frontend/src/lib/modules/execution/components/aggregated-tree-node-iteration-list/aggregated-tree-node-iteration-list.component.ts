@@ -134,6 +134,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
+  private initialTimeRangeLoadPending = true;
+
   private statusesSubscription = this.statusesCtrl.valueChanges
     .pipe(
       startWith(this.statusesCtrl.value),
@@ -150,8 +152,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private timeRangeSubscription = this._executionState.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
     const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
     const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
-    const isForce = !!timeRange?.isManualChange;
-    untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce });
+    const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
+    const isManualChange = !!timeRange?.isManualChange;
+    const isForce = isInitialTimeRangeLoad || isManualChange;
+    const hideProgress = !isForce;
+    untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
+    this.initialTimeRangeLoadPending = false;
   });
 
   protected readonly showCountWarning = computed(() => {

@@ -81,6 +81,7 @@ import { LongInlineTextComponent } from './components/long-inline-text/long-inli
 import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 import { UndraggedClickDirective } from './directives/undragged-click.directive';
+import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
 
 @NgModule({
   imports: [
@@ -101,6 +102,7 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
     UndraggedClickDirective,
+    SkeletonPlaceholderComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -253,6 +255,7 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
     LongInlineTextComponent,
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
+    SkeletonPlaceholderComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -408,3 +411,4 @@ export * from './utils/smart-switch-map';
 export * from './utils/duration-switch-map';
 export * from './utils/fare-share-calculator';
 export * from './utils/combine-latest-with-track-changes';
+export * from './components/skeleton-placeholder/skeleton-placeholder.component';
