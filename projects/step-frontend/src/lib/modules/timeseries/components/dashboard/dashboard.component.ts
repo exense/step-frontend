@@ -231,7 +231,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       getDashlets: () => this.dashlets,
       getRanger: () => this.timeRanger!,
       refreshInProgress: false,
-      lastChangeType: 'auto',
+      lastChangeType: 'manual', // to trigger loading
     };
     this.mainEngine = new DashboardStateEngine(state);
     this.mainEngine.subscribeForContextChange();

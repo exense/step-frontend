@@ -99,7 +99,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
   readonly editMode = input<boolean>(false);
-  readonly showLoadingSpinnerWhileLoading = input<boolean>(false);
+  readonly showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();

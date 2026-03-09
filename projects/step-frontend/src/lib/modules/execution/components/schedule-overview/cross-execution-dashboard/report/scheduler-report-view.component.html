@@ -7,6 +7,8 @@
           <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
         <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
+      } @else {
+        <ng-container *ngTemplateOutlet="loadingSpinner" />
       }
     </div>
 

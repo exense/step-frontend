@@ -98,7 +98,7 @@
   <step-table
     [dataSource]="tableDataSource"
     [noResultsPlaceholder]="'No data'"
-    [inProgress]="isLoading()"
+    [inProgress]="isLoading() && showLoadingSpinnerWhileLoading()"
     matSort
     class="ts-table"
     [visibleColumns]="visibleColumnsIds"
