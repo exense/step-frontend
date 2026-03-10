@@ -1,24 +1,32 @@
 @if (planLink()) {
   @if (externalLinkRepository() && repositoryLinks().length > 0) {
     <step-popover [mode]="PopoverMode.BOTH" yPosition="below" [smallFont]="false">
-      <button type="button" class="plan-link" mat-icon-button matTooltip="Navigate to plan" matTooltipPosition="right">
+      <a
+        class="plan-link"
+        href=""
+        (click)="$event.preventDefault()"
+        matTooltip="Navigate to plan"
+        matTooltipPosition="right"
+      >
         <step-icon name="external-link" />
-      </button>
+      </a>
       <step-popover-content>
         <div class="plan-links-popover">
           <strong>Open the plan in:</strong>
-          @for (link of repositoryLinks(); track link.url; let isFirst = $first) {
-            @if (isFirst) {
-              <a [href]="link.url" target="_blank" rel="noopener noreferrer" mat-flat-button color="primary">
-                {{ link.label }}
-              </a>
-            } @else {
-              <a [href]="link.url" target="_blank" rel="noopener noreferrer" mat-stroked-button>
-                {{ link.label }}
-              </a>
+          <div class="plan-links-actions">
+            @for (link of repositoryLinks(); track link.url; let isFirst = $first) {
+              @if (isFirst) {
+                <a [href]="link.url" target="_blank" rel="noopener noreferrer" mat-flat-button color="primary">
+                  {{ link.label }}
+                </a>
+              } @else {
+                <a [href]="link.url" target="_blank" rel="noopener noreferrer" mat-stroked-button>
+                  {{ link.label }}
+                </a>
+              }
             }
-          }
-          <a [routerLink]="planLink()" mat-stroked-button>Step Editor (compiled plan)</a>
+            <a [routerLink]="planLink()" mat-stroked-button>Step Plan Editor (compiled)</a>
+          </div>
         </div>
       </step-popover-content>
     </step-popover>
