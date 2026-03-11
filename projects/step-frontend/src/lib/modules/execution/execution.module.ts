@@ -941,7 +941,7 @@ export class ExecutionModule {
       widthInCells: 2,
       heightInCells: 3,
       minWidthInCells: 2,
-      minHeightInCells: 2,
+      minHeightInCells: 3,
       weight: 1,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
