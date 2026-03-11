@@ -1,21 +1,22 @@
 <step-form-field>
-  <step-prefix class="button-prefix">
-    <button
-      type="button"
-      mat-stroked-button
-      [class.active]="isEdit()"
-      (click)="toggleEditMode()"
-      [matTooltip]="hintEditGrid()"
-      matTooltipPosition="below"
-    >
-      <step-icon name="grid" />
-    </button>
-  </step-prefix>
-  <mat-select [ngModel]="selectedPresetId()" (ngModelChange)="handlePresetSelection($event)">
+  <mat-select
+    [ngModel]="selectedPresetId()"
+    (ngModelChange)="handlePresetSelection($event)"
+    [disabled]="isEdit()"
+    [matTooltip]="hintSwitchLayout()"
+    matTooltipPosition="below"
+  >
     @for (preset of presets(); track preset.key) {
       <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
     }
   </mat-select>
+  @if (!isEdit()) {
+    <step-suffix class="button-suffix">
+      <button type="button" mat-stroked-button (click)="toggleEditMode()" [matTooltip]="hintEditGrid()" matTooltipPosition="below">
+        <step-icon name="grid" />
+      </button>
+    </step-suffix>
+  }
   @if (isEdit()) {
     <step-suffix class="button-suffix">
       <button

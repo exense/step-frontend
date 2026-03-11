@@ -1,11 +1,27 @@
 <step-modal-window title="Warning" [hideButtonsSection]="true">
   <div step-modal-window-body>
     <form (submit)="onSubmit()">
-      <step-alert [type]="AlertType.DANGER">{{ dialogData.message }}</step-alert>
+      <step-alert [type]="AlertType.DANGER">{{ _dialogData.message }}</step-alert>
 
       <div class="dialog-actions">
-        <button type="button" mat-stroked-button [matDialogClose]="undefined">Cancel</button>
-        <button type="submit" mat-flat-button color="primary">Yes</button>
+        @if ((_dialogData.cancelButtonAppearance ?? 'stroked') === 'flat') {
+          <button type="button" mat-flat-button [color]="_dialogData.cancelButtonColor" [matDialogClose]="undefined">
+            {{ _dialogData.cancelButtonLabel ?? 'Cancel' }}
+          </button>
+        } @else {
+          <button type="button" mat-stroked-button [matDialogClose]="undefined">
+            {{ _dialogData.cancelButtonLabel ?? 'Cancel' }}
+          </button>
+        }
+        @if ((_dialogData.confirmButtonAppearance ?? 'flat') === 'flat') {
+          <button type="submit" mat-flat-button [color]="_dialogData.confirmButtonColor ?? 'primary'">
+            {{ _dialogData.confirmButtonLabel ?? 'Yes' }}
+          </button>
+        } @else {
+          <button type="submit" mat-stroked-button [color]="_dialogData.confirmButtonColor">
+            {{ _dialogData.confirmButtonLabel ?? 'Yes' }}
+          </button>
+        }
       </div>
     </form>
   </div>

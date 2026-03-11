@@ -30,6 +30,8 @@ export * from './components/grid-drag-handle/grid-drag-handle.component';
 export * from './directives/grid-dimensions.directive';
 export * from './injectables/grid-layout-config.token';
 export * from './injectables/grid-layout-config.provider';
+export * from './injectables/grid-editable.service';
+export * from './injectables/widgets-persistence-state.service';
 export * from './components/grid-element-title/grid-element-title.component';
 export * from './components/grid-background/grid-background.component';
 export * from './components/grid-control-tool/grid-control-tool.component';
