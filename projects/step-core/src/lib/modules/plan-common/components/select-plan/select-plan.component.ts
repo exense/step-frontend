@@ -35,6 +35,16 @@ export class SelectPlanComponent implements ControlValueAccessor {
     const hasPlanName = !!this.planName();
     return withClearButton && hasPlanName;
   });
+  protected readonly displayErrors = computed(() => {
+    const control = this._ngControl.control;
+    const errors = control?.errors;
+    if (!errors) {
+      return undefined;
+    }
+
+    const hasImmediateError = !!errors['forbidden'] || !!errors['missingPlanReference'];
+    return hasImmediateError || !!control?.touched ? errors : undefined;
+  });
 
   constructor(protected readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
