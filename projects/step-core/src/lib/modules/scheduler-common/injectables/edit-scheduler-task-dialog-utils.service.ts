@@ -8,7 +8,7 @@ import {
 } from '../../../client/step-client-module';
 import { EditSchedulerTaskDialogData } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { AuthService } from '../../auth';
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 
 type TaskAndConfig = EditSchedulerTaskDialogData['taskAndConfig'];
 
@@ -59,9 +59,9 @@ export class EditSchedulerTaskDialogUtilsService {
       .overrideInterceptor(httpOverrideForbiddenResponse())
       .getPlanById(planId)
       .pipe(
-        map((planOrForbidden: Plan | ForbiddenResponse) => {
-          const forbidden = (planOrForbidden as ForbiddenResponse).forbidden;
-          if (!!forbidden) {
+        map((planOrForbidden: Plan | ForbiddenResponse | undefined) => {
+          const forbidden = (planOrForbidden as ForbiddenResponse | undefined)?.forbidden;
+          if (forbidden) {
             return {
               plan: {
                 attributes: {
@@ -69,19 +69,56 @@ export class EditSchedulerTaskDialogUtilsService {
                 },
               } as Partial<Plan>,
               forbiddenPlanError: forbidden,
+              missingPlanReference: false,
             };
-          } else {
-            return { plan: planOrForbidden as Plan, forbiddenPlanError: undefined };
           }
+
+          if (!planOrForbidden) {
+            this.removePlanReference(task);
+            return {
+              plan: undefined,
+              forbiddenPlanError: undefined,
+              missingPlanReference: true,
+            };
+          }
+
+          return { plan: planOrForbidden as Plan, forbiddenPlanError: undefined, missingPlanReference: false };
         }),
         map(
-          ({ plan, forbiddenPlanError }) =>
+          ({ plan, forbiddenPlanError, missingPlanReference }) =>
             ({
               task,
               // TODO: Fill disablePlan flag, when it will be clarified how to fill it
-              config: { hideUser, disableUser, plan, forbiddenPlanError },
+              config: { hideUser, disableUser, plan, forbiddenPlanError, missingPlanReference },
             }) as TaskAndConfig,
         ),
+        catchError((error: unknown) => {
+          const status = (error as { status?: number })?.status;
+          if (status !== 404) {
+            return throwError(() => error);
+          }
+
+          this.removePlanReference(task);
+
+          return of({
+            task,
+            config: {
+              hideUser,
+              disableUser,
+              missingPlanReference: true,
+            },
+          } satisfies TaskAndConfig);
+        }),
       );
+  }
+
+  private removePlanReference(task: ExecutiontTaskParameters): void {
+    const repositoryObject = task.executionsParameters?.repositoryObject;
+    if (repositoryObject?.repositoryID !== 'local') {
+      return;
+    }
+
+    delete repositoryObject.repositoryParameters?.['planid'];
+    task.executionsParameters!.description = undefined;
   }
 }
