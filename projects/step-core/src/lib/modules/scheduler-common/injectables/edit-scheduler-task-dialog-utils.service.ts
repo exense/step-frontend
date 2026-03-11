@@ -59,6 +59,13 @@ export class EditSchedulerTaskDialogUtilsService {
       .overrideInterceptor(httpOverrideForbiddenResponse())
       .getPlanById(planId)
       .pipe(
+        catchError((error: unknown) => {
+          const status = (error as { status?: number })?.status;
+          if (status === 404) {
+            return of(undefined);
+          }
+          return throwError(() => error);
+        }),
         map((planOrForbidden: Plan | ForbiddenResponse | undefined) => {
           const forbidden = (planOrForbidden as ForbiddenResponse | undefined)?.forbidden;
           if (forbidden) {
@@ -92,23 +99,6 @@ export class EditSchedulerTaskDialogUtilsService {
               config: { hideUser, disableUser, plan, forbiddenPlanError, missingPlanReference },
             }) as TaskAndConfig,
         ),
-        catchError((error: unknown) => {
-          const status = (error as { status?: number })?.status;
-          if (status !== 404) {
-            return throwError(() => error);
-          }
-
-          this.removePlanReference(task);
-
-          return of({
-            task,
-            config: {
-              hideUser,
-              disableUser,
-              missingPlanReference: true,
-            },
-          } satisfies TaskAndConfig);
-        }),
       );
   }
 
