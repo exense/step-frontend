@@ -23,10 +23,16 @@ export class TimeSeriesService {
    * @param filter
    * @param limit
    * @param skip
+   * @param includeGlobalEntities
    * @returns Measurement default response
    * @throws ApiError
    */
-  public discoverMeasurements(filter?: string, limit?: number, skip?: number): Observable<Array<Measurement>> {
+  public discoverMeasurements(
+    filter?: string,
+    limit?: number,
+    skip?: number,
+    includeGlobalEntities: boolean = false,
+  ): Observable<Array<Measurement>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/time-series/raw-measurements',
@@ -34,6 +40,7 @@ export class TimeSeriesService {
         filter: filter,
         limit: limit,
         skip: skip,
+        includeGlobalEntities: includeGlobalEntities,
       },
     });
   }
@@ -54,15 +61,17 @@ export class TimeSeriesService {
 
   /**
    * @param filter
+   * @param includeGlobalEntities
    * @returns string default response
    * @throws ApiError
    */
-  public getMeasurementsAttributes(filter?: string): Observable<Array<string>> {
+  public getMeasurementsAttributes(filter?: string, includeGlobalEntities: boolean = false): Observable<Array<string>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/time-series/measurements-fields',
       query: {
         filter: filter,
+        includeGlobalEntities: includeGlobalEntities,
       },
     });
   }
@@ -81,15 +90,20 @@ export class TimeSeriesService {
 
   /**
    * @param filter
+   * @param includeGlobalEntities
    * @returns MeasurementsStats default response
    * @throws ApiError
    */
-  public getRawMeasurementsStats(filter?: string): Observable<MeasurementsStats> {
+  public getRawMeasurementsStats(
+    filter?: string,
+    includeGlobalEntities: boolean = false,
+  ): Observable<MeasurementsStats> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/time-series/raw-measurements/stats',
       query: {
         filter: filter,
+        includeGlobalEntities: includeGlobalEntities,
       },
     });
   }
