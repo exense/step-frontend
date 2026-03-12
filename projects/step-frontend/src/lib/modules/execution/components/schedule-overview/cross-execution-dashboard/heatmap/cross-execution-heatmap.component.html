@@ -9,26 +9,30 @@
       />
     </div>
     @if (heatMapData$ | async; as heatmapData) {
-      @if (heatmapData.truncated) {
-        <div class="trimmed-heatmap-placeholder">
-          <span>Results were trimmed (too much data). Refine filters to see the heatmap.</span>
-        </div>
-      } @else {
-        <step-heatmap
-          [rows]="heatmapData.data.rows"
-          [columns]="heatmapData.data.columns"
-          [legendColors]="legendColors"
-        />
-      }
       @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
-        <div class="spinner-container">
-          <mat-spinner />
-        </div>
+        <ng-container *ngTemplateOutlet="skeleton" />
       }
-    } @else {
-      <div class="spinner-container">
-        <mat-spinner />
+      <div [class.hidden]="isLoading() && _state.lastRefreshTrigger() !== 'auto'">
+        @if (heatmapData.truncated) {
+          <div class="trimmed-heatmap-placeholder">
+            <span>Results were trimmed (too much data). Refine filters to see the heatmap.</span>
+          </div>
+        } @else {
+          <step-heatmap
+            [rows]="heatmapData.data.rows"
+            [columns]="heatmapData.data.columns"
+            [legendColors]="legendColors"
+          />
+        }
       </div>
+    } @else {
+      <ng-container *ngTemplateOutlet="skeleton" />
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>
+
+<ng-template #skeleton>
+  @if (_state.lastRefreshTrigger() !== 'auto') {
+    <step-chart-skeleton />
+  }
+</ng-template>

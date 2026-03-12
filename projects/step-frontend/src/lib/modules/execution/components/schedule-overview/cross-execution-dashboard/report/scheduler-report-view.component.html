@@ -3,12 +3,14 @@
   <div class="row">
     <div class="piechart-container">
       @if (_state.summaryData$ | async; as summary) {
-        @if (_state.summaryWidgetLoading()) {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
+        @if (_state.summaryWidgetLoading() && _state.lastRefreshTrigger() !== 'auto') {
+          <ng-container *ngTemplateOutlet="summarySkeleton" />
         }
-        <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
+        <div [class.hidden]="_state.summaryWidgetLoading() && _state.lastRefreshTrigger() !== 'auto'">
+          <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
+        </div>
       } @else {
-        <ng-container *ngTemplateOutlet="loadingSpinner" />
+        <ng-container *ngTemplateOutlet="summarySkeleton" />
       }
     </div>
 
@@ -128,11 +130,13 @@
   </div>
 </section>
 
-<ng-template #loadingSpinner>
+<ng-template #summarySkeleton>
   @if (_state.lastRefreshTrigger() !== 'auto') {
-    <div class="spinner-container">
-      <mat-spinner />
-    </div>
+    <step-alt-report-widget title="Summary: Executions">
+      <step-alt-report-widget-content class="summary-skeleton-content">
+        <step-chart-skeleton />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
   }
 </ng-template>
 
