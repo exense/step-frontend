@@ -23,9 +23,9 @@ export class GridControlToolComponent {
   private _matDialog = inject(MatDialog);
 
   readonly hintEditGrid = input('Edit grid');
-  readonly hintSwitchLayout = input('Switch layout');
   readonly hintCancelResetPreset = input('Cancel edit mode and reset all unsaved changes.');
   readonly hintSave = input('Save layout changes');
+  readonly hintSwitchLayout = input('Switch layout');
 
   protected readonly selectedPresetId = linkedSignal(() => {
     const preset = this._widgetPersistence.selectedPreset();

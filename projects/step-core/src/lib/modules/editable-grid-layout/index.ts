@@ -36,3 +36,4 @@ export * from './components/grid-element-title/grid-element-title.component';
 export * from './components/grid-background/grid-background.component';
 export * from './components/grid-control-tool/grid-control-tool.component';
 export * from './components/grid-add-widget/grid-add-widget.component';
+export * from './injectables/grid-editable.service';

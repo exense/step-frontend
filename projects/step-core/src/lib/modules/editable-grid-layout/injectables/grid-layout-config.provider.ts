@@ -27,9 +27,6 @@ export const provideGridLayoutConfig = (gridId: string, params: GridElementInfo[
   },
   WidgetsPositionsUtilsService,
   WidgetsPositionsStateService,
-  {
-    provide: GridEditableService,
-    useExisting: WidgetsPositionsStateService,
-  },
   WidgetsPersistenceStateService,
+  GridEditableService,
 ];

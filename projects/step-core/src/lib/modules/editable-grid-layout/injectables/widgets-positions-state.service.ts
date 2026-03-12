@@ -9,7 +9,7 @@ import { WidgetPositionsUtilsContext } from '../types/widget-positions-utils-con
 import { v4 } from 'uuid';
 
 @Injectable()
-export class WidgetsPositionsStateService implements WidgetPositionsUtilsContext, GridEditableService {
+export class WidgetsPositionsStateService implements WidgetPositionsUtilsContext {
   private _gridConfig = inject(GRID_LAYOUT_CONFIG);
   private _colCount = inject(GRID_COLUMN_COUNT);
   private _utils = inject(WidgetsPositionsUtilsService).withContext(this);

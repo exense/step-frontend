@@ -10,13 +10,6 @@
       <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
     }
   </mat-select>
-  @if (!isEdit()) {
-    <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button (click)="toggleEditMode()" [matTooltip]="hintEditGrid()" matTooltipPosition="below">
-        <step-icon name="grid" />
-      </button>
-    </step-suffix>
-  }
   @if (isEdit()) {
     <step-suffix class="button-suffix">
       <button
@@ -39,6 +32,18 @@
         matTooltipPosition="below"
       >
         <step-icon name="save" />
+      </button>
+    </step-suffix>
+  } @else {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="toggleEditMode()"
+        [matTooltip]="hintEditGrid()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="grid" />
       </button>
     </step-suffix>
   }
