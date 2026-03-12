@@ -79,6 +79,7 @@ export class GridControlToolComponent {
 
     changeConfirmed$.subscribe((isConfirmed) => {
       if (isConfirmed) {
+        this._widgetPersistence.resetState();
         this._gridEditable.setEditMode(false);
       }
     });

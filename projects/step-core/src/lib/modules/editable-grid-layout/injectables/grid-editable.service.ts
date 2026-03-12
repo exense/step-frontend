@@ -13,4 +13,9 @@ export class GridEditableService {
   setEditMode(value: boolean): void {
     this._widgetsPositionsState.setEditMode(value);
   }
+
+  reset(): void {
+    this._widgetsPersistenceState.resetState();
+    this._widgetsPositionsState.setEditMode(false);
+  }
 }

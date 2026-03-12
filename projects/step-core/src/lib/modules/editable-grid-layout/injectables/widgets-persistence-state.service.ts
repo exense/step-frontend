@@ -85,6 +85,10 @@ export class WidgetsPersistenceStateService {
     const lastSavedPositions = untracked(() => this.lastSavedPositions());
     const positions = Object.values(lastSavedPositions ?? {});
     this._widgetsPositions.initializePositions(positions, []);
+    queueMicrotask(() => {
+      const positions = untracked(() => this._widgetsPositions.positionsState());
+      this.lastSavedPositions.set(positions);
+    });
   }
 
   selectPreset(presetKey: string): void {

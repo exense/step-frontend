@@ -38,7 +38,7 @@ import {
   SearchPaginatorComponent,
   GridSettingsRegistryService,
   EXECUTION_REPORT_GRID,
-  provideGridLayoutConfig,
+  canLeaveComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -89,7 +89,6 @@ import { ExecutionActionsExecuteContentDirective } from './directives/execution-
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { legacyExecutionGuard } from './guards/legacy-execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
-import { altExecutionReportLayoutDeactivateGuard } from './guards/alt-execution-report-layout-deactivate.guard';
 import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-drilldown/alt-report-node-details.component';
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
@@ -588,7 +587,6 @@ export class ExecutionModule {
           ],
           component: AltExecutionProgressComponent,
           providers: [
-            ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
@@ -655,7 +653,6 @@ export class ExecutionModule {
                 data: {
                   mode: ViewMode.VIEW,
                 },
-                canDeactivate: [altExecutionReportLayoutDeactivateGuard],
                 canActivate: [
                   () => {
                     const _ctx = inject(AggregatedReportViewTreeStateContextService);
@@ -668,6 +665,7 @@ export class ExecutionModule {
                   {
                     path: '',
                     component: AltExecutionReportComponent,
+                    canDeactivate: [canLeaveComponent],
                   },
                   {
                     path: '',
