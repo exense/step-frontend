@@ -11,7 +11,11 @@
         <input type="text" placeholder="Name" formControlName="name" />
       </step-form-field>
       @if (isLocal()) {
-        <step-select-plan [showRequiredMarker]="true" formControlName="plan" />
+        <step-select-plan
+          [showRequiredMarker]="true"
+          [errorsDictionary]="planErrorsDictionary"
+          formControlName="plan"
+        />
       } @else {
         <step-form-field>
           <step-label>Repository</step-label>
