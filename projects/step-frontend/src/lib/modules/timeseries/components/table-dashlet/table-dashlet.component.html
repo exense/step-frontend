@@ -1,9 +1,9 @@
 <div class="header-container">
   <span class="uplot title">
-    {{ item.name }}
+    {{ item().name }}
   </span>
   <div class="settings-container">
-    @if (editMode) {
+    @if (editMode()) {
       <div class="edit-buttons">
         <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
           <step-icon name="chevron-left"></step-icon>
@@ -19,7 +19,7 @@
         </button>
       </div>
     }
-    @if (!editMode) {
+    @if (!editMode()) {
       <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
         <step-icon name="filter"></step-icon>
       </button>
@@ -97,10 +97,12 @@
 <div class="table-container">
   <step-table
     [dataSource]="tableDataSource"
-    [inProgress]="tableIsLoading"
+    [noResultsPlaceholder]="'No data'"
+    [inProgress]="isLoading() && showLoadingSpinnerWhileLoading()"
     matSort
     class="ts-table"
     [visibleColumns]="visibleColumnsIds"
+    [indicatorMode]="TableIndicatorMode.SPINNER"
   >
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -136,7 +138,9 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <div>
             <div class="no-text-wrap">{{ column.label }}</div>
-            <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
+            @if (compareModeEnabled) {
+              <div class="subtitle">Base</div>
+            }
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -152,9 +156,11 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <div>
             <div class="no-text-wrap">{{ column.label }}</div>
-            <div *ngIf="compareModeEnabled" class="subtitle compare-value">
-              <span>Compare</span>
-            </div>
+            @if (compareModeEnabled) {
+              <div class="subtitle compare-value">
+                <span>Compare</span>
+              </div>
+            }
           </div>
         </th>
         <td mat-cell *matCellDef="let element">

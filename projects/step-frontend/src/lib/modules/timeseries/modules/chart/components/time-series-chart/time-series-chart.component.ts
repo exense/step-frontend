@@ -75,8 +75,16 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() lockStateChange = new EventEmitter<boolean>();
   lockState = signal<boolean>(false); // the state does not change when unlocking from a synced chart
 
+  private lockEffectFirstRun = true;
+
   lockEffect = effect(() => {
-    let locked = this.lockState();
+    const locked = this.lockState();
+
+    if (this.lockEffectFirstRun) {
+      this.lockEffectFirstRun = false;
+      return; // skip init
+    }
+
     this.lockStateChange.emit(locked);
   });
 

@@ -61,6 +61,7 @@ export class AltExecutionErrorsComponent {
       return this._timeSeriesApi.createErrorsLocalDataSource(data);
     }
     const data$ = (data as Observable<TimeSeriesErrorEntry[] | undefined>).pipe(map((items) => items ?? []));
+
     return this._timeSeriesApi.createErrorsLocalDataSource(data$);
   });
 

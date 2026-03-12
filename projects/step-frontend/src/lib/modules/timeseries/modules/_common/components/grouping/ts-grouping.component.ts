@@ -9,6 +9,7 @@ const EMPTY_DIMENSIONS_LABEL = 'Empty';
   templateUrl: './ts-grouping.component.html',
   styleUrls: ['./ts-grouping.component.scss'],
   imports: [COMMON_IMPORTS],
+  standalone: true,
 })
 export class TsGroupingComponent implements OnInit, OnChanges {
   readonly NO_GROUPING_OPTION = { label: 'Empty', attributes: [] };

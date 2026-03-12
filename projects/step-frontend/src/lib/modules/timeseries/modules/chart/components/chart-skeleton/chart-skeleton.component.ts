@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, Input, ViewEncapsulation } from '@angular/core';
 import { COMMON_IMPORTS } from '../../../_common';
 
 /**
@@ -13,5 +13,6 @@ import { COMMON_IMPORTS } from '../../../_common';
   imports: [COMMON_IMPORTS],
 })
 export class ChartSkeletonComponent {
-  @Input() height: number = 300;
+  readonly height = input<number>(300);
+  readonly noPadding = input<boolean>(false);
 }
