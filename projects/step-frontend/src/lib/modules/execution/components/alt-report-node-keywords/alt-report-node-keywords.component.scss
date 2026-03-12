@@ -99,7 +99,7 @@ step-alt-report-node-keywords {
     padding-left: 0.4rem;
   }
 
-  step-table tr:hover .actions > button {
+  step-table .actions > button:hover {
     background: var.$gray-100;
     border-radius: 1.6rem;
   }

@@ -23,7 +23,7 @@
                 <div class="execution-time">
                   <span class="date">{{ element.executionTime | date: 'HH:mm:ss' }}</span>
                   @if (element.duration !== undefined && element.duration !== null) {
-                    <span class="duration">{{ element.duration }}ms</span>
+                    <span class="duration">{{ element.duration | duration }}</span>
                   }
                 </div>
                 <step-report-node-icon [node]="element" />
