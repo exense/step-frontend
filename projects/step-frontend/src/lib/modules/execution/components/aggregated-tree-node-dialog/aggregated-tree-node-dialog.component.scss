@@ -23,6 +23,18 @@ step-aggregated-tree-node-dialog {
     }
   }
 
+  &:not(.is-report) {
+    .tree-node-modal-header {
+      padding-left: 2.4rem;
+    }
+  }
+
+  &.is-report {
+    .tree-node-modal-header {
+      padding-bottom: 1rem;
+    }
+  }
+
   step-modal-window {
     .mat-mdc-dialog-title {
       padding: 0 !important;

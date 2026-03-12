@@ -35,7 +35,7 @@
 step-alt-execution-tree {
   display: block;
   position: relative;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 
   @include core.reportNodeStatuses;
 
@@ -107,7 +107,7 @@ step-alt-execution-tree {
     step-tree-node-name,
     step-artefact-inline-field label,
     step-artefact-inline-field span {
-      font-size: 1.3rem !important;
+      font-size: 1.4rem !important;
     }
 
     step-artefact-inline-field {

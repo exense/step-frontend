@@ -10,7 +10,7 @@
   @include status-icon;
 
   .larger-view {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     step-icon {
       @include core.step-icon-size(2rem, true);
     }
@@ -51,7 +51,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 1rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     step-icon {
       @include core.step-icon-size(1.4rem);
     }
@@ -61,7 +61,7 @@
     display: flex;
     flex-direction: column;
     gap: .2rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
 
     step-icon {
       @include core.step-icon-size(1.6rem);
@@ -100,7 +100,7 @@
     display: flex;
     flex-direction: column;
     gap: 3rem;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
 
     .hidden {
       display: none;
@@ -108,6 +108,7 @@
 
     .container-title {
       font-weight: bold;
+      font-size: 1.6rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -129,6 +130,18 @@
         position: absolute;
         right: 0;
         top: 0;
+      }
+    }
+
+    step-json-view-expanded {
+      .name-container .name {
+        color: var.$gray-500;
+        font-weight: 400;
+      }
+
+      .value-container {
+        color: var.$blue-700;
+        font-weight: 400;
       }
     }
 

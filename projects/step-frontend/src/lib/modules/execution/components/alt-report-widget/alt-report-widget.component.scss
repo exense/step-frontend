@@ -6,7 +6,7 @@ step-alt-report-widget {
   display: flex;
   flex-direction: column;
   break-inside: avoid;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 
   @media screen {
     min-height: 44rem;
@@ -23,11 +23,11 @@ step-alt-report-widget {
     align-items: center;
     display: flex;
     gap: 1rem;
-    font-size: 1.3rem;
+    font-size: 1.6rem;
   }
 
   step-alt-report-widget-sort {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   step-alt-report-widget-filter {
@@ -46,7 +46,7 @@ step-alt-report-widget {
 
   mat-card-content {
     padding-bottom: 0 !important;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   step-icon,
