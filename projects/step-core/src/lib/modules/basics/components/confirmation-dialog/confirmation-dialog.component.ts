@@ -4,6 +4,12 @@ import { AlertType } from '../../types/alert-type.enum';
 
 export interface ConfirmationDialogData {
   message: string;
+  cancelButtonLabel?: string;
+  confirmButtonLabel?: string;
+  cancelButtonAppearance?: 'flat' | 'stroked';
+  confirmButtonAppearance?: 'flat' | 'stroked';
+  cancelButtonColor?: 'primary';
+  confirmButtonColor?: 'primary';
 }
 
 export type ConfirmationDialogResult = boolean | undefined;
@@ -17,8 +23,8 @@ export type ConfirmationDialogResult = boolean | undefined;
 export class ConfirmationDialogComponent {
   private _dialogRef = inject<MatDialogRef<ConfirmationDialogComponent, ConfirmationDialogResult>>(MatDialogRef);
 
-  readonly dialogData = inject<ConfirmationDialogData>(MAT_DIALOG_DATA);
-  readonly AlertType = AlertType;
+  protected readonly _dialogData = inject<ConfirmationDialogData>(MAT_DIALOG_DATA);
+  protected readonly AlertType = AlertType;
 
   @HostListener('keydown.enter')
   onSubmit(): void {
