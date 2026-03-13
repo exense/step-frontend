@@ -76,7 +76,6 @@ import { AltReportNodeKeywordsComponent } from './components/alt-report-node-key
 import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -101,7 +100,6 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
-  AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
@@ -115,7 +113,6 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
-import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
@@ -225,7 +222,6 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltExecutionTreePartialComponent,
-    AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeStatusFilterComponent,
     AltReportNodeArtefactFilterComponent,
@@ -233,7 +229,6 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
-    AltExecutionTreePartialTabComponent,
     AltExecutionRepositoryLinkComponent,
     ExecutionDetailsComponent,
     AggregatedTreeNodeComponent,
@@ -316,12 +311,10 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
-    AltExecutionTreePartialTabComponent,
     AltExecutionReportControlsComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
-    AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
@@ -587,10 +580,6 @@ export class ExecutionModule {
               useExisting: AggregatedReportViewTreeNodeUtilsService,
             },
             {
-              provide: AGGREGATED_TREE_TAB_STATE,
-              useClass: AggregatedReportViewTreeStateService,
-            },
-            {
               provide: AGGREGATED_TREE_WIDGET_STATE,
               useClass: AggregatedReportViewTreeStateService,
             },
@@ -604,7 +593,6 @@ export class ExecutionModule {
               inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
-            () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
             () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
             () => inject(AltReportNodeDetailsStateService).cleanup(),
             () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
@@ -645,9 +633,9 @@ export class ExecutionModule {
                 },
                 canActivate: [
                   () => {
-                    const ctx = inject(AggregatedReportViewTreeStateContextService);
-                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                    ctx.setState(treeState);
+                    const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    _ctx.setState(_treeState);
                     return true;
                   },
                 ],
@@ -673,48 +661,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionReportComponent,
-                },
-              ],
-            },
-            {
-              path: 'tree',
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
-                  ctx.setState(treeState);
-                  return true;
-                },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionTreeTabComponent,
-                },
-              ],
-            },
-            {
-              path: 'sub-tree/:reportNodeId',
-              providers: [
-                AggregatedReportViewTreeStateService,
-                {
-                  provide: TreeStateService,
-                  useExisting: AggregatedReportViewTreeStateService,
-                },
-              ],
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AggregatedReportViewTreeStateService);
-                  ctx.setState(treeState);
-                  return true;
-                },
-              ],
-              canDeactivate: [() => inject(TreeStateService).cleanup()],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionTreePartialTabComponent,
                 },
               ],
             },

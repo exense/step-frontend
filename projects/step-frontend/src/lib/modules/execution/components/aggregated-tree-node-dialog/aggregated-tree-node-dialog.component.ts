@@ -9,7 +9,7 @@ import { DOCUMENT } from '@angular/common';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltReportNodeDetailsStateService } from '../../services/alt-report-node-details-state.service';
-import {filter, map, of, switchMap, tap} from 'rxjs';
+import { filter, map, of, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
@@ -95,7 +95,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
       }
 
       return this._controllerService.getReportNode(reportNodeId).pipe(
-       tap((node) => {
+        tap((node) => {
           this.lastReportNode = node;
         }),
       );
@@ -142,12 +142,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
     if (!this.hasData) {
       this._dialogRef.close();
     }
-  }
-
-  protected handleOpenTreeView(node: ReportNode): void {
-    this._router
-      .navigate(['.', 'sub-tree', node.id], { relativeTo: this._activatedRoute!.parent!.parent! })
-      .then(() => this._dialogRef.close());
   }
 
   protected handleOpenDetails(node: ReportNode): void {

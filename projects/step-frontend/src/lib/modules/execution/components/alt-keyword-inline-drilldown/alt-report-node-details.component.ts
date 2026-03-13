@@ -44,9 +44,8 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
-  readonly openTreeView = output();
 
-  private partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
+  private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
@@ -65,7 +64,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     }),
   );
 
-  searchFor($event: string) {
+  searchFor($event: string): void {
     if (!this.partialTree()) {
       return;
     }
@@ -73,7 +72,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     this.partialTree()!.focusAndSearch($event);
   }
 
-  private aggregatedNode = computed(() => {
+  private readonly aggregatedNode = computed(() => {
     const reportNode = this.node();
     const isTreeInitialized = this._treeState.isInitialized();
     if (!isTreeInitialized) {
