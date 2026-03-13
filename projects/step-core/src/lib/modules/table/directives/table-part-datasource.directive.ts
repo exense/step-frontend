@@ -1,55 +1,83 @@
-import { Directive, inject, input } from '@angular/core';
+import { Directive, effect, forwardRef, inject, input, OnDestroy, output, signal, untracked } from '@angular/core';
 import { combineLatest, map, Observable, Subject, takeUntil, timestamp } from 'rxjs';
-import { TableDataSource } from '../shared/table-data-source';
-import { TableRemoteDataSource } from '../shared/table-remote-data-source';
-import { TableLocalDataSource } from '../shared/table-local-data-source';
-import { SearchValue } from '../shared/search-value';
-import { DataSource } from '@angular/cdk/collections';
 import { TablePartSelectionListDirective } from './table-part-selection-list.directive';
 import { TablePartPaginationDirective } from './table-part-pagination.directive';
 import { TablePartSortDirective } from './table-part-sort.directive';
 import { TablePartSearchDirective } from './table-part-search.directive';
-import { TableParameters, TablePersistenceStateService } from '@exense/step-core';
+import { TablePartParamsAndFiltersDirective } from './table-part-params-and-filters.directive';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { TablePersistenceUrlStateService } from '../services/table-persistence-url-state.service';
+import { TablePersistenceStateService } from '../services/table-persistence-state.service';
+import { TableDataSource } from '../shared/table-data-source';
+import { TableRemoteDataSource } from '../shared/table-remote-data-source';
+import { TableLocalDataSource } from '../shared/table-local-data-source';
+import { StepDataSource, TableRequestData } from '../../../client/step-client-module';
+import { SearchValue } from '../shared/search-value';
+import { TableFilter } from '../services/table-filter';
+
+export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
 @Directive({
   selector: '[stepTablePartDatasource]',
-  hostDirectives: [
-    TablePartSelectionListDirective,
-    TablePartPaginationDirective,
-    TablePartSortDirective,
+  providers: [
+    TablePersistenceUrlStateService,
     {
-      directive: TablePartSearchDirective,
-      inputs: ['defaultSearch'],
+      provide: TablePersistenceStateService,
+      useFactory: () => {
+        const _urlState = inject(TablePersistenceUrlStateService, { self: true });
+        const _externalDefinedState = inject(TablePersistenceStateService, { skipSelf: true, optional: true });
+        const result = _externalDefinedState ?? _urlState;
+        result.initialize();
+        return result;
+      },
+    },
+    {
+      provide: TableFilter,
+      useExisting: forwardRef(() => TablePartDatasourceDirective),
     },
   ],
 })
-export class TablePartDatasourceDirective<T> {
+export class TablePartDatasourceDirective<T> implements OnDestroy, TableFilter {
   private _tableState = inject(TablePersistenceStateService);
   private _tableSelection = inject(TablePartSelectionListDirective);
   protected readonly _tablePagination = inject(TablePartPaginationDirective);
   private _tableSort = inject(TablePartSortDirective);
   private _tableSearch = inject(TablePartSearchDirective);
+  private _tableParams = inject(TablePartParamsAndFiltersDirective);
 
-  readonly staticFilters = input<Record<string, SearchValue> | undefined>();
-  private staticFilters$ = toObservable(this.staticFilters);
+  private dataSourceTerminator$?: Subject<void>;
 
-  readonly filter = input<string | undefined>(undefined);
-  private filter$ = toObservable(this.filter);
+  private readonly inProgressDataSourceInternal = signal(false);
+  private readonly hasNextInternal = signal(false);
+  private readonly totalFilteredInternal = signal<number | null>(null);
+  private readonly tableDataSourceInternal = signal<TableDataSource<T> | undefined>(undefined);
 
-  readonly tableParams = input<TableParameters | undefined>(undefined);
-  private tableParams$ = toObservable(this.tableParams);
+  readonly inProgressDataSource = this.inProgressDataSourceInternal.asReadonly();
+  readonly hasNext = this.hasNextInternal.asReadonly();
+  readonly totalFiltered = this.totalFilteredInternal.asReadonly();
+  readonly tableDataSource = this.tableDataSourceInternal.asReadonly();
 
   readonly calculateCounts = input(true);
   private calculateCounts$ = toObservable(this.calculateCounts);
 
-  private dataSourceTerminator$ = new Subject<void>();
+  readonly dataSource = input<DataSource<T> | undefined>(undefined);
+  private effectDataSourceChange = effect(() => {
+    const dataSource = this.dataSource();
+    const isPaginatorReady = this._tablePagination.paginatorReady();
+    if (isPaginatorReady) {
+      untracked(() => this.setupDatasource(dataSource));
+    }
+  });
+
+  ngOnDestroy(): void {
+    this.terminateDatasource();
+  }
 
   private terminateDatasource(): void {
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
-    this.inProgressDataSource.set(false);
+    this.inProgressDataSourceInternal.set(false);
     this._tableSelection.destroySelectionList();
   }
 
@@ -69,13 +97,8 @@ export class TablePartDatasourceDirective<T> {
       tableDataSource = new TableLocalDataSource(dataSource as T[] | Observable<T[]>);
     }
 
-    this.tableDataSource = tableDataSource;
+    this.tableDataSourceInternal.set(tableDataSource);
     this._tableSelection.prepareSelectionList(tableDataSource);
-
-    if (!this._tablePagination.isPaginatorReady) {
-      this.initRequired = true;
-      return;
-    }
 
     const sort$ = this._tableSort.setupSortStream();
     const page$ = this._tablePagination.setupPageStream();
@@ -97,7 +120,14 @@ export class TablePartDatasourceDirective<T> {
       }),
     );
 
-    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$, this.calculateCounts$])
+    combineLatest([
+      pageAndSearch$,
+      sort$,
+      this._tableParams.filter$,
+      this._tableParams.tableParams$,
+      this._tableParams.staticFilters$,
+      this.calculateCounts$,
+    ])
       .pipe(takeUntil(this.dataSourceTerminator$))
       .subscribe(
         ([
@@ -129,15 +159,34 @@ export class TablePartDatasourceDirective<T> {
     });
 
     tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
-      this.inProgressDataSource.set(inProgress);
+      this.inProgressDataSourceInternal.set(inProgress);
     });
 
     tableDataSource!.totalFiltered$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
-      this.totalFiltered.set(total);
+      this.totalFilteredInternal.set(total);
     });
 
     tableDataSource!.hasNext$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((hasNext) => {
-      this.hasNext.set(hasNext);
+      this.hasNextInternal.set(hasNext);
     });
+  }
+
+  getTableFilterRequest(): TableRequestData | undefined {
+    const [search, filter, params] = [
+      this._tableSearch.search.search,
+      untracked(() => this._tableParams.filter()),
+      untracked(() => this._tableParams.tableParams()),
+    ];
+    return untracked(() => this.tableDataSource())?.getFilterRequest({ search, filter, params });
+  }
+
+  exportAsCSV(fields: string[]): void {
+    const tableDataSource = untracked(() => this.tableDataSource());
+    if (!tableDataSource) {
+      console.error('No datasource for export');
+      return;
+    }
+    const params = untracked(() => this._tableParams.tableParams());
+    tableDataSource.exportAsCSV(fields, params);
   }
 }

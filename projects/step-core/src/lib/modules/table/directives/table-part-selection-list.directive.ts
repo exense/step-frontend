@@ -1,4 +1,4 @@
-import { Directive, forwardRef, inject, OnDestroy } from '@angular/core';
+import { Directive, forwardRef, inject, Injector, OnDestroy, runInInjectionContext } from '@angular/core';
 import { EntitySelectionStateUpdatable, SelectionList } from '../../entities-selection';
 import { TableSelectionListFactoryService } from '../shared/selection/table-selection-list-factory.service';
 import { TableSelectionList } from '../shared/selection/table-selection-list';

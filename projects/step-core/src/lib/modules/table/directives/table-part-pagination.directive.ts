@@ -1,4 +1,4 @@
-import { Directive, inject, OnDestroy } from '@angular/core';
+import { Directive, inject, OnDestroy, signal } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginatorComponent } from '../components/paginator/paginator.component';
 import { ItemsPerPageDefaultService } from '../services/items-per-page-default.service';
@@ -17,6 +17,8 @@ export class TablePartPaginationDirective implements OnDestroy {
   private _itemsPerPageService = inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
 
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
+  private readonly paginatorReadyInternal = signal(false);
+  readonly paginatorReady = this.paginatorReadyInternal.asReadonly();
 
   private page: PaginatorComponent | undefined;
 
@@ -26,10 +28,12 @@ export class TablePartPaginationDirective implements OnDestroy {
 
   ngOnDestroy(): void {
     this.page = undefined;
+    this.paginatorReadyInternal.set(false);
   }
 
   initializePaginator(paginator: PaginatorComponent): void {
     this.page = paginator;
+    this.paginatorReadyInternal.set(!!paginator);
   }
 
   setupPageStream(): Observable<StepPageEvent> {
