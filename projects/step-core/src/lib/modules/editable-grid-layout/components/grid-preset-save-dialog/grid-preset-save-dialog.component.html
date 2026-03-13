@@ -1,9 +1,11 @@
 <form [formGroup]="saveForm" (submit)="handleSubmit()">
   <step-modal-window [title]="dialogTitle">
     <div step-modal-window-body>
+      <mat-slide-toggle formControlName="isShared" color="primary">Shared</mat-slide-toggle>
+      <p class="shared-description">If selected, the layout will be displayed to all users</p>
       <mat-radio-group formControlName="saveType">
         <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="_dialogData.isProtected"
-          >Save & override</mat-radio-button
+          >Save & override current layout</mat-radio-button
         >
         <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary">Save as new</mat-radio-button>
       </mat-radio-group>
@@ -11,6 +13,9 @@
         <step-form-field>
           <step-label>Preset Name</step-label>
           <input type="text" formControlName="name" />
+          @if (saveForm.controls.name.hasError('nameExists') && saveForm.controls.name.touched) {
+            <step-error>A layout with this name already exists</step-error>
+          }
         </step-form-field>
       }
     </div>

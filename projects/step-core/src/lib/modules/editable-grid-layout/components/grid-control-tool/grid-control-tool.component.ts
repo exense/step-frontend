@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal, untracked } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, untracked, ViewChild } from '@angular/core';
 import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -10,6 +10,7 @@ import {
   GridPresetSaveDialogResult,
 } from '../grid-preset-save-dialog/grid-preset-save-dialog.component';
 import { AuthService } from '../../../auth';
+import { PopoverComponent, PopoverMode } from '../../../basics/components/popover/popover.component';
 
 @Component({
   selector: 'step-grid-control-tool',
@@ -24,11 +25,9 @@ export class GridControlToolComponent {
   private _matDialog = inject(MatDialog);
   private _auth = inject(AuthService);
 
-  readonly hintEditGrid = input('Edit grid');
-  readonly hintPresetSettings = input('Settings');
-  readonly hintCancelResetPreset = input('Cancel edit mode and reset all unsaved changes.');
-  readonly hintSave = input('Save layout changes');
-  readonly hintSwitchLayout = input('Switch layout');
+  @ViewChild(PopoverComponent) private _settingsPopover?: PopoverComponent;
+
+  protected readonly PopoverMode = PopoverMode;
 
   protected readonly selectedPresetId = linkedSignal(() => {
     const preset = this._widgetPersistence.selectedPreset();
@@ -49,6 +48,15 @@ export class GridControlToolComponent {
     const preset = this._widgetPersistence.selectedPreset();
     return preset?.visibility === 'Shared';
   });
+
+  protected readonly presetName = computed(() => {
+    const preset = this._widgetPersistence.selectedPreset();
+    return preset?.attributes?.['name'] ?? '';
+  });
+
+  protected readonly popoverIsShared = linkedSignal(() => this.isShared());
+
+  protected readonly configHasChanges = computed(() => this.isShared() !== this.popoverIsShared());
 
   protected readonly presets = this._widgetPersistence.gridPresets;
   protected readonly isEdit = this._gridEditable.editMode;
@@ -103,20 +111,52 @@ export class GridControlToolComponent {
   protected save(): void {
     const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
     const isProtected = untracked(() => this.isProtected());
-    const defaultName = `${preset.attributes!['name']!}_COPY`;
+    const isShared = untracked(() => this.isShared());
+    const currentLayoutName = preset.attributes!['name']!;
+    const defaultName = `${currentLayoutName}_COPY`;
+    const existingPresetNames = untracked(() => this.presets()).map((p) => p.value);
+
     this._matDialog
       .open<GridPresetSaveDialogComponent, GridPresetSaveDialogData, GridPresetSaveDialogResult>(
         GridPresetSaveDialogComponent,
-        { data: { isProtected, defaultName } },
+        { data: { isProtected, defaultName, currentLayoutName, isShared, existingPresetNames } },
       )
       .afterClosed()
       .pipe(
         filter((result) => !!result),
-        switchMap(({ isOverride, name }) =>
-          isOverride ? this._widgetPersistence.saveState() : this._widgetPersistence.createPreset(name!),
-        ),
+        switchMap(({ isOverride, name, isShared: newIsShared }) => {
+          if (isOverride) {
+            return this._widgetPersistence.saveState().pipe(
+              switchMap(() => {
+                const currentIsShared = untracked(() => this.isShared());
+                if (newIsShared === currentIsShared) return of(undefined);
+                return newIsShared
+                  ? this._widgetPersistence.sharePreset(preset.id!)
+                  : this._widgetPersistence.unsharePreset(preset.id!);
+              }),
+            );
+          } else {
+            return this._widgetPersistence.createPreset(name!).pipe(
+              switchMap(() => {
+                if (!newIsShared) return of(undefined);
+                const newPreset = untracked(() => this._widgetPersistence.selectedPreset())!;
+                return this._widgetPersistence.sharePreset(newPreset.id!);
+              }),
+            );
+          }
+        }),
       )
       .subscribe(() => this._gridEditable.setEditMode(false));
+  }
+
+  protected savePresetConfig(): void {
+    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
+    const presetId = preset.id!;
+    const newIsShared = untracked(() => this.popoverIsShared());
+    const save$ = newIsShared
+      ? this._widgetPersistence.sharePreset(presetId)
+      : this._widgetPersistence.unsharePreset(presetId);
+    save$.subscribe(() => this._settingsPopover?.closePopover());
   }
 
   protected remove(): void {
@@ -128,18 +168,9 @@ export class GridControlToolComponent {
         filter((isConfirmed) => !!isConfirmed),
         switchMap(() => this._widgetPersistence.removePreset(presetId)),
       )
-      .subscribe(() => {});
-  }
-
-  protected share(): void {
-    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
-    const presetId = preset.id!;
-    this._widgetPersistence.sharePreset(presetId).subscribe();
-  }
-
-  protected unshare(): void {
-    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
-    const presetId = preset.id!;
-    this._widgetPersistence.unsharePreset(presetId).subscribe();
+      .subscribe(() => {
+        this._settingsPopover?.closePopover();
+        this._gridEditable.setEditMode(false);
+      });
   }
 }
