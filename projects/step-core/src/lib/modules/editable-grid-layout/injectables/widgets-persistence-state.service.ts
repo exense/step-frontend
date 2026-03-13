@@ -1,18 +1,21 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
-import { GridPersistenceService } from './grid-persistence.service';
+import { GridPersistenceStateDefaultImplService } from './grid-persistence-state-default-impl.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { WidgetsPositionsStateService } from './widgets-positions-state.service';
-import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
+import { forkJoin, map, Observable, switchMap, tap } from 'rxjs';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { WidgetState } from '../types/widget-state';
 import { KeyValue } from '@angular/common';
 import { WidgetStatePreset } from '../types/widget-state-preset';
 import { v4 } from 'uuid';
+import { GridPersistenceStateService } from './grid-persistence-state.service';
 
 @Injectable()
 export class WidgetsPersistenceStateService {
   private _gridConfig = inject(GRID_LAYOUT_CONFIG);
-  private _gridPersistence = inject(GridPersistenceService);
+  private _gridPersistence =
+    inject(GridPersistenceStateService, { optional: true }) ??
+    inject<GridPersistenceStateService>(GridPersistenceStateDefaultImplService);
   private _widgetsPositions = inject(WidgetsPositionsStateService);
 
   private readonly ALL_WIDGET_TYPE_IDS = Object.keys(this._gridConfig.defaultElementParamsMap);
@@ -52,22 +55,34 @@ export class WidgetsPersistenceStateService {
   saveState(): Observable<void> {
     const positions = untracked(() => this._widgetsPositions.positionsState());
     const preset = untracked(() => this.selectedPreset())!;
-    preset.widgets = this.getWidgetsStates();
+    preset.layout = {
+      widgets: this.getWidgetsStates(),
+    } as WidgetStatePreset['layout'];
     return this._gridPersistence.save(this._gridConfig.gridId, preset).pipe(
       tap(() => {
         this.lastSavedPositions.set(positions);
       }),
+      map(() => {}),
     );
   }
 
   createPreset(name: string): Observable<void> {
-    const id = v4();
     const widgets = this.getWidgetsStates();
-    const preset: WidgetStatePreset = { id, name, widgets };
+    const preset: WidgetStatePreset = {
+      attributes: {
+        name,
+      },
+      layout: {
+        widgets,
+      } as WidgetStatePreset['layout'],
+    };
     return this._gridPersistence.save(this._gridConfig.gridId, preset).pipe(
-      switchMap(() => this._gridPersistence.getGridPresets(this._gridConfig.gridId)),
-      tap((presets) => this.gridPresetsInternal.set(presets)),
-      tap(() => this.selectPreset(id)),
+      switchMap((presetId) =>
+        this._gridPersistence.getGridPresets(this._gridConfig.gridId).pipe(
+          tap((presets) => this.gridPresetsInternal.set(presets)),
+          tap(() => this.selectPreset(presetId)),
+        ),
+      ),
       map(() => {}),
     );
   }
@@ -81,6 +96,40 @@ export class WidgetsPersistenceStateService {
     );
   }
 
+  sharePreset(id: string): Observable<void> {
+    return this._gridPersistence.shareGridPreset(this._gridConfig.gridId, id).pipe(
+      tap(() => {
+        const preset = untracked(() => this.selectedPresetInternal());
+        if (preset?.id === id) {
+          this.selectedPresetInternal.update(
+            (value) =>
+              ({
+                ...value,
+                visibility: 'Shared',
+              }) as WidgetStatePreset,
+          );
+        }
+      }),
+    );
+  }
+
+  unsharePreset(id: string): Observable<void> {
+    return this._gridPersistence.unshareGridPreset(this._gridConfig.gridId, id).pipe(
+      tap(() => {
+        const preset = untracked(() => this.selectedPresetInternal());
+        if (preset?.id === id) {
+          this.selectedPresetInternal.update(
+            (value) =>
+              ({
+                ...value,
+                visibility: 'Private',
+              }) as WidgetStatePreset,
+          );
+        }
+      }),
+    );
+  }
+
   resetState(): void {
     const lastSavedPositions = untracked(() => this.lastSavedPositions());
     const positions = Object.values(lastSavedPositions ?? {});
@@ -91,10 +140,9 @@ export class WidgetsPersistenceStateService {
     });
   }
 
-  selectPreset(presetKey: string): void {
+  selectPreset(presetId: string): void {
     this._gridPersistence
-      .setGridSelectedPreset(this._gridConfig.gridId, presetKey)
-      .pipe(switchMap(() => this._gridPersistence.load(this._gridConfig.gridId, presetKey)))
+      .load(this._gridConfig.gridId, presetId)
       .subscribe((preset) => this.selectedPresetInternal.set(preset));
   }
 
@@ -103,63 +151,37 @@ export class WidgetsPersistenceStateService {
     if (isInitialized) {
       return;
     }
-    const presets$ = this._gridPersistence.getGridPresets(this._gridConfig.gridId).pipe(
-      switchMap((presets) => {
-        if (!!presets.length) {
-          return of(presets);
-        }
-        return this.createDefaultPreset().pipe(map((defaultPreset) => [defaultPreset]));
-      }),
-      tap((presets) => this.gridPresetsInternal.set(presets)),
-    );
+    const presets$ = this._gridPersistence
+      .getGridPresets(this._gridConfig.gridId)
+      .pipe(tap((presets) => this.gridPresetsInternal.set(presets)));
 
-    const selectedPreset$ = this._gridPersistence
-      .getGridSelectedPreset(this._gridConfig.gridId)
+    const defaultPreset$ = this._gridPersistence
+      .getGridDefaultPresetSelection(this._gridConfig.gridId)
       .pipe(map((presetId) => presetId ?? ''));
 
-    forkJoin([presets$, selectedPreset$]).subscribe(([presets, selectedPreset]) => {
+    forkJoin([presets$, defaultPreset$]).subscribe(([presets, defaultPreset]) => {
       const presetKes = new Set(presets.map((item) => item.key));
-      if (!presetKes.has(selectedPreset)) {
-        selectedPreset = presets[0].key;
+      if (!presetKes.has(defaultPreset)) {
+        defaultPreset = presets[0].key;
       }
-      this.selectPreset(selectedPreset);
+      this.selectPreset(defaultPreset);
       this.isInitializedInternal.set(true);
     });
-  }
-
-  private createDefaultPreset(): Observable<KeyValue<string, string>> {
-    this.initializePositions();
-    return from(Promise.resolve().then(() => this.getWidgetsStates())).pipe(
-      map((widgets) => {
-        const preset: WidgetStatePreset = {
-          id: 'default',
-          name: 'Default',
-          protected: true,
-          widgets,
-        };
-        return preset;
-      }),
-      switchMap((preset) =>
-        this._gridPersistence
-          .save(this._gridConfig.gridId, preset)
-          .pipe(map(() => ({ key: preset.id, value: preset.name }))),
-      ),
-    );
   }
 
   private initializePositions(preset?: WidgetStatePreset): void {
     let typesToAllocate: string[] = [];
     let usedWidgetTypes = new Set<string>();
     if (preset?.id === 'default') {
-      usedWidgetTypes = new Set((preset?.widgets ?? []).map((state) => state.widgetType));
+      usedWidgetTypes = new Set((preset?.layout?.widgets ?? []).map((state) => state.widgetType));
       typesToAllocate = this.ALL_WIDGET_TYPE_IDS.filter(
         (widgetType) =>
           this._gridConfig.defaultElementParamsMap[widgetType].defaultVisibility && !usedWidgetTypes.has(widgetType),
       );
     }
 
-    const positions = (preset?.widgets ?? []).map(
-      (widgetState) => new WidgetPosition(widgetState.id, widgetState.widgetType, widgetState.position!),
+    const positions = (preset?.layout?.widgets ?? []).map(
+      (widgetState) => new WidgetPosition(v4(), widgetState.widgetType, widgetState.position!),
     );
 
     this._widgetsPositions.initializePositions(positions, typesToAllocate);
@@ -167,16 +189,15 @@ export class WidgetsPersistenceStateService {
 
   private getWidgetsStates(): WidgetState[] {
     const positions = untracked(() => this._widgetsPositions.positionsState());
-    const result = Object.entries(positions).map(([id, position]) => {
-      return this.convertToWidgetState(id, position.widgetType, position);
+    const result = Object.values(positions).map((position) => {
+      return this.convertToWidgetState(position.widgetType, position);
     });
     return result;
   }
 
-  private convertToWidgetState(id: string, widgetType: string, position: WidgetPositionParams): WidgetState {
+  private convertToWidgetState(widgetType: string, position: WidgetPositionParams): WidgetState {
     const { row, column, widthInCells, heightInCells } = position;
     return {
-      id,
       widgetType,
       position: {
         row,

@@ -9,6 +9,7 @@ import {
   GridPresetSaveDialogData,
   GridPresetSaveDialogResult,
 } from '../grid-preset-save-dialog/grid-preset-save-dialog.component';
+import { AuthService } from '../../../auth';
 
 @Component({
   selector: 'step-grid-control-tool',
@@ -21,8 +22,10 @@ export class GridControlToolComponent {
   private _widgetPersistence = inject(WidgetsPersistenceStateService);
   private _dialogs = inject(DialogsService);
   private _matDialog = inject(MatDialog);
+  private _auth = inject(AuthService);
 
   readonly hintEditGrid = input('Edit grid');
+  readonly hintPresetSettings = input('Settings');
   readonly hintCancelResetPreset = input('Cancel edit mode and reset all unsaved changes.');
   readonly hintSave = input('Save layout changes');
   readonly hintSwitchLayout = input('Switch layout');
@@ -31,10 +34,22 @@ export class GridControlToolComponent {
     const preset = this._widgetPersistence.selectedPreset();
     return preset?.id;
   });
+
   protected readonly isProtected = computed(() => {
     const preset = this._widgetPersistence.selectedPreset();
-    return !!preset?.protected;
+    return (
+      preset?.visibility === 'Preset' ||
+      (preset?.visibility === 'Shared' &&
+        !!this._auth.isAuthenticated() &&
+        preset?.creationUser !== this._auth.getUserID())
+    );
   });
+
+  protected readonly isShared = computed(() => {
+    const preset = this._widgetPersistence.selectedPreset();
+    return preset?.visibility === 'Shared';
+  });
+
   protected readonly presets = this._widgetPersistence.gridPresets;
   protected readonly isEdit = this._gridEditable.editMode;
 
@@ -87,8 +102,8 @@ export class GridControlToolComponent {
 
   protected save(): void {
     const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
-    const isProtected = !!preset.protected;
-    const defaultName = `${preset.name}_COPY`;
+    const isProtected = untracked(() => this.isProtected());
+    const defaultName = `${preset.attributes!['name']!}_COPY`;
     this._matDialog
       .open<GridPresetSaveDialogComponent, GridPresetSaveDialogData, GridPresetSaveDialogResult>(
         GridPresetSaveDialogComponent,
@@ -102,5 +117,29 @@ export class GridControlToolComponent {
         ),
       )
       .subscribe(() => this._gridEditable.setEditMode(false));
+  }
+
+  protected remove(): void {
+    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
+    const presetId = preset.id!;
+    this._dialogs
+      .showWarning('Do you want to remove this preset?')
+      .pipe(
+        filter((isConfirmed) => !!isConfirmed),
+        switchMap(() => this._widgetPersistence.removePreset(presetId)),
+      )
+      .subscribe(() => {});
+  }
+
+  protected share(): void {
+    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
+    const presetId = preset.id!;
+    this._widgetPersistence.sharePreset(presetId).subscribe();
+  }
+
+  protected unshare(): void {
+    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
+    const presetId = preset.id!;
+    this._widgetPersistence.unsharePreset(presetId).subscribe();
   }
 }

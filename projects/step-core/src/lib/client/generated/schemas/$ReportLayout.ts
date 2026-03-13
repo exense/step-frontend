@@ -1,8 +1,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Resource = {
+export const $ReportLayout = {
   properties: {
+    layout: {
+      type: 'dictionary',
+      contains: {
+        type: 'JsonValue',
+      },
+    },
+    visibility: {
+      type: 'Enum',
+    },
     customFields: {
       type: 'dictionary',
       contains: {
@@ -27,32 +36,6 @@ export const $Resource = {
       format: 'date-time',
     },
     lastModificationUser: {
-      type: 'string',
-    },
-    currentRevisionId: {
-      type: 'string',
-      pattern: '[a-f0-9]{24}}',
-    },
-    resourceType: {
-      type: 'string',
-    },
-    resourceName: {
-      type: 'string',
-    },
-    directory: {
-      type: 'boolean',
-    },
-    ephemeral: {
-      type: 'boolean',
-    },
-    origin: {
-      type: 'string',
-    },
-    originTimestamp: {
-      type: 'number',
-      format: 'int64',
-    },
-    executionId: {
       type: 'string',
     },
     id: {

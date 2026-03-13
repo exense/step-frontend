@@ -6,7 +6,7 @@ export const OPEN_API_CONFIG_PROVIDER: Provider = {
   provide: OpenAPI,
   useValue: {
     BASE: OpenAPI?.BASE ?? '/rest',
-    VERSION: OpenAPI?.VERSION ?? '3.29.0',
+    VERSION: OpenAPI?.VERSION ?? '3.29.2',
     WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
     CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',
     TOKEN: OpenAPI?.TOKEN,

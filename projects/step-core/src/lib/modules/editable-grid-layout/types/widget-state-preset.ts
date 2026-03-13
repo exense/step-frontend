@@ -1,8 +1,8 @@
-import {WidgetState} from './widget-state';
+import { WidgetState } from './widget-state';
+import { ReportLayout } from '../../../client/step-client-module';
 
-export interface WidgetStatePreset {
-  id: string;
-  name: string;
-  protected?: boolean;
-  widgets: WidgetState[];
-}
+export type WidgetStatePreset = ReportLayout & {
+  layout?: {
+    widgets: WidgetState[];
+  };
+};

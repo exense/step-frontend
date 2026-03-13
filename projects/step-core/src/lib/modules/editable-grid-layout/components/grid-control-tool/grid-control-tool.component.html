@@ -35,6 +35,19 @@
       </button>
     </step-suffix>
   } @else {
+    @if (!isProtected()) {
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-stroked-button
+          [matTooltip]="hintPresetSettings()"
+          matTooltipPosition="below"
+          [matMenuTriggerFor]="presetSettings"
+        >
+          <step-icon name="settings" />
+        </button>
+      </step-suffix>
+    }
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -48,3 +61,20 @@
     </step-suffix>
   }
 </step-form-field>
+<mat-menu #presetSettings>
+  @if (isShared()) {
+    <button type="button" mat-menu-item (click)="unshare()">
+      <step-icon name="lock" />
+      Unshare
+    </button>
+  } @else {
+    <button type="button" mat-menu-item (click)="share()">
+      <step-icon name="share-2" />
+      Share
+    </button>
+  }
+  <button type="button" mat-menu-item (click)="remove()">
+    <step-icon name="trash-2" />
+    Delete
+  </button>
+</mat-menu>
