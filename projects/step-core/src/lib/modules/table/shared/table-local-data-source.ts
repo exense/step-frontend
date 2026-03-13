@@ -17,18 +17,22 @@ import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
 import { TableRequestData, TableParameters, StepDataSourceReloadOptions } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
+import { InFilterCondition } from './in-filter-condition';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 import { Mutable } from '../../basics/step-basics.module';
 import { RequestContainer } from '../types/request-container';
 import { StepPageEvent } from '../types/step-page-event';
 
-type FieldAccessor = Mutable<
-  Pick<
-    TableLocalDataSource<any>,
-    'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$' | 'hasNext$'
-  >
->;
+type Fields =
+  | 'data$'
+  | 'allData$'
+  | 'totalFiltered$'
+  | 'forceNavigateToFirstPage$'
+  | 'allFiltered$'
+  | 'hasNext$'
+  | 'inProgress$';
+export type TableLocalDataSourceSetupResult = Mutable<Pick<TableLocalDataSource<any>, Fields>>;
 
 interface Request {
   page?: StepPageEvent;
@@ -38,7 +42,9 @@ interface Request {
 
 const isSimpleType = (value: any) => ['string', 'number', 'boolean'].includes(typeof value);
 
-export class TableLocalDataSource<T> implements TableDataSource<T> {
+export class TableLocalDataSource<T, S extends TableLocalDataSourceSetupResult = TableLocalDataSourceSetupResult>
+  implements TableDataSource<T>
+{
   static configBuilder<X>(): TableLocalDataSourceConfigBuilder<X> {
     return new TableLocalDataSourceConfigBuilder();
   }
@@ -49,8 +55,9 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   private _request$ = new BehaviorSubject<RequestContainer<Request>>({});
   private isSharable = false;
 
-  readonly inProgress$: Observable<boolean> = of(false);
+  protected fields: S;
 
+  readonly inProgress$!: Observable<boolean>;
   readonly allData$!: Observable<T[]>;
   readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
@@ -62,13 +69,20 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     source: T[] | Observable<T[]>,
     private _config: TableLocalDataSourceConfig<T> = {},
   ) {
-    this.setupStreams(source, _config);
+    this.fields = this.setupStreams(source, _config);
+    this.totalFiltered$ = this.fields.totalFiltered$;
+    this.data$ = this.fields.data$;
+    this.allFiltered$ = this.fields.allFiltered$;
+    this.allData$ = this.fields.allData$;
+    this.hasNext$ = this.fields.hasNext$;
+    this.inProgress$ = this.fields.inProgress$;
+    this.forceNavigateToFirstPage$ = this.fields.forceNavigateToFirstPage$;
   }
 
   protected setupStreams(
     source: T[] | undefined | Observable<T[] | undefined>,
     config: TableLocalDataSourceConfig<T>,
-  ): void {
+  ): S {
     const source$ = source instanceof Array || source === undefined ? of(source as T[] | undefined) : source;
     this._source$ = source$.pipe(takeUntil(this._terminator$));
 
@@ -78,7 +92,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     ]).pipe(
       map(([src, req]) => {
         let total: number | null = null;
-        let totalFiltered = 0;
+        let totalFiltered = null;
 
         if ((!req?.page && !req.search && !req.sort) || !src) {
           return {
@@ -112,14 +126,14 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       shareReplay(1),
     );
 
-    const self = this as FieldAccessor;
-    self.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
-    self.data$ = requestResult$.pipe(map((r) => r.data));
-    self.allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
-    self.allData$ = requestResult$.pipe(map((r) => r.allData));
-    self.hasNext$ = requestResult$.pipe(map((r) => r.hasNext));
+    const totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
+    const data$ = requestResult$.pipe(map((r) => r.data));
+    const allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
+    const allData$ = requestResult$.pipe(map((r) => r.allData));
+    const hasNext$ = requestResult$.pipe(map((r) => r.hasNext));
+    const inProgress$ = of(false);
 
-    self.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
+    const forceNavigateToFirstPage$ = combineLatest([data$, totalFiltered$]).pipe(
       map(([data, totalFiltered]) => {
         const recordsInPage = (data || []).length;
         const recordsFiltered = totalFiltered || 0;
@@ -131,6 +145,16 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       // but sum previous data maybe rendered
       switchMap(() => timer(100)),
     );
+
+    return {
+      totalFiltered$,
+      data$,
+      allFiltered$,
+      allData$,
+      hasNext$,
+      inProgress$,
+      forceNavigateToFirstPage$,
+    } as S;
   }
 
   private getItemValue(item: T, field: string): string {
@@ -153,8 +177,31 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
     const predicates = Object.entries(search)
       .map(([column, value]) => {
-        // ignore complicated remote filters fol local data sources
-        if (!value || value instanceof FilterCondition) {
+        if (!value) {
+          return undefined;
+        }
+
+        if (value instanceof FilterCondition) {
+          // Support InFilterCondition for local datasource (used for execution report TC list)
+          if (value instanceof InFilterCondition) {
+            const rawValues = (value.getSearchValue?.() as string[] | undefined) ?? value.sourceObject ?? [];
+            const values = rawValues.map((entry) => (entry ?? '').toString().trim()).filter((entry) => !!entry);
+            if (values.length === 0) {
+              return undefined;
+            }
+
+            const predicate = this._config?.searchPredicates?.[column];
+            if (predicate) {
+              return (item: T) => values.some((entry) => predicate(item, entry));
+            }
+
+            const normalized = new Set(values.map((entry) => entry.toLowerCase()));
+            return (item: T) => {
+              const itemValue = isSimpleType(item) ? ((item as any) || '').toString() : this.getItemValue(item, column);
+              return normalized.has(itemValue.trim().toLowerCase());
+            };
+          }
+          // ignore complicated remote filters for local data sources
           return undefined;
         }
 
@@ -265,7 +312,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     request.page = options?.page || request.page;
     request.sort = options?.sort || request.sort;
     request.search = options?.search || request.search;
-    this._request$.next({ request, isForce: true });
+    this._request$.next({ request, isForce: options?.isForce ?? true });
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions): void {

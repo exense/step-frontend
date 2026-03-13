@@ -167,8 +167,10 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 
 @NgModule({
   declarations: [
@@ -273,6 +275,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
+    ExecutionHistorySectionComponent,
   ],
   imports: [
     StepCommonModule,
@@ -295,6 +298,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    TableCountsToggleComponent,
   ],
   exports: [
     ExecutionListComponent,

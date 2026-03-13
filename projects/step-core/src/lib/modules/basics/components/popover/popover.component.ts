@@ -56,7 +56,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   @ViewChild('popoverTemplate', { static: true }) popoverTemplate!: TemplateRef<unknown>;
 
   readonly xPosition = input<'before' | 'after'>('after');
-  readonly yPosition = input<'above' | 'below'>('above');
+  readonly yPosition = input<'above' | 'below'>('below');
   readonly noPadding = input(false);
   readonly withBorder = input(false);
   readonly whiteBackground = input(false);
@@ -114,35 +114,12 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   private createOverlay(): void {
     if (this.overlayRef) return;
 
+    const positions = this.buildPositions();
+
     this.positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this._el)
-      .withPositions([
-        {
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'start',
-          overlayY: 'top',
-        },
-        {
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'end',
-          overlayY: 'top',
-        },
-        {
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'end',
-          overlayY: 'bottom',
-        },
-        {
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'end',
-          overlayY: 'bottom',
-        },
-      ])
+      .withPositions(positions)
       .withViewportMargin(8)
       .withPush(false);
 
@@ -165,6 +142,44 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
     this.overlayRef.backdropClick().subscribe(() => {
       if (!this.isPopoverFrozen) this.closePopover();
     });
+  }
+
+  private buildPositions(): ConnectedPosition[] {
+    const isBelow = this.yPosition() === 'below';
+    const preferLeft = this.xPosition() === 'before';
+
+    const buildPosition = (
+      originY: 'top' | 'bottom',
+      overlayY: 'top' | 'bottom',
+      overlayX: 'start' | 'end',
+    ): ConnectedPosition => ({
+      originX: 'center',
+      originY,
+      overlayX,
+      overlayY,
+    });
+
+    const primary = buildPosition(isBelow ? 'bottom' : 'top', isBelow ? 'top' : 'bottom', preferLeft ? 'end' : 'start');
+
+    const secondary = buildPosition(
+      isBelow ? 'bottom' : 'top',
+      isBelow ? 'top' : 'bottom',
+      preferLeft ? 'start' : 'end',
+    );
+
+    const fallbackPrimary = buildPosition(
+      isBelow ? 'top' : 'bottom',
+      isBelow ? 'bottom' : 'top',
+      preferLeft ? 'end' : 'start',
+    );
+
+    const fallbackSecondary = buildPosition(
+      isBelow ? 'top' : 'bottom',
+      isBelow ? 'bottom' : 'top',
+      preferLeft ? 'start' : 'end',
+    );
+
+    return [primary, secondary, fallbackPrimary, fallbackSecondary];
   }
 
   private setBackdropActive(active: boolean): void {

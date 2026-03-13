@@ -37,7 +37,7 @@
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="data-cell" mat-cell *matCellDef="let element">
-        <div class="details-trigger" (click)="openNodeDetails(element)">
+        <div class="details-trigger" stepUndraggedClick (undraggedClick)="openNodeDetails(element)">
           <step-artefact-inline-details
             parentElementSize
             [offset]="100"

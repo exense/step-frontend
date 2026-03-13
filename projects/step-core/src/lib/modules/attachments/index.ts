@@ -12,7 +12,7 @@ import { AttachmentTypePipe } from './pipes/attachment-type.pipe';
 import { AttachmentTypeIconPipe } from './pipes/attachment-type-icon.pipe';
 import { StreamingTextComponent } from './components/streaming-text/streaming-text.component';
 import { StreamingAttachmentIndicatorComponent } from './components/streaming-attachment-indicator/streaming-attachment-indicator.component';
-import { AttachmentsInlinePreviewComponent } from './components/attachments-inline-preview/attachments-inline-preview.component';
+import { AttachmentInlinePreviewListComponent } from './components/attachment-inline-preview-list/attachment-inline-preview-list.component';
 
 export * from './pipes/attachment-is-image.pipe';
 export * from './pipes/attachment-is-text.pipe';
@@ -29,7 +29,7 @@ export * from './components/attachment-dialog/attachment-dialog.component';
 export * from './injectables/attachment-utils.service';
 export * from './components/streaming-text/streaming-text.component';
 export * from './components/streaming-attachment-indicator/streaming-attachment-indicator.component';
-export * from './components/attachments-inline-preview/attachments-inline-preview.component';
+export * from './components/attachment-inline-preview-list/attachment-inline-preview-list.component';
 export * from './types/attachment-type.enum';
 export * from './injectables/attachment-dialogs.service';
 export * from './directives/streaming-attachment-status.directive';
@@ -44,7 +44,7 @@ export const ATTACHMENTS_EXPORTS = [
   LegacyAttachmentsPreviewComponent,
   AttachmentPreviewComponent,
   AttachmentPreviewListComponent,
-  AttachmentsInlinePreviewComponent,
+  AttachmentInlinePreviewListComponent,
   AttachmentDialogComponent,
   AttachmentTypePipe,
   AttachmentTypeIconPipe,

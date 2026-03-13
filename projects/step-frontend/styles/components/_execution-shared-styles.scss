@@ -76,19 +76,6 @@
       flex-direction: column;
     }
 
-    .attachments-container {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-
-      span {
-        display: block;
-        max-width: 15rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
     .error-container {
       display: flex;
       gap: 0.5rem;

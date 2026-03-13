@@ -27,7 +27,8 @@ export class FileTypeUtilsService {
   }, new Map<string, TypeInfo>());
 
   findByExtension(extension?: string): TypeInfo | undefined {
-    return this.extensionsDictionary.get(extension ?? '');
+    const result = this.extensionsDictionary.get(extension ?? '');
+    return result?.isCustom ? undefined : result;
   }
 
   findByMimeTypeAndExtension(mimeType?: string, extension?: string): TypeInfo[] {

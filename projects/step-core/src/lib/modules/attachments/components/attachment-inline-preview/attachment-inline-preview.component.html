@@ -1,0 +1,65 @@
+@if (attachment(); as att) {
+  <ng-template #tplAttachmentName>
+    @if (att | attachmentType; as attachmentType) {
+      @if (attachmentType !== AttachmentType.SKIPPED) {
+        <div class="attachment-name-container">
+          @if (
+            (attachmentType === AttachmentType.STREAMING_BINARY || attachmentType === AttachmentType.STREAMING_TEXT) &&
+            $any(att).status === 'FAILED'
+          ) {
+            <step-icon
+              class="incomplete"
+              name="alert-triangle"
+              matTooltip="Potentially incomplete file"
+              matTooltipPosition="below"
+            />
+          }
+          @if (attachmentType === AttachmentType.STREAMING_BINARY) {
+            <span stepUndraggedClick (undraggedClick)="downloadBinaryStream(att, $event)">
+              <step-long-inline-text [text]="att.name" />
+            </span>
+          } @else {
+            <span class="highlight-inline-item" stepUndraggedClick (undraggedClick)="open(att, $event)">
+              <step-long-inline-text [text]="att.name" />
+            </span>
+          }
+          @if (attachmentType === AttachmentType.STREAMING_TEXT || attachmentType === AttachmentType.STREAMING_BINARY) {
+            <step-streaming-attachment-indicator [attachment]="att" />
+          }
+        </div>
+      } @else {
+        <div class="attachment-name-container">
+          <step-icon class="skipped" name="alert-circle" matTooltip="Skipped" matTooltipPosition="below" />
+          <span class="highlight-inline-item">
+            <step-long-inline-text [text]="att.name" />
+          </span>
+        </div>
+      }
+    }
+  </ng-template>
+  @if (withPopover()) {
+    <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER" [withBorder]="true">
+      <ng-container *ngTemplateOutlet="tplAttachmentName" />
+      <step-popover-content>
+        @switch (att | attachmentType) {
+          @case (AttachmentType.IMG) {
+            <step-attachment-preview class="large" [attachment]="att" [showDownload]="false" [withBorder]="false" />
+          }
+          @case (AttachmentType.SKIPPED) {
+            <div class="default-attachment-popover-view">
+              <p class="reason">{{ $any(att).reason }}</p>
+            </div>
+          }
+          @default {
+            <div class="default-attachment-popover-view">
+              <step-icon [name]="att | attachmentType | attachmentTypeIcon" />
+              <span>{{ att.name }}</span>
+            </div>
+          }
+        }
+      </step-popover-content>
+    </step-popover>
+  } @else {
+    <ng-container *ngTemplateOutlet="tplAttachmentName" />
+  }
+}

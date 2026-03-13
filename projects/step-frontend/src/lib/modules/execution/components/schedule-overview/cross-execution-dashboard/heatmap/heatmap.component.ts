@@ -114,7 +114,6 @@ export class HeatmapComponent {
     }
   }
 
-  
   handlePageChange(page: StepPageEvent) {
     if (page.pageSize !== this.pageSize()) {
       page.pageIndex = 0;

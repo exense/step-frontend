@@ -148,7 +148,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["projects/step-app/**/*.ts", "projects/step-app/**/*.html"]
+            "lintFilePatterns": ["projects/step-app/src/**/*.ts", "projects/step-app/src/**/*.html"]
           }
         }
       }
@@ -177,7 +177,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["projects/step-core/**/*.ts", "projects/step-core/**/*.html"]
+            "lintFilePatterns": ["projects/step-core/src/**/*.ts", "projects/step-core/src/**/*.html"]
           }
         }
       }
@@ -206,7 +206,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["projects/step-frontend/**/*.ts", "projects/step-frontend/**/*.html"]
+            "lintFilePatterns": ["projects/step-frontend/src/**/*.ts", "projects/step-frontend/src/**/*.html"]
           }
         }
       }

@@ -33,6 +33,7 @@ import {
   AugmentedExecutionsService,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
+  combineLatestWithTrackChanges,
   DateUtilsService,
   EntityRefService,
   Execution,
@@ -46,7 +47,6 @@ import {
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  TimeRange,
   TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -78,6 +78,7 @@ import { AltExecutionCloseHandleService } from '../../services/alt-execution-clo
 import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
 import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
+import { TimeRangeExt } from '../../shared/time-range-ext';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -96,6 +97,9 @@ interface RefreshParams {
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   hostDirectives: [ReloadableDirective],
+  host: {
+    '[class.small-screen]': 'isSmallScreen()',
+  },
   providers: [
     DashboardUrlParamsService,
     AltExecutionTabsService,
@@ -162,7 +166,7 @@ export class AltExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionId = inject(EXECUTION_ID);
   private _dateUtils = inject(DateUtilsService);
@@ -171,7 +175,8 @@ export class AltExecutionProgressComponent
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
 
-  private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
+  protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
+  private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -196,7 +201,7 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
-  private execution = toSignal(this.execution$, { initialValue: undefined });
+  private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -205,7 +210,7 @@ export class AltExecutionProgressComponent
     shareReplay(1),
   );
 
-  protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
+  protected readonly isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
   /** Active execution's range selection data stream **/
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
@@ -234,7 +239,7 @@ export class AltExecutionProgressComponent
       }
     });
 
-  protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
     this.updateTimeRangeSelection(selection);
   }
 
@@ -250,8 +255,8 @@ export class AltExecutionProgressComponent
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
   );
-  protected isResolvedParametersVisible = signal(false);
-  protected isAgentsVisible = signal(false);
+  protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -263,13 +268,23 @@ export class AltExecutionProgressComponent
     }),
   );
 
-  readonly timeRange$: Observable<TimeRange> = combineLatest([this.timeRangeSelection$, this.execution$]).pipe(
-    map(([rangeSelection, execution]) =>
-      convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId()),
-    ),
-    filter((range): range is TimeRange => range !== undefined),
+  readonly timeRange$: Observable<TimeRangeExt> = combineLatestWithTrackChanges([
+    this.timeRangeSelection$,
+    this.execution$,
+  ]).pipe(
+    map(({ result, isChanged }) => {
+      const [rangeSelection, execution] = result;
+      const [rangeSelectionChanged] = isChanged;
+      const timeRange = convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId());
+      if (!timeRange) {
+        return undefined;
+      }
+      const isManualChange = execution.id !== this._executionId() || !!rangeSelectionChanged;
+      return { ...timeRange, isManualChange } as TimeRangeExt;
+    }),
+    filter((range): range is TimeRangeExt => range !== undefined),
     shareReplay(1),
-  ) as Observable<TimeRange>;
+  ) as Observable<TimeRangeExt>;
 
   readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
 
@@ -354,7 +369,7 @@ export class AltExecutionProgressComponent
       filter((pair) => pair[0] === pair[1]),
       takeUntilDestroyed(),
     )
-    .subscribe(() => this.keywordsDataSource.reload({ isForce: false }));
+    .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
@@ -419,7 +434,7 @@ export class AltExecutionProgressComponent
 
   readonly currentEntity = this.execution;
 
-  private setupNavigationHistoryChange() {
+  private setupNavigationHistoryChange(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

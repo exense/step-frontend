@@ -96,7 +96,7 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
 
   createErrorsFetchDataSource(): TableFetchLocalDataSource<TimeSeriesErrorEntry> {
     return new TableFetchLocalDataSource(
-      (request?: TimeSeriesErrorsRequest) => (!request ? of([]) : this.findErrors(request)),
+      (request?: TimeSeriesErrorsRequest) => (!request ? of(undefined) : this.findErrors(request)),
       this.createErrorsDataSourceConfig(),
     );
   }

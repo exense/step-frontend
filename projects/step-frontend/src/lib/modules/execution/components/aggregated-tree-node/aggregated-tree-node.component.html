@@ -1,7 +1,7 @@
 @if (node(); as node) {
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
-      <div class="aggregated-info" (stepStrategyClick)="showDetails()">
+      <div class="aggregated-info" stepUndraggedClick (undraggedClick)="showDetails(undefined, undefined, $event)">
         <step-artefact-inline-details class="shift-rows smaller-view" [aggregatedInfo]="node">
           <ng-container *stepArtefactInlineDetailsHeader>
             <div class="node-header larger-view">

@@ -18,6 +18,9 @@ export interface TableGetDataOptions extends TableFilterOptions {
   page?: StepPageEvent;
   sort?: Sort;
   calculateCounts?: boolean;
+  isForce?: boolean;
+  hideProgress?: boolean;
+  immediateHideProgress?: boolean;
 }
 
 export interface TableDataSource<T> extends StepDataSource<T> {

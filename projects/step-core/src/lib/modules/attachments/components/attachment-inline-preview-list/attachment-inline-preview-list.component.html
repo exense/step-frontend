@@ -1,0 +1,20 @@
+@if (attachments(); as attachments) {
+  <div class="attachments-container invisible-items">
+    @for (att of attachments; track att.id) {
+      <step-attachment-inline-preview #items [attachment]="att" [withPopover]="false" [maxWidth]="100" />
+    }
+  </div>
+  <div class="attachments-container">
+    <div #listPrefix>
+      <step-icon name="paperclip" matTooltip="Attachments" />
+    </div>
+    @for (att of displayItems(); track att.id) {
+      <step-attachment-inline-preview [attachment]="att" />
+    }
+    @if (showMoreButton()) {
+      <div class="ellipsis" matTooltip="Has more items" matTooltipPosition="below">
+        <step-icon class="more-icon" name="more-horizontal" />
+      </div>
+    }
+  </div>
+}

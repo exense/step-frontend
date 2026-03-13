@@ -16,6 +16,7 @@
 @use 'step-tooltip';
 @use 'print';
 @use 'material-overrides' as mat-ov;
+@use 'step-skeleton' as skeleton;
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -116,7 +117,7 @@ $light-primary-text: var.$white;
   }
 
   @if not $mat-accent-palette {
-    $mat-accent-palette: mat.m2-define-palette(mat.$m2-pink-palette);
+    $mat-accent-palette: $mat-primary-palette;
   }
 
   @if not $mat-warn-palette {
@@ -273,4 +274,5 @@ $light-primary-text: var.$white;
   }
 
   @include print.print-overrides;
+  @include skeleton.skeleton-animations;
 }

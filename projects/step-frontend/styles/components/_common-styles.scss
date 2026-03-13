@@ -90,6 +90,10 @@
     text-decoration: none;
   }
 
+  step-popover-content > a {
+    color: var.$blue-100;
+  }
+
   .tab-content > .tab-pane {
     display: none;
   }

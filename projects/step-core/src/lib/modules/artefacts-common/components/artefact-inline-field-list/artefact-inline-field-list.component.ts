@@ -11,19 +11,14 @@ import {
 } from '@angular/core';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
 import { ArtefactInlineFieldComponent } from '../artefact-inline-field/artefact-inline-field.component';
-import { StepBasicsModule, ElementSizeService } from '../../../basics/step-basics.module';
+import { StepBasicsModule, ElementSizeService, FareShareCalculator } from '../../../basics/step-basics.module';
 import { ArtefactInlineItemExplicitWidths } from '../../types/artefact-inline-item-explicit-widths';
-import { WidthContainer } from '../../types/width-container';
-
-interface FairShareContext {
-  fairShare: number;
-  fairShareApplied: number;
-}
 
 const MIN_WIDTH = 100;
 const PADDINGS = 6;
 const GAP = 6;
 const CAP_ICON_SPACE = 20;
+const OFFSET = 15;
 
 @Component({
   selector: 'step-artefact-inline-field-list',
@@ -36,8 +31,8 @@ const CAP_ICON_SPACE = 20;
 export class ArtefactInlineFieldListComponent {
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
 
-  private renderedElements = viewChildren('items', { read: ArtefactInlineFieldComponent });
-  private listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
+  private readonly renderedElements = viewChildren('items', { read: ArtefactInlineFieldComponent });
+  private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
 
   readonly isVertical = input(false);
 
@@ -55,11 +50,16 @@ export class ArtefactInlineFieldListComponent {
       return items;
     }
 
-    availableWidth = availableWidth - listPrefixWidth - 15;
+    availableWidth = availableWidth - listPrefixWidth - OFFSET;
     const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth);
 
     if (elementsToDisplay.length === items.length) {
-      const totalWidth = this.countTotalWidth(renderedElements.map((element) => element.getWidths()));
+      const withContainers = renderedElements
+        .map((element) => element.getWidths())
+        .map((widths) => ({ totalWidth: widths?.total }));
+
+      const totalWidth = FareShareCalculator.calculateWidths(withContainers, GAP, PADDINGS);
+
       if (totalWidth <= availableWidth) {
         return items;
       }
@@ -107,53 +107,31 @@ export class ArtefactInlineFieldListComponent {
     renderedElementsWithInitialWidths: ArtefactInlineFieldComponent[],
     availableWidth: number,
   ): ArtefactInlineItemExplicitWidths[] {
-    let changedItems: ArtefactInlineItemExplicitWidths[] = [];
-
     const totalCount = renderedElementsWithInitialWidths.reduce((res, item) => res + (item.getCount() ?? 0), 0);
-    let fairShare = Math.round(availableWidth / totalCount);
-    if (fairShare < MIN_WIDTH) {
-      fairShare = MIN_WIDTH;
-    }
+    const fairShareContext = new FareShareCalculator(MIN_WIDTH, GAP, availableWidth, totalCount, PADDINGS);
 
-    const fairShareContext: FairShareContext = { fairShare, fairShareApplied: 0 };
-    changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
-    const totalWidth = this.countTotalWidth(changedItems.map((item) => item.explicitWidths));
-
-    if (totalWidth < availableWidth) {
-      const unallocated = availableWidth - totalWidth;
-      fairShare = fairShare + Math.round(unallocated / fairShareContext.fairShareApplied);
-      if (fairShare < MIN_WIDTH) {
-        fairShare = MIN_WIDTH;
-      }
-      changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, {
-        fairShare,
-        fairShareApplied: 0,
-      });
+    let changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
+    const isReallocated = fairShareContext.reallocate();
+    if (isReallocated) {
+      changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
     }
 
     return changedItems;
   }
 
-  private applyFareShare(context: FairShareContext, value?: number): number | undefined {
-    if (value !== undefined && value > context.fairShare) {
-      context.fairShareApplied++;
-      return context.fairShare;
-    }
-    return value;
-  }
-
   private createItemsWithReallocatedWidths(
     elements: readonly ArtefactInlineFieldComponent[],
-    context: FairShareContext,
+    context: FareShareCalculator,
   ): ArtefactInlineItemExplicitWidths[] {
     return elements.map((element) => {
       const item = element.getItem();
       const explicitWidths = element.getWidths();
-      explicitWidths.prefix = this.applyFareShare(context, explicitWidths.prefix);
-      explicitWidths.label = this.applyFareShare(context, explicitWidths.label);
-      explicitWidths.value = this.applyFareShare(context, explicitWidths.value);
-      explicitWidths.icon = this.applyFareShare(context, explicitWidths.icon);
-      explicitWidths.suffix = this.applyFareShare(context, explicitWidths.suffix);
+      context.openContainer();
+      explicitWidths.prefix = context.applyFairShare(explicitWidths.prefix);
+      explicitWidths.label = context.applyFairShare(explicitWidths.label);
+      explicitWidths.value = context.applyFairShare(explicitWidths.value);
+      explicitWidths.icon = context.applyFairShare(explicitWidths.icon);
+      explicitWidths.suffix = context.applyFairShare(explicitWidths.suffix);
       explicitWidths.total =
         (explicitWidths.prefix ?? 0) +
         (explicitWidths.label ?? 0) +
@@ -167,18 +145,5 @@ export class ArtefactInlineFieldListComponent {
       };
       return result;
     });
-  }
-
-  private countTotalWidth(widths: (WidthContainer | undefined)[]): number {
-    return widths
-      .filter((widthContainer) => !!widthContainer?.total)
-      .map((widthContainer) => widthContainer!.total!)
-      .reduce((res, total, index, self) => {
-        let value = res + total! + PADDINGS;
-        if (index < self.length - 1) {
-          value += GAP;
-        }
-        return value;
-      }, 0);
   }
 }

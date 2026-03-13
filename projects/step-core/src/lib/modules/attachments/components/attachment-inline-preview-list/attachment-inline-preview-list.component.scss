@@ -1,0 +1,13 @@
+step-attachment-inline-preview-list {
+  .invisible-items {
+    visibility: hidden;
+    height: 0;
+    width: 0;
+  }
+
+  .attachments-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
