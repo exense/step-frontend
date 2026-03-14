@@ -35,10 +35,6 @@ export class GridPresetSaveDialogComponent {
   private _fb = inject(FormBuilder).nonNullable;
   protected readonly _dialogData = inject<GridPresetSaveDialogData>(MAT_DIALOG_DATA);
 
-  protected readonly dialogTitle = this._dialogData.isProtected
-    ? 'The layout you edited is protected. Do you want to save it as new?'
-    : `Save changes of "${this._dialogData.currentLayoutName}"`;
-
   private readonly nameExistsValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     const existingNames = this._dialogData.existingPresetNames;
     const value = (control.value as string)?.trim();

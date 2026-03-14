@@ -1,5 +1,5 @@
 <form [formGroup]="saveForm" (submit)="handleSubmit()">
-  <step-modal-window [title]="dialogTitle">
+  <step-modal-window title="Save changes of '{{_dialogData.currentLayoutName}}'">
     <div step-modal-window-body>
       <mat-slide-toggle formControlName="isShared" color="primary">Shared</mat-slide-toggle>
       <p class="shared-description">If selected, the layout will be displayed to all users</p>
