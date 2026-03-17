@@ -12,46 +12,6 @@
     }
   </mat-select>
   @if (isEdit()) {
-    @if (!isProtected()) {
-      <step-suffix class="button-suffix">
-        <step-popover yPosition="below" [mode]="PopoverMode.CLICK" [whiteBackground]="true" [smallFont]="false" [withBorder]="true">
-          <button
-            type="button"
-            mat-stroked-button
-            matTooltip="Configure layout"
-            matTooltipPosition="below"
-          >
-            <step-icon name="tool" />
-          </button>
-          <step-popover-content>
-            <div class="preset-config-popover">
-              <div class="preset-config-popover__title">Configure "{{ presetName() }}"</div>
-              <mat-slide-toggle
-                [checked]="popoverIsShared()"
-                (change)="popoverIsShared.set($event.checked)"
-                color="primary"
-              >Shared</mat-slide-toggle>
-              <p class="preset-config-popover__description">If selected, the layout will be displayed to all users</p>
-              <div class="preset-config-popover__actions">
-                <button
-                  type="button"
-                  mat-flat-button
-                  color="primary"
-                  [disabled]="!configHasChanges()"
-                  (click)="savePresetConfig()"
-                >Save</button>
-                <button
-                  type="button"
-                  mat-flat-button
-                  color="warn"
-                  (click)="remove()"
-                >Delete</button>
-              </div>
-            </div>
-          </step-popover-content>
-        </step-popover>
-      </step-suffix>
-    }
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -69,12 +29,26 @@
         mat-flat-button
         (click)="save()"
         color="primary"
-        matTooltip="Save layout changes"
+        matTooltip="Save layout"
         matTooltipPosition="below"
       >
         <step-icon name="save" />
       </button>
     </step-suffix>
+    @if (!isProtected()) {
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-flat-button
+          color="warn"
+          (click)="remove()"
+          matTooltip="Delete layout"
+          matTooltipPosition="below"
+        >
+          <step-icon name="trash-2" />
+        </button>
+      </step-suffix>
+    }
   } @else {
     <step-suffix class="button-suffix">
       <button

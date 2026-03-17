@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal, untracked, ViewChild } from '@angular/core';
+import { Component, computed, inject, linkedSignal, untracked } from '@angular/core';
 import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -10,7 +10,6 @@ import {
   GridPresetSaveDialogResult,
 } from '../grid-preset-save-dialog/grid-preset-save-dialog.component';
 import { AuthService } from '../../../auth';
-import { PopoverComponent, PopoverMode } from '../../../basics/components/popover/popover.component';
 
 @Component({
   selector: 'step-grid-control-tool',
@@ -24,10 +23,6 @@ export class GridControlToolComponent {
   private _dialogs = inject(DialogsService);
   private _matDialog = inject(MatDialog);
   private _auth = inject(AuthService);
-
-  @ViewChild(PopoverComponent) private _settingsPopover?: PopoverComponent;
-
-  protected readonly PopoverMode = PopoverMode;
 
   protected readonly selectedPresetId = linkedSignal(() => {
     const preset = this._widgetPersistence.selectedPreset();
@@ -53,10 +48,6 @@ export class GridControlToolComponent {
     const preset = this._widgetPersistence.selectedPreset();
     return preset?.attributes?.['name'] ?? '';
   });
-
-  protected readonly popoverIsShared = linkedSignal(() => this.isShared());
-
-  protected readonly configHasChanges = computed(() => this.isShared() !== this.popoverIsShared());
 
   protected readonly presets = this._widgetPersistence.gridPresets;
   protected readonly isEdit = this._gridEditable.editMode;
@@ -126,7 +117,7 @@ export class GridControlToolComponent {
         filter((result) => !!result),
         switchMap(({ isOverride, name, isShared: newIsShared }) => {
           if (isOverride) {
-            return this._widgetPersistence.saveState().pipe(
+            return this._widgetPersistence.saveState(name).pipe(
               switchMap(() => {
                 const currentIsShared = untracked(() => this.isShared());
                 if (newIsShared === currentIsShared) return of(undefined);
@@ -136,7 +127,7 @@ export class GridControlToolComponent {
               }),
             );
           } else {
-            return this._widgetPersistence.createPreset(name!).pipe(
+            return this._widgetPersistence.createPreset(name).pipe(
               switchMap((newPresetId) => {
                 if (!newIsShared) return of(undefined);
                 return this._widgetPersistence.sharePreset(newPresetId);
@@ -148,28 +139,16 @@ export class GridControlToolComponent {
       .subscribe(() => this._gridEditable.setEditMode(false));
   }
 
-  protected savePresetConfig(): void {
-    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
-    const presetId = preset.id!;
-    const newIsShared = untracked(() => this.popoverIsShared());
-    const save$ = newIsShared
-      ? this._widgetPersistence.sharePreset(presetId)
-      : this._widgetPersistence.unsharePreset(presetId);
-    save$.subscribe(() => this._settingsPopover?.closePopover());
-  }
-
   protected remove(): void {
     const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
     const presetId = preset.id!;
+    const name = untracked(() => this.presetName());
     this._dialogs
-      .showWarning('Do you want to remove this preset?')
+      .showWarning(`Do you want to remove the layout: "${name}"?`)
       .pipe(
         filter((isConfirmed) => !!isConfirmed),
         switchMap(() => this._widgetPersistence.removePreset(presetId)),
       )
-      .subscribe(() => {
-        this._settingsPopover?.closePopover();
-        this._gridEditable.setEditMode(false);
-      });
+      .subscribe(() => this._gridEditable.setEditMode(false));
   }
 }

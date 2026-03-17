@@ -1,8 +1,8 @@
 <form [formGroup]="saveForm" (submit)="handleSubmit()">
   <step-modal-window title="Save changes of '{{_dialogData.currentLayoutName}}'">
     <div step-modal-window-body>
-      <mat-slide-toggle formControlName="isShared" color="primary">Shared</mat-slide-toggle>
-      <p class="shared-description">If selected, the layout will be displayed to all users</p>
+
+      <h5>Save mode</h5>
       <mat-radio-group formControlName="saveType">
         <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="_dialogData.isProtected"
           >Save & override current layout</mat-radio-button
@@ -12,15 +12,20 @@
         }
         <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary">Save as new</mat-radio-button>
       </mat-radio-group>
-      @if (saveType() === SaveType.SAVE_AS_NEW) {
+
+      <h5>Layout Settings</h5>
+      <div class="sub_settings">
         <step-form-field>
-          <step-label>Layout Name</step-label>
+          <step-label>Name</step-label>
           <input type="text" formControlName="name" />
           @if (saveForm.controls.name.hasError('nameExists') && saveForm.controls.name.touched) {
             <step-error>A layout with this name already exists</step-error>
           }
         </step-form-field>
-      }
+
+        <mat-slide-toggle formControlName="isShared" color="primary">Shared</mat-slide-toggle>
+        <p class="shared-description">If selected, the layout will be displayed to all users</p>
+      </div>
     </div>
     <div step-modal-window-buttons>
       <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
