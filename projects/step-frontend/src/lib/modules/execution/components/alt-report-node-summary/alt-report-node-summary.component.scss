@@ -1,5 +1,6 @@
 step-alt-report-node-summary {
   width: 100%;
+  container: summary-node-widget / size;
 
   step-alt-report-widget-content {
     font-size: 1.2rem;
@@ -8,9 +9,9 @@ step-alt-report-node-summary {
     align-items: center;
     justify-content: center;
     gap: 2rem;
-
-    margin-top: 6rem;
-    height: 26rem;
+    flex: 1;
+    min-height: 0;
+    container-type: size;
   }
 
   .summary {
@@ -40,6 +41,26 @@ step-alt-report-node-summary {
 
   step-status-count-badge {
     cursor: pointer;
+  }
+
+  @container summary-node-widget (aspect-ratio > 1) {
+    step-alt-report-widget-content {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+
+    step-doughnut-chart {
+      flex: 0 0 auto;
+      width: min(26rem, calc(100cqh - 5rem));
+    }
+
+    .summary {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      width: auto;
+      align-items: stretch; // makes all badges fill the same width
+    }
   }
 }
 @media print {
