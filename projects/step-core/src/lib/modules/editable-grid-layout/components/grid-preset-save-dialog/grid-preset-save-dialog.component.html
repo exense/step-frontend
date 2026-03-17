@@ -7,11 +7,14 @@
         <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="_dialogData.isProtected"
           >Save & override current layout</mat-radio-button
         >
+        @if (_dialogData.isProtected) {
+          <p class="override-warning">You can only override layouts that you created yourself.</p>
+        }
         <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary">Save as new</mat-radio-button>
       </mat-radio-group>
       @if (saveType() === SaveType.SAVE_AS_NEW) {
         <step-form-field>
-          <step-label>Preset Name</step-label>
+          <step-label>Layout Name</step-label>
           <input type="text" formControlName="name" />
           @if (saveForm.controls.name.hasError('nameExists') && saveForm.controls.name.touched) {
             <step-error>A layout with this name already exists</step-error>

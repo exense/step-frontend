@@ -137,10 +137,9 @@ export class GridControlToolComponent {
             );
           } else {
             return this._widgetPersistence.createPreset(name!).pipe(
-              switchMap(() => {
+              switchMap((newPresetId) => {
                 if (!newIsShared) return of(undefined);
-                const newPreset = untracked(() => this._widgetPersistence.selectedPreset())!;
-                return this._widgetPersistence.sharePreset(newPreset.id!);
+                return this._widgetPersistence.sharePreset(newPresetId);
               }),
             );
           }

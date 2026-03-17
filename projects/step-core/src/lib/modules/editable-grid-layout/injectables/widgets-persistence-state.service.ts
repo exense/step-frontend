@@ -66,7 +66,7 @@ export class WidgetsPersistenceStateService {
     );
   }
 
-  createPreset(name: string): Observable<void> {
+  createPreset(name: string): Observable<string> {
     const widgets = this.getWidgetsStates();
     const preset: WidgetStatePreset = {
       attributes: {
@@ -81,9 +81,9 @@ export class WidgetsPersistenceStateService {
         this._gridPersistence.getGridPresets(this._gridConfig.gridId).pipe(
           tap((presets) => this.gridPresetsInternal.set(presets)),
           tap(() => this.selectPreset(presetId)),
+          map(() => presetId),
         ),
       ),
-      map(() => {}),
     );
   }
 

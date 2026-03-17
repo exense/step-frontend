@@ -1,15 +1,28 @@
 mat-slide-toggle {
   margin-top: 2px;
+  font-size: 1.4rem;
 }
 
 .shared-description {
-  font-size: 0.85em;
+  font-size: 1.2rem;
   color: rgba(0, 0, 0, 0.6);
-  margin: 0.25rem 0 1rem;
+  margin: 1rem 0 1rem;
+}
+
+.override-warning {
+  font-size: 1.2rem;
+  color: rgba(0, 0, 0, 0.38);
+  margin: -.5rem 0 .5rem 1rem;
 }
 
 mat-radio-group {
   display: flex;
   flex-direction: column;
   margin-left: -1rem;
+  font-size: 1.4rem;
+}
+
+step-label {
+  font-weight: 400;
+  font-size: 1.4rem;
 }
