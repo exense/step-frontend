@@ -301,6 +301,7 @@ export class KeywordsService {
   }
 
   /**
+   * Returns the function referenced by the given callFunction without applying any binding parameters.
    * @param requestBody
    * @returns Function default response
    * @throws ApiError
@@ -315,6 +316,7 @@ export class KeywordsService {
   }
 
   /**
+   * Returns the function referenced by the given callFunction applying the provided binding parameters.
    * @param requestBody
    * @returns Function default response
    * @throws ApiError
