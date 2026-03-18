@@ -7,7 +7,7 @@
   matSortActive="count"
   matSortDirection="desc"
   [visibleColumns]="displayColumns()"
-  [indicatorMode]="TableIndicatorMode.SPINNER"
+  [indicatorMode]="indicatorMode()"
 >
   <ng-container matColumnDef="errorMessage" stepSearchCol>
     <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>

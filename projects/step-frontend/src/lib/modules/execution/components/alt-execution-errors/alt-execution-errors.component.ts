@@ -67,6 +67,7 @@ export class AltExecutionErrorsComponent {
 
   readonly showExecutionsMenu = input(true);
   readonly showActions = input(true);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SPINNER);
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],
@@ -90,9 +91,8 @@ export class AltExecutionErrorsComponent {
     });
   }
 
-  onFindInTree(message: string) {
+  onFindInTree(message: string): void {
     this.searchFor.emit(message);
   }
 
-  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

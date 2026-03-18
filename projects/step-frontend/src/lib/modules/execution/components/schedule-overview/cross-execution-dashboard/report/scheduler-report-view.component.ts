@@ -1,5 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { DateRange, Tab, TimeRange } from '@exense/step-core';
+import { DateRange, Tab, TableIndicatorMode, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, filter, map, pairwise, scan, take } from 'rxjs';
@@ -36,6 +36,8 @@ export class SchedulerReportViewComponent implements OnInit {
       label: 'Keywords',
     },
   ];
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 
   @ViewChild('executionList') executionList!: ExecutionListComponent;
 

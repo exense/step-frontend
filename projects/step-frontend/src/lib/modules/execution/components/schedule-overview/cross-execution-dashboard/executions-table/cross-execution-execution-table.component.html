@@ -8,7 +8,7 @@
     matSortActive="executionTime"
     matSortDirection="desc"
     [matSortDisableClear]="true"
-    [indicatorMode]="_state.lastRefreshTrigger() === 'manual' ? TableIndicatorMode.SPINNER : TableIndicatorMode.NONE"
+    [indicatorMode]="_state.lastRefreshTrigger() === 'manual' ? TableIndicatorMode.SKELETON : TableIndicatorMode.NONE"
   >
     <step-entity-column-container entityName="executions" />
     <ng-container
