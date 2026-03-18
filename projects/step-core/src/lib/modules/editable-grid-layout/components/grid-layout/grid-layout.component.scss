@@ -18,6 +18,12 @@ step-grid-layout {
   .step-grid-element {
     position: relative;
     display: flex;
+    min-width: 0;
+
+    > :not(step-grid-drag-handle):not(step-grid-resizer) {
+      width: 100%;
+      min-width: 0;
+    }
 
     &.element-hidden {
       display: none;

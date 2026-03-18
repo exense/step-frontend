@@ -55,19 +55,24 @@ export class WidgetsPersistenceStateService {
   saveState(name?: string): Observable<void> {
     const positions = untracked(() => this._widgetsPositions.positionsState());
     const preset = untracked(() => this.selectedPreset())!;
+    const widgets = this.getWidgetsStates();
     const presetToSave: WidgetStatePreset = {
       ...preset,
       attributes: name ? { ...preset.attributes, name } : preset.attributes,
-      layout: { widgets: this.getWidgetsStates() } as WidgetStatePreset['layout'],
+      layout: { widgets } as WidgetStatePreset['layout'],
     };
     return this._gridPersistence.save(this._gridConfig.gridId, presetToSave).pipe(
       tap(() => {
         this.lastSavedPositions.set(positions);
+        this.selectedPresetInternal.update(
+          (value) =>
+            ({
+              ...value!,
+              attributes: name ? { ...value!.attributes, name } : value!.attributes,
+              layout: { widgets },
+            }) as WidgetStatePreset,
+        );
         if (name) {
-          this.selectedPresetInternal.update((value) => ({
-            ...value!,
-            attributes: { ...value!.attributes, name },
-          }));
           this.gridPresetsInternal.update((presets) =>
             presets.map((p) => (p.key === presetToSave.id ? { ...p, value: name } : p)),
           );
