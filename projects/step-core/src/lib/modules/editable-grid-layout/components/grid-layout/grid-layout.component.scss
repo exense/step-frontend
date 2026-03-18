@@ -20,7 +20,7 @@ step-grid-layout {
     display: flex;
     min-width: 0;
 
-    > :not(step-grid-drag-handle):not(step-grid-resizer) {
+    > :not(step-grid-drag-handle):not(step-grid-resizer):not(step-grid-element-title) {
       width: 100%;
       min-width: 0;
     }
