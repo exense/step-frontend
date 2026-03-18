@@ -1,0 +1,46 @@
+<div class="container">
+  <div class="previous-executions-container" [style.--style__nodeSize.px]="nodesSize()">
+    <!--    eslint-disable-next-line step-lint/track-is-item-field-->
+    @for (node of paddedPastExecutions(); track $index) {
+
+      @if (node) {
+        <step-popover>
+          <div class="history-item-container" [class.arrow]="$last">
+            <div
+              class="simple-node connect-line link"
+              [style.width.px]="nodesSize()"
+              [style.height.px]="nodesSize()"
+              [style.background-color]="node.color"
+              (click)="navigateToExecution(node.id)"
+            ></div>
+          </div>
+          <step-popover-content>
+            <div>
+              <step-execution-history-node-tooltip [status]="node.status"/>
+            </div>
+          </step-popover-content>
+        </step-popover>
+
+      } @else {
+        <div class="history-item-container" [class.arrow]="$last">
+          <div class="empty-node connect-line" [style.width.px]="nodesSize()" [style.height.px]="nodesSize()"></div>
+        </div>
+      }
+    }
+  </div>
+
+  <step-popover>
+    <div
+      class="simple-node highlight link"
+      [style.width.px]="currentNodeSize()"
+      [style.height.px]="currentNodeSize()"
+      [style.background-color]="currentNode().color"
+      (click)="navigateToExecution(currentNode().id)"
+    ></div>
+    <step-popover-content>
+      <div>
+        <step-execution-history-node-tooltip [status]="currentNode().status"/>
+      </div>
+    </step-popover-content>
+  </step-popover>
+</div>

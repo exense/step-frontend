@@ -12,8 +12,7 @@ import { combineLatestWith, map, Observable, switchMap, take } from 'rxjs';
 import { TreeNodePieChartSlice } from './execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { Status } from '../../../_common/shared/status.enum';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { sign } from 'chart.js/helpers';
-import { HistoryNodeItem } from './history-nodes/history-nodes.component';
+import { HistoryNodeItem } from './history-nodes/history-node-item';
 
 interface ExecutionItem {
   execution: Execution;

@@ -167,14 +167,17 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
-import { HistoryCellComponent } from './components/execution-history-cell/execution-history-cell.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import {
   StatusDistributionBadgeComponent
 } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import {
+  ExecutionHistoryNodeTooltipComponent
+} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -277,7 +280,8 @@ import {
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
     ExecutionHistorySectionComponent,
-    HistoryCellComponent,
+    ExecutionHistoryNodesComponent,
+    ExecutionHistoryNodeTooltipComponent,
   ],
   imports: [
     StepCommonModule,

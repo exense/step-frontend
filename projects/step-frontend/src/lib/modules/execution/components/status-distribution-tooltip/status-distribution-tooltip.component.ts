@@ -28,7 +28,7 @@ export class StatusDistributionTooltipComponent {
   readonly link = input<string>();
   readonly linkLabel = input<string>();
 
-  protected distribution: Signal<InternalStatusDistribution[]> = computed(() => {
+  protected readonly distribution: Signal<InternalStatusDistribution[]> = computed(() => {
     const list = this.statuses() ?? [];
     const totalCount = list.reduce((acc, item) => acc + (item?.count ?? 0), 0);
 
@@ -41,7 +41,7 @@ export class StatusDistributionTooltipComponent {
       .sort((a, b) => b.percentage - a.percentage);
   });
 
-  protected navigateToLink() {
+  protected navigateToLink(): void {
     if (this.link()) {
       this._router.navigateByUrl(this.link()!);
     }

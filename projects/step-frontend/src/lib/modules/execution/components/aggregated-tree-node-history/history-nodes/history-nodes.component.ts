@@ -1,18 +1,8 @@
-import { Component, computed, effect, input, signal } from '@angular/core';
-import {
-  AggregatedTreeNodeStatusesPiechartComponent,
-  TreeNodePieChartSlice,
-} from '../execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { Component, computed, input } from '@angular/core';
+import { AggregatedTreeNodeStatusesPiechartComponent } from '../execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { StatusDistributionTooltipComponent } from '../../status-distribution-tooltip/status-distribution-tooltip.component';
 import { StepBasicsModule } from '@exense/step-core';
-
-export interface HistoryNodeItem {
-  statusSlices: TreeNodePieChartSlice[];
-  timestamp?: number;
-  tooltipLinkLabel?: string;
-  link?: string;
-  tooltipLink?: string;
-}
+import { HistoryNodeItem } from './history-node-item';
 
 @Component({
   selector: 'step-history-nodes',
