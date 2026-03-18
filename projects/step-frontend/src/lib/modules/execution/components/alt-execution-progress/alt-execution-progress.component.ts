@@ -54,10 +54,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import {
-  AGGREGATED_TREE_TAB_STATE,
-  AGGREGATED_TREE_WIDGET_STATE,
-} from '../../services/aggregated-report-view-tree-state.service';
+import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -164,7 +161,6 @@ export class AltExecutionProgressComponent
   private _plansApi = inject(AugmentedPlansService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
-  private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
@@ -485,14 +481,12 @@ export class AltExecutionProgressComponent
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
         if (!aggregatedReportView) {
-          this._aggregatedTreeTabState.init(undefined);
           this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
           return;
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
@@ -504,7 +498,6 @@ export class AltExecutionProgressComponent
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
-        this._aggregatedTreeTabState.searchCtrl.setValue('');
         this._aggregatedTreeWidgetState.searchCtrl.setValue('');
       });
   }

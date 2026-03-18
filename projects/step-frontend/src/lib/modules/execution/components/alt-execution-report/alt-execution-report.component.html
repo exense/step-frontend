@@ -10,11 +10,7 @@
   }
   @if (hasTestCases$ | async) {
     @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases
-        class="widget"
-        [style.--colSpan]="3"
-        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
-      />
+      <step-alt-report-nodes-testcases class="widget" [style.--colSpan]="3" />
     }
     @if (_testCasesState.summary$ | async; as testCasesSummary) {
       <step-alt-report-node-summary
@@ -45,11 +41,7 @@
     <step-alt-execution-tree-widget #treeWidget class="widget" [style.--colSpan]="3" />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords
-      class="keywords widget"
-      [style.--colSpan]="3"
-      (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
-    />
+    <step-alt-report-node-keywords class="keywords widget" [style.--colSpan]="3" />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
