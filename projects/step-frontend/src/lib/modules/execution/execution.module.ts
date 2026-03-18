@@ -168,6 +168,9 @@ import { ExecutionHistorySectionComponent } from './components/execution-history
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import { ExecutionDrilldownNodeDetailsPanelComponent } from './components/execution-drilldown-node-details-panel/execution-drilldown-node-details-panel.component';
+import { ExecutionDrilldownIterationPanelComponent } from './components/execution-drilldown-iteration-panel/execution-drilldown-iteration-panel.component';
+import { ExecutionDrilldownRootTreePanelComponent } from './components/execution-drilldown-root-tree-panel/execution-drilldown-root-tree-panel.component';
 
 @NgModule({
   declarations: [
@@ -237,6 +240,9 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
+    ExecutionDrilldownNodeDetailsPanelComponent,
+    ExecutionDrilldownIterationPanelComponent,
+    ExecutionDrilldownRootTreePanelComponent,
     ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
@@ -778,12 +784,15 @@ export class ExecutionModule {
                   },
                   {
                     hasBackdrop: false,
-                    height: '100%',
-                    width: '40%',
-                    panelClass: 'side-dialog',
+                    height: 'calc(100% - 3.2rem)',
+                    width: 'calc(100% - 25.4rem)',
+                    panelClass: 'execution-drilldown-dialog',
+                    enterAnimationDuration: '0ms',
+                    exitAnimationDuration: '0ms',
                     position: {
+                      left: '25.4rem',
                       right: '0',
-                      top: '0',
+                      top: '3.2rem',
                       bottom: '0',
                     },
                   },

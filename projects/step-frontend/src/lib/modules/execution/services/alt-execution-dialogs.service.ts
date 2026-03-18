@@ -15,6 +15,11 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
 import { NODE_DETAILS_RELATIVE_PARENT } from './node-details-relative-parent.token';
+import {
+  ExecutionDrilldownLeafPanel,
+  ExecutionDrilldownSource,
+  ExecutionDrilldownStateService,
+} from './execution-drilldown-state.service';
 
 export interface OpenIterationsParams {
   aggregatedNodeId: string;
@@ -24,11 +29,13 @@ export interface OpenIterationsParams {
   reportNodeId?: string;
   nodeStatusCount?: number;
   searchFor?: string;
+  source?: ExecutionDrilldownSource;
+  panelTitle?: string;
 }
 
 export type PartialOpenIterationsParams = Pick<
   OpenIterationsParams,
-  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
+  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor' | 'source' | 'panelTitle'
 >;
 
 @Injectable()
@@ -40,6 +47,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
   private _matDialog = inject(MatDialog);
   private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
+  private _drilldownState = inject(ExecutionDrilldownStateService);
 
   openIterations(params: OpenIterationsParams): void;
   openIterations(node: AggregatedTreeNode, restParams: PartialOpenIterationsParams): void;
@@ -51,7 +59,13 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       const node = nodeOrParams as AggregatedTreeNode;
       restParams = restParams ?? {};
       const { id: aggregatedNodeId, countByStatus, singleInstanceReportNode } = node;
-      this.openIterations({ aggregatedNodeId, countByStatus, singleInstanceReportNode, ...restParams });
+      this.openIterations({
+        aggregatedNodeId,
+        countByStatus,
+        singleInstanceReportNode,
+        panelTitle: node.name,
+        ...restParams,
+      });
       return;
     }
 
@@ -63,24 +77,30 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       nodeStatusCount,
       singleInstanceReportNode,
       searchFor,
+      source,
+      panelTitle,
     } = nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
-      this.navigateToIterationDetails(reportNodeId);
+      this.openPanelAndNavigate(this.createReportNodePanel(reportNodeId, panelTitle), source, searchFor);
       return;
     }
     const itemsCounts = Object.values(countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
       const reportNode = singleInstanceReportNode!;
       this._reportNodeDetails?.setReportNode?.(reportNode);
-      this.navigateToIterationDetails(reportNode.id!, {}, searchFor);
+      this.openPanelAndNavigate(this.createReportNodePanel(reportNode.id!, reportNode.name), source, searchFor);
       return;
     }
-    this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);
+    this.openPanelAndNavigate(
+      this.createIterationPanel(aggregatedNodeId, nodeStatus, nodeStatusCount, panelTitle),
+      source,
+      searchFor,
+    );
   }
 
-  openIterationDetails<T extends ReportNode>(reportNode: T): void {
+  openIterationDetails<T extends ReportNode>(reportNode: T, source?: ExecutionDrilldownSource): void {
     this._reportNodeDetails?.setReportNode?.(reportNode);
-    this.navigateToIterationDetails(reportNode.id!);
+    this.openPanelAndNavigate(this.createReportNodePanel(reportNode.id!, reportNode.name), source);
   }
 
   openScheduler(task: ExecutiontTaskParameters): void {
@@ -88,6 +108,15 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], {
       relativeTo: this._activatedRoute,
     });
+  }
+
+  syncRouteToPanel(panel: ExecutionDrilldownLeafPanel): void {
+    if (panel.kind === 'node-details') {
+      this.navigateToIterationDetails(panel.reportNodeId!);
+      return;
+    }
+
+    this.navigateToIterationList(panel.aggregatedNodeId!, panel.searchStatus, panel.searchStatusCount);
   }
 
   private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
@@ -112,5 +141,58 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       queryParams: mergedParams,
       queryParamsHandling: 'merge',
     });
+  }
+
+  private openPanelAndNavigate(
+    panel: Omit<ExecutionDrilldownLeafPanel, 'instanceId'>,
+    source?: ExecutionDrilldownSource,
+    searchFor?: string,
+  ): void {
+    if (source) {
+      this._drilldownState.openFromRoot(source, panel);
+    } else {
+      this._drilldownState.openNested(panel);
+    }
+
+    if (panel.kind === 'node-details') {
+      this.navigateToIterationDetails(panel.reportNodeId!, {}, searchFor);
+      return;
+    }
+
+    this.navigateToIterationList(panel.aggregatedNodeId!, panel.searchStatus, panel.searchStatusCount);
+  }
+
+  private createIterationPanel(
+    aggregatedNodeId: string,
+    searchStatus?: Status,
+    searchStatusCount?: number,
+    title?: string,
+  ): Omit<ExecutionDrilldownLeafPanel, 'instanceId'> {
+    const routeKey = this.createIterationRouteKey(aggregatedNodeId, searchStatus, searchStatusCount);
+    return {
+      routeKey,
+      kind: 'iteration-list',
+      aggregatedNodeId,
+      searchStatus,
+      searchStatusCount,
+      title,
+    };
+  }
+
+  private createReportNodePanel(reportNodeId: string, title?: string): Omit<ExecutionDrilldownLeafPanel, 'instanceId'> {
+    return {
+      routeKey: this.createReportNodeRouteKey(reportNodeId),
+      kind: 'node-details',
+      reportNodeId,
+      title,
+    };
+  }
+
+  private createIterationRouteKey(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): string {
+    return `agid_${aggregatedNodeId}:${searchStatus ?? ''}:${searchStatusCount ?? ''}`;
+  }
+
+  private createReportNodeRouteKey(reportNodeId: string): string {
+    return `rnid_${reportNodeId}`;
   }
 }
