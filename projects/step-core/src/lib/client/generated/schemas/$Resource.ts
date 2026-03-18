@@ -52,6 +52,9 @@ export const $Resource = {
       type: 'number',
       format: 'int64',
     },
+    executionId: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

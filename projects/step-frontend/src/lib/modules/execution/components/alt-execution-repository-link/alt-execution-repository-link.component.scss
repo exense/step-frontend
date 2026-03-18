@@ -1,0 +1,22 @@
+.plan-links-popover {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: fit-content;
+}
+
+.plan-links-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.plan-links-actions > a {
+  box-sizing: border-box;
+}
+
+.plan-links-actions > a[mat-stroked-button] {
+  background-color: #fff;
+}
