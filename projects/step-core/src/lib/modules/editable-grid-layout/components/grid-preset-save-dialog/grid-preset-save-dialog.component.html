@@ -4,13 +4,18 @@
 
       <h5>Save mode</h5>
       <mat-radio-group formControlName="saveType">
-        <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="_dialogData.isProtected"
+        <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="!_dialogData.canOverride"
           >Save & override current layout</mat-radio-button
         >
-        @if (_dialogData.isProtected) {
-          <p class="override-warning">You can only override layouts that you created yourself.</p>
+        @if (!_dialogData.canOverride) {
+          <p class="override-warning">You can only override layouts that you have permission to modify.</p>
         }
-        <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary">Save as new</mat-radio-button>
+        <mat-radio-button [value]="SaveType.SAVE_AS_NEW" color="primary" [disabled]="!_dialogData.canSaveAsNew"
+          >Save as new</mat-radio-button
+        >
+        @if (!_dialogData.canSaveAsNew) {
+          <p class="override-warning">You do not have permission to create a new layout.</p>
+        }
       </mat-radio-group>
 
       <h5>Layout Settings</h5>

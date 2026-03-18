@@ -67,9 +67,15 @@ export class GridPersistenceStateDefaultImplService implements GridPersistenceSt
     );
   }
 
+  getGridPreferredPresetSelection(gridId: string): Observable<string | undefined> {
+    return of(undefined);
+  }
+
   getGridDefaultPresetSelection(gridId: string): Observable<string> {
     return of('default');
   }
+
+  setGridSelectedPresetSelection(gridId: string, presetId: string): void {}
 
   removeGridPreset(gridId: string, presetId: string): Observable<void> {
     const presets = this.loadGridPresets(gridId);

@@ -1,4 +1,4 @@
-import { Component, computed, inject, linkedSignal, untracked } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, untracked } from '@angular/core';
 import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -24,19 +24,15 @@ export class GridControlToolComponent {
   private _matDialog = inject(MatDialog);
   private _auth = inject(AuthService);
 
+  readonly layoutReadPermission = input<string>();
+  readonly layoutWritePermission = input<string>();
+  readonly layoutDeletePermission = input<string>();
+  readonly layoutSharedWritePermission = input<string>();
+  readonly layoutSharedDeletePermission = input<string>();
+
   protected readonly selectedPresetId = linkedSignal(() => {
     const preset = this._widgetPersistence.selectedPreset();
     return preset?.id;
-  });
-
-  protected readonly isProtected = computed(() => {
-    const preset = this._widgetPersistence.selectedPreset();
-    return (
-      preset?.visibility === 'Preset' ||
-      (preset?.visibility === 'Shared' &&
-        !!this._auth.isAuthenticated() &&
-        preset?.creationUser !== this._auth.getUserID())
-    );
   });
 
   protected readonly isShared = computed(() => {
@@ -51,6 +47,32 @@ export class GridControlToolComponent {
 
   protected readonly presets = this._widgetPersistence.gridPresets;
   protected readonly isEdit = this._gridEditable.editMode;
+  protected readonly canReadLayouts = computed(() => this.hasPermission(this.layoutReadPermission()));
+  protected readonly canSaveAsNew = computed(() => this.hasPermission(this.layoutWritePermission()));
+  protected readonly canEditGrid = computed(() => {
+    return this.canSave() || this.canDeleteCurrentLayout();
+  });
+  protected readonly canDeleteCurrentLayout = computed(() => {
+    const preset = this._widgetPersistence.selectedPreset();
+    if (!preset || preset.visibility === 'Preset') {
+      return false;
+    }
+    if (this.isForeignSharedPreset(preset)) {
+      return this.hasPermission(this.layoutSharedDeletePermission());
+    }
+    return this.hasPermission(this.layoutDeletePermission());
+  });
+  protected readonly canOverrideCurrentLayout = computed(() => {
+    const preset = this._widgetPersistence.selectedPreset();
+    if (!preset || preset.visibility === 'Preset') {
+      return false;
+    }
+    if (this.isForeignSharedPreset(preset)) {
+      return this.hasPermission(this.layoutSharedWritePermission());
+    }
+    return this.hasPermission(this.layoutWritePermission());
+  });
+  protected readonly canSave = computed(() => this.canSaveAsNew() || this.canOverrideCurrentLayout());
 
   protected handlePresetSelection(presetId: string): void {
     const isEdit = untracked(() => this.isEdit());
@@ -101,7 +123,8 @@ export class GridControlToolComponent {
 
   protected save(): void {
     const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
-    const isProtected = untracked(() => this.isProtected());
+    const canOverride = untracked(() => this.canOverrideCurrentLayout());
+    const canSaveAsNew = untracked(() => this.canSaveAsNew());
     const isShared = untracked(() => this.isShared());
     const currentLayoutName = preset.attributes!['name']!;
     const defaultName = `${currentLayoutName}_COPY`;
@@ -110,7 +133,7 @@ export class GridControlToolComponent {
     this._matDialog
       .open<GridPresetSaveDialogComponent, GridPresetSaveDialogData, GridPresetSaveDialogResult>(
         GridPresetSaveDialogComponent,
-        { data: { isProtected, defaultName, currentLayoutName, isShared, existingPresetNames } },
+        { data: { canOverride, canSaveAsNew, defaultName, currentLayoutName, isShared, existingPresetNames } },
       )
       .afterClosed()
       .pipe(
@@ -150,5 +173,17 @@ export class GridControlToolComponent {
         switchMap(() => this._widgetPersistence.removePreset(presetId)),
       )
       .subscribe(() => this._gridEditable.setEditMode(false));
+  }
+
+  private hasPermission(permission?: string): boolean {
+    return !permission || this._auth.hasRight(permission);
+  }
+
+  private isForeignSharedPreset(preset: ReturnType<WidgetsPersistenceStateService['selectedPreset']>): boolean {
+    return (
+      preset?.visibility === 'Shared' &&
+      !!this._auth.isAuthenticated() &&
+      preset.creationUser !== this._auth.getUserID()
+    );
   }
 }

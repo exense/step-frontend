@@ -1,16 +1,18 @@
 <step-form-field>
-  <mat-select
-    [ngModel]="selectedPresetId()"
-    (ngModelChange)="handlePresetSelection($event)"
-    [disabled]="isEdit()"
-    id="layout-selector"
-    matTooltip="Switch layout"
-    matTooltipPosition="below"
-  >
-    @for (preset of presets(); track preset.key) {
-      <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
-    }
-  </mat-select>
+  @if (canReadLayouts()) {
+    <mat-select
+      [ngModel]="selectedPresetId()"
+      (ngModelChange)="handlePresetSelection($event)"
+      [disabled]="isEdit()"
+      id="layout-selector"
+      matTooltip="Switch layout"
+      matTooltipPosition="below"
+    >
+      @for (preset of presets(); track preset.key) {
+        <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
+      }
+    </mat-select>
+  }
   @if (isEdit()) {
     <step-suffix class="button-suffix">
       <button
@@ -23,19 +25,21 @@
         <step-icon name="x" />
       </button>
     </step-suffix>
-    <step-suffix class="button-suffix">
-      <button
-        type="button"
-        mat-flat-button
-        (click)="save()"
-        color="primary"
-        matTooltip="Save layout"
-        matTooltipPosition="below"
-      >
-        <step-icon name="save" />
-      </button>
-    </step-suffix>
-    @if (!isProtected()) {
+    @if (canSave()) {
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-flat-button
+          (click)="save()"
+          color="primary"
+          matTooltip="Save layout"
+          matTooltipPosition="below"
+        >
+          <step-icon name="save" />
+        </button>
+      </step-suffix>
+    }
+    @if (canDeleteCurrentLayout()) {
       <step-suffix class="button-suffix">
         <button
           type="button"
@@ -49,7 +53,7 @@
         </button>
       </step-suffix>
     }
-  } @else {
+  } @else if (canEditGrid()) {
     <step-suffix class="button-suffix">
       <button
         type="button"

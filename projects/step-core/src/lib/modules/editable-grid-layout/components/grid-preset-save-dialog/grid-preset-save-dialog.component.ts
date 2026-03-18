@@ -5,7 +5,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { StepBasicsModule, toggleValidators } from '../../../basics/step-basics.module';
 
 export interface GridPresetSaveDialogData {
-  readonly isProtected: boolean;
+  readonly canOverride: boolean;
+  readonly canSaveAsNew: boolean;
   readonly defaultName: string;
   readonly currentLayoutName: string;
   readonly isShared: boolean;
@@ -39,7 +40,7 @@ export class GridPresetSaveDialogComponent {
   private readonly saveAsNewName = this._dialogData.defaultName;
 
   // Tracks the last value set automatically so we know whether the user has manually edited the field
-  private lastAutoName = this._dialogData.isProtected ? this.saveAsNewName : this.overrideName;
+  private lastAutoName = this._dialogData.canOverride ? this.overrideName : this.saveAsNewName;
 
   private readonly nameExistsValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     const existingNames = this._dialogData.existingPresetNames;
@@ -53,11 +54,11 @@ export class GridPresetSaveDialogComponent {
 
   protected readonly saveForm = this._fb.group({
     saveType: this._fb.control<SaveType>(
-      this._dialogData.isProtected ? SaveType.SAVE_AS_NEW : SaveType.SAVE_AND_OVERRIDE,
+      this._dialogData.canOverride ? SaveType.SAVE_AND_OVERRIDE : SaveType.SAVE_AS_NEW,
       Validators.required,
     ),
-    isShared: this._fb.control<boolean>(this._dialogData.isProtected ? false : this._dialogData.isShared),
-    name: this._fb.control<string>(this._dialogData.isProtected ? this.saveAsNewName : this.overrideName, [
+    isShared: this._fb.control<boolean>(this._dialogData.canOverride ? this._dialogData.isShared : false),
+    name: this._fb.control<string>(this._dialogData.canOverride ? this.overrideName : this.saveAsNewName, [
       this.nameExistsValidator,
     ]),
   });
@@ -65,6 +66,18 @@ export class GridPresetSaveDialogComponent {
   protected readonly saveType = toSignal(this.saveForm.controls.saveType.valueChanges, {
     initialValue: this.saveForm.controls.saveType.value,
   });
+
+  constructor() {
+    if (!this._dialogData.canSaveAsNew) {
+      this.saveForm.controls.saveType.addValidators((control) =>
+        control.value === SaveType.SAVE_AS_NEW ? { saveAsNewNotAllowed: true } : null,
+      );
+      if (this.saveForm.controls.saveType.value === SaveType.SAVE_AS_NEW && this._dialogData.canOverride) {
+        this.saveForm.controls.saveType.setValue(SaveType.SAVE_AND_OVERRIDE);
+      }
+      this.saveForm.controls.saveType.updateValueAndValidity({ emitEvent: false });
+    }
+  }
 
   private effectSetupDefaultNameValidity = effect(() => {
     const saveType = this.saveType();

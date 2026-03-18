@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable, signal, untracked } from '@angula
 import { GridPersistenceStateDefaultImplService } from './grid-persistence-state-default-impl.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { WidgetsPositionsStateService } from './widgets-positions-state.service';
-import { forkJoin, map, Observable, switchMap, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { WidgetState } from '../types/widget-state';
 import { KeyValue } from '@angular/common';
@@ -159,7 +159,14 @@ export class WidgetsPersistenceStateService {
   selectPreset(presetId: string): void {
     this._gridPersistence
       .load(this._gridConfig.gridId, presetId)
-      .subscribe((preset) => this.selectedPresetInternal.set(preset));
+      .subscribe((preset) => {
+        if (!preset) {
+          this.selectFallbackPreset(presetId);
+          return;
+        }
+        this.selectedPresetInternal.set(preset);
+        this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
+      });
   }
 
   private initialize(): void {
@@ -171,18 +178,56 @@ export class WidgetsPersistenceStateService {
       .getGridPresets(this._gridConfig.gridId)
       .pipe(tap((presets) => this.gridPresetsInternal.set(presets)));
 
+    const preferredPreset$ = this._gridPersistence.getGridPreferredPresetSelection(this._gridConfig.gridId);
+
     const defaultPreset$ = this._gridPersistence
       .getGridDefaultPresetSelection(this._gridConfig.gridId)
       .pipe(map((presetId) => presetId ?? ''));
 
-    forkJoin([presets$, defaultPreset$]).subscribe(([presets, defaultPreset]) => {
+    forkJoin([presets$, preferredPreset$, defaultPreset$]).subscribe(([presets, preferredPreset, defaultPreset]) => {
       const presetKes = new Set(presets.map((item) => item.key));
+      if (preferredPreset && presetKes.has(preferredPreset)) {
+        this.selectPreset(preferredPreset);
+        this.isInitializedInternal.set(true);
+        return;
+      }
       if (!presetKes.has(defaultPreset)) {
         defaultPreset = presets[0].key;
       }
       this.selectPreset(defaultPreset);
       this.isInitializedInternal.set(true);
     });
+  }
+
+  private selectFallbackPreset(invalidPresetId: string): void {
+    forkJoin([
+      this._gridPersistence.getGridPresets(this._gridConfig.gridId),
+      this._gridPersistence.getGridDefaultPresetSelection(this._gridConfig.gridId),
+    ])
+      .pipe(
+        map(([presets, defaultPreset]) => {
+          const presetKeys = new Set(presets.map((item) => item.key));
+          if (defaultPreset && presetKeys.has(defaultPreset) && defaultPreset !== invalidPresetId) {
+            return defaultPreset;
+          }
+          return presets.find((item) => item.key !== invalidPresetId)?.key;
+        }),
+        switchMap((fallbackPresetId) => {
+          if (!fallbackPresetId) {
+            return of(undefined);
+          }
+          return this._gridPersistence.load(this._gridConfig.gridId, fallbackPresetId).pipe(
+            tap((preset) => {
+              if (!preset) {
+                return;
+              }
+              this.selectedPresetInternal.set(preset);
+              this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
+            }),
+          );
+        }),
+      )
+      .subscribe();
   }
 
   private initializePositions(preset?: WidgetStatePreset): void {

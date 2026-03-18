@@ -1,14 +1,18 @@
 import { KeyValue } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 import {
+  LOCAL_STORAGE,
   AppConfigContainerService,
   GridPersistenceStateService,
   ReportLayoutService,
   WidgetStatePreset,
 } from '@exense/step-core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, Observable, of, pipe, UnaryFunction } from 'rxjs';
 
 const DEFAULT_LAYOUT_ID_KEY = 'plugins.reporting.layouts.default.id';
+const SELECTED_LAYOUT_ID_STORAGE_KEY = 'executionReport.selectedLayoutId';
+const LAYOUT_ID_QUERY_PARAM = 'layoutId';
 
 const logAndRethrow = <T>(): UnaryFunction<Observable<T>, Observable<T>> =>
   pipe<Observable<T>, Observable<T>>(
@@ -23,6 +27,9 @@ const logAndRethrow = <T>(): UnaryFunction<Observable<T>, Observable<T>> =>
 export class ExecutionReportGridPersistenceStateService implements GridPersistenceStateService {
   private _api = inject(ReportLayoutService);
   private _appConfigContainer = inject(AppConfigContainerService);
+  private _localStorage = inject(LOCAL_STORAGE);
+  private _router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
 
   save(gridId: string, preset: WidgetStatePreset): Observable<string> {
     return this._api.saveReportLayout(preset).pipe(
@@ -51,9 +58,30 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
     );
   }
 
+  getGridPreferredPresetSelection(gridId: string): Observable<string | undefined> {
+    const queryParamPresetId = this._activatedRoute.snapshot.queryParams[LAYOUT_ID_QUERY_PARAM] as string | undefined;
+    if (queryParamPresetId) {
+      return of(queryParamPresetId);
+    }
+    return of(this._localStorage.getItem(this.getSelectedLayoutStorageKey(gridId)) ?? undefined);
+  }
+
   getGridDefaultPresetSelection(gridId: string): Observable<string> {
     const id = this._appConfigContainer.conf?.miscParams?.[DEFAULT_LAYOUT_ID_KEY] ?? '';
     return of(id);
+  }
+
+  setGridSelectedPresetSelection(gridId: string, presetId: string): void {
+    this._localStorage.setItem(this.getSelectedLayoutStorageKey(gridId), presetId);
+    if (this._activatedRoute.snapshot.queryParams[LAYOUT_ID_QUERY_PARAM] === presetId) {
+      return;
+    }
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: { [LAYOUT_ID_QUERY_PARAM]: presetId },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   removeGridPreset(gridId: string, presetId: string): Observable<void> {
@@ -75,5 +103,9 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
       logAndRethrow(),
       map(() => {}),
     );
+  }
+
+  private getSelectedLayoutStorageKey(gridId: string): string {
+    return `${SELECTED_LAYOUT_ID_STORAGE_KEY}.${gridId}`;
   }
 }

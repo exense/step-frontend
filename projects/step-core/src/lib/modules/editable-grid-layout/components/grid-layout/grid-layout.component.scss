@@ -3,6 +3,7 @@
 
 step-grid-layout {
   $cols-count: var(--style__cols-count);
+  $drag-handle-height: 6rem;
 
   display: grid;
   grid-template-columns: repeat($cols-count, sizes.columnWidth($cols-count));
@@ -32,7 +33,7 @@ step-grid-layout {
     step-grid-drag-handle {
       display: none;
       position: absolute;
-      min-height: 6rem;
+      min-height: $drag-handle-height;
       top: 0;
       left: 0;
       width: 100%;
@@ -40,8 +41,8 @@ step-grid-layout {
 
       & > section {
         position: absolute;
-        background: var.$gray-450;
-        opacity: 0.5;
+        background: var.$gray-400;
+        opacity: 1;
         top: 0;
         left: 0;
         width: 100%;
@@ -128,11 +129,44 @@ step-grid-layout {
     align-items: center;
     background: var.$white;
 
-    step-grid-element-title {
-      $size: 1.6rem;
-      font-size: $size;
+    .hidden-placeholder-info {
       position: absolute;
-      top: max(calc(50% - ($size / 2)), 8rem);
+      z-index: 12;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin-top: calc($drag-handle-height / 2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: calc(100% - 2.4rem);
+      padding: 0.8rem 1.2rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var.$gray-500;
+      text-align: center;
+      user-select: none;
+      pointer-events: none;
+
+      > span,
+      > step-icon {
+        position: relative;
+        z-index: 12;
+      }
+
+      step-icon {
+        flex: none;
+      }
+
+      step-icon[name='help-circle'] {
+        pointer-events: auto;
+      }
+    }
+
+    step-grid-drag-handle > section {
+      background: var.$blue-15;
+      opacity: 1;
     }
   }
 }
