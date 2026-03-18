@@ -784,6 +784,7 @@ export class ExecutionModule {
                   },
                   {
                     hasBackdrop: false,
+                    autoFocus: false,
                     height: 'calc(100% - 3.2rem)',
                     width: 'calc(100% - 25.4rem)',
                     panelClass: 'execution-drilldown-dialog',

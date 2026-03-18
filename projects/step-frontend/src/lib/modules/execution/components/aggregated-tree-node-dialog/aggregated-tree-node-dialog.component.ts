@@ -32,6 +32,7 @@ type LeafRenderedPanel = {
   kind: ExecutionDrilldownLeafPanel['kind'];
   panel: ExecutionDrilldownLeafPanel;
   title: string;
+  titleSuffix?: string;
 };
 
 type RenderedPanel = RootRenderedPanel | LeafRenderedPanel;
@@ -101,13 +102,14 @@ export class AggregatedTreeNodeDialogComponent implements OnInit, OnDestroy {
       key: panel.instanceId,
       kind: panel.kind,
       panel,
-      title: panel.title ?? this.resolveLeafTitle(panel),
+      title: this.resolveLeafTitle(panel),
+      titleSuffix: this.resolveLeafTitleSuffix(panel),
     }));
 
     return [rootPanel, ...leafPanels];
   });
 
-  protected readonly breadcrumbs = computed(() => this.actualPanels().map((panel) => panel.title));
+  protected readonly breadcrumbs = this.actualPanels;
   protected readonly hasBackButton = computed(() => this.leafPanels().length > 1);
   protected readonly rightMostLeafPanelId = computed(() => this.leafPanels()[this.leafPanels().length - 1]?.instanceId);
 
@@ -175,12 +177,13 @@ export class AggregatedTreeNodeDialogComponent implements OnInit, OnDestroy {
     this._drilldownState.closePanel(instanceId);
     this.maximizedPanelId.set(undefined);
     if (this.leafPanels().length) {
-      this.syncRouteToLastPanel();
+      this.replaceUrlToLastPanel();
     }
   }
 
   protected reopenPanel(panel: RenderedPanel): void {
     if (panel.kind === 'root') {
+      this._drilldownState.reset(this.rootPanel());
       this.maximizedPanelId.set(undefined);
       return;
     }
@@ -292,6 +295,15 @@ export class AggregatedTreeNodeDialogComponent implements OnInit, OnDestroy {
     this._dialogsService.syncRouteToPanel(lastPanel);
   }
 
+  private replaceUrlToLastPanel(): void {
+    const lastPanel = this.leafPanels()[this.leafPanels().length - 1];
+    if (!lastPanel) {
+      return;
+    }
+
+    this._dialogsService.replaceUrlToPanel(lastPanel);
+  }
+
   private handleWindowMouseMove = (event: MouseEvent): void => {
     if (!this.dragState) {
       return;
@@ -380,6 +392,18 @@ export class AggregatedTreeNodeDialogComponent implements OnInit, OnDestroy {
   }
 
   private resolveLeafTitle(panel: ExecutionDrilldownLeafPanel): string {
-    return panel.kind === 'iteration-list' ? 'Iteration List' : 'Node Details';
+    if (panel.kind === 'iteration-list') {
+      return panel.title ?? 'Iteration List';
+    }
+
+    return 'Node Details:';
+  }
+
+  private resolveLeafTitleSuffix(panel: ExecutionDrilldownLeafPanel): string | undefined {
+    if (panel.kind !== 'node-details') {
+      return undefined;
+    }
+
+    return panel.title;
   }
 }

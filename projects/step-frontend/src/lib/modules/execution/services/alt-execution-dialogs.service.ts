@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
@@ -41,6 +42,7 @@ export type PartialOpenIterationsParams = Pick<
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _router = inject(Router);
+  private _location = inject(Location);
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService, { optional: true });
@@ -119,6 +121,25 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this.navigateToIterationList(panel.aggregatedNodeId!, panel.searchStatus, panel.searchStatusCount);
   }
 
+  replaceUrlToPanel(panel: ExecutionDrilldownLeafPanel): void {
+    this.replaceUrlToPanelDescriptor(panel);
+  }
+
+  private replaceUrlToPanelDescriptor(panel: Pick<
+    ExecutionDrilldownLeafPanel,
+    'kind' | 'reportNodeId' | 'aggregatedNodeId' | 'searchStatus' | 'searchStatusCount'
+  >): void {
+    const urlTree =
+      panel.kind === 'node-details'
+        ? this.createNodeDetailsUrlTree(`rnid_${panel.reportNodeId}`)
+        : this.createNodeDetailsUrlTree(`agid_${panel.aggregatedNodeId}`, {
+            [this._queryParamsNames.searchStatus]: panel.searchStatus,
+            [this._queryParamsNames.searchStatusCount]: panel.searchStatusCount,
+          });
+
+    this._location.replaceState(this._router.serializeUrl(urlTree));
+  }
+
   private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
     const queryParams: Params = {};
     queryParams[this._queryParamsNames.searchStatus] = searchStatus;
@@ -131,12 +152,17 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private openNodeDetails(detailsId: string, queryParams: Params, searchFor?: string): void {
+    const urlTree = this.createNodeDetailsUrlTree(detailsId, queryParams, searchFor);
+    this._router.navigateByUrl(urlTree);
+  }
+
+  private createNodeDetailsUrlTree(detailsId: string, queryParams: Params = {}, searchFor?: string) {
     const mergedParams = { ...queryParams };
     if (searchFor) {
       mergedParams['searchFor'] = searchFor;
     }
 
-    this._router.navigate([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
+    return this._router.createUrlTree([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParams: mergedParams,
       queryParamsHandling: 'merge',
@@ -152,6 +178,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       this._drilldownState.openFromRoot(source, panel);
     } else {
       this._drilldownState.openNested(panel);
+    }
+
+    if (this.isDrilldownDialogOpen()) {
+      this.replaceUrlToPanelDescriptor(panel);
+      return;
     }
 
     if (panel.kind === 'node-details') {
@@ -194,5 +225,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
 
   private createReportNodeRouteKey(reportNodeId: string): string {
     return `rnid_${reportNodeId}`;
+  }
+
+  private isDrilldownDialogOpen(): boolean {
+    return this._matDialog.openDialogs.some(
+      (dialogRef) => dialogRef.componentInstance?.constructor?.name === 'AggregatedTreeNodeDialogComponent',
+    );
   }
 }

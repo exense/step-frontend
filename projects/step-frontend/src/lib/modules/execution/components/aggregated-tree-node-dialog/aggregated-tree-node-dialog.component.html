@@ -16,9 +16,29 @@
       <div class="header-title">Execution Drilldown</div>
       <div class="header-breadcrumbs">
         @for (item of breadcrumbs(); track item; let isLast = $last) {
-          <span class="breadcrumb">{{ item }}</span>
+          @if (isLast) {
+            <span class="breadcrumb current-breadcrumb">
+              {{ item.title }}
+              @if (item.kind !== 'root' && item.titleSuffix) {
+                <span class="breadcrumb-suffix">{{ item.titleSuffix }}</span>
+              }
+            </span>
+          } @else {
+            <button
+              type="button"
+              class="breadcrumb"
+              [matTooltip]="minimizedTooltip(item)"
+              matTooltipPosition="below"
+              (click)="reopenPanel(item)"
+            >
+              {{ item.title }}
+              @if (item.kind !== 'root' && item.titleSuffix) {
+                <span class="breadcrumb-suffix">{{ item.titleSuffix }}</span>
+              }
+            </button>
+          }
           @if (!isLast) {
-            <span class="separator">/</span>
+            <span class="separator">-&gt;</span>
           }
         }
       </div>
@@ -59,7 +79,12 @@
           } @else {
             <section class="drilldown-panel" [class.root-panel]="entry.panel.kind === 'root'">
               <header class="panel-header">
-                <h2>{{ entry.panel.title }}</h2>
+                <h2>
+                  {{ entry.panel.title }}
+                  @if (entry.panel.kind !== 'root' && entry.panel.titleSuffix) {
+                    <span class="panel-title-suffix">{{ entry.panel.titleSuffix }}</span>
+                  }
+                </h2>
                 <div class="panel-actions">
                   @if (isRightMostPanel(entry.panel)) {
                     <button
