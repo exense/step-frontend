@@ -61,11 +61,13 @@ export class AltExecutionErrorsComponent {
       return this._timeSeriesApi.createErrorsLocalDataSource(data);
     }
     const data$ = (data as Observable<TimeSeriesErrorEntry[] | undefined>).pipe(map((items) => items ?? []));
+
     return this._timeSeriesApi.createErrorsLocalDataSource(data$);
   });
 
   readonly showExecutionsMenu = input(true);
   readonly showActions = input(true);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SPINNER);
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],
@@ -89,9 +91,8 @@ export class AltExecutionErrorsComponent {
     });
   }
 
-  onFindInTree(message: string) {
+  onFindInTree(message: string): void {
     this.searchFor.emit(message);
   }
 
-  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

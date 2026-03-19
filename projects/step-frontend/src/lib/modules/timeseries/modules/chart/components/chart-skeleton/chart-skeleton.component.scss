@@ -1,8 +1,13 @@
 step-chart-skeleton .chart-skeleton {
   position: relative;
   height: 100%;
-  padding: 90px 50px;
+
   overflow: hidden;
+  background: transparent;
+
+  &.with-padding {
+    padding: 90px 50px;
+  }
 
   &:after {
     position: absolute;
