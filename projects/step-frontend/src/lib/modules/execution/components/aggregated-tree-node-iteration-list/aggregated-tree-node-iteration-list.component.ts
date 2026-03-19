@@ -10,6 +10,7 @@ import {
   Renderer2,
   signal,
   untracked,
+  ViewEncapsulation,
   viewChild,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -17,6 +18,7 @@ import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   AugmentedExecutionsService,
   DateUtilsService,
+  DateFormat,
   FilterConditionFactoryService,
   ItemsPerPageService,
   SearchValue,
@@ -56,6 +58,7 @@ const PAGE_SIZE = 25;
     TablePersistenceStateService,
     tablePersistenceConfigProvider('aggregatedIterationList', STORE_ALL),
   ],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
@@ -68,6 +71,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _dateUtils = inject(DateUtilsService);
 
   readonly statuses = REPORT_NODE_STATUS;
+  protected readonly DateFormat = DateFormat;
 
   protected tableSearch = viewChild('table', { read: TableSearch });
 

@@ -12,7 +12,37 @@ step-alt-report-node-keywords {
 
     td {
       vertical-align: top;
-      padding-top: 0.5rem !important;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+    }
+
+    tr.content-row {
+      td.mat-mdc-cell {
+        transition: background-color 120ms ease;
+      }
+
+      &:not(:last-child) {
+        td.mat-mdc-cell {
+          border-bottom: 1px solid var.$gray-200;
+        }
+      }
+
+      &.row-highlight,
+      &:hover {
+        td.mat-mdc-cell {
+          background: var.$highlight !important;
+        }
+
+        td.mat-mdc-cell:first-child {
+          border-top-left-radius: 0.8rem;
+          border-bottom-left-radius: 0.8rem;
+        }
+
+        td.mat-mdc-cell:last-child {
+          border-top-right-radius: 0.8rem;
+          border-bottom-right-radius: 0.8rem;
+        }
+      }
     }
 
     td.data-cell {
@@ -37,6 +67,21 @@ step-alt-report-node-keywords {
         white-space: nowrap;
         line-height: 1.5;
         align-self: baseline;
+      }
+
+      .execution-time {
+        font-weight: 500;
+      }
+
+      .execution-duration {
+        font-weight: 400;
+        min-width: 4rem;
+        margin-right: 0.5rem;
+        margin-left: 0.5rem;
+
+        &.is-empty {
+          visibility: hidden;
+        }
       }
     }
   }
