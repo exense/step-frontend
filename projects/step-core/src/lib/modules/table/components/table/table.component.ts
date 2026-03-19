@@ -9,7 +9,6 @@ import {
   forwardRef,
   inject,
   input,
-  linkedSignal,
   signal,
   TemplateRef,
   TrackByFunction,
@@ -36,7 +35,6 @@ import { TableColumnsDictionaryService } from '../../services/table-columns-dict
 import { ColumnInfo } from '../../types/column-info';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
-import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
 import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
 import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
@@ -50,24 +48,20 @@ import { TablePartSelectionListDirective } from '../../directives/table-part-sel
 import { TablePartSortDirective } from '../../directives/table-part-sort.directive';
 import { TablePartReloadDirective } from '../../directives/table-part-reload.directive';
 import { TableReload } from '../../services/table-reload';
-
-enum EmptyState {
-  INITIAL,
-  NO_MATCHING_RECORDS,
-}
+import { EmptyState } from '../../shared/empty-state.enum';
+import { TablePartIndicatorDirective } from '../../directives/table-part-indicator.directive';
 
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  host: {
-    '[class.in-progress]': 'applyInProgressClass()',
-    '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
-  },
   hostDirectives: [
     TablePartSelectionListDirective,
-    TablePartPaginationDirective,
+    {
+      directive: TablePartPaginationDirective,
+      inputs: ['pageSizeInputDisabled'],
+    },
     TablePartSortDirective,
     {
       directive: TablePartSearchDirective,
@@ -85,6 +79,10 @@ enum EmptyState {
       directive: TablePartReloadDirective,
       inputs: ['blockGlobalReload'],
       outputs: ['reloadData'],
+    },
+    {
+      directive: TablePartIndicatorDirective,
+      inputs: ['indicatorMode', 'inProgress'],
     },
   ],
   providers: [
@@ -107,12 +105,13 @@ export class TableComponent<T>
 {
   private _destroyRef = inject(DestroyRef);
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
-  readonly _tableColumns = inject(TableColumnsService);
+  protected readonly _tableColumns = inject(TableColumnsService);
 
   protected readonly _tablePagination = inject(TablePartPaginationDirective);
   protected readonly _tableDataSource = inject(TablePartDatasourceDirective);
   private _tableSearch = inject(TablePartSearchDirective);
   private _tableReload = inject(TablePartReloadDirective);
+  protected readonly _tableIndicator = inject(TablePartIndicatorDirective);
 
   private readonly paginator = viewChild(PaginatorComponent);
   private effectPaginatorChange = effect(() => {
@@ -131,55 +130,13 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
-
-  readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private readonly isTableReadyToRenderColumns = signal(false);
 
-  protected readonly EmptyState = EmptyState;
-  protected readonly emptyState = computed(() => {
-    const totalFiltered = this._tableDataSource.totalFiltered();
+  private effectColumnsInitialized = effect(() => {
     const isColumnsInitialized = this._tableColumns.isInitialized();
-    if (totalFiltered === null || !isColumnsInitialized) {
-      return EmptyState.INITIAL;
-    }
-
-    return EmptyState.NO_MATCHING_RECORDS;
+    this._tableDataSource.initialize(isColumnsInitialized);
   });
-
-  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
-    const indicatorMode = this.indicatorMode();
-    return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
-  });
-
-  protected readonly useSpinner = computed(() => {
-    const indicatorMode = this.indicatorMode();
-    return indicatorMode === TableIndicatorMode.SPINNER;
-  });
-
-  private effectResetSkeletonPlaceholderOnInitialLoad = effect(() => {
-    const indicatorMode = this.indicatorMode();
-    const emptyState = this.emptyState();
-    if (indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD && emptyState !== EmptyState.INITIAL) {
-      setTimeout(() => {
-        this.useSkeletonPlaceholder.set(false);
-      }, 500);
-    }
-  });
-
-  protected readonly inProgress = computed(() => {
-    const inProgressExternal = this.inProgressExternal();
-    const inProgressDataSource = this._tableDataSource.inProgressDataSource();
-    return inProgressExternal || inProgressDataSource;
-  });
-
-  protected readonly applyInProgressClass = computed(() => {
-    const inProgress = this.inProgress();
-    const emptyState = this.emptyState();
-    return inProgress || emptyState === EmptyState.INITIAL;
-  });
-
-  readonly pageSizeInputDisabled = input(false);
+  protected readonly EmptyState = EmptyState;
 
   readonly visibleColumns = input(undefined, {
     transform: (source?: string[]) => (!!source ? new Set<string>(source) : undefined),
@@ -224,8 +181,6 @@ export class TableComponent<T>
   });
 
   protected readonly rowsExtension = contentChild(RowsExtensionDirective);
-  protected readonly tablePaginatorPrefix = contentChild(TablePaginatorPrefixDirective);
-  protected readonly tablePaginatorContent = contentChild(TablePaginatorContentDirective);
 
   private readonly contentColumns = contentChildren(ColumnDirective);
 

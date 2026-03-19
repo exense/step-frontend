@@ -1,4 +1,4 @@
-import { Directive, inject, OnDestroy, signal } from '@angular/core';
+import { Directive, inject, OnDestroy, signal, contentChild, input } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { PaginatorComponent } from '../components/paginator/paginator.component';
 import { ItemsPerPageDefaultService } from '../services/items-per-page-default.service';
@@ -7,6 +7,8 @@ import { map, Observable, of, startWith, switchMap } from 'rxjs';
 import { TablePersistenceStateService } from '../services/table-persistence-state.service';
 import { ItemsPerPageService } from '../services/items-per-page.service';
 import { StepPageEvent } from '../types/step-page-event';
+import { TablePaginatorPrefixDirective } from './table-paginator-prefix.directive';
+import { TablePaginatorContentDirective } from './table-paginator-content.directive';
 
 @Directive({
   selector: '[stepTablePartPagination]',
@@ -15,12 +17,16 @@ export class TablePartPaginationDirective implements OnDestroy {
   private _tableState = inject(TablePersistenceStateService);
 
   private _itemsPerPageService = inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
+  readonly pageSizeInputDisabled = input(false);
 
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
   private readonly paginatorReadyInternal = signal(false);
   readonly paginatorReady = this.paginatorReadyInternal.asReadonly();
 
   private page: PaginatorComponent | undefined;
+
+  readonly tablePaginatorPrefix = contentChild(TablePaginatorPrefixDirective);
+  readonly tablePaginatorContent = contentChild(TablePaginatorContentDirective);
 
   get isPaginatorReady(): boolean {
     return !!this.page;

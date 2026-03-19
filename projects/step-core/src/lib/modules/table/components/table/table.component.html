@@ -1,4 +1,4 @@
-@if (useSpinner() && inProgress()) {
+@if (_tableIndicator.useSpinner() && _tableIndicator.inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
@@ -49,7 +49,7 @@
       [class.row-deactivated]="row.customFields && row.customFields.activated === false"
     ></tr>
     <tr class="mat-mdc-row no-data-row" *matNoDataRow>
-      @switch (emptyState()) {
+      @switch (_tableDataSource.emptyState()) {
         @case (EmptyState.INITIAL) {
           @for (col of displayColumns(); track col) {
             <td class="mat-mdc-cell no-data"></td>
@@ -63,17 +63,17 @@
   </table>
 </div>
 <section class="paginator-container">
-  @if (tablePaginatorPrefix(); as paginatorPrefix) {
+  @if (_tablePagination.tablePaginatorPrefix(); as paginatorPrefix) {
     <ng-container *ngTemplateOutlet="paginatorPrefix.templateRef" />
   }
   <step-paginator
-    [disabled]="pageSizeInputDisabled()"
+    [disabled]="_tablePagination.pageSizeInputDisabled()"
     [length]="_tableDataSource.totalFiltered()"
     [hasNext]="_tableDataSource.hasNext()"
     [usePagesCount]="_tableDataSource.calculateCounts()"
     [pageSizeOptions]="_tablePagination.pageSizeOptions()"
   >
-    @if (tablePaginatorContent(); as paginatorContent) {
+    @if (_tablePagination.tablePaginatorContent(); as paginatorContent) {
       <ng-container *ngTemplateOutlet="paginatorContent.templateRef" />
     }
   </step-paginator>

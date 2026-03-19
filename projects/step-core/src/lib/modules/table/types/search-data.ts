@@ -1,4 +1,4 @@
-import { SearchValue } from '@exense/step-core';
+import { SearchValue } from '../shared/search-value';
 
 export interface SearchData {
   search: Record<string, SearchValue>;

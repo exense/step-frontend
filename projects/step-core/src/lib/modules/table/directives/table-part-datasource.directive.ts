@@ -1,4 +1,4 @@
-import { Directive, effect, forwardRef, inject, input, OnDestroy, output, signal, untracked } from '@angular/core';
+import { computed, Directive, effect, forwardRef, inject, input, OnDestroy, signal, untracked } from '@angular/core';
 import { combineLatest, map, Observable, Subject, takeUntil, timestamp } from 'rxjs';
 import { TablePartSelectionListDirective } from './table-part-selection-list.directive';
 import { TablePartPaginationDirective } from './table-part-pagination.directive';
@@ -14,6 +14,7 @@ import { TableLocalDataSource } from '../shared/table-local-data-source';
 import { StepDataSource, TableRequestData } from '../../../client/step-client-module';
 import { SearchValue } from '../shared/search-value';
 import { TableFilter } from '../services/table-filter';
+import { EmptyState } from '../shared/empty-state.enum';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -47,6 +48,7 @@ export class TablePartDatasourceDirective<T> implements OnDestroy, TableFilter {
 
   private dataSourceTerminator$?: Subject<void>;
 
+  private readonly isInitialized = signal(false);
   private readonly inProgressDataSourceInternal = signal(false);
   private readonly hasNextInternal = signal(false);
   private readonly totalFilteredInternal = signal<number | null>(null);
@@ -67,6 +69,16 @@ export class TablePartDatasourceDirective<T> implements OnDestroy, TableFilter {
     if (isPaginatorReady) {
       untracked(() => this.setupDatasource(dataSource));
     }
+  });
+
+  readonly emptyState = computed(() => {
+    const totalFiltered = this.totalFiltered();
+    const isInitialized = this.isInitialized();
+    if (totalFiltered === null || !isInitialized) {
+      return EmptyState.INITIAL;
+    }
+
+    return EmptyState.NO_MATCHING_RECORDS;
   });
 
   ngOnDestroy(): void {
@@ -188,5 +200,9 @@ export class TablePartDatasourceDirective<T> implements OnDestroy, TableFilter {
     }
     const params = untracked(() => this._tableParams.tableParams());
     tableDataSource.exportAsCSV(fields, params);
+  }
+
+  initialize(isInitialized: boolean): void {
+    this.isInitialized.set(isInitialized);
   }
 }

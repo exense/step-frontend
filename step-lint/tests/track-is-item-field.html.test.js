@@ -31,6 +31,14 @@ const VALID = [
   }
 </section>
 `,
+  `
+<section>
+  @for (item of items; track trackByFn($index, item)) {
+    <div>{{item.key}}</div>
+    <div>{{item.value}}</div>
+  }
+</section>
+`,
 ];
 
 const INVALID = [

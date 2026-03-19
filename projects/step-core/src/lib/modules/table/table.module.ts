@@ -49,6 +49,8 @@ import { BulkOperationsComponent } from './components/bulk-operations/bulk-opera
 import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
 import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/columns-placeholders.component';
 import { TablePaginatorContentDirective } from './directives/table-paginator-content.directive';
+import { DatasourceListComponent } from './components/datasource-list/datasource-list.component';
+import { DatasourceListItemDirective } from './directives/datasource-list-item.directive';
 
 @NgModule({
   imports: [
@@ -65,6 +67,9 @@ import { TablePaginatorContentDirective } from './directives/table-paginator-con
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
     TablePaginatorContentDirective,
+    PaginatorComponent,
+    DatasourceListComponent,
+    DatasourceListItemDirective,
   ],
   declarations: [
     TableComponent,
@@ -85,7 +90,6 @@ import { TablePaginatorContentDirective } from './directives/table-paginator-con
     DateFilterComponent,
     DragColumnCaptionComponent,
     ColumnSettingsComponent,
-    PaginatorComponent,
     ActivityColDirective,
     ActionColDirective,
     HeaderCellContainerComponent,
@@ -123,6 +127,8 @@ import { TablePaginatorContentDirective } from './directives/table-paginator-con
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
     TablePaginatorContentDirective,
+    DatasourceListComponent,
+    DatasourceListItemDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -211,3 +217,5 @@ export * from './types/table-indicator-mode.enum';
 export * from './components/columns-placeholders/columns-placeholders.component';
 export * from './types/step-page-event';
 export * from './directives/table-paginator-content.directive';
+export * from './directives/datasource-list-item.directive';
+export * from './components/datasource-list/datasource-list.component';
