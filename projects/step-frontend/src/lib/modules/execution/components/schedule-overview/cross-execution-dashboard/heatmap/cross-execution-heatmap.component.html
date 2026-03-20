@@ -3,10 +3,7 @@
     <div class="chart-actions-container">
       <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
     </div>
-    @if (heatMapData$ | async; as heatmapData) {@if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
-        <ng-container *ngTemplateOutlet="skeleton" />
-      }
-      <div [class.hidden]="isLoading() && _state.lastRefreshTrigger() !== 'auto'">
+    @if (heatMapData$ | async; as heatmapData) {
       @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
         <ng-container *ngTemplateOutlet="skeleton" />
       }
