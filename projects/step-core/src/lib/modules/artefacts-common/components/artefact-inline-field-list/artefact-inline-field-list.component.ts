@@ -35,6 +35,8 @@ export class ArtefactInlineFieldListComponent {
   private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
 
   readonly isVertical = input(false);
+  readonly hideIcons = input(false);
+  readonly columnCount = input(1);
 
   readonly items = input([], {
     transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],

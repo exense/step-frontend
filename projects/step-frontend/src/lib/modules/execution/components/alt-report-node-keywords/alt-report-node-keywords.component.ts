@@ -1,7 +1,6 @@
 import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedScreenService,
-  DateFormat,
   ItemsPerPageService,
   ReportNode,
   STORE_ALL,
@@ -59,7 +58,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
-  protected readonly DateFormat = DateFormat;
 
   private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 

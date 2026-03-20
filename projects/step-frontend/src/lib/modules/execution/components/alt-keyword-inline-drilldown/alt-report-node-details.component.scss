@@ -64,3 +64,64 @@ step-alt-execution-tree-partial {
   position: static;
   padding-bottom: 0;
 }
+
+:host ::ng-deep step-alt-execution-tree-partial step-alt-execution-tree {
+  font-size: 1.2rem;
+
+  .step-tree-node-container .tree-node .node-content {
+    padding: 0;
+  }
+
+  .tree-node:not(.tree-node-selected) {
+    .node-content {
+      &:after {
+        background: none !important;
+      }
+
+      .node-icon {
+        &:after {
+          background: none !important;
+        }
+      }
+    }
+  }
+
+  .tree-node.tree-node-selected {
+    .node-content {
+      background: var.$light-blue-gray;
+      border-radius: 4rem;
+
+      &:after {
+        display: none;
+      }
+
+      .node-icon {
+        background: transparent !important;
+        height: 100%;
+        min-height: 2.4rem;
+
+        &:after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  step-tree-node-name {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .node-name {
+    gap: 0.5rem;
+  }
+
+  step-report-node-short,
+  step-report-node-short .mat-subheading-1,
+  step-report-node-short .mat-small,
+  step-report-node-short .detail,
+  step-report-node-short .detail-label,
+  step-report-node-short .muted {
+    font-size: 1.2rem !important;
+  }
+}

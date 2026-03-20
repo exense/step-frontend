@@ -22,6 +22,10 @@ step-artefact-inline-field-list {
   section.list {
     display: flex;
 
+    .prefix-container:empty {
+      display: none;
+    }
+
     step-artefact-inline-field-list-prefix {
       display: flex;
       flex-wrap: nowrap;
@@ -37,6 +41,19 @@ step-artefact-inline-field-list {
       flex-direction: column;
       width: 100%;
 
+      &.two-columns {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.2rem 2rem;
+        align-items: start;
+
+        step-artefact-inline-field {
+          min-width: 0;
+          width: 100%;
+          margin-bottom: 0;
+        }
+      }
+
       step-artefact-inline-field {
         &:not(:last-child) {
           margin-bottom: var(--style__margin, 0rem);
@@ -44,6 +61,12 @@ step-artefact-inline-field-list {
         section {
           max-width: unset;
         }
+      }
+    }
+
+    &.hide-icons {
+      step-icon.field-icon {
+        display: none;
       }
     }
 

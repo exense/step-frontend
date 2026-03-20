@@ -46,14 +46,13 @@
           >
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
-                <span class="execution-time">{{ element.executionTime | date: DateFormat.TIME }}</span>
-                <span class="execution-duration" [class.is-empty]="element.duration === undefined || element.duration === null">
-                  {{
-                    element.duration !== undefined && element.duration !== null
-                      ? (element.executionTime + element.duration | duration: element.executionTime)
-                      : '\u00A0'
-                  }}
-                </span>
+                <step-alt-execution-time
+                  mode="text"
+                  displayFormat="time"
+                  [preserveDurationSpace]="true"
+                  [startTime]="element.executionTime"
+                  [duration]="element.duration"
+                />
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>

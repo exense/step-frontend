@@ -59,19 +59,10 @@ step-table {
     height: 2rem;
     margin: 0 0.5rem 0.2rem 0;
 
-    .execution-time {
-      font-weight: 500;
-    }
-
-    .execution-duration {
-      font-weight: 400;
-      min-width: 4rem;
-      margin-right: 0.5rem;
-      margin-left: 0.5rem;
-
-      &.is-empty {
-        visibility: hidden;
-      }
+    step-alt-execution-time {
+      display: flex;
+      width: 12rem;
+      overflow: hidden;
     }
 
     .name {
@@ -87,12 +78,12 @@ step-table {
   margin-left: 2.5rem;
 }
 
-section > div {
+step-aggregated-tree-node-iteration-list > section > div {
   display: flex;
   gap: 1rem;
   padding-right: 2rem;
-  margin-bottom: 0.5rem;
   align-items: center;
+
   .sort-container {
     flex: 1;
   }

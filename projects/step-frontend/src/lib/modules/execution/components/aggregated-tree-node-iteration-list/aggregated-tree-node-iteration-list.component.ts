@@ -18,7 +18,6 @@ import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   AugmentedExecutionsService,
   DateUtilsService,
-  DateFormat,
   FilterConditionFactoryService,
   ItemsPerPageService,
   SearchValue,
@@ -71,7 +70,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _dateUtils = inject(DateUtilsService);
 
   readonly statuses = REPORT_NODE_STATUS;
-  protected readonly DateFormat = DateFormat;
 
   protected tableSearch = viewChild('table', { read: TableSearch });
 

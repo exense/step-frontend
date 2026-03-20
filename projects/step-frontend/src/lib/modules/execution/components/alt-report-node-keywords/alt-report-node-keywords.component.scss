@@ -62,26 +62,18 @@ step-alt-report-node-keywords {
       gap: 0.5rem;
       height: 2rem;
       margin: 0 0.5rem 0.2rem 0;
+
+      step-alt-execution-time {
+        display: flex;
+        width: 12rem;
+        overflow: hidden;
+      }
+
       .name {
         font-weight: 500;
         white-space: nowrap;
         line-height: 1.5;
         align-self: baseline;
-      }
-
-      .execution-time {
-        font-weight: 500;
-      }
-
-      .execution-duration {
-        font-weight: 400;
-        min-width: 4rem;
-        margin-right: 0.5rem;
-        margin-left: 0.5rem;
-
-        &.is-empty {
-          visibility: hidden;
-        }
       }
     }
   }
