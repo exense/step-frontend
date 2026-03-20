@@ -1,6 +1,12 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .chart-container {
   position: relative;
-  width: min(26rem, calc(100cqmin - 5rem), 100%);
+  width: min(26rem, 100%);
+  max-width: 100%;
   aspect-ratio: 1;
   margin: 0 auto;
   .total-value {

@@ -1,4 +1,5 @@
 step-alt-report-node-summary {
+  display: block;
   width: 100%;
   container: summary-node-widget / size;
 
@@ -51,8 +52,9 @@ step-alt-report-node-summary {
     }
 
     step-doughnut-chart {
-      flex: 0 0 auto;
-      width: min(26rem, calc(100cqh - 5rem));
+      flex: 0 1 26rem;
+      width: min(26rem, 100%);
+      min-width: 0;
     }
 
     .summary {
