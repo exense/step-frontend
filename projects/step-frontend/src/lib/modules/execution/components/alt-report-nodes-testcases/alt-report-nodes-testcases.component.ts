@@ -1,4 +1,4 @@
-import { Component, inject, output, viewChild } from '@angular/core';
+import { Component, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportView,
   ItemsPerPageService,
@@ -18,6 +18,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
 import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
+import { SpecificOperations } from '../../../operations/types/specific-operations.enum';
 
 @Component({
   selector: 'step-alt-report-nodes-testcases',
@@ -43,14 +44,14 @@ import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-v
     TablePersistenceStateService,
     tablePersistenceConfigProvider('testCases', STORE_ALL),
   ],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
-  showAllOperations = false;
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
   readonly openTestCaseInTreeView = output<ReportNode>();
 
@@ -91,4 +92,5 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly SpecificOperations = SpecificOperations;
 }

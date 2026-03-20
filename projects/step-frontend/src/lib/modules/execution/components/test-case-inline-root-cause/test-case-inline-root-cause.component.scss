@@ -6,6 +6,18 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+
+  &.with-overflow {
+    overflow: hidden;
+    .error-count {
+      max-width: 100%;
+      .text {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
 }
 
 p {

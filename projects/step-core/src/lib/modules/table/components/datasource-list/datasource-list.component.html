@@ -7,7 +7,7 @@
   @if (listItemTemplate(); as templateRef) {
     @if (hasItems()) {
       @for (item of items(); track trackByFn($index, item)) {
-        <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item }" />
+        <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item, $index: $index }" />
       }
     } @else {
       @switch (_tableDataSource.emptyState()) {

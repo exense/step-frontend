@@ -1,67 +1,55 @@
 <step-alt-report-node-list title="Test Cases" [mode]="_mode">
-  <step-table
-    #table
-    [dataSource]="(dataSource$ | async)!"
-    [indicatorMode]="TableIndicatorMode.SPINNER"
-    class="paddingless no-border hide-header no-highlight special-selection"
-  >
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="name" mat-cell *matCellDef="let element">
-        <section (click)="showIterations(element)">
-          <div class="details-trigger">
-            <div class="smaller-view shift-rows">
-              <div class="chip">
-                <step-report-node-icon [node]="element" />
-                <step-aggregated-status
-                  [hasDescendantInvocations]="element.hasDescendantInvocations"
-                  [countByStatus]="element.countByStatus"
-                  (statusClick)="
-                    showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
-                  "
-                />
+  <step-datasource-list #table [dataSource]="(dataSource$ | async)!" [indicatorMode]="TableIndicatorMode.SPINNER">
+    <ng-container *stepDatasourceListItem="let element; let index = $index">
+      @let hasOperations = !!element.currentOperations.length;
+      @let hasErrors = !!(element | aggregatedReportViewCountErrors);
+      <section
+        class="test-case-row"
+        stepCalcElementWidthAggregator
+        [recalcTrigger]="element"
+        [class.has-operations]="hasOperations"
+        [class.has-errors]="hasErrors"
+      >
+        <div class="name" stepCalcElementWidth="style__name-width">
+          <section (click)="showIterations(element)">
+            @let duration = element | aggregatedReportViewDurationValue;
+            <div class="details-trigger" [class.with-duration]="!!duration">
+              <div class="smaller-view shift-rows">
+                <div class="chip">
+                  <step-report-node-icon [node]="element" />
+                  <step-aggregated-status
+                    [hasDescendantInvocations]="element.hasDescendantInvocations"
+                    [countByStatus]="element.countByStatus"
+                    (statusClick)="
+                      showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
+                    "
+                  />
+                </div>
+                <span class="test-case-name">
+                  {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
+                </span>
               </div>
-              <span class="test-case-name">
-                {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
-              </span>
             </div>
+            @if (duration) {
+              <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
+            }
+          </section>
+        </div>
+        @if (hasErrors || hasOperations) {
+          <div class="error-and-operations">
+            @if (hasErrors) {
+              <step-test-case-inline-root-cause
+                class="with-overflow"
+                [item]="element"
+                (click)="showIterations(element)"
+                (searchFor)="onSearchFor(element, $event)"
+              />
+            }
+            @if (hasOperations) {
+              <step-alt-current-operation-short style="z-index: 3" [currentOperations]="element.currentOperations" />
+            }
           </div>
-          @if (element | aggregatedReportViewDurationValue; as duration) {
-            <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
-          }
-        </section>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="error">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="error" mat-cell *matCellDef="let element">
-        <section>
-          <step-test-case-inline-root-cause
-            [item]="element"
-            (click)="showIterations(element)"
-            (searchFor)="onSearchFor(element, $event)"
-          />
-        </section>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="operations">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="operations" mat-cell *matCellDef="let element">
-        <section>
-          <div></div>
-          @if (element.currentOperations; as operations) {
-            <step-alt-current-operations
-              style="z-index: 3"
-              [currentOperations]="operations"
-              [(showAll)]="showAllOperations"
-            />
-          }
-        </section>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
+        }
         @if (element?.singleInstanceReportNode; as node) {
           <step-btn-group class="actions">
             <button
@@ -75,7 +63,7 @@
             </button>
           </step-btn-group>
         }
-      </td>
+      </section>
     </ng-container>
-  </step-table>
+  </step-datasource-list>
 </step-alt-report-node-list>

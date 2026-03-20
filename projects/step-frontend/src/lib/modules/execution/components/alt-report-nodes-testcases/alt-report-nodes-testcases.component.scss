@@ -1,96 +1,130 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
-:host {
+step-alt-report-nodes-testcases {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   flex: 1;
-}
 
-step-table {
-  --mat-table-row-item-container-height: 3rem;
-  flex: 1;
-
-  td {
-    width: 1px;
-    white-space: nowrap;
-    cursor: pointer;
-
-    padding-top: 0 !important;
-    &:nth-child(1) {
-      padding-right: 0 !important;
-    }
-    &:nth-child(2) {
-      padding-left: 0 !important;
-    }
-  }
-
-  td.error {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-.actions {
-  gap: 1rem;
-  margin-right: 1rem;
-  & > button {
-    width: 2rem;
-    height: 2rem;
-  }
-}
-
-.name {
-  white-space: nowrap;
-  & > section {
+  step-datasource-list > .list-container {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .test-case-row {
+    display: grid;
+    grid-template-columns: calc(100% - 13rem) 12rem;
+    column-gap: 1rem;
+    width: 100%;
+    max-width: 100%;
     align-items: center;
-    cursor: pointer;
     position: relative;
 
-    .details-trigger span {
-      font-weight: 500;
+    &.has-operations,
+    &.has-errors {
+      grid-template-columns: min(60%, var(--style__name-width, 60%)) 1fr 5rem;
+      .name {
+        .details-trigger.with-duration {
+          max-width: calc(100% - 7rem);
+        }
+      }
     }
 
-    .chip {
+    &:hover::before {
+      content: ' ';
+      display: block;
+      height: 3rem;
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 0;
       background: var.$light-blue-gray;
       border-radius: 4rem;
-      display: flex;
-      padding-left: 1rem;
-      min-height: 3rem;
-      padding-right: 1rem;
-      align-items: center;
     }
   }
-}
 
-.test-case-name {
-  cursor: pointer;
-  font-size: 1.4rem;
-}
-
-.details-trigger {
-  display: flex;
-  gap: 1rem;
-  flex-direction: column;
-  max-width: 60rem;
-  & > div:first-child {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .name {
+    max-width: min-content;
+    white-space: nowrap;
     position: relative;
-  }
-}
+    & > section {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
 
-step-test-case-inline-root-cause {
-  justify-content: flex-start;
-  margin-left: 1rem;
+      .test-case-name {
+        cursor: pointer;
+        font-size: 1.4rem;
+      }
+
+      .details-trigger {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+        width: 100%;
+        &.with-duration {
+          max-width: calc(100% - 5rem);
+        }
+
+        span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-weight: 500;
+        }
+
+        & > div:first-child {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          position: relative;
+        }
+      }
+
+      .chip {
+        background: var.$light-blue-gray;
+        border-radius: 4rem;
+        display: flex;
+        padding-left: 1rem;
+        min-height: 3rem;
+        padding-right: 1rem;
+        align-items: center;
+      }
+    }
+  }
+
+  .error-and-operations {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: center;
+
+    step-test-case-inline-root-cause {
+      justify-content: flex-start !important;
+      margin-left: 1rem;
+      &.no-errors {
+        display: none;
+      }
+    }
+  }
+
+  .actions {
+    gap: 1rem;
+    margin-right: 1rem;
+    flex: 0 0 2rem;
+    margin-left: auto;
+    & > button {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
 }
 
 @media print {
-  .actions {
+  step-alt-report-nodes-testcases .actions {
     display: none;
   }
 }

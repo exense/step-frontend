@@ -1,0 +1,15 @@
+@if (firstOperationData(); as operation) {
+  <step-popover [whiteBackground]="true">
+    <div class="operation">
+      @if (operation.value) {
+        <strong>{{ operation.key }}:</strong>
+        <span>{{ operation.value }}</span>
+      } @else {
+        <strong>{{ operation.key }}</strong>
+      }
+    </div>
+    <step-popover-content>
+      <step-alt-current-operations [currentOperations]="currentOperations()" [showAll]="true" />
+    </step-popover-content>
+  </step-popover>
+}

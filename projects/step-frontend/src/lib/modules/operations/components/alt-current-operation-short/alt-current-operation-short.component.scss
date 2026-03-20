@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+}
+
+.operation {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 0.5rem;
+}
