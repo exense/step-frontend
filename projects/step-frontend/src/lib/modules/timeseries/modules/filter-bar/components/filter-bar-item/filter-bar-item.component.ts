@@ -25,6 +25,7 @@ import { Execution, ExecutiontTaskParameters, Plan } from '@exense/step-core';
   templateUrl: './filter-bar-item.component.html',
   styleUrls: ['./filter-bar-item.component.scss'],
   imports: [COMMON_IMPORTS, FilterBarPlanItemComponent, FilterBarTaskItemComponent, FilterBarExecutionItemComponent],
+  standalone: true,
 })
 export class FilterBarItemComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() item!: FilterBarItem; // should not make edits on it

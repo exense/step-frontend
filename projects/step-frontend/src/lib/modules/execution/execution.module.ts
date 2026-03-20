@@ -119,7 +119,7 @@ import { AltExecutionTreePartialTabComponent } from './components/alt-execution-
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -302,6 +302,7 @@ import { CalcElementWidthAggregatorDirective } from './directives/calc-element-w
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
     TableCountsToggleComponent,
+    ChartSkeletonComponent,
     AggregatedReportViewCountErrorsPipe,
     CalcElementWidthDirective,
     CalcElementWidthAggregatorDirective,
@@ -710,7 +711,9 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  // eslint-disable-next-line step-lint/underscore-injectable
                   const _treeState = inject(AggregatedReportViewTreeStateService);
                   _ctx.setState(_treeState);
                   return true;
