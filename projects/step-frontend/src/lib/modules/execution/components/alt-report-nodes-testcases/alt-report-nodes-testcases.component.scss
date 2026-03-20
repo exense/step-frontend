@@ -66,9 +66,6 @@ step-alt-report-nodes-testcases {
         gap: 1rem;
         flex-direction: column;
         width: 100%;
-        &.with-duration {
-          max-width: calc(100% - 5rem);
-        }
 
         span {
           overflow: hidden;
