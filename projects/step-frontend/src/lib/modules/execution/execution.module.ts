@@ -303,6 +303,7 @@ import { CalcElementWidthAggregatorDirective } from './directives/calc-element-w
     AltExecutionTimePopoverTitleDirective,
     TableCountsToggleComponent,
     ChartSkeletonComponent,
+    ChartSkeletonComponent,
     AggregatedReportViewCountErrorsPipe,
     CalcElementWidthDirective,
     CalcElementWidthAggregatorDirective,
@@ -711,9 +712,7 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
-                  // eslint-disable-next-line step-lint/underscore-injectable
                   const _ctx = inject(AggregatedReportViewTreeStateContextService);
-                  // eslint-disable-next-line step-lint/underscore-injectable
                   const _treeState = inject(AggregatedReportViewTreeStateService);
                   _ctx.setState(_treeState);
                   return true;
