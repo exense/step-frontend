@@ -48,6 +48,12 @@ step-alt-report-node-keywords {
     td.data-cell {
       width: 100%;
     }
+
+    td.actions-cell {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      vertical-align: middle;
+    }
   }
 
   .details-trigger {
@@ -79,12 +85,18 @@ step-alt-report-node-keywords {
   }
 
   .actions {
+    display: flex;
+    align-items: center;
     gap: 1rem;
     margin-right: 1rem;
+    min-height: 2rem;
 
     & > button {
       width: 2rem !important;
       height: 2rem !important;
+      min-width: 2rem !important;
+      min-height: 2rem !important;
+      line-height: 2rem !important;
     }
   }
 }

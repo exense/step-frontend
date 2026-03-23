@@ -45,6 +45,21 @@ step-table {
   width: 100%;
 }
 
+.actions-cell {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  vertical-align: middle;
+
+  .default-theme .mat-mdc-icon-button.mat-mdc-button-base,
+  .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 2rem !important;
+    height: 2rem !important;
+    min-width: 2rem !important;
+    min-height: 2rem !important;
+    padding: 0 !important;
+  }
+}
+
 .details-trigger {
   cursor: pointer;
   display: flex;
@@ -97,8 +112,12 @@ button.details-trigger {
 }
 
 .actions {
+  display: flex;
+  align-items: center;
   gap: 1rem;
   margin-right: 1rem;
+  min-height: 2rem;
+
   & > button {
     width: 2rem;
     height: 2rem;
