@@ -77,4 +77,9 @@ export class TestCaseInlineRootCauseComponent implements AfterViewInit {
     const item = this.item();
     return Object.keys(item.countByErrorMessage ?? [])[0] ?? Object.keys(item.countByChildrenErrorMessage ?? [])[0];
   });
+
+  protected readonly errorMessages = computed(() => {
+    const item = this.item();
+    return [...Object.keys(item.countByErrorMessage ?? {}), ...Object.keys(item.countByChildrenErrorMessage ?? {})];
+  });
 }

@@ -9,7 +9,10 @@
       }
     </div>
     <step-popover-content>
-      <step-alt-current-operations [currentOperations]="currentOperations()" [showAll]="true" />
+      <section class="popover-content">
+        <div class="popover-label">Current operation</div>
+        <step-alt-current-operations [currentOperations]="currentOperations()" [showAll]="true" />
+      </section>
     </step-popover-content>
   </step-popover>
 }

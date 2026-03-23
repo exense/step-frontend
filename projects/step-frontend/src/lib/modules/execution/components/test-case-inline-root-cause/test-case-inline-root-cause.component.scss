@@ -25,6 +25,21 @@ p {
   margin: 0;
 }
 
+.popover-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.popover-message {
+  white-space: normal;
+  max-width: 40rem;
+
+  .popover-errors & {
+    cursor: pointer;
+  }
+}
+
 .error-count {
   width: auto;
   position: relative;

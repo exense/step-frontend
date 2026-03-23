@@ -116,6 +116,9 @@ step-alt-report-nodes-testcases {
     & > button {
       width: 2rem;
       height: 2rem;
+      min-width: 2rem;
+      padding: 0;
+      line-height: 1;
     }
   }
 }
