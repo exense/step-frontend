@@ -113,12 +113,16 @@ step-alt-report-nodes-testcases {
     margin-right: 1rem;
     flex: 0 0 2rem;
     margin-left: auto;
-    & > button {
+    & > button.mat-mdc-icon-button.mat-mdc-button-base {
       width: 2rem;
       height: 2rem;
+      max-width: 2rem;
+      max-height: 2rem;
       min-width: 2rem;
+      min-height: 2rem;
       padding: 0;
       line-height: 1;
+      --mdc-icon-button-state-layer-size: 2rem;
     }
   }
 }
