@@ -176,7 +176,7 @@ export class AdminModule {
       {
         parentPath: 'settings',
         label: 'Screens',
-        accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+        accessPermissions: ['screenInputs-read'],
         weight: 10,
       },
     );
