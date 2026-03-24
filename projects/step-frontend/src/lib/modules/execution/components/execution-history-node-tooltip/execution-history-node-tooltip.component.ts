@@ -1,7 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
-import { STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
+import { DateFormat, Execution, STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
 import {Status} from "../../../_common/shared/status.enum";
+import { ExecutionNode } from '../execution-history-node/execution-history-nodes.component';
 
 @Component({
   selector: 'step-execution-history-node-tooltip',
@@ -10,22 +11,13 @@ import {Status} from "../../../_common/shared/status.enum";
   standalone: false,
 })
 export class ExecutionHistoryNodeTooltipComponent {
-  private _statusColors = inject(STATUS_COLORS);
   private _router = inject(Router);
 
-  readonly status = input.required<string>();
-  readonly link = input<string>();
-  readonly linkLabel = input<string>();
+  readonly node = input.required<ExecutionNode>();
 
-  protected readonly color = computed(() => {
-    const status = this.status();
-    return (status ? this._statusColors[status as Status] : undefined) ?? this._statusColors['TECHNICAL_ERROR'];
-  });
-
-  protected navigateToLink(): void {
-    const link = this.link();
-    if (link) {
-      this._router.navigateByUrl(link);
-    }
+  protected navigateToExecution(): void {
+    this._router.navigateByUrl(`/executions/${this.node().id}`);
   }
+
+  protected readonly DateFormat = DateFormat;
 }

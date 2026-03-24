@@ -1,5 +1,6 @@
 export interface ExecutionResultSnapshot {
   id: string;
+  startTime: number;
   status:
     | 'INITIALIZING'
     | 'IMPORTING'

@@ -5,8 +5,9 @@ import { StatusDistributionTooltipComponent } from '../status-distribution-toolt
 import { HistoryNodeItem } from '../aggregated-tree-node-history/history-nodes/history-node-item';
 import { Status } from '../../../_common/shared/status.enum';
 
-interface ExecutionNode {
+export interface ExecutionNode {
   id: string;
+  startTime: number;
   status: string;
   color: string;
 }
@@ -30,7 +31,7 @@ export class ExecutionHistoryNodesComponent {
   protected readonly pastNodes: Signal<ExecutionNode[]> = computed(() => {
     return this.execution().historyResults?.map((item) => {
       const color = this._statusColors[item.result];
-      return { id: item.id, status: item.result, color: color };
+      return { id: item.id, status: item.result, color: color, startTime: item.startTime };
     });
   });
 
@@ -42,11 +43,12 @@ export class ExecutionHistoryNodesComponent {
       id: execution.id!,
       status: resultStatus,
       color: color,
+      startTime: execution.startTime!
     };
   });
 
   protected readonly paddedPastExecutions: Signal<(ExecutionNode | null)[]> = computed(() => {
-    const pastNodes = this.pastNodes();
+    const pastNodes = this.pastNodes().reverse();
     const count = this.nodesCount();
 
     if (count <= 0) return [];
@@ -57,10 +59,6 @@ export class ExecutionHistoryNodesComponent {
 
     return pastNodes.slice(-(count - 1));
   });
-
-  protected navigateToExecution(eId: string): void {
-      this._router.navigateByUrl(`/executions/${eId}`);
-  }
 
   private padArrayWithNull(array: ExecutionNode[], size: number): (ExecutionNode | null)[] {
     const padCount = Math.max(0, size - (array?.length ?? 0));

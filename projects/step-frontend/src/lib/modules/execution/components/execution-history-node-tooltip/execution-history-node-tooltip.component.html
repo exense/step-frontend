@@ -1,9 +1,14 @@
-<div class="container" [style.--background]="color()">
-  <div class="status-tag" [style.--statusColor]="color()">
+<div class="container">
+  <div class="status-tag" [style.--statusColor]="node().color">
     <div class="status-icon">
-      <step-icon [name]="status() | statusIcon" />
+      <step-icon [name]="node().status | statusIcon" />
     </div>
-    <span>{{ status() }}</span>
+    <span>{{ node().status }}</span>
   </div>
-
+  <div class="link" (click)="navigateToExecution()" title="See Execution">
+    <span>See execution</span>
+  </div>
+</div>
+<div class="timestamp">
+  {{ node().startTime | date: DateFormat.DATE }}
 </div>

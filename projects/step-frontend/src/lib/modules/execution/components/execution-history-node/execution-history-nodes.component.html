@@ -11,12 +11,11 @@
               [style.width.px]="nodesSize()"
               [style.height.px]="nodesSize()"
               [style.background-color]="node.color"
-              (click)="navigateToExecution(node.id)"
             ></div>
           </div>
           <step-popover-content>
             <div>
-              <step-execution-history-node-tooltip [status]="node.status"/>
+              <step-execution-history-node-tooltip [node]="node"/>
             </div>
           </step-popover-content>
         </step-popover>
@@ -31,15 +30,14 @@
 
   <step-popover>
     <div
-      class="simple-node highlight link"
+      class="simple-node link"
       [style.width.px]="currentNodeSize()"
       [style.height.px]="currentNodeSize()"
       [style.background-color]="currentNode().color"
-      (click)="navigateToExecution(currentNode().id)"
     ></div>
     <step-popover-content>
       <div>
-        <step-execution-history-node-tooltip [status]="currentNode().status"/>
+        <step-execution-history-node-tooltip [node]="currentNode()"/>
       </div>
     </step-popover-content>
   </step-popover>
