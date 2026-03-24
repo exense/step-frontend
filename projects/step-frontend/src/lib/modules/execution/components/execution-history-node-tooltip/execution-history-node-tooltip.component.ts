@@ -1,7 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
-import { DateFormat, Execution, STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
-import {Status} from "../../../_common/shared/status.enum";
+import { DateFormat } from '@exense/step-core';
 import { ExecutionNode } from '../execution-history-node/execution-history-nodes.component';
 
 @Component({

@@ -1,9 +1,6 @@
 import { Component, computed, inject, input, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Execution, STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
-import { StatusDistributionTooltipComponent } from '../status-distribution-tooltip/status-distribution-tooltip.component';
-import { HistoryNodeItem } from '../aggregated-tree-node-history/history-nodes/history-node-item';
-import { Status } from '../../../_common/shared/status.enum';
 
 export interface ExecutionNode {
   id: string;
@@ -25,8 +22,6 @@ export class ExecutionHistoryNodesComponent {
   readonly execution = input.required<Execution>();
   readonly nodesSize = input<number>(10);
   readonly currentNodeSize = input<number>(16);
-
-  private _router = inject(Router);
 
   protected readonly pastNodes: Signal<ExecutionNode[]> = computed(() => {
     return this.execution().historyResults?.map((item) => {
