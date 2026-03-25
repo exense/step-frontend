@@ -1,13 +1,7 @@
 import { Component, computed, inject, input, Signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { Execution, STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
+import {ExecutionNodeItem} from "./ExecutionNodeItem";
 
-export interface ExecutionNode {
-  id: string;
-  startTime: number;
-  status: string;
-  color: string;
-}
 
 @Component({
   selector: 'step-execution-history-nodes',
@@ -23,14 +17,14 @@ export class ExecutionHistoryNodesComponent {
   readonly nodesSize = input<number>(10);
   readonly currentNodeSize = input<number>(16);
 
-  protected readonly pastNodes: Signal<ExecutionNode[]> = computed(() => {
+  protected readonly pastNodes: Signal<ExecutionNodeItem[]> = computed(() => {
     return this.execution().historyResults?.map((item) => {
       const color = this._statusColors[item.result];
       return { id: item.id, status: item.result, color: color, startTime: item.startTime };
     });
   });
 
-  protected readonly currentNode: Signal<ExecutionNode> = computed(() => {
+  protected readonly currentNode: Signal<ExecutionNodeItem> = computed(() => {
     const execution = this.execution();
     const resultStatus = execution.status === 'RUNNING' ? 'RUNNING' : execution.result!;
     const color = this._statusColors[resultStatus];
@@ -38,11 +32,11 @@ export class ExecutionHistoryNodesComponent {
       id: execution.id!,
       status: resultStatus,
       color: color,
-      startTime: execution.startTime!
+      startTime: execution.startTime!,
     };
   });
 
-  protected readonly paddedPastExecutions: Signal<(ExecutionNode | null)[]> = computed(() => {
+  protected readonly paddedPastExecutions: Signal<(ExecutionNodeItem | null)[]> = computed(() => {
     const pastNodes = this.pastNodes().reverse();
     const count = this.nodesCount();
 
@@ -55,7 +49,7 @@ export class ExecutionHistoryNodesComponent {
     return pastNodes.slice(-(count - 1));
   });
 
-  private padArrayWithNull(array: ExecutionNode[], size: number): (ExecutionNode | null)[] {
+  private padArrayWithNull(array: ExecutionNodeItem[], size: number): (ExecutionNodeItem | null)[] {
     const padCount = Math.max(0, size - (array?.length ?? 0));
     return Array(padCount).fill(null).concat(array);
   }
