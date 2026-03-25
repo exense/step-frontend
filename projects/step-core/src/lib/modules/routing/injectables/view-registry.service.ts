@@ -108,9 +108,17 @@ export class ViewRegistryService implements OnDestroy {
       isEnabledFunction: () => this._auth.hasRight('execution-read'),
       isActiveFunction: (url) => url.startsWith('/executions/list'),
     });
-    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', {
+      weight: 20,
+      parentId: 'execute-root',
+      isEnabledFunction: () => this._auth.hasRight('dashboard-read'),
+    });
     // Sub Menus Status
-    this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
+    this.registerMenuEntry('Current Operations', 'operations', 'airplay', {
+      weight: 10,
+      parentId: 'status-root',
+      isEnabledFunction: () => this._auth.hasRight('operations-read'),
+    });
     this.registerMenuEntry('Agents', 'grid-agents', 'agent', { weight: 20, parentId: 'status-root' });
     this.registerMenuEntry('Agent tokens', 'grid-tokens', 'agent-token', { weight: 30, parentId: 'status-root' });
     this.registerMenuEntry('Token Groups', 'grid-token-groups', 'agent-token-group', {
