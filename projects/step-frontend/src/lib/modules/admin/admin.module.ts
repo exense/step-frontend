@@ -228,7 +228,7 @@ export class AdminModule {
   private registerMenuEntries(): void {
     this._viewRegistry.registerMenuEntry('Admin Settings', 'admin', 'settings', {
       weight: 90,
-      isEnabledFunction: () => this._auth.hasRight('admin-ui-menu'),
+      isVisibleFunction: () => this._auth.hasRight('admin-ui-menu'),
     });
   }
 

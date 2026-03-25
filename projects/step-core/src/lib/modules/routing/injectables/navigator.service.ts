@@ -8,6 +8,7 @@ import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup
 import { MenuEntry } from '../types/menu-entry';
 
 export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFunction'> & {
+  isEnabled: boolean;
   isBookmark?: boolean;
   hasChildren?: boolean;
   children?: DisplayMenuEntry[];

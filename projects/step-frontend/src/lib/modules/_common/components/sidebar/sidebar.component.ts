@@ -62,6 +62,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
               position: element.customFields!['position'] || 100,
               parentId: BOOKMARKS_ROOT,
               weight: 1000 + bookmarks!.length,
+              isVisibleFunction(): boolean {
+                return true;
+              },
               isEnabledFunction(): boolean {
                 return true;
               },
@@ -158,7 +161,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
-  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean): void {
+  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean, isEnabled: boolean = true): void {
+    if (!isEnabled) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      return;
+    }
+
     const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
 
     if (isBookmark) {
@@ -211,18 +220,19 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       return a.weight - b.weight;
     };
 
-    const convert = ({ id, title, icon, isCustom, parentId, isActiveFunction }: MenuEntry): DisplayMenuEntry => ({
+    const convert = ({ id, title, icon, isCustom, parentId, isActiveFunction, isEnabledFunction }: MenuEntry): DisplayMenuEntry => ({
       id,
       title,
       icon,
       isCustom,
+      isEnabled: isEnabledFunction(),
       isBookmark: parentId === BOOKMARKS_ROOT,
       isActiveFunction: isActiveFunction,
     });
 
     const findChildren = (parent: DisplayMenuEntry) => {
       const children = menuItems
-        .filter((item) => item?.parentId === parent.id && item.isEnabledFunction())
+        .filter((item) => item?.parentId === parent.id && item.isVisibleFunction?.())
         .sort(weightCompare)
         .map(convert);
 
@@ -232,7 +242,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     };
 
     const result = menuItems
-      .filter((item) => item && !item.parentId && item.isEnabledFunction())
+      .filter((item) => item && !item.parentId && item.isVisibleFunction?.())
       .sort(weightCompare)
       .map(convert);
 

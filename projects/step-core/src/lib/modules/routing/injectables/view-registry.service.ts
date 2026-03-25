@@ -308,6 +308,7 @@ export class ViewRegistryService implements OnDestroy {
     options?: {
       weight?: number;
       parentId?: string;
+      isVisibleFunction?: () => boolean;
       isEnabledFunction?: () => boolean;
       isActiveFunction?: (url: string) => boolean;
     },
@@ -322,6 +323,7 @@ export class ViewRegistryService implements OnDestroy {
       parentId: options?.parentId,
       icon,
       weight: options?.weight,
+      isVisibleFunction: options?.isVisibleFunction ?? (() => true),
       isEnabledFunction: options?.isEnabledFunction ?? (() => true),
       isActiveFunction: options?.isActiveFunction,
     });

@@ -6,6 +6,7 @@ export interface MenuEntry {
   parentId?: string;
   isCustom?: boolean;
 
+  isVisibleFunction?(): boolean;
   isEnabledFunction(): boolean;
   isActiveFunction?(url: string): boolean;
   isCleanupOnReload?: boolean;
