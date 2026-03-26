@@ -21,8 +21,6 @@ export class CalcElementWidthAggregatorDirective implements AfterViewInit {
   private _ngZone = inject(NgZone);
   private _doc = inject(DOCUMENT);
 
-  private previouslySetItems: string[] = [];
-
   readonly recalcTrigger = input<unknown>(undefined);
   private readonly renderComplete = signal(false);
   private readonly items = contentChildren(CalcElementWidthDirective);
@@ -43,16 +41,11 @@ export class CalcElementWidthAggregatorDirective implements AfterViewInit {
 
   private setWidthsVariables(items: readonly CalcElementWidthDirective[]): void {
     this._ngZone.runOutsideAngular(() => {
-      this.previouslySetItems.forEach((item) => {
-        this._elementRef.nativeElement.style.removeProperty(item);
-      });
-      this.previouslySetItems = [];
       this._doc.defaultView?.setTimeout?.(() => {
         items.forEach((item) => {
           const { key, value } = item.widthInfo;
           if (!!value) {
             this._elementRef.nativeElement.style.setProperty(key, value);
-            this.previouslySetItems.push(key);
           }
         });
       }, 100);

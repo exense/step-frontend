@@ -3,37 +3,41 @@
     <ng-container *stepDatasourceListItem="let element; let index = $index">
       @let hasOperations = !!element.currentOperations.length;
       @let hasErrors = !!(element | aggregatedReportViewCountErrors);
+      @let duration = element | aggregatedReportViewDurationValue;
+      @let elementName = element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '';
       <section
         class="test-case-row"
         stepCalcElementWidthAggregator
         [recalcTrigger]="element"
         [class.has-operations]="hasOperations"
         [class.has-errors]="hasErrors"
+        [class.has-duration]="duration"
       >
-        <div class="name" stepCalcElementWidth="style__name-width">
-          <section (click)="showIterations(element)">
-            @let duration = element | aggregatedReportViewDurationValue;
-            <div class="details-trigger" [class.with-duration]="!!duration">
-              <div class="smaller-view shift-rows">
-                <div class="chip">
-                  <step-report-node-icon [node]="element" />
-                  <step-aggregated-status
-                    [hasDescendantInvocations]="element.hasDescendantInvocations"
-                    [countByStatus]="element.countByStatus"
-                    (statusClick)="
-                      showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
-                    "
-                  />
-                </div>
-                <span class="test-case-name">
-                  {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
-                </span>
-              </div>
-            </div>
-            @if (duration) {
-              <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
-            }
-          </section>
+        <div
+          class="details-trigger"
+          (click)="showIterations(element)"
+          stepCalcElementWidth="style__name-width"
+          [additionalSize]="15"
+        >
+          <div class="chip" stepCalcElementWidthItem>
+            <step-report-node-icon [node]="element" />
+            <step-aggregated-status
+              [hasDescendantInvocations]="element.hasDescendantInvocations"
+              [countByStatus]="element.countByStatus"
+              (statusClick)="
+                showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
+              "
+            />
+          </div>
+          <span class="test-case-name-real-size" stepCalcElementWidthItem>{{ elementName }}</span>
+          <span class="test-case-name">{{ elementName }}</span>
+          @if (duration) {
+            <step-execution-duration-simple
+              stepCalcElementWidthItem
+              [duration]="duration"
+              [isAverage]="element | isAverageDuration"
+            />
+          }
         </div>
         @if (hasErrors || hasOperations) {
           <div class="error-and-operations">

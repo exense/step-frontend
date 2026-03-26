@@ -174,6 +174,7 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
+import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 
 @NgModule({
   declarations: [
@@ -306,6 +307,7 @@ import { CalcElementWidthAggregatorDirective } from './directives/calc-element-w
     ChartSkeletonComponent,
     AggregatedReportViewCountErrorsPipe,
     CalcElementWidthDirective,
+    CalcElementWidthItemDirective,
     CalcElementWidthAggregatorDirective,
   ],
   exports: [
