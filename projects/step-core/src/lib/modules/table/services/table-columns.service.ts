@@ -9,7 +9,7 @@ import {
 import { MatColumnDef } from '@angular/material/table';
 import { TableColumnsConfig } from './table-columns-config.provider';
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { combineLatest, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { ColumnInfo } from '../types/column-info';
 import { CustomCellApplySubPathPipe } from '../pipe/custom-cell-apply-sub-path.pipe';
 import { Reloadable } from '../../basics/types/reloadable';
@@ -51,6 +51,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   private entityTableRemoteId = signal(
     !this._columnsConfig?.entityTableRemoteId ? undefined : new String(this._columnsConfig.entityTableRemoteId),
   );
+  private settingsReloadVersion = signal(0);
 
   private defaultSettings = computed(() => {
     const entityTableRemoteId = this.entityTableRemoteId()?.toString?.();
@@ -93,8 +94,33 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     return { tableSettings, actionColumnsIds, entityTableRemoteId };
   });
 
-  private remoteSettings$ = toObservable(this.defaultSettings).pipe(
-    switchMap((defaultSettings) => this.loadSettings(defaultSettings)),
+  private defaultSettings$ = toObservable(this.defaultSettings);
+
+  private remoteSettingsRequest$ = toObservable(
+    computed(() => ({
+      entityTableRemoteId: this.entityTableRemoteId()?.toString?.(),
+      settingsReloadVersion: this.settingsReloadVersion(),
+    })),
+  );
+
+  private fetchedRemoteSettings$ = this.remoteSettingsRequest$.pipe(
+    switchMap(({ entityTableRemoteId }) => {
+      if (!entityTableRemoteId) {
+        return of(undefined);
+      }
+      return this._tableApi.getTableSettings(entityTableRemoteId);
+    }),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  private remoteSettings$ = combineLatest([this.defaultSettings$, this.fetchedRemoteSettings$]).pipe(
+    map(([defaultSettings, remoteTableSettings]) => {
+      if (!defaultSettings?.entityTableRemoteId) {
+        return defaultSettings.tableSettings;
+      }
+      return this.mergeSettings(remoteTableSettings, defaultSettings.tableSettings, defaultSettings.actionColumnsIds);
+    }),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -133,8 +159,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   }
 
   reload(): void {
-    const entityTableRemoteId = this._columnsConfig?.entityTableRemoteId;
-    this.entityTableRemoteId.set(!entityTableRemoteId ? undefined : new String(entityTableRemoteId));
+    this.settingsReloadVersion.update((value) => value + 1);
   }
 
   showColumn(columnId: string): void {
@@ -253,19 +278,6 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     };
     this.settings.set({ ...tableSettings, columnSettingList });
     this.hasChangesInternal.set(true);
-  }
-
-  private loadSettings(defaultSettings: DefaultSettings): Observable<TableSettings> {
-    if (!defaultSettings?.entityTableRemoteId) {
-      return of(defaultSettings.tableSettings);
-    }
-    return this._tableApi
-      .getTableSettings(defaultSettings.entityTableRemoteId)
-      .pipe(
-        map((settings) =>
-          this.mergeSettings(settings, defaultSettings.tableSettings, defaultSettings.actionColumnsIds),
-        ),
-      );
   }
 
   private mergeSettings(
