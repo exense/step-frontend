@@ -51,9 +51,9 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   private entityTableRemoteId = signal(
     !this._columnsConfig?.entityTableRemoteId ? undefined : new String(this._columnsConfig.entityTableRemoteId),
   );
-  private settingsReloadVersion = signal(0);
+  private readonly settingsReloadVersion = signal(0);
 
-  private defaultSettings = computed(() => {
+  private readonly defaultSettings = computed(() => {
     const entityTableRemoteId = this.entityTableRemoteId()?.toString?.();
     const contentColumns = this._columnsDefinition.contentColumns() ?? [];
     const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
@@ -94,16 +94,16 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     return { tableSettings, actionColumnsIds, entityTableRemoteId };
   });
 
-  private defaultSettings$ = toObservable(this.defaultSettings);
+  private readonly defaultSettings$ = toObservable(this.defaultSettings);
 
-  private remoteSettingsRequest$ = toObservable(
+  private readonly remoteSettingsRequest$ = toObservable(
     computed(() => ({
       entityTableRemoteId: this.entityTableRemoteId()?.toString?.(),
       settingsReloadVersion: this.settingsReloadVersion(),
     })),
   );
 
-  private fetchedRemoteSettings$ = this.remoteSettingsRequest$.pipe(
+  private readonly fetchedRemoteSettings$ = this.remoteSettingsRequest$.pipe(
     switchMap(({ entityTableRemoteId }) => {
       if (!entityTableRemoteId) {
         return of(undefined);
@@ -114,7 +114,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     takeUntilDestroyed(),
   );
 
-  private remoteSettings$ = combineLatest([this.defaultSettings$, this.fetchedRemoteSettings$]).pipe(
+  private readonly remoteSettings$ = combineLatest([this.defaultSettings$, this.fetchedRemoteSettings$]).pipe(
     map(([defaultSettings, remoteTableSettings]) => {
       if (!defaultSettings?.entityTableRemoteId) {
         return defaultSettings.tableSettings;
@@ -125,14 +125,14 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     takeUntilDestroyed(),
   );
 
-  private hasChangesInternal = signal(false);
+  private readonly hasChangesInternal = signal(false);
   readonly hasChanges = this.hasChangesInternal.asReadonly();
 
-  private isInitializedInternal = signal(false);
+  private readonly isInitializedInternal = signal(false);
   readonly isInitialized = this.isInitializedInternal.asReadonly();
 
   private originalSettings?: TableSettings;
-  private settings = signal<TableSettings | undefined>(undefined);
+  private readonly settings = signal<TableSettings | undefined>(undefined);
 
   readonly hiddenColumns = computed(() =>
     this.prepareColumns(this.settings()?.columnSettingList, VisibilityState.HIDDEN),
