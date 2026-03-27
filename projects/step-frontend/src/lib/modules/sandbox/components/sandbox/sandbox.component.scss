@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
+  padding: 1rem;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  height: 50vh;
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+}

@@ -1,0 +1,14 @@
+:host {
+  height: 100%;
+}
+
+mat-card {
+  height: calc(100% - 1rem);
+  margin: 0.5rem;
+}
+
+mat-card-header {
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}

@@ -1,0 +1,15 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <span>{{ title() }}</span>
+    </mat-card-title>
+    <button mat-icon-button (click)="remove.emit()">
+      <step-icon name="x" />
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    @if (templateRef(); as templateRef) {
+      <ng-container *ngTemplateOutlet="templateRef" />
+    }
+  </mat-card-content>
+</mat-card>

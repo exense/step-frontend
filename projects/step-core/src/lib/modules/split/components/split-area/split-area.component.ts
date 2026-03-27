@@ -1,15 +1,14 @@
 import {
   AfterViewInit,
-  Component,
   ElementRef,
-  EventEmitter,
-  HostListener,
+  Component,
+  effect,
   inject,
-  Input,
-  OnChanges,
+  input,
+  output,
   OnDestroy,
-  Output,
-  SimpleChanges,
+  untracked,
+  linkedSignal,
 } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 
@@ -19,18 +18,34 @@ type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
   selector: 'step-split-area',
   templateUrl: './split-area.component.html',
   styleUrls: ['./split-area.component.scss'],
+  host: {
+    '(focusin)': 'handleFocusIn()',
+  },
 })
-export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class SplitAreaComponent implements AfterViewInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private sizeUpdateInternal$?: Subject<void>;
   private isViewInitialized = false;
 
-  @Input() sizeUpdateDebounce: number = 300;
-  @Input() sizeType: SplitAreaSizeType = 'pixel';
-  @Input() size?: number;
-  @Input() padding?: string;
+  readonly sizeUpdateDebounce = input(300);
+  readonly sizeType = input<SplitAreaSizeType>('pixel');
+  readonly sizeInput = input<number | undefined>(undefined, { alias: 'size' });
 
-  @Output() sizeChange = new EventEmitter<number>();
+  private readonly size = linkedSignal(() => this.sizeInput());
+
+  readonly padding = input<string | undefined>();
+  readonly sizeChange = output<number>();
+
+  private effectSizeUpdateDebounceChange = effect(() => {
+    const sizeUpdateDebounce = this.sizeUpdateDebounce();
+    this.setupSizeUpdate(sizeUpdateDebounce);
+  });
+
+  private effectSizeChange = effect(() => {
+    const size = this.size();
+    const sizeType = this.sizeType();
+    this.changeSize(size, sizeType);
+  });
 
   ngAfterViewInit(): void {
     this.isViewInitialized = true;
@@ -38,52 +53,22 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.setupSizeUpdate();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cSizeUpdateDebounce = changes['sizeUpdateDebounce'];
-    if (cSizeUpdateDebounce?.previousValue !== cSizeUpdateDebounce?.currentValue || cSizeUpdateDebounce?.firstChange) {
-      this.setupSizeUpdate(cSizeUpdateDebounce?.currentValue);
-    }
-
-    const cSizeType = changes['sizeType'];
-    const cSize = changes['size'];
-
-    let size: number | undefined;
-    let sizeType: SplitAreaSizeType | undefined;
-
-    if (cSize?.currentValue !== cSize?.previousValue || cSize?.firstChange) {
-      size = cSize?.currentValue;
-    }
-
-    if (cSizeType?.currentValue !== cSizeType?.previousValue || cSizeType?.firstChange) {
-      sizeType = cSizeType.currentValue;
-    }
-
-    if (size || sizeType) {
-      this.changeSize(size, sizeType);
-    }
-  }
-
   ngOnDestroy(): void {
     this.destroySizeUpdate();
   }
 
   get width(): number {
-    return this.boundingClientRect.width;
+    const boundingClientRect = this._elementRef.nativeElement.getBoundingClientRect();
+    return boundingClientRect.width;
   }
 
-  @HostListener('focusin')
-  onFocusIn(): void {
+  protected handleFocusIn(): void {
     this._elementRef.nativeElement.scrollTop = 0;
     this._elementRef.nativeElement.scrollLeft = 0;
   }
 
   setSize(size: number): void {
-    this.size = size;
-    this.changeSize(size);
-  }
-
-  private get boundingClientRect(): DOMRect {
-    return this._elementRef.nativeElement.getBoundingClientRect();
+    this.size.set(size);
   }
 
   private destroySizeUpdate(): void {
@@ -96,17 +81,20 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private setupSizeUpdate(sizeUpdateDebounce?: number): void {
     this.destroySizeUpdate();
-    sizeUpdateDebounce = sizeUpdateDebounce || this.sizeUpdateDebounce;
+    sizeUpdateDebounce = sizeUpdateDebounce ?? untracked(() => this.sizeUpdateDebounce());
     this.sizeUpdateInternal$ = new Subject<void>();
-    this.sizeUpdateInternal$.pipe(debounceTime(sizeUpdateDebounce)).subscribe(() => this.sizeChange.emit(this.size));
+    this.sizeUpdateInternal$.pipe(debounceTime(sizeUpdateDebounce)).subscribe(() => {
+      const size = untracked(() => this.size()) ?? 0;
+      this.sizeChange.emit(size);
+    });
   }
 
   private changeSize(size?: number, sizeType?: SplitAreaSizeType): void {
     if (!this.isViewInitialized) {
       return;
     }
-    size = size ?? this.size;
-    sizeType = sizeType ?? this.sizeType;
+    size = size ?? untracked(() => this.size());
+    sizeType = sizeType ?? untracked(() => this.sizeType());
     switch (sizeType) {
       case 'percent':
         this.setFlex({
@@ -128,6 +116,7 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
         break;
     }
   }
+
   private setFlex({
     flexBasis = '0',
     flexGrow = '0',
@@ -140,6 +129,6 @@ export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
     this._elementRef.nativeElement.style.setProperty('flex-basis', flexBasis || '');
     this._elementRef.nativeElement.style.setProperty('flex-grow', flexGrow || '');
     this._elementRef.nativeElement.style.setProperty('flex-shrink', flexShrink || '');
-    this.sizeUpdateInternal$?.next();
+    this.sizeUpdateInternal$?.next?.();
   }
 }

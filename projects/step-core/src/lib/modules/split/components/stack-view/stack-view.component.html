@@ -1,0 +1,16 @@
+<step-split>
+  @for (view of viewsAndGroups(); track view.id; let isLast = $last) {
+    @if (view | isSplitViewGroup; as group) {
+      <step-split-area sizeType="pixel" [size]="GROUP_WIDTH">
+        <step-view-group [group]="group" (openView)="openViewFromGroup($event)" />
+      </step-split-area>
+    } @else {
+      <step-split-area sizeType="flex">
+        <step-view-item [view]="view" (remove)="removeView(view.id)" />
+      </step-split-area>
+    }
+    @if (!isLast) {
+      <step-split-gutter />
+    }
+  }
+</step-split>
