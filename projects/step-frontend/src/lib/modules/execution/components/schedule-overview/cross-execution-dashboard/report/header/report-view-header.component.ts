@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { CrossExecutionDashboardState } from '../../cross-execution-dashboard-state';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { finalize, map, Observable, of, pipe, shareReplay, switchMap, tap } from 'rxjs';
 import { ReportNodeSummary } from '../../../../../shared/report-node-summary';
 import { FilterUtils, OQLBuilder, TimeSeriesConfig } from '../../../../../../timeseries/modules/_common';
 import { BucketResponse } from '@exense/step-core';
@@ -14,6 +14,10 @@ import { BucketResponse } from '@exense/step-core';
 export class ReportViewHeaderComponent {
   readonly _state = inject(CrossExecutionDashboardState);
 
+  displayLoadingOnProgress = computed(() => {
+    return this._state.lastRefreshTrigger() === 'manual';
+  });
+
   successRateValue$: Observable<string> = this._state.summaryData$.pipe(
     map((summaryData: ReportNodeSummary) => {
       const passed = summaryData.items['PASSED'] || 0;
@@ -21,6 +25,9 @@ export class ReportViewHeaderComponent {
         return '-';
       }
       return ((passed / summaryData.total) * 100).toFixed(2) + '%';
+    }),
+    tap(() => {
+      this._state.successRateValueLoading.set(false);
     }),
     shareReplay(1),
   );
@@ -41,6 +48,9 @@ export class ReportViewHeaderComponent {
         return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(totalDuration / totalCount);
       }
     }),
+    tap(() => {
+      this._state.averageDurationValueLoading.set(false);
+    }),
     shareReplay(1),
   );
 
@@ -52,6 +62,9 @@ export class ReportViewHeaderComponent {
         totalCount += bucket.count;
       });
       return totalCount;
+    }),
+    tap(() => {
+      this._state.totalExecutionsValueLoading.set(false);
     }),
     shareReplay(1),
   );

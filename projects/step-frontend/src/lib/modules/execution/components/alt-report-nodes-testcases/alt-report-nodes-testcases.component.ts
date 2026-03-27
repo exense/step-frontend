@@ -1,8 +1,7 @@
-import { Component, inject, output, viewChild } from '@angular/core';
+import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportView,
   ItemsPerPageService,
-  ReportNode,
   STORE_ALL,
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
@@ -43,6 +42,7 @@ import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-v
     TablePersistenceStateService,
     tablePersistenceConfigProvider('testCases', STORE_ALL),
   ],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
@@ -50,7 +50,6 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
-  showAllOperations = false;
 
   onSearchFor(item: AggregatedReportView, message: string): void {
     this.showIterations(item, { searchFor: message });

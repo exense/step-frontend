@@ -116,7 +116,7 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -168,6 +168,10 @@ import { ExecutionHistorySectionComponent } from './components/execution-history
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
+import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
+import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 import { ExecutionDrilldownNodeDetailsPanelComponent } from './components/execution-drilldown-node-details-panel/execution-drilldown-node-details-panel.component';
 import { ExecutionDrilldownIterationPanelComponent } from './components/execution-drilldown-iteration-panel/execution-drilldown-iteration-panel.component';
 import { ExecutionDrilldownRootTreePanelComponent } from './components/execution-drilldown-root-tree-panel/execution-drilldown-root-tree-panel.component';
@@ -300,6 +304,12 @@ import { ExecutionDrilldownRootTreePanelComponent } from './components/execution
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
     TableCountsToggleComponent,
+    ChartSkeletonComponent,
+    ChartSkeletonComponent,
+    AggregatedReportViewCountErrorsPipe,
+    CalcElementWidthDirective,
+    CalcElementWidthItemDirective,
+    CalcElementWidthAggregatorDirective,
   ],
   exports: [
     ExecutionListComponent,
