@@ -357,7 +357,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       series: [
         {
           label:
-            this.settings.xAxesSettings.label || (this.settings.xAxesSettings.time ?? true ? 'Timestamp' : 'Value'),
+            this.settings.xAxesSettings.label || ((this.settings.xAxesSettings.time ?? true) ? 'Timestamp' : 'Value'),
           value: this.settings.xAxesSettings.valueFormatFn || DEFAULT_TIMESTAMP_FORMAT_FN,
         },
         ...settings.series, // show flag will show/hide series, but they will still exist in the chart

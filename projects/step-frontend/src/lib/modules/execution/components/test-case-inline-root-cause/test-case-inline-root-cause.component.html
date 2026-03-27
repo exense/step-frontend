@@ -1,18 +1,27 @@
 @if (errorCounts() === 1) {
   <div class="error-count">
     @if (singleMessage(); as message) {
-      <div class="text link" [style.width.px]="currentWidth" (click)="onErrorClick($event, message)">
-        <step-icon name="alert-triangle" class="error" />
-        <span>{{ message }}</span>
-      </div>
+      <step-popover [whiteBackground]="true">
+        <div class="text link" [style.width.px]="currentWidth" (click)="onErrorClick($event, message)">
+          <step-icon name="alert-triangle" class="error" />
+          <span>{{ message }}</span>
+        </div>
+        <step-popover-content>
+          <div class="popover-message">{{ message }}</div>
+        </step-popover-content>
+      </step-popover>
     }
   </div>
 } @else if (errorCounts() > 1) {
   <div class="error-count">
     <div class="text">
-      <step-popover>
+      <step-popover [whiteBackground]="true">
         <step-popover-content>
-          <p>Errors occured in this TestCase</p>
+          <div class="popover-errors">
+            @for (message of errorMessages(); track message) {
+              <div class="popover-message" (click)="onErrorClick($event, message)">{{ message }}</div>
+            }
+          </div>
         </step-popover-content>
         <step-icon name="alert-triangle" class="error" />
       </step-popover>

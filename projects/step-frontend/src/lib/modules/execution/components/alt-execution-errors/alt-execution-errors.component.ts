@@ -94,5 +94,4 @@ export class AltExecutionErrorsComponent {
   onFindInTree(message: string): void {
     this.searchFor.emit(message);
   }
-
 }

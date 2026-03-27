@@ -1,12 +1,7 @@
 <step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
   <step-alt-report-widget-content class="widget-content">
     <div class="chart-actions-container">
-      <step-tabs
-        [tabs]="tabs"
-        [shrink]="true"
-        [activeTabId]="heatmapType()"
-        (activeTabIdChange)="switchType($event)"
-      />
+      <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
     </div>
     @if (heatMapData$ | async; as heatmapData) {
       @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
