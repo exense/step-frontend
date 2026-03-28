@@ -37,7 +37,7 @@ export class ExecutionHistoryNodesComponent {
   });
 
   protected readonly paddedPastExecutions: Signal<(ExecutionNodeItem | null)[]> = computed(() => {
-    const pastNodes = this.pastNodes().reverse();
+    const pastNodes = this.pastNodes()?.reverse() || [];
     const count = this.nodesCount();
 
     if (count <= 0) return [];
