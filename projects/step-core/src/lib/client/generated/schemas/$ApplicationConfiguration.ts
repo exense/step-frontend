@@ -9,9 +9,6 @@ export const $ApplicationConfiguration = {
     authenticatorName: {
       type: 'string',
     },
-    demo: {
-      type: 'boolean',
-    },
     debug: {
       type: 'boolean',
     },

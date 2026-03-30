@@ -2,15 +2,16 @@
   <div class="header">
     <step-time-range-picker
       [activeSelection]="activeTimeRangeSelection()!"
-      (selectionChange)="handleTimeRangeChange($event)"
+      (selectionChange)="handleTimeRangeSelectionChange($event)"
       [activeTimeRange]="timeRange()"
       [selectOptions]="timeRangeOptions"
     />
   </div>
 
   <step-execution-dashboard
+    #dashboardComponent
     [execution]="execution()"
-    [timeRange]="timeRange()!"
+    [initialTimeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"
     (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"
