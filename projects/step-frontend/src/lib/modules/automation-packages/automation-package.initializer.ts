@@ -161,7 +161,6 @@ const registerRoutes = () => {
         },
       ],
     },
-    { accessPermissions: ['automation-package-read'] },
   );
 };
 
