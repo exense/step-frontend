@@ -436,12 +436,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onAllSeriesCheckboxClick(checked: boolean): void {
     this.context().getSyncGroup(this.item().id).setAllSeriesChecked(checked);
 
-    this.tableDataSource?.allData$.pipe(take(1))
-      .subscribe(allData => {
-        allData.forEach((entry) => {
-          entry.isSelected = checked;
-        });
-    })
+    this.tableDataSource?.allData$.pipe(take(1)).subscribe((allData) => {
+      allData.forEach((entry) => {
+        entry.isSelected = checked;
+      });
+    });
   }
 
   onKeywordToggle(entry: TableEntry, selected: boolean): void {

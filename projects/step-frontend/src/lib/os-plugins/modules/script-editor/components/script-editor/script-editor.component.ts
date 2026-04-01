@@ -13,6 +13,7 @@ import {
 import {
   AceMode,
   AugmentedKeywordEditorService,
+  CanLeaveComponent,
   convertScriptLanguageToAce,
   DialogsService,
   Keyword,
@@ -24,7 +25,6 @@ import {
 } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { DeactivateComponentDataInterface } from '../../types/deactivate-component-data.interface';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FunctionScript } from '../../types/function-script.interface';
 
@@ -36,19 +36,19 @@ import { FunctionScript } from '../../types/function-script.interface';
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScriptEditorComponent implements AfterViewInit, DeactivateComponentDataInterface {
+export class ScriptEditorComponent implements AfterViewInit, CanLeaveComponent {
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
   private _dialogsService = inject(DialogsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
 
-  private richEditor = viewChild(RichEditorComponent);
+  private readonly richEditor = viewChild(RichEditorComponent);
 
   protected readonly keyword = toSignal(this._activatedRoute.data.pipe(map((data) => data['keyword'] as Keyword)));
-  private keywordId = computed(() => this.keyword()?.id);
+  private readonly keywordId = computed(() => this.keyword()?.id);
   private keywordId$ = toObservable(this.keywordId);
-  private initialScript = signal('');
+  private readonly initialScript = signal('');
 
   protected readonly keywordName = computed(() => this.keyword()?.attributes?.['name'] ?? '');
   protected readonly syntaxMode = computed(() => {
@@ -64,7 +64,7 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
     return initialScript !== keywordScript;
   });
 
-  protected isAfterSave = signal(false);
+  protected readonly isAfterSave = signal(false);
 
   private effectResetAfterSaveFlag = effect(() => {
     const script = this.keywordScript();
@@ -101,7 +101,7 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
     });
   }
 
-  canExit(): boolean | Observable<boolean> {
+  canLeave(): boolean | Observable<boolean> {
     if (!this.hasChanges()) {
       return true;
     }

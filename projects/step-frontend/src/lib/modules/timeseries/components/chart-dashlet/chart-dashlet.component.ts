@@ -138,7 +138,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   firstEffectTriggered = false;
 
-
   readonly itemChangeEffect = effect(() => {
     const item = this.item();
     if (this.firstEffectTriggered) {
