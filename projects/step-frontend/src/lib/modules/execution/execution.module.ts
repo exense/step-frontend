@@ -36,6 +36,9 @@ import {
   editScheduledTaskRoute,
   MultipleProjectsService,
   SearchPaginatorComponent,
+  GridSettingsRegistryService,
+  EXECUTION_REPORT_GRID,
+  canLeaveComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -171,6 +174,7 @@ import { ExecutionHistorySectionComponent } from './components/execution-history
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
@@ -223,6 +227,7 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
+    AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -341,6 +346,9 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
+    AltReportWidgetTitleDirective,
+    AltReportWidgetContentDirective,
+    AltReportWidgetFooterDirective,
   ],
   providers: [
     {
@@ -357,6 +365,7 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
+    private _gridSettingsRegistry: GridSettingsRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -365,6 +374,7 @@ export class ExecutionModule {
       this.registerDashlets();
       this.registerRoutes();
       this.registerInfoBanners();
+      this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;
     }
   }
@@ -665,6 +675,7 @@ export class ExecutionModule {
                   {
                     path: '',
                     component: AltExecutionReportComponent,
+                    canDeactivate: [canLeaveComponent],
                   },
                   {
                     path: '',
@@ -873,6 +884,93 @@ export class ExecutionModule {
   }
 
   private registerInfoBanners(): void {}
+
+  private registerGridLayout(): void {
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'errorsWidget',
+      title: 'Error Summary',
+      widthInCells: 8,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'testCases',
+      title: 'Test Cases',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'testCasesSummary',
+      title: 'Summary: Test Cases',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'keywordsSummary',
+      title: 'Summary: Keyword Calls',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'executionTree',
+      title: 'Execution Tree',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'keywordsList',
+      title: 'Steps',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'performanceOverview',
+      title: 'Performance Overview (avg)',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'errors',
+      title: 'Errors',
+      widthInCells: 8,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'currentOperations',
+      title: 'Current operations',
+      widthInCells: 4,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 99,
+    });
+  }
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';

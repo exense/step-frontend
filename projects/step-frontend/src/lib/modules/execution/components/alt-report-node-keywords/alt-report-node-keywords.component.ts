@@ -54,15 +54,15 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
 
-  private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
+  private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
   /** @Output() **/
-  openKeywordInTreeView = output<ReportNode>();
+  readonly openKeywordInTreeView = output<ReportNode>();
 
   protected openDetails(node: ReportNode): void {
     this._dialogs.openIterationDetails(node);
