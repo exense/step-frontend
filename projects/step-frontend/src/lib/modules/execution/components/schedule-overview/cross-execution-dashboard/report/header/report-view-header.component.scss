@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as m;
+
 .container {
   display: flex;
   flex-direction: row;
@@ -11,8 +13,28 @@
   }
 
   .card-value {
+    display: flex;
+    align-items: center;
     font-weight: bold;
     font-size: 2rem;
-    margin-bottom: 2rem;
+    height: 3.6rem;
+  }
+
+  .line-skeleton {
+    @include m.skeleton-background;
+    border-radius: 4px;
+    height: 2.2rem;
+    width: 60%;
+    min-width: 10rem;
+    max-width: 18rem;
+    transform: translateY(-10px);
+
+    &::before {
+      @include m.skeleton-content;
+      content: ' ';
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
   }
 }

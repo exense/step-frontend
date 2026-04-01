@@ -119,7 +119,7 @@ import { AltExecutionTreePartialTabComponent } from './components/alt-execution-
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -178,6 +178,10 @@ import {
 import {
   ExecutionHistoryNodeTooltipComponent
 } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
+import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
+import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 
 @NgModule({
   declarations: [
@@ -309,6 +313,12 @@ import {
     HistoryNodesComponent,
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
+    ChartSkeletonComponent,
+    ChartSkeletonComponent,
+    AggregatedReportViewCountErrorsPipe,
+    CalcElementWidthDirective,
+    CalcElementWidthItemDirective,
+    CalcElementWidthAggregatorDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -656,9 +666,9 @@ export class ExecutionModule {
                 },
                 canActivate: [
                   () => {
-                    const ctx = inject(AggregatedReportViewTreeStateContextService);
-                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                    ctx.setState(treeState);
+                    const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    _ctx.setState(_treeState);
                     return true;
                   },
                 ],
@@ -691,9 +701,9 @@ export class ExecutionModule {
               path: 'tree',
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AGGREGATED_TREE_TAB_STATE);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],
@@ -715,9 +725,9 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AggregatedReportViewTreeStateService);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AggregatedReportViewTreeStateService);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],

@@ -1,5 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { DateRange, Tab, TimeRange } from '@exense/step-core';
+import { DateRange, Tab, TableIndicatorMode, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, filter, map, pairwise, scan, take } from 'rxjs';
@@ -37,6 +37,8 @@ export class SchedulerReportViewComponent implements OnInit {
     },
   ];
 
+  protected readonly TableIndicatorMode = TableIndicatorMode;
+
   @ViewChild('executionList') executionList!: ExecutionListComponent;
 
   luxonDateRange = toSignal(
@@ -52,10 +54,16 @@ export class SchedulerReportViewComponent implements OnInit {
   );
 
   switchReportNodesChart(type: ReportNodesChartType) {
+    this._state.lastRefreshTrigger.set('manual');
+    if (type === 'keywords') {
+      this._state.keywordsCountChartLoading.set(true);
+    } else {
+      this._state.testCasesCountChartLoading.set(true);
+    }
     this.reportNodesChartType.set(type);
   }
 
-  readonly byExecutionChartTitle = computed(() => {
+  readonly countChartTitle = computed(() => {
     const label = this.reportNodesChartType() === 'keywords' ? 'Keyword calls count' : 'Test cases count';
     return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
   });
@@ -103,6 +111,7 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   handleMainChartZoom(timeRange: TimeRange) {
+    this._state.lastRefreshTrigger.set('manual');
     this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
       const base = chartSettings.xAxesSettings.values[0];
       const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];

@@ -6,11 +6,38 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+
+  &.with-overflow {
+    overflow: hidden;
+    .error-count {
+      max-width: 100%;
+      .text {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
 }
 
 p {
   white-space: nowrap;
   margin: 0;
+}
+
+.popover-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.popover-message {
+  white-space: normal;
+  max-width: 40rem;
+
+  .popover-errors & {
+    cursor: pointer;
+  }
 }
 
 .error-count {

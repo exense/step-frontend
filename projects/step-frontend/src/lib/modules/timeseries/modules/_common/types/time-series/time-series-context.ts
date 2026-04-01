@@ -75,7 +75,6 @@ export class TimeSeriesContext {
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
     params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
-    // any specific context change will trigger the main stateChange
     this.settingsChange$ = merge(
       this.compareModeChange$.pipe(skip(1)),
       this.inProgress$.pipe(skip(1)), // TODO
@@ -110,9 +109,9 @@ export class TimeSeriesContext {
    * If there is a selection before changing the full range, and it fits inside it, the selection will not be reset. Otherwise it does.
    * @param range
    */
-  updateFullTimeRange(range: TimeRange) {
+  updateFullTimeRange(range: TimeRange, resetSelection?: boolean) {
     range = TimeSeriesUtils.removeFloatingDigits(range);
-    const isFullRangeSelected = this.isFullRangeSelected();
+    const isFullRangeSelected = this.isFullRangeSelected() || resetSelection;
     const previousSelection = this.timeRangeSettings.selectedRange;
     if (isFullRangeSelected || !TimeSeriesUtils.intervalIsInside(range, previousSelection)) {
       // reset it

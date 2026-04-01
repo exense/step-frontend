@@ -31,7 +31,8 @@ const rule = createRule({
           name === trackBy ||
           trackBy.startsWith(`${name}.`) ||
           trackBy.includes(`${name}[`) ||
-          trackBy.includes(`(${name})[`)
+          trackBy.includes(`(${name})[`) ||
+          trackBy.includes(`($index, ${name})`)
         ) {
           return;
         }
