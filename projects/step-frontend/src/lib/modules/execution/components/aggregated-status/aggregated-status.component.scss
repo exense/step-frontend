@@ -29,9 +29,9 @@
   border-style: solid;
   border-width: 0.1rem;
   border-radius: 1rem;
-  padding: 0.1rem 0.4rem;
+  padding: 0 0.3rem;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
   background: var.$light-blue-gray;
 
   &:not(:first-child) {
