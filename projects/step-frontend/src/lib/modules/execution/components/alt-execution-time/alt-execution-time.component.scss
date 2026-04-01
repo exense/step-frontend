@@ -44,7 +44,8 @@ step-alt-execution-time {
 
     .duration {
       font-weight: 400;
-      min-width: 5rem;
+      min-width: 4.5rem;
+      padding-left: .5rem;
 
       &.is-empty {
         visibility: hidden;

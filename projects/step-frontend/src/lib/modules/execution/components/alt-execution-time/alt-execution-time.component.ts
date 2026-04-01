@@ -34,6 +34,7 @@ export class AltExecutionTimeComponent {
   readonly durationVariant = input<'plain' | 'chip'>('plain');
   readonly preserveDurationSpace = input(false);
   readonly shortenDurationMs = input(false);
+  readonly singleUnit = input(false);
   readonly popoverTitle = input<string | undefined>(undefined);
   readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
@@ -87,7 +88,7 @@ export class AltExecutionTimeComponent {
       return '';
     }
 
-    return this._durationPipe.transform(endTime, startTime, { shortenMs: this.shortenDurationMs() });
+    return this._durationPipe.transform(endTime, startTime, { shortenMs: this.shortenDurationMs(), displaySingle: this.singleUnit() });
   });
 
   protected hasContent = computed(() => {

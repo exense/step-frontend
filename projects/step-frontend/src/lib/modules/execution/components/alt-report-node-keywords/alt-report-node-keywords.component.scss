@@ -32,16 +32,6 @@ step-alt-report-node-keywords {
         td.mat-mdc-cell {
           background: var.$highlight !important;
         }
-
-        td.mat-mdc-cell:first-child {
-          border-top-left-radius: 0.8rem;
-          border-bottom-left-radius: 0.8rem;
-        }
-
-        td.mat-mdc-cell:last-child {
-          border-top-right-radius: 0.8rem;
-          border-bottom-right-radius: 0.8rem;
-        }
       }
     }
 

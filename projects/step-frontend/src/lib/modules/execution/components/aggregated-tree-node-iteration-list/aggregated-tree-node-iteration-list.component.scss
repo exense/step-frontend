@@ -1,133 +1,125 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-core/styles/core-variables' as var;
 
-step-table {
-  --mat-table-row-item-container-height: 3rem;
-  flex: 1;
+step-aggregated-tree-node-iteration-list {
+  step-table {
+    --mat-table-row-item-container-height: 3rem;
+    flex: 1;
 
-  td {
-    vertical-align: top;
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.75rem !important;
-  }
-
-  tr.content-row {
-    td.mat-mdc-cell {
-      transition: background-color 120ms ease;
+    td {
+      vertical-align: top;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
     }
 
-    &:not(:last-child) {
+    tr.content-row {
       td.mat-mdc-cell {
-        border-bottom: 1px solid var.$gray-200;
-      }
-    }
-
-    &.row-highlight,
-    &:hover {
-      td.mat-mdc-cell {
-        background: var.$highlight !important;
+        transition: background-color 120ms ease;
       }
 
-      td.mat-mdc-cell:first-child {
-        border-top-left-radius: 0.8rem;
-        border-bottom-left-radius: 0.8rem;
+      &:not(:last-child) {
+        td.mat-mdc-cell {
+          border-bottom: 1px solid var.$gray-200;
+        }
       }
 
-      td.mat-mdc-cell:last-child {
-        border-top-right-radius: 0.8rem;
-        border-bottom-right-radius: 0.8rem;
+      &.row-highlight,
+      &:hover {
+        td.mat-mdc-cell {
+          background: var.$highlight !important;
+        }
       }
     }
   }
-}
 
-.data-cell {
-  width: 100%;
-}
+  .data-cell {
+    width: 100%;
+  }
 
-.actions-cell {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-  vertical-align: middle;
+  .actions-cell {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    vertical-align: middle;
 
-  .default-theme .mat-mdc-icon-button.mat-mdc-button-base,
-  .mat-mdc-icon-button.mat-mdc-button-base {
+    .default-theme .mat-mdc-icon-button.mat-mdc-button-base,
+    .mat-mdc-icon-button.mat-mdc-button-base {
+      width: 2rem !important;
+      height: 2rem !important;
+      min-width: 2rem !important;
+      min-height: 2rem !important;
+      padding: 0 !important;
+    }
+  }
+
+  .details-trigger {
+    cursor: pointer;
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    max-width: 60rem;
+
+    .artefact-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 2rem;
+      margin: 0 0.5rem 0.2rem 0;
+
+      step-alt-execution-time {
+        display: flex;
+        width: 11.5rem;
+        overflow: hidden;
+      }
+
+      .name {
+        font-weight: 500;
+        white-space: nowrap;
+        line-height: 1.5;
+        align-self: baseline;
+      }
+    }
+  }
+
+  .sort-handler {
+    margin-left: 2.5rem;
+  }
+
+  & > section > div {
+    display: flex;
+    gap: 1rem;
+    padding-right: 2rem;
+    align-items: center;
+
+    .sort-container {
+      flex: 1;
+    }
+  }
+
+  button.details-trigger {
     width: 2rem !important;
-    height: 2rem !important;
-    min-width: 2rem !important;
-    min-height: 2rem !important;
-    padding: 0 !important;
+    step-icon {
+      @include core.step-icon-size(1.2rem);
+    }
   }
-}
 
-.details-trigger {
-  cursor: pointer;
-  display: flex;
-  gap: 0.5rem;
-  flex-direction: column;
-  max-width: 60rem;
-
-  .artefact-header {
+  .actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    height: 2rem;
-    margin: 0 0.5rem 0.2rem 0;
+    gap: 1rem;
+    margin-right: 1rem;
+    min-height: 2rem;
 
-    step-alt-execution-time {
-      display: flex;
-      width: 12rem;
-      overflow: hidden;
-    }
-
-    .name {
-      font-weight: 500;
-      white-space: nowrap;
-      line-height: 1.5;
-      align-self: baseline;
+    & > button {
+      width: 2rem;
+      height: 2rem;
     }
   }
-}
 
-.sort-handler {
-  margin-left: 2.5rem;
-}
-
-step-aggregated-tree-node-iteration-list > section > div {
-  display: flex;
-  gap: 1rem;
-  padding-right: 2rem;
-  align-items: center;
-
-  .sort-container {
-    flex: 1;
-  }
-}
-
-button.details-trigger {
-  width: 2rem !important;
-  step-icon {
-    @include core.step-icon-size(1.2rem);
-  }
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-right: 1rem;
-  min-height: 2rem;
-
-  & > button {
-    width: 2rem;
-    height: 2rem;
-  }
-}
-
-step-alert {
-  margin-bottom: 0;
-  padding: 0.5rem;
-  .warning-explanation {
-    margin-left: 0.5rem;
+  step-alert {
+    margin-bottom: 0;
+    padding: 0.5rem;
+    .warning-explanation {
+      margin-left: 0.5rem;
+    }
   }
 }
