@@ -1,4 +1,7 @@
-<step-alt-report-widget [title]="title()">
+<step-alt-report-widget>
+  <step-alt-report-widget-title>
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
   <step-alt-report-widget-content>
     <step-execution-custom-panel [context]="execution()" [itemKey]="type()" />
   </step-alt-report-widget-content>

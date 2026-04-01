@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+}
+
+.operation {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 0.5rem;
+}
+
+.popover-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.popover-label {
+  font-weight: 700;
+}

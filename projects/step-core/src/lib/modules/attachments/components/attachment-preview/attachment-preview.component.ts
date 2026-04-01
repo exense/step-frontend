@@ -46,7 +46,7 @@ export class AttachmentPreviewComponent {
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
-  private streamingStatus = computed(() => this._streamingStatus.status());
+  private readonly streamingStatus = computed(() => this._streamingStatus.status());
 
   protected readonly isStreamingInProgress = computed(() => {
     const status = this.streamingStatus();

@@ -1,0 +1,7 @@
+$row-height: 13rem;
+$row-gap: 2.4rem;
+$column-gap: 1.5rem;
+
+@function columnWidth($column-count) {
+  @return calc((100% / $column-count) - $column-gap);
+}

@@ -7,7 +7,11 @@
           <ng-container *ngTemplateOutlet="summarySkeleton" />
         }
         <div [class.hidden]="_state.summaryWidgetLoading() && _state.lastRefreshTrigger() !== 'auto'">
-          <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
+          <step-alt-report-node-summary
+            title="Summary: Executions"
+            [summary]="summary"
+            [disableChartItemClick]="true"
+          />
         </div>
       } @else {
         <ng-container *ngTemplateOutlet="summarySkeleton" />

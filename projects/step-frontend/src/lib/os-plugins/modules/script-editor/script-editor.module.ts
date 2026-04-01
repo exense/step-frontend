@@ -1,6 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordsService,
+  canLeaveComponent,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   EntityRefDirective,
@@ -15,7 +16,6 @@ import { ScriptEditorComponent } from './components/script-editor/script-editor.
 import './components/script-editor/script-editor.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import './components/function-type-script/function-type-script.component';
-import { canDeactivateFn } from './guards/can-deactivate-function';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ActivatedRouteSnapshot } from '@angular/router';
 
@@ -57,7 +57,7 @@ export class ScriptEditorModule {
             },
           },
           canDeactivate: [
-            canDeactivateFn,
+            canLeaveComponent,
             () => {
               inject(MultipleProjectsService).cleanupProjectMessage();
               inject(AugmentedKeywordsService).cleanupCache();
