@@ -11,18 +11,21 @@ import {
   output,
 } from '@angular/core';
 import { AggregatedReportView, StepBasicsModule, StepIconsModule } from '@exense/step-core';
+import { AggregatedReportViewCountErrorsPipe } from '../../pipes/aggregated-report-view-count-errors.pipe';
 
 @Component({
   selector: 'step-test-case-inline-root-cause',
   imports: [StepIconsModule, StepBasicsModule],
   templateUrl: './test-case-inline-root-cause.component.html',
   styleUrl: './test-case-inline-root-cause.component.scss',
+  providers: [AggregatedReportViewCountErrorsPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TestCaseInlineRootCauseComponent implements AfterViewInit {
   readonly item = input.required<AggregatedReportView>();
   readonly searchFor = output<string>();
 
+  private _aggregatedReportViewPipe = inject(AggregatedReportViewCountErrorsPipe);
   private _element: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
   private _zone: NgZone = inject(NgZone);
   private _changeDetection = inject(ChangeDetectorRef);
@@ -33,7 +36,7 @@ export class TestCaseInlineRootCauseComponent implements AfterViewInit {
     const container = this.findContainer();
     if (!container) return;
 
-    const update = () => {
+    const update = (): void => {
       const targetWidth = Math.max(0, container.clientWidth - 40);
 
       if (this.currentWidth || 0 < container.clientWidth - 60 || this.currentWidth || 0 > container.clientWidth + 60) {
@@ -67,14 +70,16 @@ export class TestCaseInlineRootCauseComponent implements AfterViewInit {
 
   protected readonly errorCounts = computed(() => {
     const item = this.item();
-    let result = 0;
-    Object.values(item.countByErrorMessage ?? {}).forEach((count) => (result += count));
-    Object.values(item.countByChildrenErrorMessage ?? {}).forEach((count) => (result += count));
-    return result;
+    return this._aggregatedReportViewPipe.transform(item);
   });
 
   protected readonly singleMessage = computed(() => {
     const item = this.item();
     return Object.keys(item.countByErrorMessage ?? [])[0] ?? Object.keys(item.countByChildrenErrorMessage ?? [])[0];
+  });
+
+  protected readonly errorMessages = computed(() => {
+    const item = this.item();
+    return [...Object.keys(item.countByErrorMessage ?? {}), ...Object.keys(item.countByChildrenErrorMessage ?? {})];
   });
 }

@@ -1,0 +1,172 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use '../grid-sizes' as sizes;
+
+step-grid-layout {
+  $cols-count: var(--style__cols-count);
+  $drag-handle-height: 6rem;
+
+  display: grid;
+  grid-template-columns: repeat($cols-count, sizes.columnWidth($cols-count));
+  grid-auto-rows: sizes.$row-height;
+  row-gap: sizes.$row-gap;
+  column-gap: sizes.$column-gap;
+  position: relative;
+
+  &.hidden {
+    visibility: hidden;
+  }
+
+  .step-grid-element {
+    position: relative;
+    display: flex;
+    min-width: 0;
+
+    > :not(step-grid-drag-handle):not(step-grid-resizer):not(step-grid-element-title) {
+      width: 100%;
+      min-width: 0;
+    }
+
+    &.element-hidden {
+      display: none;
+    }
+
+    step-grid-drag-handle {
+      display: none;
+      position: absolute;
+      min-height: $drag-handle-height;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 11;
+
+      & > section {
+        position: absolute;
+        background: var.$gray-400;
+        opacity: 1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      step-grid-element-remove {
+        position: absolute;
+        z-index: 6;
+        right: 1rem;
+        top: calc(50% - 1rem);
+        line-height: 1;
+        font-size: initial;
+      }
+    }
+
+    step-grid-resizer {
+      display: none;
+      position: absolute;
+      bottom: 0.2rem;
+      right: 0.2rem;
+      z-index: 11;
+    }
+  }
+
+  .preview {
+    border-style: solid;
+    border-width: 0.1rem;
+    background: var.$blue-50;
+    border-color: var.$blue-600;
+    opacity: 0.5;
+    border-radius: 0.5rem;
+    position: absolute;
+    display: none;
+
+    $animation-duration: 0.2s;
+    transition:
+      top $animation-duration ease,
+      left $animation-duration ease,
+      width $animation-duration ease,
+      height $animation-duration ease;
+
+    &.preview-invalid {
+      background: var.$red-50;
+      border-color: var.$red-650;
+    }
+  }
+
+  &.show-preview {
+    .preview {
+      display: block;
+    }
+  }
+
+  &.is-resize {
+    cursor: nwse-resize;
+  }
+
+  &.edit-mode .step-grid-element {
+    step-grid-drag-handle,
+    step-grid-resizer {
+      display: block;
+    }
+    .step-grid-drag-handle {
+      cursor: grab;
+    }
+
+    &::after {
+      content: ' ';
+      position: absolute;
+      display: block;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+  }
+
+  .hidden-placeholder {
+    border: dashed 0.1rem var.$black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var.$white;
+
+    .hidden-placeholder-info {
+      position: absolute;
+      z-index: 12;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      margin-top: calc($drag-handle-height / 2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: calc(100% - 2.4rem);
+      padding: 0.8rem 1.2rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var.$gray-500;
+      text-align: center;
+      user-select: none;
+      pointer-events: none;
+
+      > span,
+      > step-icon {
+        position: relative;
+        z-index: 12;
+      }
+
+      step-icon {
+        flex: none;
+      }
+
+      step-icon[name='help-circle'] {
+        pointer-events: auto;
+      }
+    }
+
+    step-grid-drag-handle > section {
+      background: var.$blue-15;
+      opacity: 1;
+    }
+  }
+}

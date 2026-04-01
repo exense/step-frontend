@@ -6,6 +6,9 @@ import { ItemInfo, Mutable } from '@exense/step-core';
 
 type FieldAccessor = Mutable<Pick<SingleExecutionPanelsService, 'customPanels'>>;
 
+/**
+ * @deprecated Relates to legacy execution's view
+ * **/
 @Injectable()
 export class SingleExecutionPanelsService {
   private _executionsPanelService = inject(ExecutionsPanelsService);
@@ -62,7 +65,7 @@ export class SingleExecutionPanelsService {
     this._executionsPanelService.setShowPanel(viewId, show, this.executionId);
   }
 
-  toggleShowPanel(viewId: string) {
+  toggleShowPanel(viewId: string): void {
     if (!this.executionId) {
       return;
     }
