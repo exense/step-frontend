@@ -62,7 +62,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
   protected openDetails(node: ReportNode): void {
-    this._dialogs.openIterationDetails(node, 'steps');
+    this._dialogs.openIterationDetails(node);
   }
 
   protected toggleCountsCalculation(): void {

@@ -1,125 +1,68 @@
-<step-modal-window [hideButtonsSection]="true">
+<step-modal-window>
   <div class="tree-node-modal-header" step-modal-window-title>
-    @if (hasBackButton()) {
-      <button
-        type="button"
-        mat-icon-button
-        (click)="navigateBack()"
-        matTooltip="Back"
-        matTooltipPosition="below"
-        tabindex="-1"
-      >
-        <step-icon name="arrow-left" />
-      </button>
-    }
-    <div class="header-text">
-      <div class="header-title">Execution Drilldown</div>
-      <div class="header-breadcrumbs">
-        @for (item of breadcrumbs(); track item; let isLast = $last) {
-          <span class="breadcrumb">{{ item }}</span>
-          @if (!isLast) {
-            <span class="separator">/</span>
-          }
-        }
-      </div>
-    </div>
-    <button type="button" mat-button class="close-button" (click)="closeDialog()">Close</button>
-  </div>
-
-  <div step-modal-window-body>
-    <div class="panel-layout">
-      @for (entry of visibleEntries(); track entry.key; let isLast = $last) {
-        <section
-          class="panel-area"
-          [class.minimized-area]="entry.kind === 'minimized'"
-          [attr.data-panel-key]="entry.key"
-          [style.width]="panelWidth(entry, isLast)"
-          [style.flex]="$last ? '1 1 auto' : '0 0 auto'"
+    @if (selectedReportNode(); as reportNode) {
+      @if (hasBackButton()) {
+        <button
+          type="button"
+          mat-icon-button
+          (click)="navigateBack()"
+          matTooltip="Back"
+          matTooltipPosition="below"
+          tabindex="-1"
         >
-          @if (entry.kind === 'minimized') {
-            <section class="drilldown-panel minimized-panel">
-              <header class="panel-header">
-                <step-icon name="more-horizontal" />
-              </header>
-              <div class="panel-content minimized-content">
-                @for (panel of entry.panels; track panel.key) {
-                  <button
-                    type="button"
-                    class="minimized-item"
-                    [matTooltip]="minimizedTooltip(panel)"
-                    matTooltipPosition="left"
-                    (click)="reopenPanel(panel)"
-                  >
-                    <span class="minimized-item-label">{{ minimizedLabel(panel) }}</span>
-                    <step-icon [name]="panelIcon(panel)" />
-                  </button>
-                }
-              </div>
-            </section>
-          } @else {
-            <section class="drilldown-panel" [class.root-panel]="entry.panel.kind === 'root'">
-              <header class="panel-header">
-                <h2>{{ entry.panel.title }}</h2>
-                <div class="panel-actions">
-                  @if (isRightMostPanel(entry.panel)) {
-                    <button
-                      type="button"
-                      mat-icon-button
-                      [matTooltip]="isMaximized(entry.panel) ? 'Restore panels' : 'Maximize panel'"
-                      matTooltipPosition="below"
-                      (click)="toggleRightMostPanelSize(entry.panel)"
-                    >
-                      <step-icon [name]="isMaximized(entry.panel) ? 'minimize-2' : 'maximize-2'" />
-                    </button>
-                  }
-                  @if (entry.panel.kind !== 'root') {
-                    <button
-                      type="button"
-                      mat-icon-button
-                      matTooltip="Close panel"
-                      matTooltipPosition="below"
-                      (click)="closePanel(entry.panel.panel.instanceId)"
-                    >
-                      <step-icon name="x" />
-                    </button>
-                  }
-                </div>
-              </header>
-
-              <div class="panel-content">
-                @switch (entry.panel.kind) {
-                  @case ('root') {
-                    @switch (entry.panel.source) {
-                      @case ('steps') {
-                        <step-alt-report-node-keywords />
-                      }
-                      @case ('testcases') {
-                        <step-alt-report-nodes-testcases />
-                      }
-                      @default {
-                        <step-execution-drilldown-root-tree-panel />
-                      }
-                    }
-                  }
-                  @case ('iteration-list') {
-                    <step-execution-drilldown-iteration-panel [panel]="entry.panel.panel" />
-                  }
-                  @case ('node-details') {
-                    <step-execution-drilldown-node-details-panel [panel]="entry.panel.panel" />
-                  }
-                }
-              </div>
-            </section>
-          }
-        </section>
-
-        @if (!isLast) {
-          <div
-            class="panel-divider"
-            (mousedown)="handleDividerMouseDown(entry, visibleEntries()[$index + 1], $event)"
-          ></div>
-        }
+          <step-icon name="arrow-left" />
+        </button>
       }
-    </div>
+      <step-report-node-icon class="artefact-icon" [node]="reportNode" />
+      <step-status [status]="reportNode.status" [iconMode]="true" />
+      <span>{{ reportNode.name }}</span>
+      <step-alt-execution-time
+        [startTime]="reportNode.executionTime"
+        [duration]="reportNode.duration"
+        [timeOnly]="true"
+      />
+      <div class="btn-show-details-container">
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Show plan node details"
+          matTooltipPosition="below"
+          [routerLink]="['.', 'plan-node']"
+          [relativeTo]="_activatedRoute"
+          [queryParams]="{ reportNodeId: reportNode.id }"
+          queryParamsHandling="merge"
+        >
+          <step-icon name="external-link" />
+        </button>
+      </div>
+    } @else {
+      <span>Iteration list</span>
+    }
+  </div>
+  <div step-modal-window-body>
+    @if (hasData()) {
+      <div class="panel-container">
+        <div class="main-content">
+          @if (selectedReportNode(); as reportNode) {
+            <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
+          } @else {
+            @if (aggregatedNode(); as aggregatedNode) {
+              <div class="iteration-list">
+                <step-aggregated-tree-node-iteration-list
+                  [node]="aggregatedNode!"
+                  [resolvedPartialPath]="resolvedPartialPath"
+                  [initialStatus]="initialSearchStatus"
+                  [initialStatusCount]="initialSearchStatusCount"
+                  (showDetails)="handleOpenDetails($event)"
+                />
+              </div>
+              @if (historyHashContainer(); as historyHashContainer) {
+                <step-execution-history-section [artefactHashContainer]="historyHashContainer" />
+              }
+            }
+          }
+        </div>
+      </div>
+    }
   </div>
 </step-modal-window>

@@ -84,7 +84,6 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       nodeStatus: options?.status,
       nodeStatusCount: options?.count,
       searchFor: options?.searchFor,
-      source: 'testcases',
     });
   }
 

@@ -172,9 +172,6 @@ import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-v
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import { ExecutionDrilldownNodeDetailsPanelComponent } from './components/execution-drilldown-node-details-panel/execution-drilldown-node-details-panel.component';
-import { ExecutionDrilldownIterationPanelComponent } from './components/execution-drilldown-iteration-panel/execution-drilldown-iteration-panel.component';
-import { ExecutionDrilldownRootTreePanelComponent } from './components/execution-drilldown-root-tree-panel/execution-drilldown-root-tree-panel.component';
 
 @NgModule({
   declarations: [
@@ -244,9 +241,6 @@ import { ExecutionDrilldownRootTreePanelComponent } from './components/execution
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
-    ExecutionDrilldownNodeDetailsPanelComponent,
-    ExecutionDrilldownIterationPanelComponent,
-    ExecutionDrilldownRootTreePanelComponent,
     ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
@@ -794,15 +788,12 @@ export class ExecutionModule {
                   },
                   {
                     hasBackdrop: false,
-                    height: 'calc(100% - 3.2rem)',
-                    width: 'calc(100% - 25.4rem)',
-                    panelClass: 'execution-drilldown-dialog',
-                    enterAnimationDuration: '0ms',
-                    exitAnimationDuration: '0ms',
+                    height: '100%',
+                    width: '40%',
+                    panelClass: 'side-dialog',
                     position: {
-                      left: '25.4rem',
                       right: '0',
-                      top: '3.2rem',
+                      top: '0',
                       bottom: '0',
                     },
                   },

@@ -10,7 +10,6 @@ import { AltReportNodesStateService } from '../../services/alt-report-nodes-stat
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
-import { EXECUTION_DRILLDOWN_PANEL_SOURCE } from '../../services/execution-drilldown-panel-source.token';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -33,10 +32,6 @@ import { EXECUTION_DRILLDOWN_PANEL_SOURCE } from '../../services/execution-drill
       provide: AltReportNodesStateService,
       useExisting: AltKeywordNodesStateService,
     },
-    {
-      provide: EXECUTION_DRILLDOWN_PANEL_SOURCE,
-      useValue: 'tree',
-    },
     AggregatedReportViewTreeSearchFacadeService,
   ],
   hostDirectives: [ElementSizeDirective],
@@ -47,7 +42,7 @@ export class AltExecutionTreeWidgetComponent {
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
 
-  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+  private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   private effectFocusNode = effect(() => {
     const foundItems = this._treeSearch.foundItems();
@@ -63,7 +58,7 @@ export class AltExecutionTreeWidgetComponent {
     });
   });
 
-  focusAndSearch(query: string) {
+  focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }
 

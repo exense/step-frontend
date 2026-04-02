@@ -5,7 +5,6 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 import { ElementSizeService, TreeNodeData } from '@exense/step-core';
-import { EXECUTION_DRILLDOWN_PANEL_SOURCE } from '../../services/execution-drilldown-panel-source.token';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -24,7 +23,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _parentElementSize = inject(ElementSizeService, { skipSelf: true, optional: true });
   private _treeNodeData = inject(TreeNodeData);
-  private _drilldownSource = inject(EXECUTION_DRILLDOWN_PANEL_SOURCE, { optional: true });
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
@@ -41,12 +39,12 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     return result;
   });
 
-  protected node = computed(() => {
+  protected readonly node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
   });
 
-  protected isSelected = computed(() => {
+  protected readonly isSelected = computed(() => {
     const nodeId = this.nodeId();
     const selectedNodes = this._treeState.selectedNodeIds();
     return selectedNodes.includes(nodeId);
@@ -65,10 +63,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
       count = Object.values(node.countByStatus ?? {}).reduce((res, item) => res + item, 0);
     }
     this._treeState.selectNode(node);
-    this._executionDialogs.openIterations(node, {
-      nodeStatus: status,
-      nodeStatusCount: count,
-      source: this._drilldownSource ?? undefined,
-    });
+    this._executionDialogs.openIterations(node, { nodeStatus: status, nodeStatusCount: count });
   }
 }
