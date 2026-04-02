@@ -76,10 +76,12 @@ step-alt-execution-tree {
     flex: 1;
     .node-content {
       align-items: flex-start !important;
+      margin-bottom: 0 !important;
       max-width: 100%;
       min-width: 50rem;
       overflow: hidden;
       .node-icon {
+        background: transparent !important;
         transform: translateX(0.6rem);
         position: relative;
         border: none !important;
