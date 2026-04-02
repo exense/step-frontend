@@ -1,14 +1,28 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>
-      <span>{{ title() }}</span>
+      @if (titleTemplateRef(); as templateRef) {
+        <ng-container *ngTemplateOutlet="templateRef" />
+      } @else {
+        <span>{{ title() }}</span>
+      }
     </mat-card-title>
+    @if (canMinimize()) {
+      <button mat-icon-button (click)="minimize.emit()">
+        <step-icon name="minimize-2" />
+      </button>
+    }
+    @if (canMaximize()) {
+      <button mat-icon-button (click)="maximize.emit()">
+        <step-icon name="maximize-2" />
+      </button>
+    }
     <button mat-icon-button (click)="remove.emit()">
       <step-icon name="x" />
     </button>
   </mat-card-header>
   <mat-card-content>
-    @if (templateRef(); as templateRef) {
+    @if (contentTemplateRef(); as templateRef) {
       <ng-container *ngTemplateOutlet="templateRef" />
     }
   </mat-card-content>

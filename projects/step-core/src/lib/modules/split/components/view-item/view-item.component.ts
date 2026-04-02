@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 import { StackViewInfo } from '../../types/stack-view-info';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 
@@ -7,11 +7,17 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   imports: [StepBasicsModule],
   templateUrl: './view-item.component.html',
   styleUrl: './view-item.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ViewItemComponent {
   readonly view = input.required<StackViewInfo>();
+  readonly canMinimize = input(false);
+  readonly canMaximize = input(false);
   readonly remove = output();
+  readonly minimize = output();
+  readonly maximize = output();
 
   protected readonly title = computed(() => this.view().title);
-  protected readonly templateRef = computed(() => this.view().templateRef);
+  protected readonly titleTemplateRef = computed(() => this.view().titleTemplateRef);
+  protected readonly contentTemplateRef = computed(() => this.view().contentTemplateRef);
 }

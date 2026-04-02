@@ -1,0 +1,20 @@
+@for (item of views(); track item.id; let isLast = $last) {
+  @if (isLast) {
+    <div>
+      @if (item.titleTemplateRef) {
+        <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
+      } @else {
+        {{ item.title }}
+      }
+    </div>
+  } @else {
+    <button type="button" mat-button (click)="openView.emit(item.id)">
+      @if (item.titleTemplateRef) {
+        <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
+      } @else {
+        {{ item.title }}
+      }
+    </button>
+    <step-icon name="arrow-right" />
+  }
+}

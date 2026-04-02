@@ -1,12 +1,20 @@
+<step-stack-view-breadcrumbs [views]="views()" (openView)="openView($event)" />
 <step-split>
-  @for (view of viewsAndGroups(); track view.id; let isLast = $last) {
+  @for (view of viewsAndGroups(); track view.id; let isLast = $last; let isFirst = $first) {
     @if (view | isSplitViewGroup; as group) {
       <step-split-area sizeType="pixel" [size]="GROUP_WIDTH">
-        <step-view-group [group]="group" (openView)="openViewFromGroup($event)" />
+        <step-view-group [group]="group" (openView)="openView($event)" />
       </step-split-area>
     } @else {
       <step-split-area sizeType="flex">
-        <step-view-item [view]="view" (remove)="removeView(view.id)" />
+        <step-view-item
+          [view]="view"
+          [canMinimize]="isMaximized() && isLast && !isFirst"
+          [canMaximize]="!isMaximized() && isLast && !isFirst"
+          (remove)="removeView(view.id)"
+          (maximize)="maximize()"
+          (minimize)="minimize()"
+        />
       </step-split-area>
     }
     @if (!isLast) {

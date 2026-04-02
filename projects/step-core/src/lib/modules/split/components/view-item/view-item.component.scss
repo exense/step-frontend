@@ -1,14 +1,18 @@
-:host {
+step-view-item {
   height: 100%;
-}
 
-mat-card {
-  height: calc(100% - 1rem);
-  margin: 0.5rem;
-}
+  mat-card {
+    height: calc(100% - 1rem);
+    margin: 0.5rem;
+  }
 
-mat-card-header {
-  align-items: center;
-  gap: 1rem;
-  justify-content: space-between;
+  mat-card-header {
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: space-between;
+
+    & > div:first-child {
+      flex: 1;
+    }
+  }
 }

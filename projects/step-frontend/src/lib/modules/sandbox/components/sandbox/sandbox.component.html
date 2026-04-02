@@ -1,10 +1,13 @@
 <section>
   <step-stack-view (removeItem)="removeItem($event)">
     @for (item of items(); track item.id) {
-      <div class="item" *stepStackViewItem="item.id; title: item.title">
-        <span>Content for view with id</span>
-        <strong>{{ item.id }}</strong>
-      </div>
+      <step-stack-view-item [itemId]="item.id" [itemTitle]="item.title">
+        <strong *stepStackViewItemTitle>{{ item.title }}</strong>
+        <div class="item" *stepStackViewItemContent>
+          <span>Content for view with id</span>
+          <strong>{{ item.id }}</strong>
+        </div>
+      </step-stack-view-item>
     }
   </step-stack-view>
   <div>

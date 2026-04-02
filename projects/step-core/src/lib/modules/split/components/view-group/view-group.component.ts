@@ -19,7 +19,7 @@ export class ViewGroupComponent {
     const items = group?.children ?? [];
     return items.map((item) => {
       const key = item.id;
-      const value = item.title[0];
+      const value = item.title?.[0] ?? item.id?.[0];
       return { key, value } as KeyValue<string, string>;
     });
   });

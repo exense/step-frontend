@@ -15,10 +15,11 @@ import { StackViewInfo } from '../../types/stack-view-info';
 import { IsSplitViewGroupPipe } from '../../pipes/is-split-view-group.pipe';
 import { ViewGroupComponent } from '../view-group/view-group.component';
 import { ViewItemComponent } from '../view-item/view-item.component';
-import { StackViewItemDirective } from '../../directives/stack-view-item.directive';
 import { SplitAreaComponent } from '../split-area/split-area.component';
 import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
 import { SplitComponent } from '../split/split.component';
+import { StackViewItemComponent } from '../stack-view-item/stack-view-item.component';
+import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-view-breadcrumbs.component';
 
 @Component({
   selector: 'step-stack-view',
@@ -29,6 +30,7 @@ import { SplitComponent } from '../split/split.component';
     IsSplitViewGroupPipe,
     ViewGroupComponent,
     ViewItemComponent,
+    StackViewBreadcrumbsComponent,
   ],
   templateUrl: './stack-view.component.html',
   styleUrl: './stack-view.component.scss',
@@ -44,11 +46,13 @@ export class StackViewComponent {
     afterNextRender(() => this.isRendered.set(true));
   }
 
+  private readonly isMaximizedInternal = signal(false);
   private readonly isRendered = signal(false);
   private readonly splitAreas = viewChildren(SplitAreaComponent);
-  private readonly items = contentChildren(StackViewItemDirective);
+  private readonly items = contentChildren(StackViewItemComponent);
 
-  private readonly views = signal<StackViewInfo[]>([]);
+  protected readonly isMaximized = this.isMaximizedInternal.asReadonly();
+  protected readonly views = signal<StackViewInfo[]>([]);
 
   private effectUpdateViews = effect(() => {
     const items = this.items();
@@ -64,6 +68,21 @@ export class StackViewComponent {
 
   protected readonly viewsAndGroups = computed(() => {
     const views = this.views();
+    const isMaximized = this.isMaximizedInternal();
+
+    if (isMaximized && views.length > 1) {
+      const group = views.slice(0, views.length - 1);
+      return [
+        {
+          id: 'group',
+          title: 'Group',
+          content: '',
+          children: group,
+        } as StackViewInfo,
+        views[views.length - 1],
+      ];
+    }
+
     if (views.length <= 3) {
       return views;
     }
@@ -84,6 +103,7 @@ export class StackViewComponent {
   private effectUpdateAreasSize = effect(() => {
     const viewsAndGroups = this.viewsAndGroups();
     const splitAreas = this.splitAreas();
+    const isMaximized = this.isMaximizedInternal();
     if (!splitAreas?.length) {
       return;
     }
@@ -93,7 +113,10 @@ export class StackViewComponent {
 
     if (splitAreas.length <= 3) {
       for (let i = 0; i < splitAreas.length; i++) {
-        const size = i === splitAreas.length - 1 ? half : subWidth;
+        let size = i === splitAreas.length - 1 ? half : subWidth;
+        if (isMaximized && i === 0) {
+          size = this.GROUP_WIDTH;
+        }
         splitAreas[i].setSize(size);
       }
       return;
@@ -110,13 +133,22 @@ export class StackViewComponent {
     this.removeItem.emit(id);
   }
 
-  protected openViewFromGroup(id: string): void {
+  protected openView(id: string): void {
     const views = untracked(() => this.views());
     const viewIndex = views.findIndex((item) => item.id === id);
     const sibling = views[viewIndex + 1];
     if (!sibling) {
       return;
     }
+    this.minimize();
     this.removeItem.emit(sibling.id);
+  }
+
+  protected maximize(): void {
+    this.isMaximizedInternal.set(true);
+  }
+
+  protected minimize(): void {
+    this.isMaximizedInternal.set(false);
   }
 }
