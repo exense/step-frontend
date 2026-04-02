@@ -37,10 +37,13 @@ import {
   DateUtilsService,
   EntityRefService,
   Execution,
+  EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
+  GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
+  provideGridLayoutConfig,
   ReloadableDirective,
   ReportNode,
   smartSwitchMap,
@@ -76,6 +79,7 @@ import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-
 import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 import { TimeRangeExt } from '../../shared/time-range-ext';
+import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -146,6 +150,11 @@ interface RefreshParams {
       useExisting: forwardRef(() => AltExecutionProgressComponent),
     },
     AggregatedTreeDataLoaderService,
+    {
+      provide: GridPersistenceStateService,
+      useClass: ExecutionReportGridPersistenceStateService,
+    },
+    ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   standalone: false,
 })

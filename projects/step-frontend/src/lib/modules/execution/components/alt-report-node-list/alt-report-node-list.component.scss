@@ -18,8 +18,15 @@ step-alt-report-node-list {
     }
   }
 
+  .mat-mdc-card {
+    max-height: 100%;
+  }
+
+  .mat-mdc-card-content {
+    max-height: calc(100% - 5rem);
+  }
+
   step-alt-report-widget-content {
-    max-height: 38rem;
     & > div {
       color: var.$gray-500;
       display: flex;

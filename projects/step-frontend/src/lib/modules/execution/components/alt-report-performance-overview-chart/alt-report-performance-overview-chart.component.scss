@@ -1,11 +1,37 @@
 step-alt-report-performance-overview-chart {
   width: 100%;
 
+  step-alt-report-widget-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
   step-standalone-dashlet {
-    step-timeseries-chart .chart-wrapper {
-      overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    step-timeseries-chart {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
+      .chart-wrapper {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .ts-chart-legend {
+        flex-grow: 0;
+        flex-shrink: 0;
+        margin-bottom: 1.5rem;
+      }
     }
   }
+
   button {
     white-space: nowrap;
   }
