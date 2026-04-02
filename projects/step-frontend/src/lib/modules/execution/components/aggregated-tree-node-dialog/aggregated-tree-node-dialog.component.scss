@@ -42,48 +42,8 @@ step-aggregated-tree-node-dialog {
     }
 
     .breadcrumb {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.4rem;
-      min-width: 0;
-      padding: 0.2rem 0.6rem;
-      border-radius: 0.6rem;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      cursor: pointer;
-      font: inherit;
       overflow: hidden;
       text-overflow: ellipsis;
-      outline: none;
-
-      &:hover {
-        color: rgb(55, 65, 81);
-        text-decoration: underline;
-      }
-
-      &:focus-visible {
-        background: rgb(229, 231, 235);
-        color: rgb(31, 41, 55);
-        text-decoration: none;
-      }
-    }
-
-    .current-breadcrumb {
-      padding-left: 0;
-      padding-right: 0;
-      cursor: default;
-
-      &:hover,
-      &:focus-visible {
-        background: transparent;
-        color: inherit;
-        text-decoration: none;
-      }
-    }
-
-    .breadcrumb-suffix {
-      font-weight: 400;
     }
 
     .separator {
@@ -180,11 +140,6 @@ step-aggregated-tree-node-dialog {
       white-space: nowrap;
       font-size: 1.4rem;
       font-weight: 600;
-    }
-
-    .panel-title-suffix {
-      margin-left: 0.4rem;
-      font-weight: 400;
     }
   }
 
