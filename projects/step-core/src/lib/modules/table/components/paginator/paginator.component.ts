@@ -1,13 +1,15 @@
 import { Component, computed, effect, input, model, output, signal, ViewEncapsulation } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { StepPageEvent } from '../../types/step-page-event';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { EDITABLE_LABELS_EXPORTS } from '../../../editable-labels';
 
 @Component({
   selector: 'step-paginator',
   templateUrl: './paginator.component.html',
   styleUrl: './paginator.component.scss',
   encapsulation: ViewEncapsulation.None,
-  standalone: false,
+  imports: [StepBasicsModule, ...EDITABLE_LABELS_EXPORTS],
 })
 export class PaginatorComponent {
   readonly showPageSizeOptions = input(true);
@@ -16,7 +18,7 @@ export class PaginatorComponent {
     transform: (value?: number[] | null) => value ?? [],
   });
 
-  protected areOptionsEditable = computed(() => this.pageSizeOptions().length > 1);
+  protected readonly areOptionsEditable = computed(() => this.pageSizeOptions().length > 1);
 
   protected effectSetSizeOptions = effect(() => {
     const options = this.pageSizeOptions();
@@ -38,18 +40,18 @@ export class PaginatorComponent {
     this.length.set(this.lengthInput());
   });
 
-  isPageDisabled = input(false, {
+  readonly isPageDisabled = input(false, {
     alias: 'disabled',
     transform: (value: boolean | undefined | null) => !!value,
   });
 
   readonly length = signal(0);
-  pageSize = model(0);
+  readonly pageSize = model(0);
   readonly pageIndex = signal(0);
 
   readonly pageChange = output<StepPageEvent>();
 
-  private pageEvent = computed<StepPageEvent>(() => {
+  private readonly pageEvent = computed<StepPageEvent>(() => {
     const pageIndex = this.pageIndex();
     const pageSize = this.pageSize();
     return {
@@ -65,7 +67,7 @@ export class PaginatorComponent {
 
   readonly page$ = toObservable(this.pageEvent);
 
-  private pagesCount = computed(() => {
+  private readonly pagesCount = computed(() => {
     const length = this.length();
     const pageSize = this.pageSize();
     if (pageSize <= 0) {
@@ -78,8 +80,8 @@ export class PaginatorComponent {
     return result;
   });
 
-  protected canGoPrev = computed(() => this.pageIndex() > 0);
-  protected canGoNext = computed(() => {
+  protected readonly canGoPrev = computed(() => this.pageIndex() > 0);
+  protected readonly canGoNext = computed(() => {
     const [usePagesCount, pageIndex, pagesCount, hasNext] = [
       this.usePagesCount(),
       this.pageIndex(),
@@ -92,7 +94,7 @@ export class PaginatorComponent {
     return hasNext;
   });
 
-  protected pageLabel = computed(() => {
+  protected readonly pageLabel = computed(() => {
     const [pageIndex, pageSize, pagesCount, length, usePagesCount] = [
       this.pageIndex(),
       this.pageSize(),

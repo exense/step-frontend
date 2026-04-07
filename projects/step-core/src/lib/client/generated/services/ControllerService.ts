@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { ArtefactInfo } from '../models/ArtefactInfo';
+import type { ArtefactLinks } from '../models/ArtefactLinks';
 import type { Plan } from '../models/Plan';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
@@ -27,6 +28,20 @@ export class ControllerService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/controller/repository/artefact/info',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns ArtefactLinks default response
+   * @throws ApiError
+   */
+  public getArtefactLinks(requestBody?: RepositoryObjectReference): Observable<ArtefactLinks> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/controller/repository/artefact/links',
       body: requestBody,
       mediaType: 'application/json',
     });

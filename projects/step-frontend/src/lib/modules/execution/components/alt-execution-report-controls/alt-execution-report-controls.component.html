@@ -3,6 +3,16 @@
     <step-icon name="file-text" />
   </button>
 </step-btn-group>
+@if (!(_isSmallScreen$ | async)) {
+  <step-grid-control-tool
+    hintEditGrid="Edit report layout"
+    layoutReadPermission="reportLayout-read"
+    layoutWritePermission="reportLayout-write"
+    layoutDeletePermission="reportLayout-delete"
+    layoutSharedWritePermission="reportLayout-shared-write"
+    layoutSharedDeletePermission="reportLayout-shared-delete"
+  />
+}
 <mat-menu #menu="matMenu">
   <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
   <button type="button" mat-menu-item (click)="_printService.printAll()">Print All</button>

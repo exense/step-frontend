@@ -75,8 +75,16 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() lockStateChange = new EventEmitter<boolean>();
   lockState = signal<boolean>(false); // the state does not change when unlocking from a synced chart
 
+  private lockEffectFirstRun = true;
+
   lockEffect = effect(() => {
-    let locked = this.lockState();
+    const locked = this.lockState();
+
+    if (this.lockEffectFirstRun) {
+      this.lockEffectFirstRun = false;
+      return; // skip init
+    }
+
     this.lockStateChange.emit(locked);
   });
 
@@ -206,9 +214,11 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   ) => subScaleKey == pubScaleKey;
 
   getSize = () => {
+    // When height is 0 the chart uses the rendered height of the parent element
+    const containerHeight = this.height || this._element.nativeElement.parentElement.offsetHeight;
     return {
       width: this._element.nativeElement.parentElement.offsetWidth - 12,
-      height: this.height - this.HEADER_HEIGHT - this.LEGEND_HEIGHT,
+      height: containerHeight - this.HEADER_HEIGHT - this.LEGEND_HEIGHT,
     };
   };
 
@@ -349,7 +359,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       series: [
         {
           label:
-            this.settings.xAxesSettings.label || (this.settings.xAxesSettings.time ?? true ? 'Timestamp' : 'Value'),
+            this.settings.xAxesSettings.label || ((this.settings.xAxesSettings.time ?? true) ? 'Timestamp' : 'Value'),
           value: this.settings.xAxesSettings.valueFormatFn || DEFAULT_TIMESTAMP_FORMAT_FN,
         },
         ...settings.series, // show flag will show/hide series, but they will still exist in the chart

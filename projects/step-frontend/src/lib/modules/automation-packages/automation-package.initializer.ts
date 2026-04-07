@@ -18,6 +18,7 @@ import {
   AugmentedAutomationPackagesService,
   AugmentedResourcesService,
   AutomationPackageEntityTableRegistryService,
+  AuthService,
   checkEntityGuardFactory,
   dialogRoute,
   EntityRegistry,
@@ -166,10 +167,12 @@ const registerRoutes = () => {
 };
 
 const registerMenuEntries = () => {
+  const _auth = inject(AuthService);
   const _viewRegistry = inject(ViewRegistryService);
   _viewRegistry.registerMenuEntry(LABEL_MENU, 'automation-package', AP_ICON, {
     parentId: 'automation-root',
     weight: 100,
+    isEnabledFunction: () => _auth.hasRight('automation-package-read'),
   });
 };
 

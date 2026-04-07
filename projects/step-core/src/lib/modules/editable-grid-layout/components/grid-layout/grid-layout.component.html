@@ -1,0 +1,29 @@
+@if (_gridEditable.editMode()) {
+  <step-grid-background />
+}
+@if (isInitialised()) {
+  @for (item of gridItems(); track item.widgetId) {
+    @if (item.templateRef; as templateRef) {
+      <step-grid-element [elementId]="item.widgetId">
+        <ng-container *ngTemplateOutlet="templateRef" />
+        <step-grid-drag-handle />
+        <step-grid-resizer />
+      </step-grid-element>
+    } @else {
+      <step-grid-element [elementId]="item.widgetId" class="hidden-placeholder">
+        <step-grid-drag-handle />
+        <div class="hidden-placeholder-info">
+          <step-icon name="eye" />
+          <span>Widget is currently hidden for this execution</span>
+          <step-icon
+            name="help-circle"
+            matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
+            matTooltipPosition="below"
+          />
+        </div>
+        <step-grid-resizer />
+      </step-grid-element>
+    }
+  }
+}
+<div #preview class="preview" [class.preview-invalid]="invalidPreview()"></div>
