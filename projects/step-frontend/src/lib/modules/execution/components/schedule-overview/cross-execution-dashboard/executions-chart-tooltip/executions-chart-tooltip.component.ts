@@ -41,16 +41,16 @@ export class ExecutionsChartTooltipComponent {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _executionService = inject(ExecutionsService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _state = inject(CrossExecutionDashboardState);
 
-  reposition = output<void>();
+  readonly reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
   readonly scaleKey = input.required<string>();
 
-  selectedSeries?: TransformedSeries;
-  selectedSeriesExecutions: ExecutionItem[] = [];
-  executionsListTruncated: boolean = false;
+  protected selectedSeries?: TransformedSeries;
+  protected selectedSeriesExecutions: ExecutionItem[] = [];
+  protected executionsListTruncated: boolean = false;
 
   readonly timeRange = computed(() => {
     const contextData = this.data();
@@ -104,13 +104,13 @@ export class ExecutionsChartTooltipComponent {
     return transformedSeries;
   });
 
-  selectSeries(series: TransformedSeries) {
+  selectSeries(series: TransformedSeries): void {
     this.selectedSeries = series;
     // wait for the rendering to takes effect
     this.fetchExecutionsForSelectedItem(series, () => setTimeout(() => this.reposition.emit(), 200));
   }
 
-  fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void) {
+  fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void): void {
     const data = this.data()!;
     const bucketInterval = data.xValues[1] - data.xValues[0];
     const limit = 10;
@@ -120,7 +120,7 @@ export class ExecutionsChartTooltipComponent {
     const oql = new OQLBuilder()
       .open('and')
       .append('attributes.metricType = "executions/duration"')
-      .append(FilterUtils.filtersToOQL([this._state.getDashboardFilter()], 'attributes'))
+      .append(this._state.getDashboardFilter())
       .append(`attributes.result = ${item.label}`)
       .build();
 
@@ -158,7 +158,7 @@ export class ExecutionsChartTooltipComponent {
       });
   }
 
-  jumpToExecution(execution: ExecutionItem) {
+  jumpToExecution(execution: ExecutionItem): void {
     window.open(`#/executions/${execution.id!}/report`);
   }
 }

@@ -16,40 +16,40 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
 })
 export class SchedulerPerformanceViewComponent implements OnInit {
   private _authService = inject(AuthService);
-  readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _state = inject(CrossExecutionDashboardState);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   protected readonly timeRange = signal<TimeRangePickerSelection | undefined>(undefined);
-  isLoading = false;
+  protected isLoading = false;
 
-  dashboardId?: string;
-  dashboardFilters: FilterBarItem[] = [];
+  protected dashboardId?: string;
+  protected dashboardFilters: FilterBarItem[] = [];
 
-  activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
+  readonly activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
 
   constructor() {
     this.dashboardId = this._authService.getConf()!.miscParams![TimeSeriesConfig.PARAM_KEY_ANALYTICS_DASHBOARD_ID];
-    this.dashboardFilters = [this._state.getDashboardFilter()];
+    this.dashboardFilters = []; // TODO this._state.getDashboardFilter()
   }
 
   ngOnInit(): void {
     this.subscribeToUrlNavigation();
   }
 
-  handleDashboardSettingsChange(context: TimeSeriesContext) {
+  handleDashboardSettingsChange(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, false);
   }
 
-  handleDashboardSettingsInit(context: TimeSeriesContext) {
+  handleDashboardSettingsInit(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, true);
   }
 
-  handleFullRangeChangeRequest(range: TimeRange) {
+  handleFullRangeChangeRequest(range: TimeRange): void {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
-  private subscribeToUrlNavigation() {
+  private subscribeToUrlNavigation(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

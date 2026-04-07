@@ -24,7 +24,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
 
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
-  viewTitle = computed(() => {
+  protected readonly viewTitle = computed(() => {
     const isTask = this._state.viewType() === 'task';
     let entity = isTask ? this._state.task() : this._state.plan();
     if (entity === undefined) {
@@ -36,7 +36,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     }
   });
 
-  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+  protected readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.WEEK } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.WEEK * 2 } },
@@ -52,20 +52,20 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.updateTimeAndRefresh(urlParams);
   }
 
-  handleRefreshIntervalChange(interval: number) {
+  handleRefreshIntervalChange(interval: number): void {
     this._state.refreshInterval.set(interval);
   }
 
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+  handleTimeRangeChange(selection: TimeRangePickerSelection): void {
     this._state.activeTimeRangeSelection.set(selection);
   }
 
-  triggerRefresh() {
+  triggerRefresh(): void {
     this._state.activeTimeRangeSelection.set({ ...this._state.activeTimeRangeSelection()! });
     this.fetchLastExecutionTrigger$.next();
   }
 
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams): void {
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }

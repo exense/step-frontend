@@ -1,4 +1,4 @@
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { inject, Injectable, signal, Signal } from '@angular/core';
 import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/modules/_common';
 import {
@@ -19,29 +19,20 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
     return 'plan';
   }
 
-  getDashboardFilter(): FilterBarItem {
-    return {
-      attributeName: 'planId',
-      type: FilterBarItemType.TASK,
-      searchEntities: [{ searchValue: this._planIdFn() }],
-    };
+  getEntityId(): string {
+    return this._planIdFn();
+  }
+
+  getDashboardFilter(): string {
+    const planId = this._planIdFn();
+    return `(attributes.planId = \"${planId}\" or attributes.canonicalPlanName = \"${planId}\")`;
   }
 
   fetchLastExecution(): Observable<Execution> {
-    return this._executionService
-      .findByCritera({
-        criteria: { planId: this._planIdFn() },
-        limit: 1,
-      })
-      .pipe(map((executions) => executions[0]));
+    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 1).pipe(map(list => list[0]));
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    return this._executionService.findByCritera({
-      criteria: { planId: this._planIdFn() },
-      limit: 30,
-      start: timeRange.from.toString(),
-      end: timeRange.to.toString(),
-    });
+    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 30, timeRange.from, timeRange.to);
   }
 }

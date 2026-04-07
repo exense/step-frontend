@@ -39,7 +39,7 @@ export class SchedulerReportViewComponent implements OnInit {
 
   @ViewChild('executionList') executionList!: ExecutionListComponent;
 
-  luxonDateRange = toSignal(
+  readonly luxonDateRange = toSignal(
     this._state.timeRange$.pipe(
       map(
         ({ from, to }) =>
@@ -51,7 +51,7 @@ export class SchedulerReportViewComponent implements OnInit {
     ),
   );
 
-  switchReportNodesChart(type: ReportNodesChartType) {
+  switchReportNodesChart(type: ReportNodesChartType): void {
     this.reportNodesChartType.set(type);
   }
 
@@ -98,11 +98,11 @@ export class SchedulerReportViewComponent implements OnInit {
     });
   }
 
-  jumpToExecution(eId: string) {
+  jumpToExecution(eId: string): void {
     window.open(`#/executions/${eId!}/report`);
   }
 
-  handleMainChartZoom(timeRange: TimeRange) {
+  handleMainChartZoom(timeRange: TimeRange): void {
     this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
       const base = chartSettings.xAxesSettings.values[0];
       const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];
@@ -121,7 +121,7 @@ export class SchedulerReportViewComponent implements OnInit {
     { initialValue: [] },
   );
 
-  private subscribeToBackEvents() {
+  private subscribeToBackEvents(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

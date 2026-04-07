@@ -57,24 +57,24 @@ export abstract class CrossExecutionDashboardState {
   protected _executionService = inject(ExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
-  private _uPlotUtils = inject(UPlotUtilsService);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
   readonly plan = signal<Plan | null | undefined>(undefined);
 
   // view settings
-  activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
-  refreshInterval = signal<number>(0);
+  readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+  readonly refreshInterval = signal<number>(0);
 
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
-  abstract getDashboardFilter(): FilterBarItem;
+  abstract getDashboardFilter(): string;
   abstract readonly viewType: Signal<CrossExecutionViewType>;
   abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
+  abstract getEntityId(): string;
 
-  updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+  updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
     this.activeTimeRangeSelection.set(selection);
   }
 
@@ -116,7 +116,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .append(this.getDashboardFilter())
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -148,7 +148,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .append(this.getDashboardFilter())
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -437,10 +437,13 @@ export abstract class CrossExecutionDashboardState {
   readonly errorsDataSource = this._timeSeriesService.createErrorsFetchDataSource();
 
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
-    let filterItem = this.getDashboardFilter();
-    // this is working only with searchEntities for now. extend it if needed
-    const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
+    let entityParams = undefined;
+    if (this.getViewType() === 'plan') {
+      entityParams = {planId: this.getEntityId()};
+    } else {
+      entityParams = {taskId: this.getEntityId()};
+    }
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {

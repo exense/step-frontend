@@ -11,22 +11,22 @@ import { Execution, SearchValue, TimeRange } from '@exense/step-core';
 @Injectable()
 export class SchedulerPageStateService extends CrossExecutionDashboardState {
   readonly _taskIdFn = inject(SCHEDULE_ID);
-  viewType: Signal<CrossExecutionViewType> = signal('task');
+  readonly viewType: Signal<CrossExecutionViewType> = signal('task');
 
   readonly executionsTableFilter: Record<string, SearchValue> = {
     executionTaskID: this._taskIdFn(),
   };
 
+  getEntityId(): string {
+    return this._taskIdFn();
+  }
+
   getViewType(): CrossExecutionViewType {
     return 'task';
   }
 
-  getDashboardFilter(): FilterBarItem {
-    return {
-      attributeName: 'taskId',
-      type: FilterBarItemType.TASK,
-      searchEntities: [{ searchValue: this._taskIdFn() }],
-    };
+  getDashboardFilter(): string {
+    return `attributes.taskId = ${this._taskIdFn()}`;
   }
 
   fetchLastExecution(): Observable<Execution> {

@@ -38,7 +38,7 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
     } else if (request.executionId) {
       oqlFilter = `attributes.executionId = ${request.executionId}`;
     } else if (request.planId) {
-      oqlFilter = `attributes.planId = ${request.planId}`;
+      oqlFilter = `(attributes.planId = \"${request.planId}\" or attributes.canonicalPlanName = \"${request.planId}\")`;
     }
 
     const executionsAttributesLimit = 10;
