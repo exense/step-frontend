@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { SkippedAttachmentMeta } from '../../../../client/step-client-module';
@@ -11,6 +12,7 @@ import { StreamingTextComponent } from '../streaming-text/streaming-text.compone
 import { StreamingAttachmentStatusDirective } from '../../directives/streaming-attachment-status.directive';
 import { PreviewAttachmentMeta } from '../../types/preview-attachment-meta';
 import { UndraggedClickDirective } from '../../../basics/directives/undragged-click.directive';
+import { AuthService } from '../../../auth';
 
 @Component({
   selector: 'step-attachment-preview',
@@ -39,12 +41,17 @@ import { UndraggedClickDirective } from '../../../basics/directives/undragged-cl
   ],
 })
 export class AttachmentPreviewComponent {
+  private _auth = inject(AuthService);
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _attachmentDialogs = inject(AttachmentDialogsService);
   private _streamingStatus = inject(StreamingAttachmentStatusDirective, { self: true });
 
   readonly showDownload = input(true);
   readonly withBorder = input(true);
+
+  protected readonly hasResourceReadPermission = toSignal(this._auth.hasRight$('resource-read'), {
+    initialValue: this._auth.hasRight('resource-read'),
+  });
 
   private streamingStatus = computed(() => this._streamingStatus.status());
 
@@ -66,6 +73,9 @@ export class AttachmentPreviewComponent {
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;
   protected readonly attachmentTooltip = computed(() => {
+    if (!this.hasResourceReadPermission()) {
+      return 'Missing resource-read permission';
+    }
     const attachmentType = this.attachmentType();
     const attachment = this.attachment() as SkippedAttachmentMeta;
     if (attachmentType !== AttachmentType.SKIPPED) {
@@ -76,7 +86,7 @@ export class AttachmentPreviewComponent {
 
   protected readonly canOpenDetails = computed(() => {
     const attachmentType = this.attachmentType()!;
-    return attachmentType !== AttachmentType.STREAMING_BINARY;
+    return this.hasResourceReadPermission() && attachmentType !== AttachmentType.STREAMING_BINARY;
   });
 
   protected open(): void {
@@ -90,6 +100,9 @@ export class AttachmentPreviewComponent {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
+    if (!this.hasResourceReadPermission()) {
+      return;
+    }
     this._attachmentUtils.downloadAttachment(this.attachment());
   }
 }
