@@ -36,7 +36,7 @@ import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-v
   styleUrl: './stack-view.component.scss',
 })
 export class StackViewComponent {
-  protected readonly GROUP_WIDTH = 160;
+  protected readonly GROUP_WIDTH = 100;
 
   readonly removeItem = output<string>();
 
@@ -108,12 +108,12 @@ export class StackViewComponent {
       return;
     }
     const parentWidth = this._elRef.nativeElement.getBoundingClientRect().width;
-    const half = parentWidth / 2;
-    let subWidth = half / (splitAreas.length - 1);
+    const mainView = parentWidth / 2;
+    let subWidth = (parentWidth - mainView) / (splitAreas.length - 1);
 
     if (splitAreas.length <= 3) {
       for (let i = 0; i < splitAreas.length; i++) {
-        let size = i === splitAreas.length - 1 ? half : subWidth;
+        let size = i === splitAreas.length - 1 ? mainView : subWidth;
         if (isMaximized && i === 0) {
           size = this.GROUP_WIDTH;
         }
@@ -122,11 +122,11 @@ export class StackViewComponent {
       return;
     }
 
-    subWidth = (half - this.GROUP_WIDTH) / 2;
+    subWidth = (parentWidth - mainView - this.GROUP_WIDTH) / 2;
     splitAreas[0].setSize(subWidth);
     splitAreas[1].setSize(this.GROUP_WIDTH);
     splitAreas[2].setSize(subWidth);
-    splitAreas[3].setSize(half);
+    splitAreas[3].setSize(mainView);
   });
 
   protected removeView(id: string): void {

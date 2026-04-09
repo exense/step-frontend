@@ -6,9 +6,13 @@
   </mat-card-header>
   <mat-card-content>
     <section>
-      @for (item of items(); track item.key) {
-        <button type="button" mat-stroked-button (click)="openView.emit(item.key)">
-          {{ item.value | uppercase }}
+      @for (item of items(); track item.id) {
+        <button type="button" mat-stroked-button (click)="openView.emit(item.id)">
+          @if (item.miniatureTemplateRef; as miniatureTemplateRef) {
+            <ng-container *ngTemplateOutlet="miniatureTemplateRef" />
+          } @else {
+            {{ item | viewItemDefaultName }}
+          }
         </button>
       }
     </section>

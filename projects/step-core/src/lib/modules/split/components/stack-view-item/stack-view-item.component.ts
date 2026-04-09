@@ -3,6 +3,7 @@ import { StackViewItemContentDirective } from '../../directives/stack-view-item-
 import { StackViewItemTitleDirective } from '../../directives/stack-view-item-title.directive';
 import { StackViewInfo } from '../../types/stack-view-info';
 import { StackViewBreadcrumbsTitleDirective } from '../../directives/stack-view-breadcrumbs-title.directive';
+import { StackViewItemMiniatureDirective } from '../../directives/stack-view-item-miniature.directive';
 
 @Component({
   selector: 'step-stack-view-item',
@@ -16,6 +17,7 @@ export class StackViewItemComponent {
   private readonly childTitle = contentChild(StackViewItemTitleDirective);
   private readonly childContent = contentChild(StackViewItemContentDirective);
   private readonly childBreadcrumbsTitle = contentChild(StackViewBreadcrumbsTitleDirective);
+  private readonly childMiniature = contentChild(StackViewItemMiniatureDirective);
 
   private readonly viewInfo = computed(() => {
     const itemId = this.itemId();
@@ -23,12 +25,14 @@ export class StackViewItemComponent {
     const childTitle = this.childTitle();
     const breadcrumbsTitle = this.childBreadcrumbsTitle();
     const childContent = this.childContent();
+    const childMiniature = this.childMiniature();
     return {
       id: itemId,
       title: itemTitle,
       titleTemplateRef: childTitle?._templateRef,
       titleBreadcrumbsRef: breadcrumbsTitle?._templateRef,
       contentTemplateRef: childContent?._templateRef,
+      miniatureTemplateRef: childMiniature?._templateRef,
     } as StackViewInfo;
   });
 

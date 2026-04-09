@@ -3,7 +3,10 @@
     @switch (item.type) {
       @case (StackItemType.ROOT) {
         <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
-          <div *stepStackViewBreadcrumbsTitle>Execution Tree</div>
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="tree" />
+            <span>Execution Tree</span>
+          </div>
           <section *stepStackViewItemTitle class="root-title">
             <div>Execution Tree</div>
             <step-alt-execution-tree-control-panel />
@@ -18,10 +21,18 @@
               (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
             />
           </section>
+          <div class="miniature" *stepStackViewItemMiniature matTooltip="Execution Tree" matTooltipPosition="below">
+            <span>ET</span>
+            <step-icon name="tree" />
+          </div>
         </step-stack-view-item>
       }
       @case (StackItemType.AGGREGATED_REPORT_NODE) {
         <step-stack-view-item [itemId]="item.id" itemTitle="Iteration List">
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="list" />
+            <span>Iteration List</span>
+          </div>
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
@@ -31,11 +42,18 @@
               (showDetails)="handleOpenDetails($event, item.id)"
             />
           </section>
+          <div class="miniature" *stepStackViewItemMiniature matTooltip="Iteration List" matTooltipPosition="below">
+            <span>E</span>
+            <step-icon name="list" />
+          </div>
         </step-stack-view-item>
       }
       @case (StackItemType.REPORT_NODE) {
         <step-stack-view-item [itemId]="item.id">
-          <div *stepStackViewBreadcrumbsTitle>{{ $any(item).data.name }}</div>
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="sidebar" />
+            <span>{{ $any(item).data.name }}</span>
+          </div>
           <ng-container *stepStackViewItemTitle>
             <step-alt-report-node-header [node]="$any(item).data" />
           </ng-container>
@@ -46,6 +64,15 @@
               (opernIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
             />
           </ng-container>
+          <div
+            class="miniature"
+            *stepStackViewItemMiniature
+            [matTooltip]="'Node Details: ' + $any(item).data.name"
+            matTooltipPosition="below"
+          >
+            <span>ND</span>
+            <step-icon name="sidebar" />
+          </div>
         </step-stack-view-item>
       }
     }

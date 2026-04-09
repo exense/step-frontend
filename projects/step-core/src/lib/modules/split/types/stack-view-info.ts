@@ -6,6 +6,7 @@ export interface StackViewInfo {
   titleTemplateRef?: TemplateRef<unknown>;
   titleBreadcrumbsRef?: TemplateRef<unknown>;
   contentTemplateRef?: TemplateRef<unknown>;
+  miniatureTemplateRef?: TemplateRef<unknown>;
 }
 
 export interface StackViewInfoGroup extends StackViewInfo {

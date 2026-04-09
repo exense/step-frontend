@@ -39,6 +39,7 @@ import {
   GridSettingsRegistryService,
   EXECUTION_REPORT_GRID,
   canLeaveComponent,
+  ViewItemDefaultNamePipe,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -322,6 +323,7 @@ import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution
     CalcElementWidthAggregatorDirective,
     AltExecutionTreeWidgetDirective,
     AltExecutionTreeSearchFocusDirective,
+    ViewItemDefaultNamePipe,
   ],
   exports: [
     ExecutionListComponent,
