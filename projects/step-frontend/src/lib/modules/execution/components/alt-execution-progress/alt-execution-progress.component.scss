@@ -220,6 +220,11 @@ step-alt-execution-progress {
     }
   }
 
+  &.is-drilldown-opened {
+    height: calc(100vh - 6.4rem);
+    overflow: hidden;
+  }
+
   .node-details-drilldown {
     position: absolute;
     padding: 0 2.5rem;

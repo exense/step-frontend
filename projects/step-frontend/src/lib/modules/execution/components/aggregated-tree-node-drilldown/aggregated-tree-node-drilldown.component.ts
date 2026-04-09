@@ -1,4 +1,4 @@
-import { Component, inject, signal, untracked, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, signal, untracked, ViewEncapsulation } from '@angular/core';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { filter, map, switchMap } from 'rxjs';
 import { ReportNode } from '@exense/step-core';
@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
 import { AltExecutionDialogsService, PartialOpenIterationsParams } from '../../services/alt-execution-dialogs.service';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
-import { DOCUMENT } from '@angular/common';
 
 interface DrilldownData {
   aggregatedNodeId?: string;
@@ -27,21 +26,26 @@ enum StackItemType {
 type StackItem =
   | {
       id: string;
+      nodeId: string;
       type: StackItemType.ROOT;
     }
   | {
       id: string;
+      nodeId: string;
       type: StackItemType.REPORT_NODE;
       data: ReportNode;
     }
   | {
       id: string;
+      nodeId: string;
       type: StackItemType.AGGREGATED_REPORT_NODE;
       data: AggregatedTreeNode;
       resolvedPartialPath?: string;
       searchStatus?: Status;
       searchStatusCount?: number;
     };
+
+const IS_DRILLDOWN_OPENED = 'is-drilldown-opened';
 
 @Component({
   selector: 'step-aggregated-tree-node-drilldown',
@@ -61,7 +65,8 @@ type StackItem =
     AltExecutionDialogsService,
   ],
 })
-export class AggregatedTreeNodeDrilldownComponent {
+export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
+  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService);
@@ -69,7 +74,16 @@ export class AggregatedTreeNodeDrilldownComponent {
   private _nodeDetailsRelativeParent =
     inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute.parent!.parent!;
 
-  protected readonly stackItems = signal<StackItem[]>([{ type: StackItemType.ROOT, id: 'root' }]);
+  protected readonly stackItems = signal<StackItem[]>([{ type: StackItemType.ROOT, id: 'root', nodeId: 'root' }]);
+
+  private get currentLength(): number {
+    const items = untracked(() => this.stackItems());
+    return items.length;
+  }
+
+  private get executionProgressElement(): HTMLElement | null {
+    return this._el.nativeElement.closest('step-alt-execution-progress') as HTMLElement | null;
+  }
 
   private readonly data$ = this._activatedRoute.data.pipe(map((data) => data as DrilldownData));
 
@@ -79,7 +93,15 @@ export class AggregatedTreeNodeDrilldownComponent {
       map((data) => data.reportNodeId),
       switchMap((reportNodeId) => this._altExecutionNodesHelper.getReportNode(reportNodeId)),
       filter((data) => !!data),
-      map((data) => ({ data, id: data.id, type: StackItemType.REPORT_NODE }) as StackItem),
+      map(
+        (data) =>
+          ({
+            data,
+            id: `${data.id}_${this.currentLength}`,
+            nodeId: data.id,
+            type: StackItemType.REPORT_NODE,
+          }) as StackItem,
+      ),
       takeUntilDestroyed(),
     )
     .subscribe((item) => {
@@ -95,9 +117,10 @@ export class AggregatedTreeNodeDrilldownComponent {
             if (!node) {
               return undefined;
             }
-            const { resolvedPartialPath, searchStatus, searchStatusCount, aggregatedNodeId: id } = data;
+            const { resolvedPartialPath, searchStatus, searchStatusCount, aggregatedNodeId: nodeId } = data;
             return {
-              id,
+              id: `${nodeId}_${this.currentLength}`,
+              nodeId,
               type: StackItemType.AGGREGATED_REPORT_NODE,
               data: node,
               resolvedPartialPath,
@@ -113,6 +136,14 @@ export class AggregatedTreeNodeDrilldownComponent {
     .subscribe((item) => {
       this.stackItems.update((value) => [...value, item]);
     });
+
+  ngOnInit(): void {
+    this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
+  }
+
+  ngOnDestroy(): void {
+    this.executionProgressElement?.classList?.remove?.(IS_DRILLDOWN_OPENED);
+  }
 
   protected removeItem(id: string): void {
     const items = untracked(() => this.stackItems());
@@ -132,10 +163,10 @@ export class AggregatedTreeNodeDrilldownComponent {
 
   protected handleOpenIteration(
     node: AggregatedTreeNode,
-    parentId: string,
+    parentStackItemId: string,
     params: PartialOpenIterationsParams = {},
   ): void {
-    this.removeAllAfterItem(parentId);
+    this.removeAllAfterItem(parentStackItemId);
     queueMicrotask(() => {
       this._dialogsService.openIterations(node, params);
     });

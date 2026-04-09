@@ -4,11 +4,11 @@
       @case (StackItemType.ROOT) {
         <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
           <div *stepStackViewBreadcrumbsTitle>Execution Tree</div>
-          <section *stepStackViewItemTitle>
+          <section *stepStackViewItemTitle class="root-title">
             <div>Execution Tree</div>
             <step-alt-execution-tree-control-panel />
           </section>
-          <section *stepStackViewItemContent>
+          <section *stepStackViewItemContent class="root-content">
             <step-alt-execution-tree
               stepAltExecutionTreeSearchFocus
               stepTreeAutoChooseVirtualScroll="340px"

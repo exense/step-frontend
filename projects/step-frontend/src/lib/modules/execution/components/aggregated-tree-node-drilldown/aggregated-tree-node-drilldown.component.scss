@@ -2,4 +2,15 @@
 
 step-aggregated-tree-node-drilldown {
   background: var.$white;
+
+  .root-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .root-content step-alt-execution-tree {
+    min-height: 30rem;
+  }
 }

@@ -15,4 +15,13 @@ step-view-item {
       flex: 1;
     }
   }
+
+  .mat-mdc-card-title {
+    white-space: nowrap;
+  }
+
+  .mat-mdc-card-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
