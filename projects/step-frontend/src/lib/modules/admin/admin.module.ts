@@ -176,7 +176,7 @@ export class AdminModule {
       {
         parentPath: 'settings',
         label: 'Screens',
-        accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+        accessPermissions: ['screenInputs-read'],
         weight: 10,
       },
     );
@@ -228,7 +228,7 @@ export class AdminModule {
   private registerMenuEntries(): void {
     this._viewRegistry.registerMenuEntry('Admin Settings', 'admin', 'settings', {
       weight: 90,
-      isEnabledFct: () => this._auth.hasRight('admin-ui-menu'),
+      isVisibleFunction: () => this._auth.hasRight('admin-ui-menu'),
     });
   }
 

@@ -57,7 +57,8 @@ export class CustomMenuEntriesService implements OnDestroy, Reloadable {
       icon: params?.icon!,
       isCleanupOnReload: params?.isCleanupOnReload,
       isCustom: true,
-      isEnabledFct: () => true,
+      isVisibleFunction: () => true,
+      isEnabledFunction: () => true,
     };
 
     this.registeredIds.add(id);

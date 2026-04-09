@@ -10,6 +10,7 @@ import { SubRouterConfig } from '../types/sub-router-config.interface';
 import { QuickAccessRouteService } from '../../basics/step-basics.module';
 import { MenuEntry } from '../types/menu-entry';
 import { InfoBannerRegisterService } from '../../info-banner';
+import { AuthService } from '../../auth';
 
 export interface CustomView {
   template: string;
@@ -23,7 +24,7 @@ export interface Dashlet {
   id: string;
   weight?: number;
 
-  isEnabledFct?(): boolean;
+  isEnabledFunction?(): boolean;
 }
 
 @Injectable({
@@ -34,6 +35,7 @@ export class ViewRegistryService implements OnDestroy {
   private _quickAccessRoute = inject(QuickAccessRouteService);
   private _router = inject(Router);
   private _infoBannerRegister = inject(InfoBannerRegisterService);
+  private _auth = inject(AuthService);
 
   private temporaryRouteChildren = new Map<string, Routes>();
 
@@ -78,20 +80,45 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
-    this.registerMenuEntry('Keywords', 'functions', 'keyword', { weight: 10, parentId: 'automation-root' });
-    this.registerMenuEntry('Plans', 'plans', 'plan', { weight: 30, parentId: 'automation-root' });
-    this.registerMenuEntry('Parameters', 'parameters', 'list', { weight: 40, parentId: 'automation-root' });
-    this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
+    this.registerMenuEntry('Keywords', 'functions', 'keyword', {
+      weight: 10,
+      parentId: 'automation-root',
+      isEnabledFunction: () => this._auth.hasRight('kw-read'),
+    });
+    this.registerMenuEntry('Plans', 'plans', 'plan', {
+      weight: 30,
+      parentId: 'automation-root',
+      isEnabledFunction: () => this._auth.hasRight('plan-read'),
+    });
+    this.registerMenuEntry('Parameters', 'parameters', 'list', {
+      weight: 40,
+      parentId: 'automation-root',
+      isEnabledFunction: () => this._auth.hasRight('param-read'),
+    });
+    this.registerMenuEntry('Schedules', 'scheduler', 'clock', {
+      weight: 100,
+      parentId: 'automation-root',
+      isEnabledFunction: () => this._auth.hasRight('task-read'),
+    });
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', {
       weight: 10,
       parentId: 'execute-root',
-      isActiveFct: (url) => url.startsWith('/executions/list'),
+      isEnabledFunction: () => this._auth.hasRight('execution-read'),
+      isActiveFunction: (url) => url.startsWith('/executions/list'),
     });
-    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
+    this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', {
+      weight: 20,
+      parentId: 'execute-root',
+      isEnabledFunction: () => this._auth.hasRight('dashboard-read'),
+    });
     // Sub Menus Status
-    this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
+    this.registerMenuEntry('Current Operations', 'operations', 'airplay', {
+      weight: 10,
+      parentId: 'status-root',
+      isEnabledFunction: () => this._auth.hasRight('operations-read'),
+    });
     this.registerMenuEntry('Agents', 'grid-agents', 'agent', { weight: 20, parentId: 'status-root' });
     this.registerMenuEntry('Agent tokens', 'grid-tokens', 'agent-token', { weight: 30, parentId: 'status-root' });
     this.registerMenuEntry('Token Groups', 'grid-token-groups', 'agent-token-group', {
@@ -289,8 +316,9 @@ export class ViewRegistryService implements OnDestroy {
     options?: {
       weight?: number;
       parentId?: string;
-      isEnabledFct?: () => boolean;
-      isActiveFct?: (url: string) => boolean;
+      isVisibleFunction?: () => boolean;
+      isEnabledFunction?: () => boolean;
+      isActiveFunction?: (url: string) => boolean;
     },
   ): void {
     if (!id || this.registeredMenuIds.includes(id)) {
@@ -303,8 +331,9 @@ export class ViewRegistryService implements OnDestroy {
       parentId: options?.parentId,
       icon,
       weight: options?.weight,
-      isEnabledFct: options?.isEnabledFct ?? (() => true),
-      isActiveFct: options?.isActiveFct,
+      isVisibleFunction: options?.isVisibleFunction ?? (() => true),
+      isEnabledFunction: options?.isEnabledFunction ?? (() => true),
+      isActiveFunction: options?.isActiveFunction,
     });
   }
 
@@ -351,13 +380,13 @@ export class ViewRegistryService implements OnDestroy {
     template: string,
     id: string,
     position: number,
-    isEnabledFct: () => boolean,
+    isEnabledFunction: () => boolean,
   ): void {
     this.getDashlets(path).splice(position, 0, {
       label: label,
       template: template,
       id: id,
-      isEnabledFct: isEnabledFct,
+      isEnabledFunction: isEnabledFunction,
     });
   }
 
