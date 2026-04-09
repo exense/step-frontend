@@ -15,6 +15,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
 import { NODE_DETAILS_RELATIVE_PARENT } from './node-details-relative-parent.token';
+import { AltExecutionNodesHelperService } from './alt-execution-nodes-helper.service';
 
 export interface OpenIterationsParams {
   aggregatedNodeId: string;
@@ -31,12 +32,18 @@ export type PartialOpenIterationsParams = Pick<
   'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
 >;
 
+export interface OpenIterationsEvent {
+  node: AggregatedTreeNode;
+  restParams: PartialOpenIterationsParams;
+}
+
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService, { optional: true });
+  private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService, { optional: true });
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
   private _matDialog = inject(MatDialog);
   private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
@@ -72,6 +79,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
       const reportNode = singleInstanceReportNode!;
       this._reportNodeDetails?.setReportNode?.(reportNode);
+      this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
       this.navigateToIterationDetails(reportNode.id!, {}, searchFor);
       return;
     }
@@ -80,6 +88,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
 
   openIterationDetails<T extends ReportNode>(reportNode: T): void {
     this._reportNodeDetails?.setReportNode?.(reportNode);
+    this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
     this.navigateToIterationDetails(reportNode.id!);
   }
 

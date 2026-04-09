@@ -36,8 +36,7 @@
     <step-alt-execution-tree-widget *stepGridItem="'executionTree'" #treeWidget class="widget" />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords*stepGridItem="'keywordsList'"
-      class="keywords" />
+    <step-alt-report-node-keywords *stepGridItem="'keywordsList'" class="keywords" />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart

@@ -14,6 +14,9 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
+import { AltReportNodeDetailsDirective } from '../../directives/alt-report-node-details.directive';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 @Component({
   selector: 'step-alt-report-node-details',
@@ -36,18 +39,31 @@ import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/
     },
   ],
   standalone: false,
+  hostDirectives: [
+    {
+      directive: AltReportNodeDetailsDirective,
+      inputs: ['node'],
+    },
+  ],
 })
-export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
+export class AltReportNodeDetailsComponent {
   private _controllerService = inject(AugmentedControllerService);
   private _artefactService = inject(ArtefactService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _nodeDetailsDirective = inject(AltReportNodeDetailsDirective);
 
-  readonly node = input.required<R>();
   readonly showArtefact = input(false);
 
   private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
 
-  private children$ = toObservable(this.node).pipe(
+  protected readonly reportNode = computed(() => {
+    const reportNode = this._nodeDetailsDirective.reportNode();
+    return reportNode as ReportNode;
+  });
+
+  readonly opernIterations = output<OpenIterationsEvent>();
+
+  private children$ = toObservable(this.reportNode).pipe(
     switchMap((node) => {
       if (node.status !== 'FAILED') {
         return of(undefined);
@@ -73,7 +89,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   }
 
   private readonly aggregatedNode = computed(() => {
-    const reportNode = this.node();
+    const reportNode = this.reportNode();
     const isTreeInitialized = this._treeState.isInitialized();
     if (!isTreeInitialized) {
       return undefined;
@@ -85,7 +101,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   });
 
   protected readonly children = toSignal(this.children$, { initialValue: [] });
-  protected readonly artefactClass = computed(() => this.node().resolvedArtefact?._class);
+  protected readonly artefactClass = computed(() => this.reportNode().resolvedArtefact?._class);
 
   protected readonly rootCauseErrors = computed(() => {
     const treeNode = this.aggregatedNode();
@@ -116,7 +132,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   });
 
   protected readonly artefactHashContainer = computed(() => {
-    const reportNode = this.node();
+    const reportNode = this.reportNode();
     const aggregatedNode = this.aggregatedNode();
     const artefactHash = (aggregatedNode?.artefactHash || reportNode.artefactHash)!;
     return { artefactHash };

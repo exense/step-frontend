@@ -1,0 +1,20 @@
+@if (reportNode(); as reportNode) {
+  <step-report-node-icon class="artefact-icon" [node]="reportNode" />
+  <step-status [status]="reportNode.status" [iconMode]="true" />
+  <span>{{ reportNode.name }}</span>
+  <step-alt-execution-time [startTime]="reportNode.executionTime" [duration]="reportNode.duration" [timeOnly]="true" />
+  <div class="btn-show-details-container">
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Show plan node details"
+      matTooltipPosition="below"
+      [routerLink]="['.', 'plan-node']"
+      [relativeTo]="_activatedRoute"
+      [queryParams]="{ reportNodeId: reportNode.id }"
+      queryParamsHandling="merge"
+    >
+      <step-icon name="external-link" />
+    </button>
+  </div>
+}

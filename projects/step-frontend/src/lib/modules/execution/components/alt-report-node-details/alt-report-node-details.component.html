@@ -1,4 +1,4 @@
-@if (node(); as node) {
+@if (reportNode(); as node) {
   <div class="grid">
     @if (rootCauseErrors(); as rootCauseErrors) {
       <step-error-root-causes
@@ -69,6 +69,7 @@
         [noPadding]="true"
         [showDetailsButton]="true"
         [autoFocusNode]="false"
+        (openIterations)="opernIterations.emit($event)"
       />
     </div>
   </div>

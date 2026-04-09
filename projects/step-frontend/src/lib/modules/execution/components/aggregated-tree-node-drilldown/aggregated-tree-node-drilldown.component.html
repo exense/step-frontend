@@ -1,0 +1,53 @@
+<step-stack-view (removeItem)="removeItem($event)">
+  @for (item of stackItems(); track item.id) {
+    @switch (item.type) {
+      @case (StackItemType.ROOT) {
+        <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
+          <div *stepStackViewBreadcrumbsTitle>Execution Tree</div>
+          <section *stepStackViewItemTitle>
+            <div>Execution Tree</div>
+            <step-alt-execution-tree-control-panel />
+          </section>
+          <section *stepStackViewItemContent>
+            <step-alt-execution-tree
+              stepAltExecutionTreeSearchFocus
+              stepTreeAutoChooseVirtualScroll="340px"
+              [applyVirtualScrollFrom]="150"
+              [showSpinnerWhileTreeInitialize]="true"
+              [handleOpenIterationsManually]="true"
+              (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+            />
+          </section>
+        </step-stack-view-item>
+      }
+      @case (StackItemType.AGGREGATED_REPORT_NODE) {
+        <step-stack-view-item [itemId]="item.id" itemTitle="Iteration List">
+          <section *stepStackViewItemContent>
+            <step-aggregated-tree-node-iteration-list
+              [node]="$any(item).data!"
+              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [initialStatus]="$any(item).searchStatus"
+              [initialStatusCount]="$any(item).searchStatusCount"
+              (showDetails)="handleOpenDetails($event, item.id)"
+            />
+          </section>
+        </step-stack-view-item>
+      }
+      @case (StackItemType.REPORT_NODE) {
+        <step-stack-view-item [itemId]="item.id">
+          <div *stepStackViewBreadcrumbsTitle>{{ $any(item).data.name }}</div>
+          <ng-container *stepStackViewItemTitle>
+            <step-alt-report-node-header [node]="$any(item).data" />
+          </ng-container>
+          <ng-container *stepStackViewItemContent>
+            <step-alt-report-node-details
+              [node]="$any(item).data"
+              [showArtefact]="false"
+              (opernIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+            />
+          </ng-container>
+        </step-stack-view-item>
+      }
+    }
+  }
+</step-stack-view>

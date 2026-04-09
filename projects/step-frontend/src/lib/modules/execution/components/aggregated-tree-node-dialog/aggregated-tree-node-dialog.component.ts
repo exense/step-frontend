@@ -13,6 +13,8 @@ import { filter, map, of, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNodeId?: string;
@@ -22,6 +24,8 @@ export interface AggregatedTreeNodeDialogData {
   searchStatusCount?: number;
   reportNodeChildren: ReportNode[];
 }
+
+// todo for remove
 
 @Component({
   selector: 'step-aggregated-tree-node-dialog',
@@ -34,6 +38,7 @@ export interface AggregatedTreeNodeDialogData {
       provide: NODE_DETAILS_RELATIVE_PARENT,
       useFactory: () => inject(ActivatedRoute).parent!.parent!,
     },
+    AltExecutionNodesHelperService,
     AltExecutionDialogsService,
   ],
   host: {
@@ -48,6 +53,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected _dialogsService = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
+  protected _activateRoute = inject(ActivatedRoute);
 
   private _executionState = inject(AltExecutionStateService);
   private _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
@@ -142,6 +148,10 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
     if (!this.hasData) {
       this._dialogRef.close();
     }
+  }
+
+  protected handleOpenIteration(node: AggregatedTreeNode): void {
+    this._dialogsService.openIterations(node, {});
   }
 
   protected handleOpenDetails(node: ReportNode): void {

@@ -1,0 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-aggregated-tree-node-drilldown {
+  background: var.$white;
+}

@@ -5,6 +5,7 @@ import { StackViewComponent } from './components/stack-view/stack-view.component
 import { StackViewItemComponent } from './components/stack-view-item/stack-view-item.component';
 import { StackViewItemContentDirective } from './directives/stack-view-item-content.directive';
 import { StackViewItemTitleDirective } from './directives/stack-view-item-title.directive';
+import { StackViewBreadcrumbsTitleDirective } from './directives/stack-view-breadcrumbs-title.directive';
 
 export * from './components/split/split.component';
 export * from './components/split-area/split-area.component';
@@ -16,6 +17,7 @@ export * from './pipes/is-split-view-group.pipe';
 export * from './components/stack-view-item/stack-view-item.component';
 export * from './directives/stack-view-item-title.directive';
 export * from './directives/stack-view-item-content.directive';
+export * from './directives/stack-view-breadcrumbs-title.directive';
 
 export const SPLIT_EXPORTS = [
   SplitComponent,
@@ -25,4 +27,5 @@ export const SPLIT_EXPORTS = [
   StackViewItemComponent,
   StackViewItemContentDirective,
   StackViewItemTitleDirective,
+  StackViewBreadcrumbsTitleDirective,
 ];

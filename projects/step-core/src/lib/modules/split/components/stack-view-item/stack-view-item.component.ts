@@ -2,6 +2,7 @@ import { Component, computed, contentChild, input, untracked } from '@angular/co
 import { StackViewItemContentDirective } from '../../directives/stack-view-item-content.directive';
 import { StackViewItemTitleDirective } from '../../directives/stack-view-item-title.directive';
 import { StackViewInfo } from '../../types/stack-view-info';
+import { StackViewBreadcrumbsTitleDirective } from '../../directives/stack-view-breadcrumbs-title.directive';
 
 @Component({
   selector: 'step-stack-view-item',
@@ -14,16 +15,19 @@ export class StackViewItemComponent {
   readonly itemTitle = input<string | unknown>();
   private readonly childTitle = contentChild(StackViewItemTitleDirective);
   private readonly childContent = contentChild(StackViewItemContentDirective);
+  private readonly childBreadcrumbsTitle = contentChild(StackViewBreadcrumbsTitleDirective);
 
   private readonly viewInfo = computed(() => {
     const itemId = this.itemId();
     const itemTitle = this.itemTitle();
     const childTitle = this.childTitle();
+    const breadcrumbsTitle = this.childBreadcrumbsTitle();
     const childContent = this.childContent();
     return {
       id: itemId,
       title: itemTitle,
       titleTemplateRef: childTitle?._templateRef,
+      titleBreadcrumbsRef: breadcrumbsTitle?._templateRef,
       contentTemplateRef: childContent?._templateRef,
     } as StackViewInfo;
   });

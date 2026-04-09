@@ -1,7 +1,9 @@
 @for (item of views(); track item.id; let isLast = $last) {
   @if (isLast) {
     <div>
-      @if (item.titleTemplateRef) {
+      @if (item.titleBreadcrumbsRef) {
+        <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
+      } @else if (item.titleTemplateRef) {
         <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
       } @else {
         {{ item.title }}
@@ -9,7 +11,9 @@
     </div>
   } @else {
     <button type="button" mat-button (click)="openView.emit(item.id)">
-      @if (item.titleTemplateRef) {
+      @if (item.titleBreadcrumbsRef) {
+        <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
+      } @else if (item.titleTemplateRef) {
         <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
       } @else {
         {{ item.title }}

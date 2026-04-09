@@ -4,6 +4,7 @@ export interface StackViewInfo {
   id: string;
   title?: string;
   titleTemplateRef?: TemplateRef<unknown>;
+  titleBreadcrumbsRef?: TemplateRef<unknown>;
   contentTemplateRef?: TemplateRef<unknown>;
 }
 

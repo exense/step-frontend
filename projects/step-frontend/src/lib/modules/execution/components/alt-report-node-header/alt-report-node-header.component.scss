@@ -1,0 +1,23 @@
+step-alt-report-node-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  step-status,
+  button {
+    font-size: 1.4rem;
+  }
+
+  .artefact-icon {
+    line-height: 1rem;
+  }
+
+  step-status {
+    line-height: 1.6rem;
+  }
+
+  .btn-show-details-container {
+    flex: 1;
+    text-align: right;
+  }
+}

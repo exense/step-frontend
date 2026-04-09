@@ -88,7 +88,7 @@ import { ExecutionActionsExecuteContentDirective } from './directives/execution-
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { legacyExecutionGuard } from './guards/legacy-execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
-import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-drilldown/alt-report-node-details.component';
+import { AltReportNodeDetailsComponent } from './components/alt-report-node-details/alt-report-node-details.component';
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
@@ -110,7 +110,8 @@ import {
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
-import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+// todo to remove
+// import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
@@ -176,6 +177,12 @@ import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-v
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
+import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
+import { AltExecutionNodesHelperService } from './services/alt-execution-nodes-helper.service';
+import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
+import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
+import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
+import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
 
 @NgModule({
   declarations: [
@@ -232,6 +239,7 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AltExecutionTreeComponent,
     AltExecutionTreePartialComponent,
     AltExecutionTreeWidgetComponent,
+    AltExecutionTreeControlPanelComponent,
     AltReportNodeStatusFilterComponent,
     AltReportNodeArtefactFilterComponent,
     TreeNodeVisualStateDirective,
@@ -245,7 +253,8 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
-    AggregatedTreeNodeDialogComponent,
+    // todo to remove
+    // AggregatedTreeNodeDialogComponent,
     ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
@@ -280,6 +289,8 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AggregatedTreeNodeHistoryComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
     ExecutionHistorySectionComponent,
+    AltReportNodeHeaderComponent,
+    AggregatedTreeNodeDrilldownComponent,
   ],
   imports: [
     StepCommonModule,
@@ -309,6 +320,8 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     CalcElementWidthDirective,
     CalcElementWidthItemDirective,
     CalcElementWidthAggregatorDirective,
+    AltExecutionTreeWidgetDirective,
+    AltExecutionTreeSearchFocusDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -342,6 +355,7 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AltReportWidgetTitleDirective,
     AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,
+    AltExecutionTreeControlPanelComponent,
   ],
   providers: [
     {
@@ -764,6 +778,47 @@ export class ExecutionModule {
               outlet: 'nodeDetails',
               component: SimpleOutletComponent,
               children: [
+                {
+                  path: ':detailsId',
+                  resolve: {
+                    aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
+                      const detailsId = route.params['detailsId'];
+                      return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
+                    },
+                    resolvedPartialPath: () =>
+                      inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
+                    reportNodeId: (route: ActivatedRouteSnapshot) => {
+                      const detailsId = route.params['detailsId'];
+                      return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
+                    },
+                    searchStatus: (route: ActivatedRouteSnapshot) => {
+                      const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                      return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
+                    },
+                    searchStatusCount: (route: ActivatedRouteSnapshot) => {
+                      const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                      const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
+                      const statusCount = parseInt(statusCountStr);
+                      return isNaN(statusCount) ? undefined : statusCount;
+                    },
+                  },
+                  component: AggregatedTreeNodeDrilldownComponent,
+                  children: [
+                    dialogRoute({
+                      path: 'plan-node',
+                      dialogComponent: PlanNodeDetailsDialogComponent,
+                    }),
+                  ],
+                },
+              ],
+            },
+            /*
+            //todo for removal
+            {
+              path: 'node-details',
+              outlet: 'nodeDetails',
+              component: SimpleOutletComponent,
+              children: [
                 dialogRoute(
                   {
                     path: ':detailsId',
@@ -811,6 +866,7 @@ export class ExecutionModule {
                 ),
               ],
             },
+*/
             {
               path: 'viz',
               redirectTo: 'analytics',

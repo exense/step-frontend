@@ -44,7 +44,11 @@
       <div class="panel-container">
         <div class="main-content">
           @if (selectedReportNode(); as reportNode) {
-            <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
+            <step-alt-report-node-details
+              [node]="reportNode"
+              [showArtefact]="true"
+              (opernIterations)="handleOpenIteration($event.node)"
+            />
           } @else {
             @if (aggregatedNode(); as aggregatedNode) {
               <div class="iteration-list">

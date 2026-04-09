@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.collapse-buttons {
+  button {
+    height: 3.4rem !important;
+  }
+}

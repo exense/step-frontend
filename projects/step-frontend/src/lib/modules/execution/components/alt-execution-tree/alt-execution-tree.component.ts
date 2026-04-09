@@ -5,6 +5,8 @@ import {
   forwardRef,
   inject,
   input,
+  output,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -18,6 +20,7 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { ERROR_STATUSES } from '../../../_common/shared/status.enum';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
@@ -41,16 +44,19 @@ enum TreeNodeAction {
 export class AltExecutionTreeComponent implements TreeActionsService {
   protected readonly _treeSate = inject(AggregatedReportViewTreeStateService);
   private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private tree = viewChild('tree', { read: TreeComponent });
+  private readonly tree = viewChild('tree', { read: TreeComponent });
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
     this._urlParamsService.patchUrlParams(range, undefined, true);
   });
 
   readonly showSpinnerWhileTreeInitialize = input(false);
+  readonly handleOpenIterationsManually = input(false);
+  readonly openIterations = output<OpenIterationsEvent>();
 
   protected readonly showSpinner = computed(() => {
     const showSpinnerForEmptyTree = this.showSpinnerWhileTreeInitialize();
@@ -83,6 +89,14 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   hasActionsForNode(node: TreeNode): boolean {
     return true;
+  }
+
+  handleOpenIterations(event: OpenIterationsEvent): void {
+    const handleEventManually = untracked(() => this.handleOpenIterationsManually());
+    if (handleEventManually) {
+      this.openIterations.emit(event);
+    }
+    this._executionDialogs.openIterations(event.node, event.restParams);
   }
 
   proceedAction(actionId: string, node: TreeNode, multiple?: boolean): void {
