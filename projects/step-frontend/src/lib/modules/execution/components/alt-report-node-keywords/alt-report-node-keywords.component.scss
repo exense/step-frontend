@@ -1,0 +1,58 @@
+step-alt-report-node-keywords {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+
+  step-table {
+    --mat-table-row-item-container-height: 3rem;
+    flex: 1;
+
+    td {
+      vertical-align: top;
+      padding-top: 0.5rem !important;
+    }
+
+    td.data-cell {
+      width: 100%;
+    }
+  }
+
+  .details-trigger {
+    cursor: pointer;
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+
+    .artefact-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 2rem;
+      margin: 0 0.5rem 0.2rem 0;
+      .name {
+        font-weight: 500;
+        white-space: nowrap;
+        line-height: 1.5;
+        align-self: baseline;
+      }
+    }
+  }
+
+  .actions {
+    gap: 1rem;
+    margin-right: 1rem;
+
+    & > button {
+      width: 2rem !important;
+      height: 2rem !important;
+    }
+  }
+}
+
+@media print {
+  step-alt-keyword-inline-drilldown,
+  .actions {
+    display: none;
+  }
+}

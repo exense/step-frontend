@@ -186,6 +186,8 @@ import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree
 import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
 import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
 import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
+import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
 
 @NgModule({
   declarations: [
@@ -236,7 +238,9 @@ import { AltReportNodeSearchComponent } from './components/alt-report-node-searc
     AltReportWidgetSortDirective,
     AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
+    AltReportNodeKeywordsComponent,
     AltReportNodeKeywordsWidgetComponent,
+    AltReportNodeTestcasesComponent,
     AltReportNodeTestcasesWidgetComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,

@@ -1,0 +1,34 @@
+<step-table
+  #table
+  [dataSource]="(_state.datasource$ | async)!"
+  [tableParams]="(keywordsParameters$ | async)!"
+  [calculateCounts]="calculateCounts()"
+  [indicatorMode]="TableIndicatorMode.SPINNER"
+  class="paddingless no-border hide-header no-highlight special-selection"
+>
+  <ng-container matColumnDef="executionTime">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td class="data-cell" mat-cell *matCellDef="let element">
+      <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
+        <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
+          <ng-container *stepArtefactInlineDetailsHeader>
+            <div class="larger-view artefact-header">
+              <step-alt-execution-time
+                class="special-selection"
+                [startTime]="element.executionTime"
+                [duration]="element.duration"
+                [timeOnly]="true"
+              />
+              <step-report-node-icon [node]="element" />
+              <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+              <span class="name">{{ element.name }}</span>
+            </div>
+          </ng-container>
+        </step-artefact-inline-details>
+      </div>
+    </td>
+  </ng-container>
+  <ng-container *stepTablePaginatorContent>
+    <step-table-counts-toggle [enabled]="calculateCounts()" itemsLabel="steps" (toggle)="toggleCountsCalculation()" />
+  </ng-container>
+</step-table>
