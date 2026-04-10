@@ -4,6 +4,8 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { AltExecutionTreeWidgetDirective } from '../../directives/alt-execution-tree-widget.directive';
+import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
+import { DrilldownRootType } from '../../shared/drilldown-root-type';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -15,8 +17,16 @@ import { AltExecutionTreeWidgetDirective } from '../../directives/alt-execution-
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
+
+  handleOpenIterations(event: OpenIterationsEvent): void {
+    this._executionDialogs.openIterations(event.node, {
+      ...event.restParams,
+      drilldownRootType: DrilldownRootType.TREE,
+    });
+  }
 
   focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');

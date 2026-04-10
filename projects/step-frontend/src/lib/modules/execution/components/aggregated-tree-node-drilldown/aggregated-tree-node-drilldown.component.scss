@@ -8,6 +8,17 @@ step-aggregated-tree-node-drilldown {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+
+    &.nodes-list-title > div {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    step-alr-report-widget-sort {
+      display: flex;
+      height: 2.5rem;
+    }
   }
 
   .root-content step-alt-execution-tree {

@@ -9,6 +9,7 @@ import { AltExecutionNodesHelperService } from '../../services/alt-execution-nod
 import { AltExecutionDialogsService, PartialOpenIterationsParams } from '../../services/alt-execution-dialogs.service';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { DrilldownRootType } from '../../shared/drilldown-root-type';
 
 interface DrilldownData {
   aggregatedNodeId?: string;
@@ -28,6 +29,7 @@ type StackItem =
   | {
       id: string;
       nodeId: string;
+      rootType: DrilldownRootType;
       type: StackItemType.ROOT;
     }
   | {
@@ -79,7 +81,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _nodeDetailsRelativeParent =
     inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute.parent!.parent!;
 
-  protected readonly stackItems = signal<StackItem[]>([{ type: StackItemType.ROOT, id: 'root', nodeId: 'root' }]);
+  protected readonly stackItems = signal<StackItem[]>([]);
   protected readonly StackItemType = StackItemType;
 
   private get stackItemsUntracked(): StackItem[] {
@@ -147,6 +149,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     });
 
   ngOnInit(): void {
+    this.initializeRootElement();
     this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
   }
 
@@ -224,4 +227,19 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     const nextItemId = items[index + 1].id;
     this.removeItem(nextItemId);
   }
+
+  private initializeRootElement(): void {
+    let rootType = this._activatedRoute.snapshot.data?.['drilldownRootType'] as DrilldownRootType | undefined;
+    rootType = rootType ?? DrilldownRootType.TREE;
+    this.stackItems.update((items) => {
+      if (items[0]?.type === StackItemType.ROOT) {
+        items = [{ ...items[0], rootType }, ...items.slice(1)];
+      } else {
+        items = [{ type: StackItemType.ROOT, id: 'root', nodeId: 'root', rootType }, ...items];
+      }
+      return items;
+    });
+  }
+
+  protected readonly DrilldownRootType = DrilldownRootType;
 }

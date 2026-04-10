@@ -188,6 +188,9 @@ import { AltReportNodeListSortDirective } from './directives/alt-report-node-lis
 import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
 import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
 import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
+import { DrilldownRootType } from './shared/drilldown-root-type';
+import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
+import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
 
 @NgModule({
   declarations: [
@@ -332,6 +335,8 @@ import { AltReportNodeTestcasesComponent } from './components/alt-report-node-te
     ViewItemDefaultNamePipe,
     AltReportNodeListSortDirective,
     AltReportNodeSearchComponent,
+    AltReportNodeListProvideKeywordsDirective,
+    AltReportNodeListProvideTestcasesDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -810,6 +815,14 @@ export class ExecutionModule {
                       const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
                       const statusCount = parseInt(statusCountStr);
                       return isNaN(statusCount) ? undefined : statusCount;
+                    },
+                    drilldownRootType: () => {
+                      const _router = inject(Router);
+                      const currentNavigation = _router.getCurrentNavigation();
+                      const drilldownRootType = currentNavigation?.extras?.state?.['drilldownRootType'] as
+                        | DrilldownRootType
+                        | undefined;
+                      return drilldownRootType;
                     },
                   },
                   component: AggregatedTreeNodeDrilldownComponent,

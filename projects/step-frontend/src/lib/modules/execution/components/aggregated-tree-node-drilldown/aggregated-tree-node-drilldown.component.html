@@ -2,48 +2,100 @@
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
       @case (StackItemType.ROOT) {
-        <!--
-        <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
-          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
-            <step-icon name="tree" />
-            <span>Keywords</span>
-          </div>
-          <section *stepStackViewItemTitle class="root-title">
-            <div>Keywords</div>
-          </section>
-          <section *stepStackViewItemContent class="root-content">
-            <step-alt-report-node-keywords />
-          </section>
-          <div class="miniature" *stepStackViewItemMiniature matTooltip="Keywords" matTooltipPosition="below">
-            <span>KW</span>
-            <step-icon name="tree" />
-          </div>
-        </step-stack-view-item>
--->
-        <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
-          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
-            <step-icon name="tree" />
-            <span>Execution Tree</span>
-          </div>
-          <section *stepStackViewItemTitle class="root-title">
-            <div>Execution Tree</div>
-            <step-alt-execution-tree-control-panel />
-          </section>
-          <section *stepStackViewItemContent class="root-content">
-            <step-alt-execution-tree
-              stepAltExecutionTreeSearchFocus
-              stepTreeAutoChooseVirtualScroll="340px"
-              [applyVirtualScrollFrom]="150"
-              [showSpinnerWhileTreeInitialize]="true"
-              [handleOpenIterationsManually]="true"
-              (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
-            />
-          </section>
-          <div class="miniature" *stepStackViewItemMiniature matTooltip="Execution Tree" matTooltipPosition="below">
-            <span>ET</span>
-            <step-icon name="tree" />
-          </div>
-        </step-stack-view-item>
+        @switch ($any(item).rootType) {
+          @case (DrilldownRootType.KEYWORDS) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltReportNodeListSort
+              sortByColumn="executionTime"
+              matSort
+              matSortActive="executionTime"
+              matSortDirection="desc"
+              [matSortDisableClear]="true"
+              stepAltReportNodesProvideKeywords
+              #keywordsSort="AltReportNodeListSort"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="list" />
+                <span>Keywords</span>
+              </div>
+              <section *stepStackViewItemTitle class="root-title nodes-list-title">
+                <div>
+                  <span>Keywords</span>
+                  @if (keywordsSort.showSort()) {
+                    <step-alt-report-widget-sort>
+                      <step-icon
+                        [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+                        (click)="keywordsSort.toggleSort()"
+                      />
+                    </step-alt-report-widget-sort>
+                  }
+                </div>
+                <div>
+                  <step-alt-report-node-status-filter />
+                  <step-alt-report-node-search />
+                </div>
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-report-node-keywords (openDetails)="handleOpenDetails($event, item.id)" />
+              </section>
+              <div class="miniature" *stepStackViewItemMiniature matTooltip="Keywords" matTooltipPosition="below">
+                <span>KW</span>
+                <step-icon name="list" />
+              </div>
+            </step-stack-view-item>
+          }
+          @case (DrilldownRootType.TESTCASES) {
+            <step-stack-view-item [itemId]="item.id" stepAltReportNodeListProvideTestcases>
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="list" />
+                <span>Testcases</span>
+              </div>
+              <section *stepStackViewItemTitle class="root-title nodes-list-title">
+                <div>Test Cases</div>
+                <div>
+                  <step-alt-report-node-status-filter />
+                  <step-alt-report-node-search />
+                </div>
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-report-node-testcases
+                  (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+                />
+              </section>
+              <div class="miniature" *stepStackViewItemMiniature matTooltip="Keywords" matTooltipPosition="below">
+                <span>TC</span>
+                <step-icon name="list" />
+              </div>
+            </step-stack-view-item>
+          }
+          @case (DrilldownRootType.TREE) {
+            <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="tree" />
+                <span>Execution Tree</span>
+              </div>
+              <section *stepStackViewItemTitle class="root-title">
+                <div>Execution Tree</div>
+                <step-alt-execution-tree-control-panel />
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-execution-tree
+                  stepAltExecutionTreeSearchFocus
+                  stepTreeAutoChooseVirtualScroll="340px"
+                  [applyVirtualScrollFrom]="150"
+                  [showSpinnerWhileTreeInitialize]="true"
+                  [handleOpenIterationsManually]="true"
+                  (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+                />
+              </section>
+              <div class="miniature" *stepStackViewItemMiniature matTooltip="Execution Tree" matTooltipPosition="below">
+                <span>ET</span>
+                <step-icon name="tree" />
+              </div>
+            </step-stack-view-item>
+          }
+        }
       }
       @case (StackItemType.AGGREGATED_REPORT_NODE) {
         <step-stack-view-item [itemId]="item.id" itemTitle="Iteration List">

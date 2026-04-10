@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 
 @Directive({
   selector: '[stepAltReportNodeListSort]',
+  exportAs: 'AltReportNodeListSort',
 })
 export class AltReportNodeListSortDirective {
   private _matSort = inject(MatSort, { optional: true });

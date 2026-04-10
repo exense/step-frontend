@@ -11,6 +11,8 @@
       stepTreeAutoChooseVirtualScroll="340px"
       [applyVirtualScrollFrom]="150"
       [showSpinnerWhileTreeInitialize]="true"
+      [handleOpenIterationsManually]="true"
+      (openIterations)="handleOpenIterations($event)"
     />
   </step-alt-report-widget-content>
 </step-alt-report-widget>
