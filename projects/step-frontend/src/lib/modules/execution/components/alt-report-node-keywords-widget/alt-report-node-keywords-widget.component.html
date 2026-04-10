@@ -1,4 +1,4 @@
-<step-alt-report-node-list
+<step-alt-report-node-list-widget
   sortByColumn="executionTime"
   [mode]="_mode"
   matSort
@@ -9,7 +9,7 @@
 >
   <step-table
     #table
-    [dataSource]="(dataSource$ | async)!"
+    [dataSource]="(_state.datasource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
     [calculateCounts]="calculateCounts()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
@@ -41,4 +41,4 @@
       <step-table-counts-toggle [enabled]="calculateCounts()" itemsLabel="steps" (toggle)="toggleCountsCalculation()" />
     </ng-container>
   </step-table>
-</step-alt-report-node-list>
+</step-alt-report-node-list-widget>

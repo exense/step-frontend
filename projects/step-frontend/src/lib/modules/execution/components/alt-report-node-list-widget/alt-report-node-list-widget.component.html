@@ -2,21 +2,19 @@
   <step-alt-report-widget-title>
     <step-grid-element-title />
   </step-alt-report-widget-title>
-  @if (showSort()) {
+  @if (_reportNodeListSort.showSort()) {
     <step-alt-report-widget-sort>
-      <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" (click)="toggleSort()" />
+      <step-icon
+        [name]="_reportNodeListSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+        (click)="_reportNodeListSort.toggleSort()"
+      />
     </step-alt-report-widget-sort>
   }
   <step-alt-report-widget-filter>
     <ng-content select="step-alt-report-widget-filter" />
     @if (mode() === ViewMode.VIEW) {
       <step-alt-report-node-status-filter />
-      <step-form-field>
-        <step-prefix class="icon-prefix">
-          <step-icon name="search" />
-        </step-prefix>
-        <input type="text" class="search-input" [formControl]="_state.searchCtrl" placeholder="Search" />
-      </step-form-field>
+      <step-alt-report-node-search />
     } @else {
       <div>{{ statusText }}</div>
       <div>{{ searchText }}</div>

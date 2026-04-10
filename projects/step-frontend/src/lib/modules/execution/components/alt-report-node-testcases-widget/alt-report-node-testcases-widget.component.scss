@@ -1,7 +1,7 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
-step-alt-report-nodes-testcases {
+step-alt-report-node-testcases-widget {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -117,7 +117,7 @@ step-alt-report-nodes-testcases {
 }
 
 @media print {
-  step-alt-report-nodes-testcases .actions {
+  step-alt-report-node-testcases-widget .actions {
     display: none;
   }
 }

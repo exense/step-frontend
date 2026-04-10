@@ -68,7 +68,7 @@ import { AltExecutionProgressComponent } from './components/alt-execution-progre
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
-import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
+import { AltReportNodeListWidgetComponent } from './components/alt-report-node-list-widget/alt-report-node-list-widget.component';
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
 import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
@@ -76,8 +76,8 @@ import { AltReportCurrentOperationsComponent } from './components/alt-report-cur
 import { AltReportWidgetComponent } from './components/alt-report-widget/alt-report-widget.component';
 import { AltReportWidgetFilterDirective } from './directives/alt-report-widget-filter.directive';
 import { AltReportWidgetContentDirective } from './directives/alt-report-widget-content.directive';
-import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
-import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
+import { AltReportNodeKeywordsWidgetComponent } from './components/alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
@@ -184,6 +184,8 @@ import { AltReportNodeHeaderComponent } from './components/alt-report-node-heade
 import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
 import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
 import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
+import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
+import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
 
 @NgModule({
   declarations: [
@@ -225,7 +227,7 @@ import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
-    AltReportNodeListComponent,
+    AltReportNodeListWidgetComponent,
     AltExecutionTimeComponent,
     AltReportPerformanceOverviewChartComponent,
     AltReportCurrentOperationsComponent,
@@ -234,8 +236,8 @@ import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution
     AltReportWidgetSortDirective,
     AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
-    AltReportNodeKeywordsComponent,
-    AltReportNodesTestcasesComponent,
+    AltReportNodeKeywordsWidgetComponent,
+    AltReportNodeTestcasesWidgetComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltExecutionTreePartialComponent,
@@ -324,6 +326,8 @@ import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution
     AltExecutionTreeWidgetDirective,
     AltExecutionTreeSearchFocusDirective,
     ViewItemDefaultNamePipe,
+    AltReportNodeListSortDirective,
+    AltReportNodeSearchComponent,
   ],
   exports: [
     ExecutionListComponent,

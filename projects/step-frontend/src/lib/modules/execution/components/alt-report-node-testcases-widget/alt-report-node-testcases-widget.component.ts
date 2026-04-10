@@ -1,7 +1,6 @@
-import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, inject, untracked, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportView,
-  ItemsPerPageService,
   STORE_ALL,
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
@@ -12,16 +11,18 @@ import {
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
-import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
+import { VIEW_MODE } from '../../shared/view-mode';
+import { AltReportNodeListSearchDirective } from '../../directives/alt-report-node-list-search.directive';
+import { AltReportNodeListItemsPerPageDirective } from '../../directives/alt-report-node-list-items-per-page.directive';
 
 @Component({
-  selector: 'step-alt-report-nodes-testcases',
-  templateUrl: './alt-report-nodes-testcases.component.html',
-  styleUrl: './alt-report-nodes-testcases.component.scss',
+  selector: 'step-alt-report-node-testcases-widget',
+  templateUrl: './alt-report-node-testcases-widget.component.html',
+  styleUrl: './alt-report-node-testcases-widget.component.scss',
   providers: [
     {
       provide: AltReportNodesStateService,
@@ -32,31 +33,39 @@ import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-v
       useExisting: AltReportNodesStateService,
     },
     {
-      provide: ItemsPerPageService,
-      useExisting: AltReportNodesTestcasesComponent,
-    },
-    {
       provide: TableStorageService,
       useClass: TableMemoryStorageService,
     },
     TablePersistenceStateService,
     tablePersistenceConfigProvider('testCases', STORE_ALL),
   ],
+  hostDirectives: [AltReportNodeListSearchDirective, AltReportNodeListItemsPerPageDirective],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
-export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
+export class AltReportNodeTestcasesWidgetComponent implements AfterViewInit {
+  protected readonly _state = inject(AltReportNodesStateService);
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+  private _listSearch = inject(AltReportNodeListSearchDirective, { self: true });
+  protected readonly _mode = inject(VIEW_MODE);
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
-  onSearchFor(item: AggregatedReportView, message: string): void {
-    this.showIterations(item, { searchFor: message });
+  private get tableSearchUntracked(): TableSearch | undefined {
+    return untracked(() => this.tableSearch());
   }
 
-  override setupDateRangeFilter(): void {
-    // Empty implementation
+  ngAfterViewInit(): void {
+    this._listSearch.searchName$.subscribe((name) => this.tableSearchUntracked?.onSearch?.('name', name));
+    this._listSearch.searchStatuses$.subscribe((status) => this.tableSearchUntracked?.onSearch?.('status', status));
+    this._listSearch.searchReportNodeClass$.subscribe((reportNodeClass) =>
+      this.tableSearchUntracked?.onSearch?.('_class', reportNodeClass),
+    );
+  }
+
+  onSearchFor(item: AggregatedReportView, message: string): void {
+    this.showIterations(item, { searchFor: message });
   }
 
   protected showIterations(

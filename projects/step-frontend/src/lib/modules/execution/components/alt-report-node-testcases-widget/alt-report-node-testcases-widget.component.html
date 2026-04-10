@@ -1,5 +1,9 @@
-<step-alt-report-node-list title="Test Cases" [mode]="_mode">
-  <step-datasource-list #table [dataSource]="(dataSource$ | async)!" [indicatorMode]="TableIndicatorMode.SPINNER">
+<step-alt-report-node-list-widget title="Test Cases" [mode]="_mode">
+  <step-datasource-list
+    #table
+    [dataSource]="(_state.datasource$ | async)!"
+    [indicatorMode]="TableIndicatorMode.SPINNER"
+  >
     <ng-container *stepDatasourceListItem="let element; let index = $index">
       @let hasOperations = !!element.currentOperations.length;
       @let hasErrors = !!(element | aggregatedReportViewCountErrors);
@@ -69,4 +73,4 @@
       </section>
     </ng-container>
   </step-datasource-list>
-</step-alt-report-node-list>
+</step-alt-report-node-list-widget>

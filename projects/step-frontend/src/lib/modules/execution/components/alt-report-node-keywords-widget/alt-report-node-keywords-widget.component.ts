@@ -1,6 +1,7 @@
-import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, inject, signal, untracked, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedScreenService,
+  FilterConditionFactoryService,
   ItemsPerPageService,
   ReportNode,
   STORE_ALL,
@@ -13,18 +14,20 @@ import {
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
-import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
+import { VIEW_MODE } from '../../shared/view-mode';
+import { AltReportNodeListSearchDirective } from '../../directives/alt-report-node-list-search.directive';
+import { AltReportNodeListItemsPerPageDirective } from '../../directives/alt-report-node-list-items-per-page.directive';
 
 @Component({
-  selector: 'step-alt-report-node-keywords',
-  templateUrl: './alt-report-node-keywords.component.html',
-  styleUrl: './alt-report-node-keywords.component.scss',
+  selector: 'step-alt-report-node-keywords-widget',
+  templateUrl: './alt-report-node-keywords-widget.component.html',
+  styleUrl: './alt-report-node-keywords-widget.component.scss',
   providers: [
     {
       provide: AltReportNodesStateService,
@@ -35,26 +38,31 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useExisting: AltReportNodesStateService,
     },
     {
-      provide: ItemsPerPageService,
-      useExisting: AltReportNodeKeywordsComponent,
-    },
-    {
       provide: TableStorageService,
       useClass: TableMemoryStorageService,
     },
     TablePersistenceStateService,
     tablePersistenceConfigProvider('keywords', { ...STORE_ALL, storeSort: false }),
   ],
+  hostDirectives: [AltReportNodeListSearchDirective, AltReportNodeListItemsPerPageDirective],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
-export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
+export class AltReportNodeKeywordsWidgetComponent implements AfterViewInit {
+  readonly _state = inject(AltReportNodesStateService);
+  private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _screenApiService = inject(AugmentedScreenService);
+  private _listSearch = inject(AltReportNodeListSearchDirective, { self: true });
+  protected readonly _mode = inject(VIEW_MODE);
 
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
+
+  private get tableSearchUntracked(): TableSearch | undefined {
+    return untracked(() => this.tableSearch());
+  }
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
@@ -65,19 +73,28 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
     this._dialogs.openIterationDetails(node);
   }
 
-  protected toggleCountsCalculation(): void {
-    this.calculateCounts.update((value) => !value);
+  private searchName$ = this._state.search$.pipe(
+    map((value) => this._filterConditionFactory.reportNodeFilterCondition(value, this.keywordColumnIds())),
+    takeUntilDestroyed(),
+  );
+
+  ngAfterViewInit(): void {
+    this.searchName$.subscribe((name) => this.tableSearchUntracked?.onSearch?.('name', name));
+    this._listSearch.searchStatuses$.subscribe((status) => this.tableSearchUntracked?.onSearch?.('status', status));
+    this._listSearch.searchReportNodeClass$.subscribe((reportNodeClass) =>
+      this.tableSearchUntracked?.onSearch?.('_class', reportNodeClass),
+    );
+    this._listSearch.searchDateRange$.subscribe(({ searchValue, params }) => {
+      if (typeof searchValue === 'string') {
+        this.tableSearchUntracked?.onSearch?.('executionTime', searchValue, true, params);
+      } else {
+        this.tableSearchUntracked?.onSearch?.('executionTime', searchValue, params);
+      }
+    });
   }
 
-  override setupSearchFilter(): void {
-    this._state.search$
-      .pipe(
-        map((value) => this._filterConditionFactory.reportNodeFilterCondition(value, this.keywordColumnIds())),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((filterCondition) => {
-        this.tableSearch()?.onSearch('name', filterCondition);
-      });
+  protected toggleCountsCalculation(): void {
+    this.calculateCounts.update((value) => !value);
   }
 
   private getKeywordColumnIds(): Observable<string[]> {
