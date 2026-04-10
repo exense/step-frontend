@@ -166,19 +166,26 @@ import { ReportViewHeaderComponent } from './components/schedule-overview/cross-
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
 import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
-import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
-import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
+import {
+  StatusDistributionBadgeComponent
+} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import {
+  ExecutionHistoryNodeTooltipComponent
+} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -279,12 +286,11 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     ReportViewHeaderComponent,
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
-    StatusDistributionBadgeComponent,
-    StatusDistributionTooltipComponent,
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
-    AggregatedTreeNodeStatusesPiechartComponent,
     ExecutionHistorySectionComponent,
+    ExecutionHistoryNodesComponent,
+    ExecutionHistoryNodeTooltipComponent,
   ],
   imports: [
     StepCommonModule,
@@ -314,6 +320,10 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     CalcElementWidthDirective,
     CalcElementWidthItemDirective,
     CalcElementWidthAggregatorDirective,
+    AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryNodesComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -346,6 +356,7 @@ import { CalcElementWidthItemDirective } from './directives/calc-element-width-i
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
+    HistoryNodesComponent,
     AltReportWidgetTitleDirective,
     AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,

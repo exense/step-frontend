@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: color-mix(in oklab, var(--background) 80%, white);
+  padding: 0.3rem;
+  font-size: 1.2rem;
+  border-radius: 16px;
+  gap: 2rem;
+
+  .status-tag {
+    background: var(--statusColor);
+    padding: 0.2rem 1.4rem 0.2rem 0.4rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .status-icon {
+    transform: scale(0.8);
+  }
+
+  .link {
+    cursor: pointer;
+    text-decoration: underline;
+
+    &.disabled {
+      cursor: default;
+      opacity: 0.6;
+      text-decoration: none;
+    }
+  }
+}
+
+
+.timestamp {
+  font-size: 1.1rem;
+  margin-left: 0.6rem;
+  margin-top: 1rem;
+}
