@@ -95,6 +95,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
     const handleEventManually = untracked(() => this.handleOpenIterationsManually());
     if (handleEventManually) {
       this.openIterations.emit(event);
+      return;
     }
     this._executionDialogs.openIterations(event.node, event.restParams);
   }

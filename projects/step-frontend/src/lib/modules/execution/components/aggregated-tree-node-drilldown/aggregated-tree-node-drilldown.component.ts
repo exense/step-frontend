@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
 import { AltExecutionDialogsService, PartialOpenIterationsParams } from '../../services/alt-execution-dialogs.service';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 interface DrilldownData {
   aggregatedNodeId?: string;
@@ -61,6 +62,10 @@ const IS_DRILLDOWN_OPENED = 'is-drilldown-opened';
       provide: NODE_DETAILS_RELATIVE_PARENT,
       useFactory: () => inject(ActivatedRoute).parent!.parent!,
     },
+    {
+      provide: VIEW_MODE,
+      useValue: ViewMode.VIEW,
+    },
     AltExecutionNodesHelperService,
     AltExecutionDialogsService,
   ],
@@ -75,10 +80,14 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute.parent!.parent!;
 
   protected readonly stackItems = signal<StackItem[]>([{ type: StackItemType.ROOT, id: 'root', nodeId: 'root' }]);
+  protected readonly StackItemType = StackItemType;
+
+  private get stackItemsUntracked(): StackItem[] {
+    return untracked(() => this.stackItems());
+  }
 
   private get currentLength(): number {
-    const items = untracked(() => this.stackItems());
-    return items.length;
+    return this.stackItemsUntracked.length;
   }
 
   private get executionProgressElement(): HTMLElement | null {
@@ -146,7 +155,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   }
 
   protected removeItem(id: string): void {
-    const items = untracked(() => this.stackItems());
+    const items = this.stackItemsUntracked;
     // By closing of the first item, close entire view
     if (items[0].id === id) {
       this._router.navigate([{ outlets: { nodeDetails: null } }], {
@@ -166,23 +175,45 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     parentStackItemId: string,
     params: PartialOpenIterationsParams = {},
   ): void {
+    const singleReportNode = this._dialogsService.getSingleReportNode(node);
+    if (
+      (singleReportNode && !this.isPossibleToInsertItem(singleReportNode.id!, parentStackItemId)) ||
+      !this.isPossibleToInsertItem(node.id!, parentStackItemId)
+    ) {
+      return;
+    }
     this.removeAllAfterItem(parentStackItemId);
     queueMicrotask(() => {
       this._dialogsService.openIterations(node, params);
     });
   }
 
-  protected handleOpenDetails(node: ReportNode, parentId: string): void {
-    this.removeAllAfterItem(parentId);
+  protected handleOpenDetails(node: ReportNode, parentStackItemId: string): void {
+    if (!this.isPossibleToInsertItem(node.id!, parentStackItemId)) {
+      return;
+    }
+    this.removeAllAfterItem(parentStackItemId);
     queueMicrotask(() => {
       this._dialogsService.openIterationDetails(node);
     });
   }
 
-  protected readonly StackItemType = StackItemType;
+  private isPossibleToInsertItem(nodeId: string, parentStackItemId: string): boolean {
+    // Prevents to open two same items twice one after another
+    let itemsToCheck = [...this.stackItemsUntracked];
+    const parentIndex = itemsToCheck.findIndex((item) => item.id === parentStackItemId);
+    if (parentIndex < 0) {
+      return true;
+    }
+    itemsToCheck = itemsToCheck.splice(0, parentIndex + 1);
+    if (itemsToCheck[itemsToCheck.length - 1].nodeId === nodeId) {
+      return false;
+    }
+    return true;
+  }
 
   private removeAllAfterItem(id: string): void {
-    const items = untracked(() => this.stackItems());
+    const items = this.stackItemsUntracked;
     if (items[items.length - 1].id === id) {
       return;
     }

@@ -48,6 +48,17 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _matDialog = inject(MatDialog);
   private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
 
+  getSingleReportNode(
+    node: AggregatedTreeNode | OpenIterationsParams,
+  ): ReportNodeWithArtefact<AbstractArtefact> | undefined {
+    const { countByStatus, singleInstanceReportNode } = node;
+    const itemsCounts = Object.values(countByStatus ?? {});
+    if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
+      return singleInstanceReportNode!;
+    }
+    return undefined;
+  }
+
   openIterations(params: OpenIterationsParams): void;
   openIterations(node: AggregatedTreeNode, restParams: PartialOpenIterationsParams): void;
   openIterations(
@@ -62,22 +73,14 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       return;
     }
 
-    const {
-      aggregatedNodeId,
-      countByStatus,
-      reportNodeId,
-      nodeStatus,
-      nodeStatusCount,
-      singleInstanceReportNode,
-      searchFor,
-    } = nodeOrParams as OpenIterationsParams;
+    const { aggregatedNodeId, reportNodeId, nodeStatus, nodeStatusCount, searchFor } =
+      nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
       this.navigateToIterationDetails(reportNodeId);
       return;
     }
-    const itemsCounts = Object.values(countByStatus ?? {});
-    if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
-      const reportNode = singleInstanceReportNode!;
+    const reportNode = this.getSingleReportNode(nodeOrParams);
+    if (!!reportNode) {
       this._reportNodeDetails?.setReportNode?.(reportNode);
       this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
       this.navigateToIterationDetails(reportNode.id!, {}, searchFor);
