@@ -6,14 +6,26 @@ import {
   Measure,
   ReportNode,
   TableDataSource,
+  TableFetchLocalDataSource,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 import { DOCUMENT } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
+
+interface MetricSample {
+  sampleTime: number;
+  name: string;
+  count: number;
+  sum: number;
+  max: number;
+  type: 'COUNTER' | 'GAUGE' | 'HISTOGRAM';
+  labels?: Record<string, string>;
+}
 
 @Component({
   selector: 'step-call-keyword-report-details',
@@ -28,6 +40,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   private _controllerService = inject(AugmentedControllerService);
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _http = inject(HttpClient);
   private _window = inject(DOCUMENT).defaultView!;
 
   private reportNodesToRender = new Set([
@@ -103,6 +116,14 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     return this.createMeasurementsDataSource(id);
   });
 
+  protected readonly metricSamplesDataSource = computed(() => {
+    const id = this.nodeId();
+    if (!id) {
+      return undefined;
+    }
+    return this.createMetricSamplesDataSource(id);
+  });
+
   /**
    * Add additional effect to refresh dataSource when node changes, event id is the same
    * **/
@@ -110,6 +131,12 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     const node = this.node();
     const measuresDataSource = untracked(() => this.measuresDataSource());
     measuresDataSource?.reload?.();
+  });
+
+  private effectRefreshMetricSamples = effect(() => {
+    const node = this.node();
+    const metricSamplesDataSource = untracked(() => this.metricSamplesDataSource());
+    metricSamplesDataSource?.reload?.();
   });
 
   protected copyInput(): void {
@@ -153,6 +180,17 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
       {
         rnId: reportNodeId,
       },
+    );
+  }
+
+  private createMetricSamplesDataSource(reportNodeId: string): TableDataSource<MetricSample> {
+    return new TableFetchLocalDataSource(
+      () => this._http.get<MetricSample[]>(`/rest/raw-samples/metric-samples/${reportNodeId}/aggregated`),
+      TableFetchLocalDataSource.configBuilder<MetricSample>()
+        .addSortNumberPredicate('sampleTime', (item) => item.sampleTime)
+        .addSortStringPredicate('name', (item) => item.name)
+        .addSortNumberPredicate('count', (item) => item.count)
+        .build(),
     );
   }
 
