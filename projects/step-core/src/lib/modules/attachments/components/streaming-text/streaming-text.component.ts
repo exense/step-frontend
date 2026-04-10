@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { WsResourceStatusChange } from '../../types/ws-resource-status-change';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { IndicatorStateFactoryService, StepBasicsModule } from '../../../basics/step-basics.module';
+import { DialogsService, IndicatorStateFactoryService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { RichEditorVerticalScroll, RichEditorComponent } from '../../../rich-editor';
 import {
   AttachmentMeta,
@@ -65,22 +65,25 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _wsFactory = inject(WsFactoryService);
   private _destroyRef = inject(DestroyRef);
+  private _dialogs = inject(DialogsService);
   private _indicatorStateFactory = inject(IndicatorStateFactoryService);
   private wsChannel?: WsChannel<RequestLines, WsResourceStatusChange | ResponseLines>;
+  private pendingRequest?: RequestLines;
+  private openingErrorShown = false;
 
-  private richEditor = viewChild('richEditor', { read: RichEditorComponent });
+  private readonly richEditor = viewChild('richEditor', { read: RichEditorComponent });
 
-  private totalLines = signal(0);
+  private readonly totalLines = signal(0);
 
-  protected statusInternal = signal<AttachmentStreamStatus | undefined>(undefined);
+  protected readonly statusInternal = signal<AttachmentStreamStatus | undefined>(undefined);
 
   readonly status = this.statusInternal.asReadonly();
 
-  private areLinesRequestedIndicator = this._indicatorStateFactory.createIndicatorState(500);
+  private readonly areLinesRequestedIndicator = this._indicatorStateFactory.createIndicatorState(500);
   readonly areLinesRequested = this.areLinesRequestedIndicator.isVisible;
 
-  private frameRequest = signal<FrameRequest>({ start: 0, end: 0, causedBy: FrameChangeCause.INIT });
-  private frameRequest$ = toObservable(this.frameRequest);
+  private readonly frameRequest = signal<FrameRequest>({ start: 0, end: 0, causedBy: FrameChangeCause.INIT });
+  private readonly frameRequest$ = toObservable(this.frameRequest);
 
   readonly displayLatestRows = input<number | undefined>(undefined);
   readonly linesFrame = input<number>(Infinity);
@@ -97,7 +100,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   private direction = Direction.DOWN;
 
-  private frameInfoInternal = signal<{ startLineIndex: number; endLineIndex: number; totalLines: number }>({
+  private readonly frameInfoInternal = signal<{ startLineIndex: number; endLineIndex: number; totalLines: number }>({
     startLineIndex: 0,
     endLineIndex: 0,
     totalLines: 0,
@@ -109,7 +112,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   readonly attachment = input.required<AttachmentMeta>();
 
-  private attachmentUrl = computed(() => {
+  private readonly attachmentUrl = computed(() => {
     const attachment = this.attachment();
     return this._attachmentUtils.getAttachmentStreamingUrl(attachment);
   });
@@ -128,8 +131,8 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     this.createChannel(url);
   });
 
-  private lines = signal<string[]>([]);
-  private linesCount = computed(() => this.lines().length);
+  private readonly lines = signal<string[]>([]);
+  private readonly linesCount = computed(() => this.lines().length);
   protected readonly text = computed(() => this.lines().join(''));
 
   ngOnInit(): void {
@@ -214,13 +217,17 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
       )
       .subscribe((request) => {
         this.areLinesRequestedIndicator.show();
-        this.wsChannel?.send(request);
+        this.pendingRequest = request;
+        if (this.wsChannel?.isConnected()) {
+          this.sendPendingRequest();
+        }
       });
   }
 
   private closeChannel(): void {
     this.wsChannel?.disconnect?.();
     this.wsChannel = undefined;
+    this.pendingRequest = undefined;
   }
 
   private proceedLinesResponse(lines: string[]): void {
@@ -271,47 +278,115 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   private createChannel(url: string): void {
     this.closeChannel();
+    this.openingErrorShown = false;
     this.wsChannel = this._wsFactory.connect(url);
-    this.wsChannel.data$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((response) => {
-      if (response instanceof Blob) {
-        console.error('Binary data is not supported for text streaming');
-        return;
-      }
+    const wsChannel = this.wsChannel;
 
-      const autoCloseChannelWhenFinished = untracked(() => this.autoCloseChannelWhenFinished());
+    toObservable(wsChannel.isConnected)
+      .pipe(
+        filter((isConnected) => isConnected),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.sendPendingRequest());
 
-      if (response['@'] === 'Lines') {
-        this.proceedLinesResponse(response.lines);
-        const status = untracked(() => this.status());
-        if ((status === 'FAILED' || status === 'COMPLETED') && autoCloseChannelWhenFinished) {
-          this.closeChannel();
-        }
-        return;
-      }
-
-      const { transferStatus, numberOfLines: totalLines } = response.resourceStatus;
-      this.statusInternal.set(transferStatus);
-      if (transferStatus === 'FAILED' && totalLines === 0) {
-        this.areLinesRequestedIndicator.hide();
-        if (autoCloseChannelWhenFinished) {
-          this.closeChannel();
-        }
-        return;
-      }
-
-      this.totalLines.set(totalLines);
-      const linesFrame = this.linesFrame();
-
-      let newFrameStart = 0;
-      let newFrameEnd = totalLines;
-
-      if (linesFrame !== Infinity) {
-        newFrameStart = totalLines - linesFrame;
-      }
-
-      this.frameRequest.set({ start: newFrameStart, end: newFrameEnd, causedBy: FrameChangeCause.PROGRESS });
-      this.direction = Direction.DOWN;
+    wsChannel.error$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((error) => {
+      this.handleStreamingOpenError(error);
     });
+
+    wsChannel.data$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe({
+      next: (response) => {
+        if (response instanceof Blob) {
+          console.error('Binary data is not supported for text streaming');
+          return;
+        }
+
+        const autoCloseChannelWhenFinished = untracked(() => this.autoCloseChannelWhenFinished());
+
+        if (response['@'] === 'Lines') {
+          this.proceedLinesResponse(response.lines);
+          const status = untracked(() => this.status());
+          if ((status === 'FAILED' || status === 'COMPLETED') && autoCloseChannelWhenFinished) {
+            this.closeChannel();
+          }
+          return;
+        }
+
+        const { transferStatus, numberOfLines: totalLines } = response.resourceStatus;
+        this.statusInternal.set(transferStatus);
+        if (transferStatus === 'FAILED' && totalLines === 0) {
+          this.handleStreamingOpenError();
+          if (autoCloseChannelWhenFinished) {
+            this.closeChannel();
+          }
+          return;
+        }
+
+        this.totalLines.set(totalLines);
+        const linesFrame = this.linesFrame();
+
+        let newFrameStart = 0;
+        let newFrameEnd = totalLines;
+
+        if (linesFrame !== Infinity) {
+          newFrameStart = totalLines - linesFrame;
+        }
+
+        this.frameRequest.set({ start: newFrameStart, end: newFrameEnd, causedBy: FrameChangeCause.PROGRESS });
+        this.direction = Direction.DOWN;
+      },
+      error: (error) => {
+        this.handleStreamingOpenError(error);
+      },
+    });
+  }
+
+  private sendPendingRequest(): void {
+    if (!this.pendingRequest || !this.wsChannel?.isConnected()) {
+      return;
+    }
+    const request = this.pendingRequest;
+    this.pendingRequest = undefined;
+    this.wsChannel.send(request);
+  }
+
+  private handleStreamingOpenError(error?: unknown): void {
+    this.statusInternal.set('FAILED');
+    this.areLinesRequestedIndicator.hide();
+    this.pendingRequest = undefined;
+
+    if (this.totalLines() > 0 || this.linesCount() > 0) {
+      return;
+    }
+
+    if (this.openingErrorShown) {
+      return;
+    }
+    this.openingErrorShown = true;
+
+    const message = this.resolveStreamingErrorMessage(error);
+    this._dialogs.showErrorMsg(message).subscribe();
+  }
+
+  private resolveStreamingErrorMessage(error?: unknown): string {
+    if (error instanceof CloseEvent) {
+      return error.reason || 'Unable to open the streaming attachment.';
+    }
+
+    if (typeof error === 'string' && error.trim()) {
+      return error;
+    }
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof error.message === 'string' &&
+      error.message
+    ) {
+      return error.message;
+    }
+
+    return 'Unable to open the streaming attachment.';
   }
 
   private calcStartLineIndex({ start }: FrameRequest, linesFrame: number): number {
