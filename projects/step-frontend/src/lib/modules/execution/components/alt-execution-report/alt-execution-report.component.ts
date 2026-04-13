@@ -59,7 +59,10 @@ export class AltExecutionReportComponent
   private _widgetsPersistence = inject(WidgetsPersistenceStateService);
   protected readonly _mode = inject(VIEW_MODE);
   protected readonly hasNoLayout = computed(
-    () => this._widgetsPersistence.isInitialized() && !this._widgetsPersistence.selectedPreset(),
+    () =>
+      this._widgetsPersistence.isInitialized() &&
+      !this._widgetsPersistence.selectedPreset() &&
+      !this._gridEditable.editMode(),
   );
   private _router = inject(Router);
   private _gridEditable = inject(GridEditableService);
