@@ -122,12 +122,12 @@ export class GridControlToolComponent {
   }
 
   protected save(): void {
-    const preset = untracked(() => this._widgetPersistence.selectedPreset())!;
+    const preset = untracked(() => this._widgetPersistence.selectedPreset());
     const canOverride = untracked(() => this.canOverrideCurrentLayout());
     const canSaveAsNew = untracked(() => this.canSaveAsNew());
     const isShared = untracked(() => this.isShared());
-    const currentLayoutName = preset.attributes!['name']!;
-    const defaultName = `${currentLayoutName}_COPY`;
+    const currentLayoutName = preset?.attributes?.['name'] ?? '';
+    const defaultName = preset ? `${currentLayoutName}_COPY` : 'New Layout';
     const existingPresetNames = untracked(() => this.presets()).map((p) => p.value);
 
     this._matDialog
