@@ -145,8 +145,8 @@ export class GridControlToolComponent {
                 const currentIsShared = untracked(() => this.isShared());
                 if (newIsShared === currentIsShared) return of(undefined);
                 return newIsShared
-                  ? this._widgetPersistence.sharePreset(preset.id!)
-                  : this._widgetPersistence.unsharePreset(preset.id!);
+                  ? this._widgetPersistence.sharePreset(preset!.id!)
+                  : this._widgetPersistence.unsharePreset(preset!.id!);
               }),
             );
           } else {
