@@ -53,7 +53,7 @@ export class AttachmentPreviewComponent {
     initialValue: this._auth.hasRight('resource-read'),
   });
 
-  private streamingStatus = computed(() => this._streamingStatus.status());
+  private readonly streamingStatus = computed(() => this._streamingStatus.status());
 
   protected readonly isStreamingInProgress = computed(() => {
     const status = this.streamingStatus();

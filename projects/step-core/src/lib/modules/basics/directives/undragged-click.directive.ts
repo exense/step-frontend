@@ -47,8 +47,8 @@ export class UndraggedClickDirective {
 
   private bindWindowListeners(): void {
     this.removeWindowListeners?.();
-    const move = (event: MouseEvent) => this.guard.pointerMove(event);
-    const up = () => {
+    const move = (event: MouseEvent): void => this.guard.pointerMove(event);
+    const up = (): void => {
       this.guard.pointerUp();
       this.removeWindowListeners?.();
       this.removeWindowListeners = undefined;

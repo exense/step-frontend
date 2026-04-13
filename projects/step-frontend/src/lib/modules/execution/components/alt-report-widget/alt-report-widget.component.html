@@ -2,9 +2,12 @@
   <mat-card-header>
     <mat-card-title>
       <ng-content select="step-alt-report-widget-sort" />
-      <div>
-        {{ title() }}
-      </div>
+      @if (!hasTitleLayout()) {
+        <div>
+          {{ title() }}
+        </div>
+      }
+      <ng-content select="step-alt-report-widget-title" />
     </mat-card-title>
     <ng-content select="step-alt-report-widget-filter" />
   </mat-card-header>
