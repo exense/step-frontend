@@ -10,7 +10,7 @@
     position: relative;
 
     .node-icon {
-      background: $color;
+      background: $color !important;
 
       &:after {
         background: $color;
