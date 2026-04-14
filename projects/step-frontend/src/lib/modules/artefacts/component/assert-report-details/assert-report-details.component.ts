@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
 } from '@exense/step-core';
 import { AssertReportNode } from '../../types/assert.report-node';
 
@@ -27,15 +28,15 @@ export class AssertReportDetailsComponent extends BaseReportDetailsComponent<Ass
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        ['negated', node.resolvedArtefact.doNegate, 'log-in'],
-        ['actual', node.resolvedArtefact.actual, 'log-in'],
-        ['operator', node.resolvedArtefact.operator, 'log-in'],
-        ['expected', node.resolvedArtefact.expected, 'log-in'],
+        { label: 'negated', value: node.resolvedArtefact.doNegate, itemType: ItemType.configuration },
+        { label: 'actual', value: node.resolvedArtefact.actual, itemType: ItemType.configuration },
+        { label: 'operator', value: node.resolvedArtefact.operator, itemType: ItemType.configuration },
+        { label: 'expected', value: node.resolvedArtefact.expected, itemType: ItemType.configuration },
       );
     }
 
     if (!node.error) {
-      source.push(['message', node.message, 'log-out']);
+      source.push({ label: 'message', value: node.message, itemType: ItemType.result });
     }
 
     if (!source.length) {

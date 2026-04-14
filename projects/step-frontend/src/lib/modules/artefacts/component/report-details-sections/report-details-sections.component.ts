@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { ArtefactInlineItem } from '@exense/step-core';
+import { ArtefactInlineItem, ItemType } from '@exense/step-core';
 
 @Component({
   selector: 'step-report-details-sections',
@@ -13,13 +13,13 @@ export class ReportDetailsSectionsComponent {
 
   protected readonly configurationItems = computed(() =>
     (this.items() ?? [])
-      .filter((item) => item.icon !== 'log-out')
-      .map(({ icon, iconTooltip, ...item }) => item),
+      .filter((item) => item.itemType !== ItemType.result)
+      .map(({ itemType, ...item }) => item),
   );
 
   protected readonly resultItems = computed(() =>
     (this.items() ?? [])
-      .filter((item) => item.icon === 'log-out')
-      .map(({ icon, iconTooltip, ...item }) => item),
+      .filter((item) => item.itemType === ItemType.result)
+      .map(({ itemType, ...item }) => item),
   );
 }

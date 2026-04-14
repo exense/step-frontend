@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
+import { ArtefactInlineItemUtilsService, ItemType, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
 import { SwitchArtefact } from '../../types/switch.artefact';
 
 @Component({
@@ -20,6 +20,6 @@ export class SwitchReportDetailsComponent extends BaseReportDetailsComponent<Rep
     if (!artefact) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([['expression', artefact.expression, 'log-in']]);
+    return this._artefactInlineUtils.convert([{ label: 'expression', value: artefact.expression, itemType: ItemType.configuration }]);
   });
 }

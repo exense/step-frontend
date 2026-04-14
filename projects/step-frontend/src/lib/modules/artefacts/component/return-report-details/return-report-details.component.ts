@@ -4,6 +4,7 @@ import {
   BaseReportDetailsComponent,
   DynamicValueString,
   DynamicValuesUtilsService,
+  ItemType,
   ReportNodeWithArtefact,
   SimpleOrDynamicValue,
 } from '@exense/step-core';
@@ -47,7 +48,7 @@ export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<Rep
             const preparedValue = isDynamic
               ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
               : value;
-            return [key, this.normalizeInlineValue(preparedValue), 'log-out'] as [string, string | number | boolean | undefined, string];
+            return { label: key, value: this.normalizeInlineValue(preparedValue), itemType: ItemType.result };
           }),
         );
       }

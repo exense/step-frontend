@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemsBuilderService,
-  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
   DynamicValueString,
+  ItemType,
 } from '@exense/step-core';
 import { ReturnArtefact } from '../../types/return.artefact';
 
@@ -37,12 +37,11 @@ export class ReturnInlineComponent extends BaseInlineArtefactComponent<ReturnArt
         return undefined;
       }
 
-      const outputs: ArtefactInlineItemSource = Object.entries(returnOutputs).map(([label, value]) => [
+      const outputs = Object.entries(returnOutputs).map(([label, value]) => ({
         label,
         value,
-        'log-out',
-        'Output',
-      ]);
+        itemType: ItemType.result,
+      }));
 
       return this._artefactInlineUtils.convert(outputs);
     });

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemUtilsService,
+  ArtefactInlineItemUtilsService, ItemType,
   ArtefactService,
   BaseReportDetailsComponent,
   ReportNodeWithArtefact,
@@ -25,6 +25,6 @@ export class IfReportDetailsComponent extends BaseReportDetailsComponent<ReportN
     if (!artefact) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([['condition', artefact.condition, 'log-in']]);
+    return this._artefactInlineUtils.convert([{ label: 'condition', value: artefact.condition, itemType: ItemType.configuration }]);
   });
 }
