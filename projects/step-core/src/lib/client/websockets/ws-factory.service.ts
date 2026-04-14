@@ -40,6 +40,7 @@ class WsChannelImpl<REQ, RESP> implements WsChannel<REQ, RESP> {
   private closeInternal$ = new Subject<CloseEvent>();
   private errorInternal$ = new Subject<unknown>();
   private isDisconnectRequested = false;
+  private pendingRequests: REQ[] = [];
 
   readonly isConnected = this.isConnectedInternal.asReadonly();
   readonly data$: Observable<RESP | Blob>;
@@ -51,11 +52,12 @@ class WsChannelImpl<REQ, RESP> implements WsChannel<REQ, RESP> {
     this.websocket$?.complete?.();
     this.websocket$ = undefined;
     this.isConnectedInternal.set(false);
+    this.pendingRequests = [];
   }
 
   send(request: REQ): void {
     if (!this.isConnected()) {
-      console.error(`Websocket not connected to url: ${this.url}`);
+      this.pendingRequests.push(request);
       return;
     }
     this.websocket$?.next?.(request);
@@ -68,6 +70,9 @@ class WsChannelImpl<REQ, RESP> implements WsChannel<REQ, RESP> {
         next: () => {
           this.isDisconnectRequested = false;
           this.isConnectedInternal.set(true);
+          const queuedRequests = [...this.pendingRequests];
+          this.pendingRequests = [];
+          queuedRequests.forEach((request) => this.websocket$?.next?.(request));
         },
       },
       closeObserver: {

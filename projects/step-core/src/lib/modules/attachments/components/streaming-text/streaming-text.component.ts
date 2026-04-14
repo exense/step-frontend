@@ -68,7 +68,6 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private _dialogs = inject(DialogsService);
   private _indicatorStateFactory = inject(IndicatorStateFactoryService);
   private wsChannel?: WsChannel<RequestLines, WsResourceStatusChange | ResponseLines>;
-  private pendingRequest?: RequestLines;
   private openingErrorShown = false;
 
   private readonly richEditor = viewChild('richEditor', { read: RichEditorComponent });
@@ -217,17 +216,13 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
       )
       .subscribe((request) => {
         this.areLinesRequestedIndicator.show();
-        this.pendingRequest = request;
-        if (this.wsChannel?.isConnected()) {
-          this.sendPendingRequest();
-        }
+        this.wsChannel?.send(request);
       });
   }
 
   private closeChannel(): void {
     this.wsChannel?.disconnect?.();
     this.wsChannel = undefined;
-    this.pendingRequest = undefined;
   }
 
   private proceedLinesResponse(lines: string[]): void {
@@ -282,13 +277,6 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     this.wsChannel = this._wsFactory.connect(url);
     const wsChannel = this.wsChannel;
 
-    toObservable(wsChannel.isConnected)
-      .pipe(
-        filter((isConnected) => isConnected),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => this.sendPendingRequest());
-
     wsChannel.error$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((error) => {
       this.handleStreamingOpenError(error);
     });
@@ -340,19 +328,9 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     });
   }
 
-  private sendPendingRequest(): void {
-    if (!this.pendingRequest || !this.wsChannel?.isConnected()) {
-      return;
-    }
-    const request = this.pendingRequest;
-    this.pendingRequest = undefined;
-    this.wsChannel.send(request);
-  }
-
   private handleStreamingOpenError(error?: unknown): void {
     this.statusInternal.set('FAILED');
     this.areLinesRequestedIndicator.hide();
-    this.pendingRequest = undefined;
 
     if (this.totalLines() > 0 || this.linesCount() > 0) {
       return;
