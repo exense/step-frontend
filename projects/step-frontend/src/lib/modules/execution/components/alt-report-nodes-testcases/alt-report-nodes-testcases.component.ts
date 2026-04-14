@@ -1,4 +1,4 @@
-import { Component, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportView,
   ItemsPerPageService,
@@ -89,6 +89,26 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       nodeStatusCount: options?.count,
       searchFor: options?.searchFor,
     });
+  }
+
+  protected readonly expandIterations = signal(false);
+
+  protected toggleExpandIterations(): void {
+    this.expandIterations.update((v) => !v);
+  }
+
+  protected expandItems(item: AggregatedReportView): Array<{ status: Status; count: number }> {
+    const result: Array<{ status: Status; count: number }> = [];
+    for (const [status, count] of Object.entries(item.countByStatus ?? {})) {
+      for (let i = 0; i < count; i++) {
+        result.push({ status: status as Status, count });
+      }
+    }
+    return result;
+  }
+
+  protected singleStatusMap(status: Status): Record<string, number> {
+    return { [status]: 1 };
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
