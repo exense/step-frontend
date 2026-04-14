@@ -58,6 +58,17 @@ step-alt-execution-report {
     }
   }
 
+  .no-layout-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    h3 {
+      text-align: center;
+    }
+  }
+
   .print-footer {
     display: none;
   }

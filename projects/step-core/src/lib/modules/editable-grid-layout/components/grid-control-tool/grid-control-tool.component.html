@@ -8,6 +8,9 @@
       matTooltip="Switch layout"
       matTooltipPosition="below"
     >
+      @if (!presets().length) {
+        <mat-option [value]="undefined" disabled>No Layout</mat-option>
+      }
       @for (preset of presets(); track preset.key) {
         <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
       }
