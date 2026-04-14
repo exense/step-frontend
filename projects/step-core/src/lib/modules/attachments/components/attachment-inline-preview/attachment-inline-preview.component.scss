@@ -25,4 +25,8 @@ step-attachment-inline-preview {
   .incomplete {
     color: var.$orange;
   }
+
+  .disabled-inline-item {
+    cursor: default;
+  }
 }

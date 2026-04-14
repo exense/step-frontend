@@ -1,4 +1,5 @@
 import { Component, computed, ElementRef, inject, input, untracked, ViewEncapsulation } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AttachmentMeta, StreamingAttachmentMeta } from '../../../../client/step-client-module';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
@@ -10,6 +11,7 @@ import { AttachmentTypePipe } from '../../pipes/attachment-type.pipe';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { StreamingAttachmentIndicatorComponent } from '../streaming-attachment-indicator/streaming-attachment-indicator.component';
 import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
+import { AuthService } from '../../../auth';
 
 @Component({
   selector: 'step-attachment-inline-preview',
@@ -31,6 +33,7 @@ import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-wit
 })
 export class AttachmentInlinePreviewComponent {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private _auth = inject(AuthService);
   private _attachmentDialogs = inject(AttachmentDialogsService);
   private _attachmentUtils = inject(AttachmentUtilsService);
 
@@ -40,6 +43,10 @@ export class AttachmentInlinePreviewComponent {
   readonly attachment = input<AttachmentMetaWithExplicitWidth | undefined>(undefined);
   readonly maxWidth = input<number | undefined>(undefined);
   readonly withPopover = input(true);
+
+  protected readonly hasResourceReadPermission = toSignal(this._auth.hasRight$('resource-read'), {
+    initialValue: this._auth.hasRight('resource-read'),
+  });
 
   readonly availableWidth = computed(() => {
     const attachment = this.attachment();
@@ -63,11 +70,14 @@ export class AttachmentInlinePreviewComponent {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
+    if (!this.hasResourceReadPermission()) {
+      return;
+    }
     this._attachmentDialogs.showDetails(attachment);
   }
 
   protected downloadBinaryStream(attachment: StreamingAttachmentMeta, $event: MouseEvent): void {
-    if (attachment.status !== 'COMPLETED' && attachment.status !== 'FAILED') {
+    if (!this.hasResourceReadPermission() || (attachment.status !== 'COMPLETED' && attachment.status !== 'FAILED')) {
       return;
     }
     $event.preventDefault();
