@@ -1,0 +1,78 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+$lines-color: var.$gray-300;
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-top: 1rem;
+}
+
+.previous-executions-container {
+  margin-right: calc(var(--style__nodeSize) / 2);
+  display: flex;
+  flex-direction: row;
+}
+
+.no-previous-execution {
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+
+.empty-piechart {
+  border-radius: 50%;
+  border: 1px solid $lines-color;
+  background: white;
+}
+
+.connect-line::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--style__nodeSize) / 2);
+  left: 50%;
+  height: 2px;
+  width: var(--style__nodeSize);
+  background: $lines-color;
+  transform: translateY(-50%);
+  z-index: -1;
+}
+
+.history-item-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: calc(var(--style__nodeSize) * 1.25);
+  z-index: 1;
+  --arrow-w: calc(var(--style__nodeSize) / 4);
+  --arrow-h: calc(var(--style__nodeSize) / 5);
+  --line-color: #{$lines-color};
+
+  .timestamp {
+    font-size: 1.2rem;
+    margin-top: 0.4rem;
+  }
+
+  &.arrow:last-child::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--style__nodeSize) / 2);
+    left: calc(var(--style__nodeSize) * 1.5);
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: var(--arrow-w) solid var(--line-color);
+    border-top: var(--arrow-h) solid transparent;
+    border-bottom: var(--arrow-h) solid transparent;
+  }
+  &.highlight {
+    font-weight: bold;
+  }
+}
+
+.empty-node {
+  background-color: grey;
+  border-radius: 50%;
+}

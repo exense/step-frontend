@@ -1,6 +1,7 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector, runInInjectionContext } from '@angular/core';
 import {
   AugmentedResourcesService,
+  AuthService,
   BulkOperationType,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
@@ -70,10 +71,12 @@ const registerRoutes = () => {
 };
 
 const registerMenuEntries = () => {
+  const _auth = inject(AuthService);
   const _viewRegistry = inject(ViewRegistryService);
   _viewRegistry.registerMenuEntry('Resources', 'resources', 'file-attachment-03', {
     weight: 50,
     parentId: 'automation-root',
+    isEnabledFunction: () => _auth.hasRight('resource-read'),
   });
 };
 
