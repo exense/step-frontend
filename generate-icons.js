@@ -61,7 +61,9 @@ const run = async () => {
     const exportName = upperCamelize(iconName);
 
     const markup = await fs.readFile(`${folder}/${file}`, { encoding: 'utf-8' });
-    const markupContent = String(markup).trim();
+    const markupContent = String(markup)
+      .trim()
+      .replace(/^<\?xml[^?]*\?>\s*/i, '');
     const payload = markupContent.match(PAYLOAD_REGEXP)[1];
 
     if (!payload) {

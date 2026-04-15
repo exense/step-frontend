@@ -325,7 +325,7 @@ export class ArtefactsModule {
       },
     });
     this._artefactService.register('For', {
-      icon: 'cpu',
+      icon: 'for',
       component: ForComponent,
       inlineComponent: ForInlineComponent,
       reportDetailsComponent: ForReportDetailsComponent,
@@ -340,7 +340,7 @@ export class ArtefactsModule {
         ].filter((item) => !!item),
     });
     this._artefactService.register('ForEach', {
-      icon: 'cpu',
+      icon: 'for-each',
       component: ForEachComponent,
       inlineComponent: ForEachInlineComponent,
       reportDetailsComponent: ForEachReportDetailsComponent,
@@ -357,7 +357,7 @@ export class ArtefactsModule {
       },
     });
     this._artefactService.register('While', {
-      icon: 'rotate-cw',
+      icon: 'while',
       component: WhileComponent,
       inlineComponent: WhileInlineComponent,
       reportDetailsComponent: WhileReportDetailsComponent,
@@ -431,7 +431,7 @@ export class ArtefactsModule {
       getArtefactSearchValues: (artefact?: ReturnArtefact) => (artefact?.output ? [artefact.output] : undefined),
     });
     this._artefactService.register('Echo', {
-      icon: 'zoom-in',
+      icon: 'message-square',
       component: EchoComponent,
       inlineComponent: EchoInlineComponent,
       reportDetailsComponent: EchoReportDetailsComponent,
@@ -446,7 +446,7 @@ export class ArtefactsModule {
       },
     });
     this._artefactService.register('If', {
-      icon: 'square',
+      icon: 'if',
       component: IfComponent,
       inlineComponent: IfInlineComponent,
       reportDetailsComponent: IfReportDetailsComponent,
@@ -465,7 +465,7 @@ export class ArtefactsModule {
       component: SetComponent,
       inlineComponent: SetInlineComponent,
       reportDetailsComponent: SetReportDetailsComponent,
-      icon: 'download',
+      icon: 'set',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
       getArtefactSearchValues: (artefact?: SetArtefact) => [artefact?.key, artefact?.value].filter((item) => !!item),
       getReportNodeSearchValues: (reportNode?: SetReportNode) => {
@@ -523,7 +523,7 @@ export class ArtefactsModule {
       isSelectable: false,
     });
     this._artefactService.register('Switch', {
-      icon: 'more-vertical',
+      icon: 'switch',
       component: SwitchComponent,
       inlineComponent: SwitchInlineComponent,
       reportDetailsComponent: SwitchReportDetailsComponent,
@@ -532,7 +532,7 @@ export class ArtefactsModule {
         artefact?.expression ? [artefact.expression] : undefined,
     });
     this._artefactService.register('Case', {
-      icon: 'minus',
+      icon: 'case',
       component: CaseComponent,
       inlineComponent: CaseInlineComponent,
       reportDetailsComponent: CaseReportDetailsComponent,
@@ -572,7 +572,7 @@ export class ArtefactsModule {
       getArtefactSearchValues: (artefact?: CheckArtefact) => (artefact?.expression ? [artefact.expression] : undefined),
     });
     this._artefactService.register('Assert', {
-      icon: 'check',
+      icon: 'assert',
       component: AssertComponent,
       inlineComponent: AssertInlineComponent,
       reportDetailsComponent: AssertReportDetailsComponent,
@@ -616,7 +616,7 @@ export class ArtefactsModule {
       isSelectable: false,
     });
     this._artefactService.register('PerformanceAssert', {
-      icon: 'check',
+      icon: 'performance-assert',
       component: AssertPerformanceComponent,
       inlineComponent: AssertPerformanceInlineComponent,
       reportDetailsComponent: AssertPerformanceReportDetailsComponent,
