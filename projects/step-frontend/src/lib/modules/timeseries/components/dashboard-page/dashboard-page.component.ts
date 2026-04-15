@@ -10,6 +10,7 @@ import {
   OnInit,
   signal,
   untracked,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../modules/_common';
@@ -44,6 +45,7 @@ export class DashboardPageComponent implements OnInit {
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activatedRoute = inject(ActivatedRoute);
+  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
@@ -112,7 +114,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleDashboardUpdate(dashboard: DashboardView) {
-    // this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
+    // the dashboard is editable. this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
     const mergedDashboard: DashboardView = {
       ...dashboard,
       attributes: this.dashboard!()!.attributes,
@@ -139,10 +141,6 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
-    this.activeTimeRangeSelection.set(pickerSelection);
-  }
-
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
@@ -160,9 +158,16 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
+  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
+    this.activeTimeRangeSelection.set(pickerSelection);
+    let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
+    this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'manual' });
+  }
+
   triggerRefresh() {
-    let rangeSelection = this.activeTimeRangeSelection()!;
-    this.activeTimeRangeSelection.set({ ...rangeSelection });
+    let pickerSelection = this.activeTimeRangeSelection()!;
+    let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
+    this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
   }
 
   private subscribeToUrlNavigation() {

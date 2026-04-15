@@ -23,6 +23,15 @@ import {
 } from '../components/messages-list-dialog/messages-list-dialog.component';
 import { AlertType } from '../types/alert-type.enum';
 
+export interface WarningDialogOptions {
+  cancelButtonLabel?: string;
+  confirmButtonLabel?: string;
+  cancelButtonAppearance?: 'flat' | 'stroked';
+  confirmButtonAppearance?: 'flat' | 'stroked';
+  cancelButtonColor?: 'primary';
+  confirmButtonColor?: 'primary';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -46,7 +55,7 @@ export class DialogsService {
     return dialogRef.afterClosed().pipe(filter((result) => result !== undefined)) as Observable<string>;
   }
 
-  showWarning(message: string): Observable<boolean> {
+  showWarning(message: string, options?: WarningDialogOptions): Observable<boolean> {
     const dialogRef = this._matDialog.open<
       ConfirmationDialogComponent,
       ConfirmationDialogData,
@@ -54,6 +63,7 @@ export class DialogsService {
     >(ConfirmationDialogComponent, {
       data: {
         message,
+        ...options,
       },
     });
 
@@ -113,6 +123,7 @@ export class DialogsService {
         data: {
           messageHTML,
           title: 'Error',
+          hideCancelButton: true,
         },
       },
     );

@@ -1,5 +1,5 @@
 @if (singleAttachment(); as singleAttachment) {
-  <a [href]="singleAttachment | attachmentUrl">
+  <a [href]="hasResourceReadPermission() ? (singleAttachment | attachmentUrl) : null">
     <step-icon name="paperclip" />
   </a>
 } @else if (hasAttachments()) {
@@ -8,7 +8,7 @@
   </button>
   <mat-menu #menu="matMenu">
     @for (attachment of attachments(); track attachment.id) {
-      <button mat-menu-item (click)="openAttachment(attachment)">
+      <button mat-menu-item [disabled]="!hasResourceReadPermission()" (click)="openAttachment(attachment)">
         {{ attachment!.name }}
       </button>
     }

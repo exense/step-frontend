@@ -331,7 +331,7 @@ export class ExecutionProgressComponent
   private initTabs(): void {
     this.tabs = this._viewRegistry
       .getDashlets('executionTabMigrated')
-      .filter((dashlet) => !!dashlet?.isEnabledFct && dashlet.isEnabledFct());
+      .filter((dashlet) => !!dashlet?.isEnabledFunction && dashlet.isEnabledFunction());
     let tabToSelect = this.tabs[0]?.id;
     if (this.activeTabId) {
       let foundTab = this.tabs.find((tab) => tab.id === this.activeTabId);

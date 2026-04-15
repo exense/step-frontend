@@ -1,4 +1,4 @@
-<step-form-field [control]="_ngControl.control" [showRequiredMarker]="showRequiredMarker()" #formField="FormField">
+<step-form-field [control]="_ngControl.control" [showRequiredMarker]="showRequiredMarker()">
   @if (label(); as label) {
     <step-label>{{ label }}</step-label>
   }
@@ -13,7 +13,7 @@
       </button>
     </step-suffix>
   }
-  @if (formField.controlErrors(); as errors) {
+  @if (displayErrors(); as errors) {
     <step-error>
       <step-errors-list [errors]="errors" [keysDictionary]="errorsDictionary()" />
     </step-error>

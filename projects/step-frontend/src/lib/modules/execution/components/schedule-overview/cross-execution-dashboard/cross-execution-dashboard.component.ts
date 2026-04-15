@@ -53,6 +53,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
   }
 
   handleRefreshIntervalChange(interval: number): void {
+    this._state.lastRefreshTrigger.set('auto');
     this._state.refreshInterval.set(interval);
   }
 
@@ -65,7 +66,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.fetchLastExecutionTrigger$.next();
   }
 
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams): void {
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }

@@ -98,6 +98,7 @@
             data-step-testid="download-library-btn"
             mat-icon-button
             matTooltip="Download library"
+            [disabled]="!('resource-read' | hasRight | async)"
             (click)="downloadResource(element.id)"
           >
             <step-icon name="download-cloud" />

@@ -60,8 +60,9 @@
             } @else {
               <label
                 class="no-children"
+                [class.disabled]="!mainMenuEntry.isEnabled"
                 [class.active-primary-item]="mainMenuEntry | isMenuItemActive | async"
-                (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
+                (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event, false, mainMenuEntry.isEnabled)"
               >
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
                 <span
@@ -78,8 +79,9 @@
                 <section>
                   <div
                     class="sidebar-subtab"
+                    [class.disabled]="!entry.isEnabled"
                     [class.sidebar-highlighted-subtab]="entry | isMenuItemActive | async"
-                    (stepSideBarClick)="navigateTo(entry.id, $event)"
+                    (stepSideBarClick)="navigateTo(entry.id, $event, false, entry.isEnabled)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
                     <span
@@ -96,8 +98,9 @@
                       <section>
                         <div
                           class="sidebar-sub-subtab"
+                          [class.disabled]="!subEntry.isEnabled"
                           [class.sidebar-highlighted-subtab]="subEntry | isMenuItemActive | async"
-                          (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark)"
+                          (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark, subEntry.isEnabled)"
                         >
                           <span
                             class="sidebar-aligned-sub-subtext visible-when-collapsed"

@@ -1,5 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
-import { CommonEntitiesUrlsService, Execution } from '@exense/step-core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { CommonEntitiesUrlsService, ControllerService, Execution, PopoverMode } from '@exense/step-core';
+import { catchError, filter, map, of, shareReplay, startWith, switchMap, take } from 'rxjs';
+
+interface RepositoryLinkItem {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'step-alt-execution-repository-link',
@@ -11,8 +18,10 @@ import { CommonEntitiesUrlsService, Execution } from '@exense/step-core';
 })
 export class AltExecutionRepositoryLinkComponent {
   private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
+  private _controllerService = inject(ControllerService);
 
   readonly execution = input.required<Execution>();
+  protected readonly PopoverMode = PopoverMode;
 
   protected readonly planLink = computed(() => {
     const execution = this.execution();
@@ -28,6 +37,48 @@ export class AltExecutionRepositoryLinkComponent {
     }
 
     return this._commonEntitiesUrl.planEditorUrl(execution.planId);
+  });
+
+  protected readonly externalLinkRepository = computed(() => {
+    const execution = this.execution();
+    const repository = execution.executionParameters?.repositoryObject;
+    if (
+      !execution.planId ||
+      !repository ||
+      repository.repositoryID === 'Artifact' ||
+      repository.repositoryParameters?.['wrapPlans'] === 'true' ||
+      repository.repositoryID === 'local'
+    ) {
+      return undefined;
+    }
+    return repository;
+  });
+
+  private readonly repositoryLinks$ = toObservable(this.externalLinkRepository).pipe(
+    filter((repository) => !!repository),
+    take(1),
+    switchMap((repository) => {
+      return this._controllerService.getArtefactLinks(repository).pipe(
+        map((artefactLinks) =>
+          (artefactLinks.links ?? [])
+            .filter((link) => !!link.url && `${link.url}`.trim() !== '')
+            .map((link) => {
+              const url = link.url!.trim();
+              return {
+                url,
+                label: link.description || url,
+              } as RepositoryLinkItem;
+            }),
+        ),
+        catchError(() => of([])),
+      );
+    }),
+    startWith([]),
+    shareReplay(1),
+  );
+
+  protected readonly repositoryLinks = toSignal(this.repositoryLinks$, {
+    initialValue: [] as RepositoryLinkItem[],
   });
 
   protected readonly automationPackageLinkParams = computed(() => {

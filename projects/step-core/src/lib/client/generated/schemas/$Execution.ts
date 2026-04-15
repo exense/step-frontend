@@ -74,6 +74,9 @@ export const $Execution = {
     agentsInvolved: {
       type: 'string',
     },
+    stepVersion: {
+      type: 'Version',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

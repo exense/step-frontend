@@ -1,3 +1,8 @@
 .sidebar-home-and-settings-icon {
   margin-top: -5px;
 }
+
+.sidebar .disabled {
+  cursor: default;
+  opacity: 0.55;
+}

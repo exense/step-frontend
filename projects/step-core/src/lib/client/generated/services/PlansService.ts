@@ -346,7 +346,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the plan referenced by the given CallPlan.
+   * Returns the plan referenced by the given CallPlan without applying any binding parameters.
    * @param requestBody
    * @returns Plan default response
    * @throws ApiError
@@ -361,7 +361,7 @@ export class PlansService {
   }
 
   /**
-   * Returns the plan referenced by the given CallPlan applying provided binding parameters.
+   * Returns the plan referenced by the given CallPlan applying the provided binding parameters.
    * @param requestBody
    * @returns Plan default response
    * @throws ApiError

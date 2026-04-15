@@ -53,18 +53,25 @@ describe('ArrayInputComponent', () => {
   let fixture: ComponentFixture<ArrayInputTestComponent>;
   let loader: HarnessLoader;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     await TestBed.configureTestingModule({
       imports: [ArrayInputTestComponent],
     }).compileComponents();
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(ArrayInputTestComponent);
     loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
-    await fixture.whenStable();
   });
 
-  const wait = async (ms: number) => {
+  afterEach(() => {
+    fixture.destroy();
+  });
+
+  const wait = async (ms: number): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, ms));
+    fixture.detectChanges();
     await fixture.whenStable();
   };
 

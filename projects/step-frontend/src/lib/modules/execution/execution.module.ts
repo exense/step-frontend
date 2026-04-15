@@ -35,6 +35,9 @@ import {
   SimpleOutletComponent,
   editScheduledTaskRoute,
   MultipleProjectsService,
+  GridSettingsRegistryService,
+  EXECUTION_REPORT_GRID,
+  canLeaveComponent,
   SearchPaginatorComponent, EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -119,7 +122,7 @@ import { AltExecutionTreePartialTabComponent } from './components/alt-execution-
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -172,12 +175,17 @@ import { HistoryNodesComponent } from './components/aggregated-tree-node-history
 import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
-import {
-  StatusDistributionBadgeComponent
-} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
+import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
+import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
+import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 import {
   ExecutionHistoryNodeTooltipComponent
 } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import {
+  StatusDistributionBadgeComponent
+} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 
 @NgModule({
   declarations: [
@@ -226,6 +234,7 @@ import {
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
+    AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -305,6 +314,16 @@ import {
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
     TableCountsToggleComponent,
+    ChartSkeletonComponent,
+    ChartSkeletonComponent,
+    AggregatedReportViewCountErrorsPipe,
+    CalcElementWidthDirective,
+    CalcElementWidthItemDirective,
+    CalcElementWidthAggregatorDirective,
+    AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryNodesComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
     HistoryNodesComponent,
     StatusDistributionBadgeComponent,
@@ -343,6 +362,9 @@ import {
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
     HistoryNodesComponent,
+    AltReportWidgetTitleDirective,
+    AltReportWidgetContentDirective,
+    AltReportWidgetFooterDirective,
   ],
   providers: [
     {
@@ -359,6 +381,7 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
+    private _gridSettingsRegistry: GridSettingsRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -367,6 +390,7 @@ export class ExecutionModule {
       this.registerDashlets();
       this.registerRoutes();
       this.registerInfoBanners();
+      this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;
     }
   }
@@ -657,9 +681,9 @@ export class ExecutionModule {
                 },
                 canActivate: [
                   () => {
-                    const ctx = inject(AggregatedReportViewTreeStateContextService);
-                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                    ctx.setState(treeState);
+                    const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    _ctx.setState(_treeState);
                     return true;
                   },
                 ],
@@ -667,6 +691,7 @@ export class ExecutionModule {
                   {
                     path: '',
                     component: AltExecutionReportComponent,
+                    canDeactivate: [canLeaveComponent],
                   },
                   {
                     path: '',
@@ -692,9 +717,9 @@ export class ExecutionModule {
               path: 'tree',
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AGGREGATED_TREE_TAB_STATE);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],
@@ -716,9 +741,9 @@ export class ExecutionModule {
               ],
               canActivate: [
                 () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AggregatedReportViewTreeStateService);
-                  ctx.setState(treeState);
+                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const _treeState = inject(AggregatedReportViewTreeStateService);
+                  _ctx.setState(_treeState);
                   return true;
                 },
               ],
@@ -875,6 +900,93 @@ export class ExecutionModule {
   }
 
   private registerInfoBanners(): void {}
+
+  private registerGridLayout(): void {
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'errorsWidget',
+      title: 'Error Summary',
+      widthInCells: 8,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'testCases',
+      title: 'Test Cases',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'testCasesSummary',
+      title: 'Summary: Test Cases',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'keywordsSummary',
+      title: 'Summary: Keyword Calls',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'executionTree',
+      title: 'Execution Tree',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'keywordsList',
+      title: 'Steps',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'performanceOverview',
+      title: 'Performance Overview (avg)',
+      widthInCells: 2,
+      heightInCells: 3,
+      minWidthInCells: 2,
+      minHeightInCells: 2,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'errors',
+      title: 'Errors',
+      widthInCells: 8,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'currentOperations',
+      title: 'Current operations',
+      widthInCells: 4,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 99,
+    });
+  }
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';

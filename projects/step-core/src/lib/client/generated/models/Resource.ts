@@ -16,5 +16,6 @@ export type Resource = {
   ephemeral?: boolean;
   origin?: string;
   originTimestamp?: number;
+  executionId?: string;
   id?: string;
 };

@@ -7,7 +7,8 @@ import { filter, first, map, Observable, shareReplay, startWith } from 'rxjs';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
 import { MenuEntry } from '../types/menu-entry';
 
-export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFct'> & {
+export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFunction'> & {
+  isEnabled: boolean;
   isBookmark?: boolean;
   hasChildren?: boolean;
   children?: DisplayMenuEntry[];
@@ -41,7 +42,7 @@ export class NavigatorService {
     return this.activeUrl$.pipe(
       startWith(this._router.url),
       map((url) =>
-        view.isActiveFct ? view.isActiveFct(url) : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
+        view.isActiveFunction ? view.isActiveFunction(url) : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
       ),
     );
   }
