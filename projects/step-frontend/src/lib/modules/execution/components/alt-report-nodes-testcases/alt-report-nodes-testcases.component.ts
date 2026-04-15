@@ -1,7 +1,8 @@
-import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportView,
   ItemsPerPageService,
+  Operation,
   ReportNode,
   STORE_ALL,
   tablePersistenceConfigProvider,
@@ -18,7 +19,9 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
 import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
-import { SpecificOperations } from '../../../operations/types/specific-operations.enum';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 
 @Component({
   selector: 'step-alt-report-nodes-testcases',
@@ -50,16 +53,21 @@ import { SpecificOperations } from '../../../operations/types/specific-operation
 export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+  private _executionState = inject(AltExecutionStateService);
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly testCasesParameters$ = this._executionState.testCasesTableParameters$;
+  protected readonly displayMode = toSignal(this._executionState.testCasesDisplayMode$, {
+    initialValue: TestCasesDisplayMode.AGGREGATED,
+  });
 
   readonly openTestCaseInTreeView = output<ReportNode>();
 
-  onSearchFor(item: AggregatedReportView, message: string): void {
+  protected onSearchFor(item: AggregatedReportView, message: string): void {
     this.showIterations(item, { searchFor: message });
   }
 
-  override setupDateRangeFilter(): void {
+  protected override setupDateRangeFilter(): void {
     // Empty implementation
   }
 
@@ -91,26 +99,30 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
     });
   }
 
-  protected readonly expandIterations = signal(false);
-
-  protected toggleExpandIterations(): void {
-    this.expandIterations.update((v) => !v);
+  protected toggleDisplayMode(): void {
+    this._executionState.toggleTestCasesDisplayMode();
   }
 
-  protected expandItems(item: AggregatedReportView): Array<{ status: Status; count: number }> {
-    const result: Array<{ status: Status; count: number }> = [];
-    for (const [status, count] of Object.entries(item.countByStatus ?? {})) {
-      for (let i = 0; i < count; i++) {
-        result.push({ status: status as Status, count });
-      }
-    }
-    return result;
+  protected asAggregatedReportView(item: AggregatedReportView | ReportNode): AggregatedReportView {
+    return item as AggregatedReportView;
   }
 
-  protected singleStatusMap(status: Status): Record<string, number> {
-    return { [status]: 1 };
+  protected asReportNode(item: AggregatedReportView | ReportNode): ReportNode {
+    return item as ReportNode;
+  }
+
+  protected currentOperations(item: AggregatedReportView): Operation[] {
+    return item.currentOperations ?? [];
+  }
+
+  protected openIterationDetails(item: ReportNode): void {
+    this._executionDialogs.openIterationDetails(item);
+  }
+
+  protected iterationErrorMessage(item: ReportNode): string | undefined {
+    return item.error?.msg?.trim() || undefined;
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
-  protected readonly SpecificOperations = SpecificOperations;
+  protected readonly TestCasesDisplayMode = TestCasesDisplayMode;
 }
