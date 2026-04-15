@@ -1,6 +1,4 @@
 @use 'projects/step-core/styles/core-variables' as var;
-@use 'projects/step-frontend/styles/common-mixins' as common;
-
 step-alt-report-nodes-testcases {
   display: flex;
   flex-direction: column;

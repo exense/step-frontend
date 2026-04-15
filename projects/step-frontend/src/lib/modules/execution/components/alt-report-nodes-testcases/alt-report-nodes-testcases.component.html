@@ -21,7 +21,7 @@
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(testCasesParameters$ | async)!"
-    [indicatorMode]="TableIndicatorMode.SPINNER"
+    [indicatorMode]="TableIndicatorMode.SKELETON"
   >
     <ng-container *stepDatasourceListItem="let element; let index = $index">
       @if (displayMode() === TestCasesDisplayMode.AGGREGATED) {
