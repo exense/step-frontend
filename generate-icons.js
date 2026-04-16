@@ -3,6 +3,7 @@ const fs = require('fs/promises');
 const STRING_CAMELIZE_REGEXP = /(-|_|\.|\s)+(.)?/g;
 const PAYLOAD_REGEXP = /^<svg[^>]+?>((.|\n)+)<\/svg>$/;
 const VIEWBOX_REGEXP = /viewBox="(.+?)"/;
+const STYLE_BLOCK_REGEXP = /<style[^>]*>([\s\S]*?)<\/style>/;
 
 const iconsSvgFolders = [
   'node_modules/feather-icons/dist/icons',
@@ -46,6 +47,46 @@ const getExistingFolders = async () => {
 
 const removeExtension = (name) => name.substr(0, name.lastIndexOf('.'));
 
+/**
+ * Ensures all CSS class names defined in an SVG's <style> block are prefixed
+ * with the icon name to avoid collisions when multiple icons share the DOM.
+ */
+const prefixStyleClasses = (svgContent, iconName) => {
+  const styleMatch = STYLE_BLOCK_REGEXP.exec(svgContent);
+  if (!styleMatch) return svgContent;
+
+  const classNames = new Set();
+  const classRegex = /\.([a-zA-Z_-][a-zA-Z0-9_-]*)/g;
+  let m;
+  while ((m = classRegex.exec(styleMatch[1])) !== null) {
+    classNames.add(m[1]);
+  }
+
+  if (classNames.size === 0) return svgContent;
+
+  const unprefixed = [...classNames].filter((name) => !name.includes(iconName));
+
+  if (unprefixed.length === 0) return svgContent;
+
+  const unprefixedSet = new Set(unprefixed);
+  let result = svgContent;
+
+  for (const name of unprefixed) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    result = result.replace(new RegExp(`\\.${escaped}(?=[^a-zA-Z0-9_-])`, 'g'), `.${iconName}-${name}`);
+  }
+
+  result = result.replace(/class="([^"]*)"/g, (_match, classValue) => {
+    const newValue = classValue
+      .split(/\s+/)
+      .map((cls) => (unprefixedSet.has(cls) ? `${iconName}-${cls}` : cls))
+      .join(' ');
+    return `class="${newValue}"`;
+  });
+
+  return result;
+};
+
 const run = async () => {
   const iconTemplate = await fs.readFile(templateFile, { encoding: 'utf-8' });
 
@@ -63,7 +104,9 @@ const run = async () => {
     const markupContent = String(markup)
       .trim()
       .replace(/^<\?xml[^?]*\?>\s*/i, '');
-    const match = markupContent.match(PAYLOAD_REGEXP);
+
+    const normalizedContent = prefixStyleClasses(markupContent, iconName);
+    const match = normalizedContent.match(PAYLOAD_REGEXP);
 
     if (!match) {
       console.log('FAILED TO EXTRACT SVG FROM:', `${folder}/${file}`);
@@ -74,8 +117,8 @@ const run = async () => {
 
     const payload = match[1];
     let viewBox = '0 0 24 24';
-    if (VIEWBOX_REGEXP.test(markupContent)) {
-      viewBox = markupContent.match(VIEWBOX_REGEXP)[1];
+    if (VIEWBOX_REGEXP.test(normalizedContent)) {
+      viewBox = normalizedContent.match(VIEWBOX_REGEXP)[1];
     }
 
     const output = iconTemplate
