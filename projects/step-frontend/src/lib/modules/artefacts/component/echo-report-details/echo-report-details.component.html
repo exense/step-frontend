@@ -1,7 +1,5 @@
 @if (items(); as items) {
-  <section class="fields-container">
-    <step-artefact-inline-field-list [items]="items" [isVertical]="true" />
-  </section>
+  <step-report-details-sections [items]="items" />
 }
 @if (node()?.error) {
   <step-report-details-error [node]="node()" />

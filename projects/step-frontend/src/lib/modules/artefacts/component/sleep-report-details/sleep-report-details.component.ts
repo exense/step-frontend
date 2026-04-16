@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
   TimeUnitDictKey,
 } from '@exense/step-core';
@@ -30,13 +30,8 @@ export class SleepReportDetailsComponent extends BaseReportDetailsComponent<Repo
     const { duration, unit, releaseTokens } = artefact;
 
     return this._artefactInlineService.convert([
-      {
-        label: 'sleep',
-        value: duration,
-        timeValueUnit: unit.value as TimeUnitDictKey,
-        icon: 'log-in',
-      },
-      ['releaseToken', releaseTokens, 'log-in'],
+      { label: 'sleep', value: duration, timeValueUnit: unit.value as TimeUnitDictKey, itemType: ItemType.configuration },
+      { label: 'releaseToken', value: releaseTokens, itemType: ItemType.configuration },
     ]);
   });
 }

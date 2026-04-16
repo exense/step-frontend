@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
 } from '@exense/step-core';
 import { EchoReportNode } from '../../types/echo.report-node';
 
@@ -24,12 +24,7 @@ export class EchoReportDetailsComponent extends BaseReportDetailsComponent<EchoR
     const echo = node?.echo;
     const echoExpression = node?.resolvedArtefact?.text?.expression;
     return this._artefactInlineUtils.convert([
-      {
-        label: 'text',
-        value: echo,
-        valueExplicitExpression: echoExpression,
-        icon: 'log-in',
-      },
+      { label: 'text', value: echo, valueExplicitExpression: echoExpression, itemType: ItemType.configuration },
     ]);
   });
 }
