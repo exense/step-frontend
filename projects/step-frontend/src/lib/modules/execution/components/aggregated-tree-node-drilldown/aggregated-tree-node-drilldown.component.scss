@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 step-aggregated-tree-node-drilldown {
   background: var.$white;
@@ -33,12 +34,8 @@ step-aggregated-tree-node-drilldown {
   }
 
   .miniature {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.1rem;
-    span {
-      font-weight: bold;
+    step-icon {
+      @include core.step-icon-size(2.5rem, true);
     }
   }
 }

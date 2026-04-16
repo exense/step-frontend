@@ -191,6 +191,7 @@ import { AltReportNodeTestcasesComponent } from './components/alt-report-node-te
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
 import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
+import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
 
 @NgModule({
   declarations: [
@@ -257,6 +258,7 @@ import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-rep
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltExecutionRepositoryLinkComponent,
+    AltIterationListTitleComponent,
     ExecutionDetailsComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,

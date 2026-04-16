@@ -1,4 +1,5 @@
 <step-stack-view-breadcrumbs [views]="views()" (openView)="openView($event)" />
+<button type="button" mat-button mat-raised-button (click)="closeAll.emit()">Close All</button>
 <step-split>
   @for (view of viewsAndGroups(); track view.id; let isLast = $last; let isFirst = $first) {
     @if (view | isSplitViewGroup; as group) {

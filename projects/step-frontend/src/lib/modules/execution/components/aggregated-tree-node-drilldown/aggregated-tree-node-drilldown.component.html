@@ -1,4 +1,4 @@
-<step-stack-view (removeItem)="removeItem($event)">
+<step-stack-view (removeItem)="removeItem($event)" (closeAll)="handleCloseAll()">
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
       @case (StackItemType.ROOT) {
@@ -14,6 +14,7 @@
               [matSortDisableClear]="true"
               stepAltReportNodesProvideKeywords
               #keywordsSort="AltReportNodeListSort"
+              breadcrumbsTooltip="Click go back to Keywords"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="list" />
@@ -43,13 +44,16 @@
                 />
               </section>
               <div class="miniature" *stepStackViewItemMiniature matTooltip="Keywords" matTooltipPosition="below">
-                <span>KW</span>
                 <step-icon name="list" />
               </div>
             </step-stack-view-item>
           }
           @case (DrilldownRootType.TESTCASES) {
-            <step-stack-view-item [itemId]="item.id" stepAltReportNodeListProvideTestcases>
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltReportNodeListProvideTestcases
+              breadcrumbsTooltip="Click go back to Testcases"
+            >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="list" />
                 <span>Testcases</span>
@@ -68,13 +72,16 @@
                 />
               </section>
               <div class="miniature" *stepStackViewItemMiniature matTooltip="Keywords" matTooltipPosition="below">
-                <span>TC</span>
                 <step-icon name="list" />
               </div>
             </step-stack-view-item>
           }
           @case (DrilldownRootType.TREE) {
-            <step-stack-view-item [itemId]="item.id" stepAltExecutionTreeWidget>
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltExecutionTreeWidget
+              breadcrumbsTooltip="Click go back to Execution Tree"
+            >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="tree" />
                 <span>Execution Tree</span>
@@ -94,7 +101,6 @@
                 />
               </section>
               <div class="miniature" *stepStackViewItemMiniature matTooltip="Execution Tree" matTooltipPosition="below">
-                <span>ET</span>
                 <step-icon name="tree" />
               </div>
             </step-stack-view-item>
@@ -102,11 +108,17 @@
         }
       }
       @case (StackItemType.AGGREGATED_REPORT_NODE) {
-        <step-stack-view-item [itemId]="item.id" itemTitle="Iteration List">
+        <step-stack-view-item
+          [itemId]="item.id"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Iterations)'"
+        >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
             <step-icon name="list" />
-            <span>Iteration List</span>
+            <span>Iterations of {{ $any(item).data.name }}</span>
           </div>
+          <ng-container *stepStackViewItemTitle>
+            <step-alt-iteration-list-title [node]="$any(item).data" />
+          </ng-container>
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
@@ -116,17 +128,24 @@
               (showDetails)="handleOpenDetails($event, item.id)"
             />
           </section>
-          <div class="miniature" *stepStackViewItemMiniature matTooltip="Iteration List" matTooltipPosition="below">
-            <span>E</span>
+          <div
+            class="miniature"
+            *stepStackViewItemMiniature
+            [matTooltip]="'Iterations of ' + $any(item).data.name"
+            matTooltipPosition="below"
+          >
             <step-icon name="list" />
           </div>
         </step-stack-view-item>
       }
       @case (StackItemType.REPORT_NODE) {
-        <step-stack-view-item [itemId]="item.id">
+        <step-stack-view-item
+          [itemId]="item.id"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Details)'"
+        >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
             <step-icon name="sidebar" />
-            <span>{{ $any(item).data.name }}</span>
+            <span>Details of {{ $any(item).data.name }}</span>
           </div>
           <ng-container *stepStackViewItemTitle>
             <step-alt-report-node-header [node]="$any(item).data" />
@@ -141,10 +160,9 @@
           <div
             class="miniature"
             *stepStackViewItemMiniature
-            [matTooltip]="'Node Details: ' + $any(item).data.name"
+            [matTooltip]="'Details of ' + $any(item).data.name"
             matTooltipPosition="below"
           >
-            <span>ND</span>
             <step-icon name="sidebar" />
           </div>
         </step-stack-view-item>

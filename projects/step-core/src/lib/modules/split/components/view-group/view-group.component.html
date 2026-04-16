@@ -1,20 +1,16 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>
-      <span>...</span>
-    </mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <section>
-      @for (item of items(); track item.id) {
-        <button type="button" mat-stroked-button (click)="openView.emit(item.id)">
-          @if (item.miniatureTemplateRef; as miniatureTemplateRef) {
-            <ng-container *ngTemplateOutlet="miniatureTemplateRef" />
-          } @else {
-            {{ item | viewItemDefaultName }}
-          }
-        </button>
-      }
-    </section>
-  </mat-card-content>
-</mat-card>
+<section>
+  <div class="panel-header">
+    <div class="title">...</div>
+  </div>
+  <div class="content">
+    @for (item of items(); track item.id) {
+      <button type="button" mat-stroked-button (click)="openView.emit(item.id)">
+        @if (item.miniatureTemplateRef; as miniatureTemplateRef) {
+          <ng-container *ngTemplateOutlet="miniatureTemplateRef" />
+        } @else {
+          {{ item | viewItemDefaultName }}
+        }
+      </button>
+    }
+  </div>
+</section>

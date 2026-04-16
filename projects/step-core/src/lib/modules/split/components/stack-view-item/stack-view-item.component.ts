@@ -13,7 +13,8 @@ import { StackViewItemMiniatureDirective } from '../../directives/stack-view-ite
 })
 export class StackViewItemComponent {
   readonly itemId = input.required<string>();
-  readonly itemTitle = input<string | unknown>();
+  readonly itemTitle = input<string | undefined>();
+  readonly breadcrumbsTooltip = input<string | undefined>();
   private readonly childTitle = contentChild(StackViewItemTitleDirective);
   private readonly childContent = contentChild(StackViewItemContentDirective);
   private readonly childBreadcrumbsTitle = contentChild(StackViewBreadcrumbsTitleDirective);
@@ -23,12 +24,14 @@ export class StackViewItemComponent {
     const itemId = this.itemId();
     const itemTitle = this.itemTitle();
     const childTitle = this.childTitle();
+    const breadcrumbsTooltip = this.breadcrumbsTooltip();
     const breadcrumbsTitle = this.childBreadcrumbsTitle();
     const childContent = this.childContent();
     const childMiniature = this.childMiniature();
     return {
       id: itemId,
       title: itemTitle,
+      breadcrumbsTooltip: breadcrumbsTooltip,
       titleTemplateRef: childTitle?._templateRef,
       titleBreadcrumbsRef: breadcrumbsTitle?._templateRef,
       contentTemplateRef: childContent?._templateRef,

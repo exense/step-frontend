@@ -20,6 +20,7 @@ import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
 import { SplitComponent } from '../split/split.component';
 import { StackViewItemComponent } from '../stack-view-item/stack-view-item.component';
 import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-view-breadcrumbs.component';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-stack-view',
@@ -31,6 +32,7 @@ import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-v
     ViewGroupComponent,
     ViewItemComponent,
     StackViewBreadcrumbsComponent,
+    StepBasicsModule,
   ],
   templateUrl: './stack-view.component.html',
   styleUrl: './stack-view.component.scss',
@@ -39,6 +41,7 @@ export class StackViewComponent {
   protected readonly GROUP_WIDTH = 100;
 
   readonly removeItem = output<string>();
+  readonly closeAll = output<void>();
 
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 

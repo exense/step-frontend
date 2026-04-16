@@ -1,27 +1,30 @@
 step-view-item {
   height: 100%;
 
-  mat-card {
+  & > section {
     height: calc(100% - 1rem);
     margin: 0.5rem;
-  }
+    padding: 0 0.5rem;
 
-  mat-card-header {
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: space-between;
+    .header {
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: space-between;
 
-    & > div:first-child {
-      flex: 1;
+      & > div:first-child {
+        flex: 1;
+      }
+
+      .title {
+        white-space: nowrap;
+        font-size: 2rem;
+        font-weight: bold;
+      }
     }
-  }
 
-  .mat-mdc-card-title {
-    white-space: nowrap;
-  }
-
-  .mat-mdc-card-content {
-    overflow-x: hidden;
-    overflow-y: auto;
+    .content {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   }
 }

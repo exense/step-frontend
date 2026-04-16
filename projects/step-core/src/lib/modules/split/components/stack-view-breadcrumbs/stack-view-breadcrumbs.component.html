@@ -10,7 +10,13 @@
       }
     </div>
   } @else {
-    <button type="button" mat-button (click)="openView.emit(item.id)">
+    <button
+      type="button"
+      mat-button
+      (click)="openView.emit(item.id)"
+      [matTooltip]="item.breadcrumbsTooltip"
+      matTooltipPosition="below"
+    >
       @if (item.titleBreadcrumbsRef) {
         <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
       } @else if (item.titleTemplateRef) {

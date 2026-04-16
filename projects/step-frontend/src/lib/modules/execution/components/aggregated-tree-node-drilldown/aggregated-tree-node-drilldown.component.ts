@@ -158,6 +158,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
             if (!node) {
               return undefined;
             }
+            console.log('AGGREGATED NODE', node);
             const { resolvedPartialPath, searchStatus, searchStatusCount, aggregatedNodeId: nodeId } = data;
             return {
               id: `${nodeId}_${this.currentLength}`,
@@ -185,6 +186,11 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.executionProgressElement?.classList?.remove?.(IS_DRILLDOWN_OPENED);
+  }
+
+  protected handleCloseAll(): void {
+    const items = this.stackItemsUntracked;
+    this.removeItem(items[0].id);
   }
 
   protected removeItem(id: string): void {
