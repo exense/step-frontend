@@ -47,7 +47,6 @@ const getExistingFolders = async () => {
 const removeExtension = (name) => name.substr(0, name.lastIndexOf('.'));
 
 const run = async () => {
-  let exportAllString = `\nexport const allIcons = {\n`;
   const iconTemplate = await fs.readFile(templateFile, { encoding: 'utf-8' });
 
   await fs.rm(iconsDestFolder, { force: true, recursive: true });
@@ -64,15 +63,16 @@ const run = async () => {
     const markupContent = String(markup)
       .trim()
       .replace(/^<\?xml[^?]*\?>\s*/i, '');
-    const payload = markupContent.match(PAYLOAD_REGEXP)[1];
+    const match = markupContent.match(PAYLOAD_REGEXP);
 
-    if (!payload) {
+    if (!match) {
       console.log('FAILED TO EXTRACT SVG FROM:', `${folder}/${file}`);
       console.log('MARKUP', markup.trim());
       console.log('---------------------------------');
-      return;
+      return null;
     }
 
+    const payload = match[1];
     let viewBox = '0 0 24 24';
     if (VIEWBOX_REGEXP.test(markupContent)) {
       viewBox = markupContent.match(VIEWBOX_REGEXP)[1];
@@ -84,26 +84,32 @@ const run = async () => {
       .replace(/__VIEW_BOX__/g, viewBox)
       .replace(/__PAYLOAD__/, payload);
 
-    await fs.writeFile(`${iconsDestFolder}/${iconName}.ts`, output, { encoding: 'utf-8' });
-    await fs.appendFile(indexFile, `export { ${exportName} } from './svg/${iconName}';\n`);
-    await fs.appendFile(allFile, `import { ${exportName} } from './svg/${iconName}';\n`);
-
-    exportAllString += `  ${exportName}, \n`;
+    return { iconName, exportName, output };
   };
 
   const proceedFolder = async (folder) => {
     const files = await fs.readdir(folder);
-    const filePromises = files.map((file) => proceedFile(folder, file));
-    return Promise.all(filePromises);
+    const results = await Promise.all(files.map((file) => proceedFile(folder, file)));
+    return results.filter(Boolean);
   };
 
   const folders = await getExistingFolders();
-  await Promise.all(folders.map((f) => proceedFolder(f)));
+  const perFolder = await Promise.all(folders.map((f) => proceedFolder(f)));
+  const icons = perFolder.flat().sort((a, b) => a.exportName.localeCompare(b.exportName));
 
-  exportAllString += `};\n`;
+  await Promise.all(
+    icons.map(({ iconName, output }) =>
+      fs.writeFile(`${iconsDestFolder}/${iconName}.ts`, output, { encoding: 'utf-8' }),
+    ),
+  );
 
-  await fs.appendFile(allFile, exportAllString);
-  await fs.appendFile(indexFile, `\nexport { allIcons } from './all';\n`);
+  const indexLines = icons.map(({ exportName, iconName }) => `export { ${exportName} } from './svg/${iconName}';`);
+  indexLines.push('', `export { allIcons } from './all';`);
+  await fs.writeFile(indexFile, indexLines.join('\n') + '\n', { encoding: 'utf-8' });
+
+  const allImports = icons.map(({ exportName, iconName }) => `import { ${exportName} } from './svg/${iconName}';`);
+  const allExport = ['', 'export const allIcons = {', ...icons.map(({ exportName }) => `  ${exportName},`), '};'];
+  await fs.writeFile(allFile, [...allImports, ...allExport].join('\n') + '\n', { encoding: 'utf-8' });
 };
 
 return run().catch((err) => console.error(err));
