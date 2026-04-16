@@ -1,11 +1,25 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  untracked,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
+  CanLeaveComponent,
+  DialogsService,
   ExecutionCustomPanelRegistryService,
+  GridEditableService,
   IS_SMALL_SCREEN,
   ReportNode,
   TimeRange,
+  WidgetsPersistenceStateService,
 } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -13,7 +27,7 @@ import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nod
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, map, scan } from 'rxjs';
+import { first, map, noop, Observable, scan, tap } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../../_common/shared/status.enum';
@@ -38,16 +52,27 @@ import {
   encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
-export class AltExecutionReportComponent implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy {
+export class AltExecutionReportComponent
+  implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy, CanLeaveComponent
+{
   private _activatedRoute = inject(ActivatedRoute);
+  private _widgetsPersistence = inject(WidgetsPersistenceStateService);
   protected readonly _mode = inject(VIEW_MODE);
+  protected readonly hasNoLayout = computed(
+    () =>
+      this._widgetsPersistence.isInitialized() &&
+      !this._widgetsPersistence.selectedPreset() &&
+      !this._gridEditable.editMode(),
+  );
   private _router = inject(Router);
+  private _gridEditable = inject(GridEditableService);
+  private _dialogs = inject(DialogsService);
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
-  private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
-  private treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
-  private errors = viewChild('errors', { read: ElementRef });
+  private readonly treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+  private readonly treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
+  private readonly errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -85,6 +110,23 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     this._hooks.cleanupStrategy();
   }
 
+  canLeave(): boolean | Observable<boolean> {
+    const hasChanges = untracked(() => this._gridEditable.hasChanges());
+    if (!hasChanges) {
+      return true;
+    }
+
+    return this._dialogs
+      .showWarning('Navigating away will discard all changes to the layout. Do you want to navigate anyway?', {
+        confirmButtonLabel: 'Ok',
+        confirmButtonAppearance: 'stroked',
+        cancelButtonLabel: 'Keep editing',
+        cancelButtonAppearance: 'flat',
+        cancelButtonColor: 'primary',
+      })
+      .pipe(tap((isConfirmed) => (isConfirmed ? this._gridEditable.reset() : noop())));
+  }
+
   reportNodeOpened(reportNode: ReportNode): void {
     this.treeWidget()?.focusNodeByReport(reportNode);
   }
@@ -109,7 +151,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
 
-  protected handleChartZooming(range: TimeRange) {
+  protected handleChartZooming(range: TimeRange): void {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
@@ -125,7 +167,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
 
   protected readonly ViewMode = ViewMode;
 
-  searchFor($event: string) {
+  searchFor($event: string): void {
     if (!this.treeWidget() || !this.treeWidgetContainer()) {
       return;
     }

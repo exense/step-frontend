@@ -60,7 +60,7 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
   readonly defaultDateRange = input<DateRange>();
   protected readonly calculateCounts = signal(false);
 
-  protected tableFilters = computed(() => {
+  protected readonly tableFilters = computed(() => {
     const filters = this.hiddenFilters();
     const range = this.defaultDateRange();
     if (!range) {

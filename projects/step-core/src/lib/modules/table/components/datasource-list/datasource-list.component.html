@@ -1,0 +1,39 @@
+@if (_tableIndicator.useSpinner() && _tableIndicator.inProgress()) {
+  <section class="spinner-container">
+    <mat-spinner />
+  </section>
+}
+<section class="list-container">
+  @if (listItemTemplate(); as templateRef) {
+    @if (hasItems()) {
+      @for (item of items(); track trackByFn($index, item)) {
+        <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item, $index: $index }" />
+      }
+    } @else {
+      @switch (_tableDataSource.emptyState()) {
+        @case (EmptyState.INITIAL) {
+          <div class="no-data"></div>
+        }
+        @case (EmptyState.NO_MATCHING_RECORDS) {
+          <div class="no-data">No matching records found</div>
+        }
+      }
+    }
+  }
+</section>
+<section class="paginator-container">
+  @if (_tablePagination.tablePaginatorPrefix(); as paginatorPrefix) {
+    <ng-container *ngTemplateOutlet="paginatorPrefix.templateRef" />
+  }
+  <step-paginator
+    [disabled]="_tablePagination.pageSizeInputDisabled()"
+    [length]="_tableDataSource.totalFiltered()"
+    [hasNext]="_tableDataSource.hasNext()"
+    [usePagesCount]="_tableDataSource.calculateCounts()"
+    [pageSizeOptions]="_tablePagination.pageSizeOptions()"
+  >
+    @if (_tablePagination.tablePaginatorContent(); as paginatorContent) {
+      <ng-container *ngTemplateOutlet="paginatorContent.templateRef" />
+    }
+  </step-paginator>
+</section>

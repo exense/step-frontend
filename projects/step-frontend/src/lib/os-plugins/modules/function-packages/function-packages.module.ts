@@ -1,6 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
+  AuthService,
   checkEntityGuardFactory,
   CheckProjectGuardConfig,
   CustomCellRegistryService,
@@ -43,6 +44,8 @@ import { PackageUrlPipe } from './pipes/package-url.pipe';
   ],
 })
 export class FunctionPackagesModule {
+  private _auth = inject(AuthService);
+
   constructor(
     private _entityRegistry: EntityRegistry,
     private _cellsRegistry: CustomCellRegistryService,
@@ -143,6 +146,7 @@ export class FunctionPackagesModule {
     this._viewRegistry.registerMenuEntry('Keyword Packages', 'function-packages', 'package', {
       weight: 20,
       parentId: 'automation-root',
+      isEnabledFunction: () => this._auth.hasRight('kw-read'),
     });
   }
 }

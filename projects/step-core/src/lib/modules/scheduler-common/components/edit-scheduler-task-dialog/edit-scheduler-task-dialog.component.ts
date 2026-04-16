@@ -61,6 +61,7 @@ export interface EditSchedulerTaskDialogConfig {
   hideUser?: boolean;
   plan?: Plan;
   forbiddenPlanError?: string;
+  missingPlanReference?: boolean;
 }
 
 export interface EditSchedulerTaskDialogData {
@@ -131,6 +132,10 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   protected paramsSchema = signal<JsonFieldsSchema | undefined>(undefined);
   protected isLocal = signal(false);
   protected hasExclusions = toSignal(this.hasExclusions$);
+  protected readonly planErrorsDictionary: Record<string, string> = {
+    required: 'Please select a plan.',
+    missingPlanReference: 'The previously selected plan no longer exists. Please select a new plan.',
+  };
 
   private testCases$ = this.createTestCasesStream();
 
@@ -212,14 +217,18 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
 
   private addCustomErrors(): void {
     const forbidden = this.config?.forbiddenPlanError;
-    if (!forbidden) {
+    const missingPlanReference = this.config?.missingPlanReference;
+    if (!forbidden && !missingPlanReference) {
       return;
     }
     // FormGroup directive will invoke `updateValueAndValidity` when new form object will be assigned
     // it will erase all custom errors.
     // Zero timeout has been added, to put error after FormGroup's `updateValueAndValidity` invocation
     setTimeout(() => {
-      this.taskForm.controls.plan.setErrors({ forbidden });
+      this.taskForm.controls.plan.setErrors({
+        ...(forbidden ? { forbidden } : {}),
+        ...(missingPlanReference ? { missingPlanReference: true } : {}),
+      });
       this.taskForm.controls.plan.markAsTouched();
     }, 0);
   }

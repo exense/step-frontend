@@ -1,5 +1,6 @@
-import { Component, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, OnDestroy, viewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
+import { Router } from '@angular/router';
 
 export interface TreeNodePieChartSlice {
   color: string;
@@ -11,18 +12,28 @@ export interface TreeNodePieChartSlice {
   selector: 'step-aggregated-tree-node-statuses-piechart',
   templateUrl: './aggregated-tree-node-statuses-piechart.component.html',
   styleUrls: ['./aggregated-tree-node-statuses-piechart.component.scss'],
-  standalone: false,
+  standalone: true,
 })
 export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   readonly slices = input.required<TreeNodePieChartSlice[]>();
-  readonly size = input<number>(24);
+  readonly size = input<number>(40);
   readonly startAngleDeg = input<number>(-90);
   readonly circumferenceDeg = input<number>(360);
   readonly emptyColor = input<string>('#e5e7eb');
   readonly highlight = input<boolean>(false);
+  readonly link = input<string>();
+
+  private _router = inject(Router);
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private chart?: Chart | undefined;
+
+  protected navigateToLink(): void {
+    let link = this.link();
+    if (link) {
+      this._router.navigateByUrl(link);
+    }
+  }
 
   private renderEffect = effect(() => {
     const canvasElement = this.canvas();
@@ -68,7 +79,6 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       rotation: (startAngle * Math.PI) / 180,
       circumference,
     } as const;
-
     if (this.chart) {
       // update in place
       this.chart.data.labels = data.labels as any;
@@ -81,11 +91,17 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
     } else {
       this.chart = new Chart(canvasElement.nativeElement, {
         type: 'pie',
-        data,
-        options,
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 0 },
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          elements: { arc: arcStyle },
+        },
       }) as Chart;
-      canvasElement.nativeElement.width = size;
-      canvasElement.nativeElement.height = size;
+      // canvasElement.nativeElement.width = size;
+      // canvasElement.nativeElement.height = size;
     }
   });
 

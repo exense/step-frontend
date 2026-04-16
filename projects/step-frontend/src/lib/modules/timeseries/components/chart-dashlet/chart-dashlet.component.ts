@@ -4,6 +4,7 @@ import {
   effect,
   inject,
   input,
+  Input,
   OnChanges,
   OnInit,
   output,
@@ -31,7 +32,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -79,6 +80,7 @@ const resolutionLabels: Record<string, string> = {
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],
+  standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -111,11 +113,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly height = input.required<number>();
   readonly editMode = input<boolean>(false);
   readonly showExecutionLinks = input<boolean>(false);
+  readonly showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+
+  readonly isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -479,6 +484,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           truncated: response.truncated,
         };
       }),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -541,6 +547,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private fetchDataAndCreateChartSettings(): Observable<TSChartSettings> {
+    this.isLoading.set(true);
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;

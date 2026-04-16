@@ -66,9 +66,13 @@
           <step-drag-column-caption>Name</step-drag-column-caption>
         </th>
         <td mat-cell *matCellDef="let element">
-          <a href="#" class="automation-package-link" (click)="editPackage(element); (false)">
+          @if (AutomationPackagePermission.READ | hasRight | async) {
+            <a href="#" class="automation-package-link" (click)="editPackage(element); (false)">
+              {{ element.attributes?.['name'] }}
+            </a>
+          } @else {
             {{ element.attributes?.['name'] }}
-          </a>
+          }
           <step-status [status]="element.status" />
         </td>
       </ng-container>
@@ -150,7 +154,7 @@
               mat-icon-button
               matTooltip="Refresh the Automation Package from its maven repository. Note: Libraries are not affected by this."
               (click)="refreshPackage(element)"
-              [disabled]="!(AutomationPackagePermission.READ | hasRight | async)"
+              [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
             >
               <step-icon name="refresh-cw" />
             </button>

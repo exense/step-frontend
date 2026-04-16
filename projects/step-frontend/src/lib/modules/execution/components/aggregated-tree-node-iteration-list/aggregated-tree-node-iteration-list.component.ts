@@ -10,6 +10,7 @@ import {
   Renderer2,
   signal,
   untracked,
+  ViewEncapsulation,
   viewChild,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -56,6 +57,7 @@ const PAGE_SIZE = 25;
     TablePersistenceStateService,
     tablePersistenceConfigProvider('aggregatedIterationList', STORE_ALL),
   ],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {

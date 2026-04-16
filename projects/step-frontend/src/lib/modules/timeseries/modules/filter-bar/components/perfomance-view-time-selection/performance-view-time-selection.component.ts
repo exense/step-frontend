@@ -4,6 +4,7 @@ import {
   EventEmitter,
   inject,
   input,
+  Input,
   OnInit,
   output,
   Output,
@@ -25,16 +26,20 @@ import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { sign } from 'chart.js/helpers';
+import { ChartSkeletonComponent } from '../../../chart';
 
 @Component({
   selector: 'step-execution-time-selection',
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TSRangerComponent],
+  imports: [COMMON_IMPORTS, TSRangerComponent, ChartSkeletonComponent],
+  standalone: true,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {
   readonly context = input.required<TimeSeriesContext>();
+  readonly showSpinnerWhileLoading = input<boolean>(false);
 
   readonly rangerLoaded = output<void>();
 
@@ -45,6 +50,8 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _destroyRef = inject(DestroyRef);
+
+  readonly isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     const context = this.context();
@@ -76,7 +83,9 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   }
 
   createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
+    this.isLoading.set(true);
     const customFiltering = JSON.parse(JSON.stringify(this.context().getFilteringSettings())) as TsFilteringSettings;
+
     customFiltering.filterItems = []; // ignore visible filters.
     const request = new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
@@ -100,11 +109,11 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
               label: 'Response Time',
               labelItems: ['Response Time'],
               data: avgData,
-              // value: (self, x) => Math.trunc(x) + ' ms',
               legendName: 'Ranger',
             },
           ],
         });
+        this.isLoading.set(false);
       }),
     );
   }

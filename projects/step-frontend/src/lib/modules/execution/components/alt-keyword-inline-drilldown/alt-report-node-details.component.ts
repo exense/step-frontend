@@ -14,6 +14,7 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
+import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 
 @Component({
   selector: 'step-alt-report-node-details',
@@ -34,6 +35,10 @@ import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/
       provide: CLICK_STRATEGY,
       useValue: ClickStrategyType.DOUBLE_CLICK,
     },
+    {
+      provide: AGGREGATED_TREE_NODE_LARGE_VIEW,
+      useValue: false,
+    },
   ],
   standalone: false,
 })
@@ -46,7 +51,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   readonly showArtefact = input(false);
   readonly openTreeView = output();
 
-  private partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
+  private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
@@ -65,7 +70,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     }),
   );
 
-  searchFor($event: string) {
+  searchFor($event: string): void {
     if (!this.partialTree()) {
       return;
     }
@@ -73,7 +78,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     this.partialTree()!.focusAndSearch($event);
   }
 
-  private aggregatedNode = computed(() => {
+  private readonly aggregatedNode = computed(() => {
     const reportNode = this.node();
     const isTreeInitialized = this._treeState.isInitialized();
     if (!isTreeInitialized) {

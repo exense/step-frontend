@@ -42,7 +42,10 @@ export class AugmentedBookmarksService extends BookmarksService implements HttpO
             icon: element.customFields!['icon'],
             parentId: 'bookmarks-root',
             weight: 1000 + bookmarks.length,
-            isEnabledFct(): boolean {
+            isVisibleFunction(): boolean {
+              return true;
+            },
+            isEnabledFunction(): boolean {
               return true;
             },
           };

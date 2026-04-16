@@ -22,6 +22,7 @@ import { from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
+import { AuthService } from '../../../auth';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
 
@@ -44,6 +45,7 @@ const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
   },
 })
 export class AttachmentDialogComponent implements OnInit {
+  private _auth = inject(AuthService);
   private _resourceService = inject(AugmentedResourcesService);
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _userService = inject(UserService);
@@ -93,6 +95,9 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly scrollDownOnRefresh = model(true);
 
   protected readonly contentCtrl = this._fb.control('');
+  protected readonly hasResourceReadPermission = toSignal(this._auth.hasRight$('resource-read'), {
+    initialValue: this._auth.hasRight('resource-read'),
+  });
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
   protected readonly AttachmentType = AttachmentType;
 
@@ -101,6 +106,9 @@ export class AttachmentDialogComponent implements OnInit {
   }
 
   protected download(): void {
+    if (!this.hasResourceReadPermission()) {
+      return;
+    }
     this._attachmentUtils.downloadAttachment(this._data);
   }
 
@@ -109,6 +117,9 @@ export class AttachmentDialogComponent implements OnInit {
   }
 
   protected openTraceViewerInSeparateTab(): void {
+    if (!this.hasResourceReadPermission()) {
+      return;
+    }
     this.traceViewer()?.openInSeparateTab?.();
   }
 

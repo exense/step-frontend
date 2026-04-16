@@ -1,4 +1,7 @@
-<step-alt-report-widget [title]="title()" [applyOverflow]="true">
+<step-alt-report-widget [applyOverflow]="true">
+  <step-alt-report-widget-title>
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
   @if (showSort()) {
     <step-alt-report-widget-sort>
       <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" (click)="toggleSort()" />

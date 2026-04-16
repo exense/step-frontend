@@ -29,7 +29,11 @@
         <div class="full-width-grow">
           <div class="time-section-container">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
-              <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
+              <step-execution-time-selection
+                #timeSelection
+                [context]="mainEngine.state.context"
+                [showSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
+              />
             </div>
             @if (compareModeEnabled) {
               <div
@@ -41,7 +45,7 @@
               </div>
             } @else {
               <div
-                (click)="updateTimeRangeFromSelection()"
+                (click)="emitFullRangeUpdateRequest()"
                 class="round-btn grey-border align-with-ranger"
                 [class.disabled]="fullRangeSelected"
                 mat-icon-button
@@ -58,7 +62,9 @@
               [context]="mainEngine.state.context"
               [compactView]="compareModeEnabled"
               [showHiddenFilters]="compareModeEnabled"
-              (fullRangeChange)="handleMainFullRangeChange($event)"
+              (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
+              (groupingChange)="handleGroupingChange(mainEngine, $event)"
+              (filtersChange)="handleFiltersChange(mainEngine, $event)"
             />
             @if (!compareModeEnabled) {
               <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
@@ -84,8 +90,10 @@
               #compareFilterBar
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
-              [compactView]="compareModeEnabled"
-              (fullRangeChange)="handleCompareFullRangeChange($event)"
+              [compactView]="true"
+              (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
+              (groupingChange)="handleGroupingChange(compareEngine!, $event)"
+              (filtersChange)="handleFiltersChange(compareEngine!, $event)"
             />
           </div>
         }
@@ -101,6 +109,7 @@
                 #chart
                 [editMode]="editMode"
                 [showExecutionLinks]="showExecutionLinks"
+                [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                 [item]="dashlet"
                 [context]="mainEngine.state.context"
                 [height]="DASHLET_HEIGHT"
@@ -115,6 +124,7 @@
                 <div class="compare-mode-tag">Compare</div>
                 <step-chart-dashlet
                   #compareChart
+                  [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
                   [editMode]="editMode"
                   [item]="dashlet"
                   [context]="compareEngine!.state.context"
@@ -130,6 +140,9 @@
               <step-table-dashlet
                 #chart
                 [item]="dashlet"
+                [showLoadingSpinnerWhileLoading]="
+                  mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
+                "
                 [context]="mainEngine.state.context"
                 [editMode]="editMode"
                 (remove)="handleChartDelete(i)"

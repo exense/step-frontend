@@ -1,9 +1,9 @@
-@if (useSpinner() && inProgress()) {
+@if (_tableIndicator.useSpinner() && _tableIndicator.inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
 }
-@for (additionalHeaderGroup of additionalHeaderGroups; track additionalHeaderGroup) {
+@for (additionalHeaderGroup of additionalHeaderGroups(); track additionalHeaderGroup) {
   <div class="additional-header" [class.additional-header-flex]="!!additionalHeaderGroup[1]">
     @for (additionalHeader of additionalHeaderGroup; track additionalHeader.headerId) {
       <ng-container *ngTemplateOutlet="additionalHeader!.template" />
@@ -20,7 +20,7 @@
 }
 <step-columns-placeholders />
 <div class="table-container">
-  <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
+  <table mat-table [dataSource]="_tableDataSource.tableDataSource()!" [trackBy]="trackBy()">
     @for (searchCol of searchColumns; track searchCol.colName) {
       <ng-container [matColumnDef]="searchCol.colName">
         <th mat-header-cell *matHeaderCellDef>
@@ -49,7 +49,7 @@
       [class.row-deactivated]="row.customFields && row.customFields.activated === false"
     ></tr>
     <tr class="mat-mdc-row no-data-row" *matNoDataRow>
-      @switch (emptyState()) {
+      @switch (_tableDataSource.emptyState()) {
         @case (EmptyState.INITIAL) {
           @for (col of displayColumns(); track col) {
             <td class="mat-mdc-cell no-data"></td>
@@ -63,17 +63,17 @@
   </table>
 </div>
 <section class="paginator-container">
-  @if (tablePaginatorPrefix(); as paginatorPrefix) {
+  @if (_tablePagination.tablePaginatorPrefix(); as paginatorPrefix) {
     <ng-container *ngTemplateOutlet="paginatorPrefix.templateRef" />
   }
   <step-paginator
-    [disabled]="pageSizeInputDisabled()"
-    [length]="totalFiltered()"
-    [hasNext]="hasNext()"
-    [usePagesCount]="calculateCounts()"
-    [pageSizeOptions]="pageSizeOptions()"
+    [disabled]="_tablePagination.pageSizeInputDisabled()"
+    [length]="_tableDataSource.totalFiltered()"
+    [hasNext]="_tableDataSource.hasNext()"
+    [usePagesCount]="_tableDataSource.calculateCounts()"
+    [pageSizeOptions]="_tablePagination.pageSizeOptions()"
   >
-    @if (tablePaginatorContent(); as paginatorContent) {
+    @if (_tablePagination.tablePaginatorContent(); as paginatorContent) {
       <ng-container *ngTemplateOutlet="paginatorContent.templateRef" />
     }
   </step-paginator>

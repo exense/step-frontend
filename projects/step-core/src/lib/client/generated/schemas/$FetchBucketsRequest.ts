@@ -55,5 +55,8 @@ export const $FetchBucketsRequest = {
       type: 'number',
       format: 'int32',
     },
+    includeGlobalEntities: {
+      type: 'boolean',
+    },
   },
 } as const;

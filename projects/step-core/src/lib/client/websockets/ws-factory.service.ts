@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { WsChannel } from './ws-channel';
-import { map, Observable } from 'rxjs';
+import { map, Observable, Subject, tap } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { APP_HOST } from '../_common';
 
@@ -27,24 +27,37 @@ export class WsFactoryService {
 class WsChannelImpl<REQ, RESP> implements WsChannel<REQ, RESP> {
   constructor(private url: string) {
     this.websocket$ = this.createWebsocket(url);
-    this.data$ = this.websocket$.pipe(map((data) => data as RESP | Blob));
+    this.data$ = this.websocket$.pipe(
+      tap({
+        error: (error) => this.errorInternal$.next(error),
+      }),
+      map((data) => data as RESP | Blob),
+    );
   }
 
-  private isConnectedInternal = signal(false);
+  private readonly isConnectedInternal = signal(false);
   private websocket$?: WebSocketSubject<unknown>;
+  private closeInternal$ = new Subject<CloseEvent>();
+  private errorInternal$ = new Subject<unknown>();
+  private isDisconnectRequested = false;
+  private pendingRequests: REQ[] = [];
 
   readonly isConnected = this.isConnectedInternal.asReadonly();
   readonly data$: Observable<RESP | Blob>;
+  readonly close$ = this.closeInternal$.asObservable();
+  readonly error$ = this.errorInternal$.asObservable();
 
   disconnect(): void {
+    this.isDisconnectRequested = true;
     this.websocket$?.complete?.();
     this.websocket$ = undefined;
     this.isConnectedInternal.set(false);
+    this.pendingRequests = [];
   }
 
   send(request: REQ): void {
     if (!this.isConnected()) {
-      console.error(`Websocket not connected to url: ${this.url}`);
+      this.pendingRequests.push(request);
       return;
     }
     this.websocket$?.next?.(request);
@@ -54,10 +67,22 @@ class WsChannelImpl<REQ, RESP> implements WsChannel<REQ, RESP> {
     return new WebSocketSubject({
       url,
       openObserver: {
-        next: () => this.isConnectedInternal.set(true),
+        next: () => {
+          this.isDisconnectRequested = false;
+          this.isConnectedInternal.set(true);
+          const queuedRequests = [...this.pendingRequests];
+          this.pendingRequests = [];
+          queuedRequests.forEach((request) => this.websocket$?.next?.(request));
+        },
       },
       closeObserver: {
-        next: () => this.isConnectedInternal.set(false),
+        next: (event) => {
+          this.isConnectedInternal.set(false);
+          this.closeInternal$.next(event);
+          if (!this.isDisconnectRequested && event.code !== 1000) {
+            this.errorInternal$.next(event);
+          }
+        },
       },
       deserializer: (e: MessageEvent) => {
         if (typeof e.data === 'string') {
