@@ -1,8 +1,7 @@
 export const FilterErrors = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-filter-errors">
-    
   <defs>
     <style>
-      .filter-errors-icon-filters-errors {
+      .filter-errors-icon {
         fill: none;
         stroke: currentColor;
         stroke-linecap: round;
@@ -11,8 +10,8 @@ export const FilterErrors = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 
       }
     </style>
   </defs>
-  <polygon class="filter-errors-icon-filters-errors" points="20.17 3 2.94 3 9.83 11.15 9.83 16.79 13.28 18.51 13.28 11.15 20.17 3"/>
-  <line class="filter-errors-icon-filters-errors" x1="18.62" y1="12" x2="18.62" y2="16"/>
-  <line class="filter-errors-icon-filters-errors" x1="18.62" y1="20" x2="18.63" y2="20"/>
+  <polygon class="filter-errors-icon" points="20.17 3 2.94 3 9.83 11.15 9.83 16.79 13.28 18.51 13.28 11.15 20.17 3"/>
+  <line class="filter-errors-icon" x1="18.62" y1="12" x2="18.62" y2="16"/>
+  <line class="filter-errors-icon" x1="18.62" y1="20" x2="18.63" y2="20"/>
 
 </svg>`;
