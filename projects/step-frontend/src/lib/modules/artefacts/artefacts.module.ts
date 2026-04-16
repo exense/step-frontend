@@ -67,6 +67,7 @@ import { TestSetReportDetailsComponent } from './component/test-set-report-detai
 import { SessionInlineComponent } from './component/session-inline/session-inline.component';
 import { SessionReportDetailsComponent } from './component/session-report-details/session-report-details.component';
 import { AssertPerformanceReportDetailsComponent } from './component/assert-performance-report-details/assert-performance-report-details.component';
+import { ReportDetailsSectionsComponent } from './component/report-details-sections/report-details-sections.component';
 import { DataSetInlineComponent } from './component/data-set-inline/data-set-inline.component';
 import { DataSetReportDetailsComponent } from './component/data-set-report-details/data-set-report-details.component';
 import { ForEachInlineComponent } from './component/for-each-inline/for-each-inline.component';
@@ -189,6 +190,7 @@ import { AssertPerformanceArtefact } from './types/assert-performance.artefact';
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
     AssertPerformanceReportDetailsComponent,
+    ReportDetailsSectionsComponent,
   ],
   imports: [StepCommonModule, ReportNodesModule],
   exports: [
