@@ -4,6 +4,8 @@
   [tableParams]="(keywordsParameters$ | async)!"
   [calculateCounts]="calculateCounts()"
   [indicatorMode]="TableIndicatorMode.SPINNER"
+  [highlightedItem]="selectedReportId()"
+  [highlightedItemExtractor]="extractReportId"
   class="paddingless no-border hide-header no-highlight special-selection"
 >
   <ng-container matColumnDef="executionTime">

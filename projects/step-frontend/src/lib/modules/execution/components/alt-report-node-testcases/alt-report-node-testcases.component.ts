@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, inject, output, untracked, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  input,
+  output,
+  untracked,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   AggregatedReportView,
   STORE_ALL,
@@ -42,6 +51,7 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
   readonly openIterations = output<OpenIterationsEvent>();
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
+  readonly selectedId = input<string | undefined>(undefined);
 
   private get tableSearchUntracked(): TableSearch | undefined {
     return untracked(() => this.tableSearch());

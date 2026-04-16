@@ -6,6 +6,7 @@
     @let elementName = element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '';
     <section
       class="test-case-row"
+      [class.highlighted-item]="element?.singleInstanceReportNode?.id === selectedId()"
       stepCalcElementWidthAggregator
       [recalcTrigger]="element"
       [class.has-operations]="hasOperations"

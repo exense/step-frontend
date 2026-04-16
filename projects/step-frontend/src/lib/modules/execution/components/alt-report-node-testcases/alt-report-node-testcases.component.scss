@@ -27,16 +27,19 @@ step-alt-report-node-testcases {
       grid-template-columns: min(60%, var(--style__name-width, 60%)) 1fr 4rem;
     }
 
-    &:hover::before {
-      content: ' ';
-      display: block;
-      height: 3rem;
-      position: absolute;
-      left: 0;
-      right: 0;
-      z-index: 0;
-      background: var.$light-blue-gray;
-      border-radius: 4rem;
+    &.highlighted-item,
+    &:hover {
+      &::before {
+        content: ' ';
+        display: block;
+        height: 3rem;
+        position: absolute;
+        left: 0;
+        right: 0;
+        z-index: 0;
+        background: var.$light-blue-gray;
+        border-radius: 4rem;
+      }
     }
   }
 

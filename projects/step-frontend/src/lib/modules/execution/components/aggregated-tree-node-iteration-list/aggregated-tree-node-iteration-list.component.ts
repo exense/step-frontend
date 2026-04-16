@@ -30,6 +30,7 @@ import {
   TableDataSource,
   AlertType,
   TableIndicatorMode,
+  HighlightedItemExtractor,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
@@ -87,6 +88,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const mastSort = this.matSort();
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
+
+  protected readonly selectedReportNode = signal<ReportNode | undefined>(undefined);
 
   protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
@@ -194,6 +197,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   }
 
   protected openNodeDetails(node: ReportNode): void {
+    this.selectedReportNode.set(node);
     this.showDetails.emit(node);
   }
 

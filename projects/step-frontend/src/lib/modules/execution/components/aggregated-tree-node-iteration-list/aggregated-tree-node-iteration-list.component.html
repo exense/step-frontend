@@ -32,6 +32,7 @@
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
+    [highlightedItem]="selectedReportNode()"
     class="paddingless no-border hide-header no-highlight special-selection"
   >
     <ng-container matColumnDef="executionTime">

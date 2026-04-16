@@ -1,4 +1,14 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, signal, untracked, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  untracked,
+  ViewEncapsulation,
+} from '@angular/core';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { filter, map, switchMap } from 'rxjs';
 import { ReportNode } from '@exense/step-core';
@@ -24,6 +34,8 @@ enum StackItemType {
   REPORT_NODE = 'reportNode',
   AGGREGATED_REPORT_NODE = 'aggregatedReportNode',
 }
+
+const ROOT = 'root';
 
 type StackItem =
   | {
@@ -83,6 +95,24 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
 
   protected readonly stackItems = signal<StackItem[]>([]);
   protected readonly StackItemType = StackItemType;
+
+  protected readonly selectedRootReportNodeId = computed(() => {
+    const stackItems = this.stackItems();
+    const [root, first] = stackItems;
+    if (root.type !== StackItemType.ROOT || root.rootType !== DrilldownRootType.KEYWORDS || !first) {
+      return undefined;
+    }
+    return first.nodeId;
+  });
+
+  protected readonly selectedAggregatedNodeId = computed(() => {
+    const stackItems = this.stackItems();
+    const [root, first] = stackItems;
+    if (root.type !== StackItemType.ROOT || root.rootType !== DrilldownRootType.TESTCASES || !first) {
+      return undefined;
+    }
+    return first.nodeId;
+  });
 
   private get stackItemsUntracked(): StackItem[] {
     return untracked(() => this.stackItems());
@@ -235,7 +265,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       if (items[0]?.type === StackItemType.ROOT) {
         items = [{ ...items[0], rootType }, ...items.slice(1)];
       } else {
-        items = [{ type: StackItemType.ROOT, id: 'root', nodeId: 'root', rootType }, ...items];
+        items = [{ type: StackItemType.ROOT, id: ROOT, nodeId: ROOT, rootType }, ...items];
       }
       return items;
     });

@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   inject,
+  input,
   output,
   signal,
   untracked,
@@ -11,6 +12,7 @@ import {
 import {
   AugmentedScreenService,
   FilterConditionFactoryService,
+  HighlightedItemExtractor,
   ReportNode,
   STORE_ALL,
   TableIndicatorMode,
@@ -55,6 +57,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
 
+  readonly selectedReportId = input<string | undefined>(undefined);
   readonly openDetails = output<ReportNode>();
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
@@ -62,6 +65,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
     return untracked(() => this.tableSearch());
   }
 
+  protected readonly extractReportId: HighlightedItemExtractor<ReportNode, string> = (node?: ReportNode) => node?.id;
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
 
