@@ -65,6 +65,8 @@ export class DataSourceFieldsService {
         return this.extractFileSearchFields(dataSource);
       case DataSourceType.FOLDER:
         return this.extractFolderSearchFields(dataSource);
+      default:
+        return [];
     }
   }
 
