@@ -3,7 +3,7 @@
 <step-split>
   @for (view of viewsAndGroups(); track view.id; let isLast = $last; let isFirst = $first) {
     @if (view | isSplitViewGroup; as group) {
-      <step-split-area sizeType="pixel" [size]="GROUP_WIDTH">
+      <step-split-area sizeType="pixel" [size]="GROUP_WIDTH" [isFixedInput]="true">
         <step-view-group [group]="group" (openView)="openView($event)" />
       </step-split-area>
     } @else {

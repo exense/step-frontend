@@ -30,11 +30,16 @@ export class SplitAreaComponent implements AfterViewInit, OnDestroy {
   readonly sizeUpdateDebounce = input(300);
   readonly sizeType = input<SplitAreaSizeType>('pixel');
   readonly sizeInput = input<number | undefined>(undefined, { alias: 'size' });
+  readonly isFixedInput = input(false, { alias: 'isFixedInput' });
 
   private readonly size = linkedSignal(() => this.sizeInput());
 
   readonly padding = input<string | undefined>();
   readonly sizeChange = output<number>();
+
+  get isFixed(): boolean {
+    return untracked(() => this.isFixedInput());
+  }
 
   private effectSizeUpdateDebounceChange = effect(() => {
     const sizeUpdateDebounce = this.sizeUpdateDebounce();

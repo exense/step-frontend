@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal, untracked } from '@angular/core';
 import { SplitComponent } from '../split/split.component';
+import { SplitAreaComponent } from '../split-area/split-area.component';
 
 @Component({
   selector: 'step-split-gutter',
@@ -31,19 +32,33 @@ export class SplitGutterComponent {
   private readonly leftArea = computed(() => {
     const areas = this.allAreas();
     const gutterIndex = this.gutterIndex();
+    let result: SplitAreaComponent | undefined = undefined;
     if (!areas.length || gutterIndex < 0) {
-      return undefined;
+      return result;
     }
-    return areas[gutterIndex];
+    for (let i = gutterIndex; i >= 0; i--) {
+      if (!areas[i].isFixed) {
+        result = areas[i];
+        break;
+      }
+    }
+    return result;
   });
 
   private readonly rightArea = computed(() => {
     const areas = this.allAreas();
     const gutterIndex = this.gutterIndex();
+    let result: SplitAreaComponent | undefined = undefined;
     if (!areas.length || gutterIndex < 0) {
-      return undefined;
+      return result;
     }
-    return areas[gutterIndex + 1];
+    for (let i = gutterIndex + 1; i < areas.length; i++) {
+      if (!areas[i].isFixed) {
+        result = areas[i];
+        break;
+      }
+    }
+    return result;
   });
 
   updateSizes(): void {
