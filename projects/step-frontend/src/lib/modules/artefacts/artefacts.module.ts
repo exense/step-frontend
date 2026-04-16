@@ -446,7 +446,7 @@ export class ArtefactsModule {
       },
     });
     this._artefactService.register('If', {
-      icon: 'if',
+      icon: 'if-control',
       component: IfComponent,
       inlineComponent: IfInlineComponent,
       reportDetailsComponent: IfReportDetailsComponent,
@@ -465,7 +465,7 @@ export class ArtefactsModule {
       component: SetComponent,
       inlineComponent: SetInlineComponent,
       reportDetailsComponent: SetReportDetailsComponent,
-      icon: 'set',
+      icon: 'set-control',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
       getArtefactSearchValues: (artefact?: SetArtefact) => [artefact?.key, artefact?.value].filter((item) => !!item),
       getReportNodeSearchValues: (reportNode?: SetReportNode) => {

@@ -1,4 +1,4 @@
-export const Set = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-set">
+export const SetControl = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-set-control">
     
   <defs>
     <style>

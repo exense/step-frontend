@@ -155,7 +155,7 @@ import { Heart } from './svg/heart';
 import { HelpCircle } from './svg/help-circle';
 import { Hexagon } from './svg/hexagon';
 import { Home } from './svg/home';
-import { If } from './svg/if';
+import { IfControl } from './svg/if-control';
 import { Image } from './svg/image';
 import { Inbox } from './svg/inbox';
 import { Info } from './svg/info';
@@ -258,7 +258,7 @@ import { Search } from './svg/search';
 import { SearchErrors } from './svg/search-errors';
 import { Send } from './svg/send';
 import { Server } from './svg/server';
-import { Set } from './svg/set';
+import { SetControl } from './svg/set-control';
 import { Settings } from './svg/settings';
 import { Share } from './svg/share';
 import { Share2 } from './svg/share-2';
@@ -502,7 +502,7 @@ export const allIcons = {
   HelpCircle,
   Hexagon,
   Home,
-  If,
+  IfControl,
   Image,
   Inbox,
   Info,
@@ -605,7 +605,7 @@ export const allIcons = {
   SearchErrors,
   Send,
   Server,
-  Set,
+  SetControl,
   Settings,
   Share,
   Share2,
