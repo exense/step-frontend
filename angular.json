@@ -58,12 +58,12 @@
               },
               {
                 "glob": "**/*",
-                "input": "node_modules/playwright-core/lib/vite/traceViewer",
+                "input": "../node_modules/playwright-core/lib/vite/traceViewer",
                 "output": "/trace-viewer"
               },
               {
                 "glob": "worker-javascript.js",
-                "input": "node_modules/ace-builds/src-min-noconflict",
+                "input": "../node_modules/ace-builds/src-min-noconflict",
                 "output": "/"
               },
               {
@@ -72,8 +72,8 @@
                 "output": "/"
               }
             ],
-            "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
-            "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
+            "styles": ["projects/step-app/src/styles.scss", "../node_modules/uplot/dist/uPlot.min.css"],
+            "scripts": ["../node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
             "allowedCommonJsDependencies": ["ace-builds", "luxon"]
@@ -112,6 +112,20 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "development-cli": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/step-app/src/environments/environment.ts",
+                  "with": "projects/step-app/src/environments/environment.cli.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -129,6 +143,14 @@
             },
             "local": {
               "buildTarget": "@exense/step-app:build:development",
+              "proxyConfig": "projects/step-app/proxy-local.conf.json"
+            },
+            "cli": {
+              "buildTarget": "@exense/step-app:build:development-cli",
+              "proxyConfig": "projects/step-app/proxy.conf.json"
+            },
+            "local-cli": {
+              "buildTarget": "@exense/step-app:build:development-cli",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },

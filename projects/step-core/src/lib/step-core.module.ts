@@ -21,6 +21,7 @@ import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
+import { ShowForCliModeDirective } from './directives/show-for-cli-mode.directive';
 import { StepBasicsModule } from './modules/basics/step-basics.module';
 import {
   CustomCellRegistryService,
@@ -85,6 +86,7 @@ import { EDITABLE_GRID_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
   declarations: [
     MatchingAuthenticator,
     CapsLockDirective,
+    ShowForCliModeDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
     AutorefreshToggleComponent,
@@ -163,6 +165,7 @@ import { EDITABLE_GRID_LAYOUT_EXPORTS } from './modules/editable-grid-layout';
     FormsModule,
     ReactiveFormsModule,
     CapsLockDirective,
+    ShowForCliModeDirective,
     ClampFadeDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -261,6 +264,8 @@ export class StepCoreModule {
 
 export { BaseHttpRequest } from './client/generated/core/BaseHttpRequest';
 export { CancelError, CancelablePromise } from './client/generated/core/CancelablePromise';
+export { CLI_MODE } from './modules/basics/injectables/cli-mode.token';
+export { AppModeService } from './modules/basics/injectables/app-mode.service';
 export { OpenAPI } from './client/generated/core/OpenAPI';
 export type { OpenAPIConfig } from './client/generated/core/OpenAPI';
 export * from './client/generated/index';

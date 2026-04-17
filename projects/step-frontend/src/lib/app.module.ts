@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Inject, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -7,6 +7,9 @@ import {
   BaseHttpRequest,
   StepHttpRequestService,
   KEYWORDS_COMMON_INITIALIZER,
+  CLI_MODE,
+  MenuEntry,
+  MenuItemsOverrideConfigService,
 } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
@@ -31,6 +34,7 @@ import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './mo
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 import { InProgressComponent } from './components/in-progress/in-progress.component';
+import { of } from 'rxjs';
 
 Settings.defaultLocale = 'en';
 
@@ -39,6 +43,52 @@ const MODULES_INITIALIZERS = [
   AUTOMATION_PACKAGE_INITIALIZER,
   ERRORS_VIEW_INITIALIZER,
   RESOURCES_INITIALIZER,
+];
+
+const cliMenuItem = (item: Omit<MenuEntry, 'isVisibleFunction' | 'isEnabledFunction'>): MenuEntry => ({
+  ...item,
+  isVisibleFunction: () => true,
+  isEnabledFunction: () => true,
+});
+
+const CLI_MENU_ITEMS: MenuEntry[] = [
+  cliMenuItem({ id: 'automation-root', title: 'Design', icon: 'edit', weight: 10 }),
+  cliMenuItem({
+    id: 'functions',
+    title: 'Keywords',
+    icon: 'keyword',
+    weight: 10,
+    parentId: 'automation-root',
+  }),
+  cliMenuItem({
+    id: 'plans',
+    title: 'Plans',
+    icon: 'plan',
+    weight: 20,
+    parentId: 'automation-root',
+  }),
+  cliMenuItem({
+    id: 'parameters',
+    title: 'Parameters',
+    icon: 'list',
+    weight: 30,
+    parentId: 'automation-root',
+  }),
+  cliMenuItem({
+    id: 'scheduler',
+    title: 'Schedules',
+    icon: 'clock',
+    weight: 40,
+    parentId: 'automation-root',
+  }),
+  cliMenuItem({ id: 'execute-root', title: 'Reporting', icon: 'file-check-03', weight: 20 }),
+  cliMenuItem({
+    id: 'executions',
+    title: 'Executions',
+    icon: 'rocket',
+    weight: 10,
+    parentId: 'execute-root',
+  }),
 ];
 
 @NgModule({
@@ -79,7 +129,16 @@ const MODULES_INITIALIZERS = [
   ],
   bootstrap: [RootComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(_menuItemsOverrideConfig: MenuItemsOverrideConfigService, @Inject(CLI_MODE) _cliMode: boolean) {
+    const globalCliMode = (globalThis as { __STEP_CLI_MODE?: boolean }).__STEP_CLI_MODE;
+    const isCliMode = typeof globalCliMode === 'boolean' ? globalCliMode : _cliMode;
+
+    if (isCliMode) {
+      _menuItemsOverrideConfig.configure(of(CLI_MENU_ITEMS));
+    }
+  }
+}
 
 export * from './components/root/root.component';
 export * from './components/main-view/main-view.component';
