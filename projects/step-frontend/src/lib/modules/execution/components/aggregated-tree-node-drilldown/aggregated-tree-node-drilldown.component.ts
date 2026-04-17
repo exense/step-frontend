@@ -158,7 +158,6 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
             if (!node) {
               return undefined;
             }
-            console.log('AGGREGATED NODE', node);
             const { resolvedPartialPath, searchStatus, searchStatusCount, aggregatedNodeId: nodeId } = data;
             return {
               id: `${nodeId}_${this.currentLength}`,
@@ -243,6 +242,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     const parentIndex = itemsToCheck.findIndex((item) => item.id === parentStackItemId);
     if (parentIndex < 0) {
       return true;
+    }
+    if (itemsToCheck[parentIndex + 1]?.nodeId === nodeId) {
+      return false;
     }
     itemsToCheck = itemsToCheck.splice(0, parentIndex + 1);
     if (itemsToCheck[itemsToCheck.length - 1].nodeId === nodeId) {
