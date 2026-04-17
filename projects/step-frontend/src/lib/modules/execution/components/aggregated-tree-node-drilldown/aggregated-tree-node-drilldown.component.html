@@ -1,4 +1,4 @@
-<step-stack-view (removeItem)="removeItem($event)" (closeAll)="handleCloseAll()">
+<step-stack-view [withOverflow]="true" (removeItem)="removeItem($event)" (closeAll)="handleCloseAll()">
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
       @case (StackItemType.ROOT) {
@@ -154,6 +154,7 @@
             <step-alt-report-node-details
               [node]="$any(item).data"
               [showArtefact]="false"
+              (openDetails)="handleOpenDetails($event, item.id)"
               (opernIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
             />
           </ng-container>

@@ -1,7 +1,7 @@
 <step-table
   #table
   [dataSource]="(_state.datasource$ | async)!"
-  [tableParams]="(keywordsParameters$ | async)!"
+  [tableParams]="(_state.tableParams$ | async)!"
   [calculateCounts]="calculateCounts()"
   [indicatorMode]="TableIndicatorMode.SPINNER"
   [highlightedItem]="selectedReportId()"

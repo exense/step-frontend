@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { AltReportNodesStateService } from './alt-report-nodes-state.service';
+import { inject, Injectable } from '@angular/core';
+import { AltReportNodesSummaryStateService } from './alt-report-nodes-summary-state.service';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import { AggregatedReportView, Execution, FetchBucketsRequest, TimeRange } from '@exense/step-core';
+import { of } from 'rxjs';
 
 @Injectable()
-export class AltTestCasesNodesStateService extends AltReportNodesStateService<AggregatedReportView> {
-  constructor(_executionState: AltExecutionStateService) {
-    super(_executionState.testCasesDataSource$, 'testCases');
+export class AltTestCasesNodesStateService extends AltReportNodesSummaryStateService<AggregatedReportView> {
+  constructor() {
+    super(inject(AltExecutionStateService).testCasesDataSource$, 'testCases');
   }
 
   protected readonly statusDistributionViewId = 'statusDistributionForTestcases';
@@ -20,4 +21,6 @@ export class AltTestCasesNodesStateService extends AltReportNodesStateService<Ag
       groupDimensions: ['status'],
     };
   }
+
+  readonly tableParams$ = of(undefined);
 }

@@ -12,6 +12,9 @@ step-split {
   width: 100%;
   height: 100%;
   grid-column: 1/3;
+  &.with-overflow {
+    overflow: auto;
+  }
 }
 
 step-split-area {

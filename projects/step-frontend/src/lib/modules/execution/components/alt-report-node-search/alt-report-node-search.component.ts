@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { StepCoreModule } from '@exense/step-core';
-import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
+import { AltReportNodesSummaryStateService } from '../../services/alt-report-nodes-summary-state.service';
 
 @Component({
   selector: 'step-alt-report-node-search',
@@ -9,5 +9,5 @@ import { AltReportNodesStateService } from '../../services/alt-report-nodes-stat
   styleUrl: './alt-report-node-search.component.scss',
 })
 export class AltReportNodeSearchComponent {
-  protected _state = inject(AltReportNodesStateService);
+  protected _state = inject(AltReportNodesSummaryStateService);
 }

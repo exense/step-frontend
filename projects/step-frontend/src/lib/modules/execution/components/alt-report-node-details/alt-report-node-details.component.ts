@@ -15,7 +15,6 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
 import { AltReportNodeDetailsDirective } from '../../directives/alt-report-node-details.directive';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 @Component({
@@ -62,6 +61,7 @@ export class AltReportNodeDetailsComponent {
   });
 
   readonly opernIterations = output<OpenIterationsEvent>();
+  readonly openDetails = output<ReportNode>();
 
   private children$ = toObservable(this.reportNode).pipe(
     switchMap((node) => {
@@ -123,6 +123,11 @@ export class AltReportNodeDetailsComponent {
     }
 
     return !result.length ? undefined : result;
+  });
+
+  protected readonly isTestCase = computed(() => {
+    const artefactClass = this.artefactClass();
+    return artefactClass === 'TestCase';
   });
 
   protected readonly detailsComponent = computed(() => {

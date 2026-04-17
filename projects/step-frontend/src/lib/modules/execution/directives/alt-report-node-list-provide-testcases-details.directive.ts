@@ -1,15 +1,16 @@
 import { Directive } from '@angular/core';
 import { AltReportNodesSummaryStateService } from '../services/alt-report-nodes-summary-state.service';
-import { AltTestCasesNodesStateService } from '../services/alt-test-cases-nodes-state.service';
 import { AltReportNodesFilterService } from '../services/alt-report-nodes-filter.service';
 import { AltReportNodesStateService } from '../services/alt-report-nodes-state.service';
+import { AltTestCasesDetailsNodesStateService } from '../services/alt-test-cases-details-nodes-state.service';
 
 @Directive({
-  selector: '[stepAltReportNodeListProvideTestcases]',
+  selector: '[stepAltReportNodeListProvideTestcasesDetails]',
   providers: [
+    AltTestCasesDetailsNodesStateService,
     {
       provide: AltReportNodesSummaryStateService,
-      useExisting: AltTestCasesNodesStateService,
+      useExisting: AltTestCasesDetailsNodesStateService,
     },
     {
       provide: AltReportNodesStateService,
@@ -21,4 +22,4 @@ import { AltReportNodesStateService } from '../services/alt-report-nodes-state.s
     },
   ],
 })
-export class AltReportNodeListProvideTestcasesDirective {}
+export class AltReportNodeListProvideTestcasesDetailsDirective {}

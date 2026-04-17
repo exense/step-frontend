@@ -51,6 +51,22 @@
       </section>
     }
   </div>
+  @if (isTestCase()) {
+    @if (node?.artefactID; as artefactID) {
+      <step-alt-report-node-details-testcases-steps
+        class="execution-report-node-details"
+        [testCaseId]="artefactID"
+        (openDetails)="openDetails.emit($event)"
+      >
+        <div class="data-container">
+          <div class="container-title">
+            <step-icon name="list" />
+            <span>Test Case Steps</span>
+          </div>
+        </div>
+      </step-alt-report-node-details-testcases-steps>
+    }
+  }
   <div class="tree-container execution-report-node-details" stepElementSize>
     <div class="data-container">
       <div class="container-title">

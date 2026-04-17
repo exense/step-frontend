@@ -6,6 +6,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   output,
   signal,
   untracked,
@@ -48,6 +49,8 @@ export class StackViewComponent {
   constructor() {
     afterNextRender(() => this.isRendered.set(true));
   }
+
+  readonly withOverflow = input(false);
 
   private readonly isMaximizedInternal = signal(false);
   private readonly isRendered = signal(false);

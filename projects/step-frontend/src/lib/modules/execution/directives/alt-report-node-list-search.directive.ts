@@ -1,5 +1,4 @@
 import { Directive, inject } from '@angular/core';
-import { AltReportNodesStateService } from '../services/alt-report-nodes-state.service';
 import {
   ArtefactClass,
   DateRange,
@@ -12,6 +11,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { combineLatest, map, tap } from 'rxjs';
 import { ReportNodeType } from '../../report-nodes/shared/report-node-type.enum';
+import { AltReportNodesStateService } from '../services/alt-report-nodes-state.service';
+import { AltExecutionStateService } from '../services/alt-execution-state.service';
 
 const ARTEFACT_REPORT_NODE_MAP: Record<string, string> = {
   [ArtefactClass.KEYWORD]: ReportNodeType.CALL_FUNCTION_REPORT_NODE,
@@ -30,6 +31,7 @@ export class AltReportNodeListSearchDirective {
   private _state = inject(AltReportNodesStateService);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dateUtils = inject(DateUtilsService);
+  private _executionState = inject(AltExecutionStateService);
 
   private initialDateRangeLoadPending = true;
 
@@ -53,7 +55,9 @@ export class AltReportNodeListSearchDirective {
     takeUntilDestroyed(),
   );
 
-  readonly searchDateRange$ = combineLatest([this._state.dateRange$, this.isRemoteDataSource$]).pipe(
+  readonly dateRange$ = this._executionState.timeRange$;
+
+  readonly searchDateRange$ = combineLatest([this.dateRange$, this.isRemoteDataSource$]).pipe(
     map(([range, isRemote]) => {
       let searchValue: string | FilterCondition<unknown>;
       if (isRemote) {

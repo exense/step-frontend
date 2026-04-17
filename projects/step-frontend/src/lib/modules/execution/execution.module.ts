@@ -26,7 +26,6 @@ import {
   TreeNodeUtilsService,
   ViewRegistryService,
   DialogParentService,
-  TreeStateService,
   sequenceCanActivateGuards,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
@@ -111,8 +110,6 @@ import {
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
-// todo to remove
-// import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
@@ -179,7 +176,6 @@ import { CalcElementWidthDirective } from './directives/calc-element-width.direc
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
-import { AltExecutionNodesHelperService } from './services/alt-execution-nodes-helper.service';
 import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
 import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
 import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
@@ -192,6 +188,7 @@ import { DrilldownRootType } from './shared/drilldown-root-type';
 import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
 import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
 import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
+import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
 
 @NgModule({
   declarations: [
@@ -245,6 +242,7 @@ import { AltIterationListTitleComponent } from './components/alt-iteration-list-
     AltReportNodeKeywordsComponent,
     AltReportNodeKeywordsWidgetComponent,
     AltReportNodeTestcasesComponent,
+    AltReportNodeDetailsTestcasesStepsComponent,
     AltReportNodeTestcasesWidgetComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
@@ -265,8 +263,6 @@ import { AltIterationListTitleComponent } from './components/alt-iteration-list-
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
-    // todo to remove
-    // AggregatedTreeNodeDialogComponent,
     ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
@@ -837,61 +833,6 @@ export class ExecutionModule {
                 },
               ],
             },
-            /*
-            //todo for removal
-            {
-              path: 'node-details',
-              outlet: 'nodeDetails',
-              component: SimpleOutletComponent,
-              children: [
-                dialogRoute(
-                  {
-                    path: ':detailsId',
-                    resolve: {
-                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
-                      },
-                      resolvedPartialPath: () =>
-                        inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
-                      reportNodeId: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                      },
-                      searchStatus: (route: ActivatedRouteSnapshot) => {
-                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                        return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
-                      },
-                      searchStatusCount: (route: ActivatedRouteSnapshot) => {
-                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                        const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
-                        const statusCount = parseInt(statusCountStr);
-                        return isNaN(statusCount) ? undefined : statusCount;
-                      },
-                    },
-                    dialogComponent: AggregatedTreeNodeDialogComponent,
-                    children: [
-                      dialogRoute({
-                        path: 'plan-node',
-                        dialogComponent: PlanNodeDetailsDialogComponent,
-                      }),
-                    ],
-                  },
-                  {
-                    hasBackdrop: false,
-                    height: '100%',
-                    width: '40%',
-                    panelClass: 'side-dialog',
-                    position: {
-                      right: '0',
-                      top: '0',
-                      bottom: '0',
-                    },
-                  },
-                ),
-              ],
-            },
-*/
             {
               path: 'viz',
               redirectTo: 'analytics',
