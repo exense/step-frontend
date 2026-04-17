@@ -55,6 +55,7 @@ interface GridItem {
     '[class.is-resize]': 'isResize()',
     '[class.edit-mode]': '_gridEditable.editMode()',
     '[class.hidden]': '!isInitialised()',
+    '[class.first-row-auto-height]': 'applyAutoHeight()',
     '[style.--style__cols-count]': '_colCount',
   },
   hostDirectives: [GridDimensionsDirective],
@@ -95,6 +96,31 @@ export class GridLayoutComponent implements AfterViewInit {
   );
 
   private readonly gridTemplateItems = toSignal(this.gridTemplateItems$, { initialValue: [] });
+
+  private readonly autoHeightWidgetTypes = computed(() => {
+    const gridTemplateItems = this.gridTemplateItems();
+
+    return gridTemplateItems.reduce((res, item) => {
+      if (item.autoHeightOnFirstRow) {
+        res.add(item.widgetType);
+      }
+      return res;
+    }, new Set<string>());
+  });
+
+  protected readonly applyAutoHeight = computed(() => {
+    const autoHeightWidgetTypes = this.autoHeightWidgetTypes();
+    const widgetPositions = Object.values(this._widgetPositions.positions());
+    const firstFullWidthPosition = widgetPositions.find(
+      (position) =>
+        position.row === 1 &&
+        position.heightInCells === 1 &&
+        position.column === 1 &&
+        position.widthInCells === this._colCount,
+    );
+    return !!firstFullWidthPosition && autoHeightWidgetTypes.has(firstFullWidthPosition.widgetType);
+  });
+
   protected readonly gridItems = computed(() => {
     const gridTemplateItems = this.gridTemplateItems();
     const templateDictionary = gridTemplateItems.reduce(
@@ -104,9 +130,9 @@ export class GridLayoutComponent implements AfterViewInit {
       },
       {} as Record<string, TemplateRef<any>>,
     );
-    const widgetPositons = Object.values(this._widgetPositions.positions());
+    const widgetPositions = Object.values(this._widgetPositions.positions());
 
-    const gridItems = widgetPositons.map((position) => {
+    const gridItems = widgetPositions.map((position) => {
       const widgetId = position.id;
       const widgetType = position.widgetType;
       const templateRef = templateDictionary[widgetType];
