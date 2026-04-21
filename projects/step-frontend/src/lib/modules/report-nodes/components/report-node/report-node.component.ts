@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, effect, inject, input, model } from '@angular/core';
 import { ControllerService, DialogsService, ReportNode, CommonEntitiesUrlsService } from '@exense/step-core';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
@@ -10,16 +10,15 @@ import { Router } from '@angular/router';
   styleUrls: ['./report-node.component.scss'],
   standalone: false,
 })
-export class ReportNodeComponent implements OnChanges {
+export class ReportNodeComponent {
   private _api = inject(ControllerService);
   private _dialogs = inject(DialogsService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
-  @Input() reportNodeId?: string;
+  readonly reportNodeId = input<string | undefined>(undefined);
 
-  @Input() showArtefact: boolean = false;
-  @Output() showArtefactChange = new EventEmitter<boolean>();
+  readonly showArtefact = model(false);
 
   readonly ReportNodeType = ReportNodeType;
 
@@ -28,16 +27,12 @@ export class ReportNodeComponent implements OnChanges {
 
   hideSource: boolean = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cReportNodeId = changes['reportNodeId'];
-    if (cReportNodeId?.previousValue !== cReportNodeId?.currentValue || cReportNodeId?.firstChange) {
-      this.loadReportNode(cReportNodeId?.currentValue);
-    }
-  }
+  private readonly effectLoadReportNode = effect(() => {
+    this.loadReportNode(this.reportNodeId());
+  });
 
   toggleShowArtefact(): void {
-    this.showArtefact = !this.showArtefact;
-    this.showArtefactChange.emit(this.showArtefact);
+    this.showArtefact.update((value) => !value);
   }
 
   openPlan(): void {
@@ -67,18 +62,24 @@ export class ReportNodeComponent implements OnChanges {
   }
 
   private loadReportNode(id?: string): void {
+    this.node = undefined;
+    this.children = [];
+
     if (!id) {
-      this.node = undefined;
-      this.children = [];
       return;
     }
 
     forkJoin({
       node: this._api.getReportNode(id),
       children: this._api.getReportNodeChildren(id),
-    }).subscribe(({ node, children }) => {
-      this.node = node;
-      this.children = children.filter((child) => child.resolvedArtefact !== null);
-    });
+    })
+      .pipe(catchError(() => of({ node: undefined, children: [] as ReportNode[] })))
+      .subscribe(({ node, children }) => {
+        if (!node) {
+          return;
+        }
+        this.node = node;
+        this.children = children.filter((child) => child.resolvedArtefact !== null);
+      });
   }
 }

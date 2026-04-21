@@ -9,7 +9,7 @@ import { DOCUMENT } from '@angular/common';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltReportNodeDetailsStateService } from '../../services/alt-report-node-details-state.service';
-import { filter, map, of, switchMap, tap } from 'rxjs';
+import { catchError, filter, map, of, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-node-history.component';
@@ -98,6 +98,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
         tap((node) => {
           this.lastReportNode = node;
         }),
+        catchError(() => of(undefined)),
       );
     }),
   );
