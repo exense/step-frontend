@@ -1,6 +1,7 @@
-import { Component, effect, inject, input, model } from '@angular/core';
+import { Component, inject, input, model } from '@angular/core';
 import { ControllerService, DialogsService, ReportNode, CommonEntitiesUrlsService } from '@exense/step-core';
-import { catchError, forkJoin, of, switchMap } from 'rxjs';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { Router } from '@angular/router';
 
@@ -27,8 +28,31 @@ export class ReportNodeComponent {
 
   hideSource: boolean = false;
 
-  private readonly effectLoadReportNode = effect(() => {
-    this.loadReportNode(this.reportNodeId());
+  private readonly loadReportNode$ = toObservable(this.reportNodeId).pipe(
+    map((id) => {
+      this.node = undefined;
+      this.children = [];
+      return id;
+    }),
+    switchMap((id) => {
+      if (!id) {
+        return of({ node: undefined, children: [] as ReportNode[] });
+      }
+
+      return forkJoin({
+        node: this._api.getReportNode(id),
+        children: this._api.getReportNodeChildren(id),
+      }).pipe(catchError(() => of({ node: undefined, children: [] as ReportNode[] })));
+    }),
+    takeUntilDestroyed(),
+  );
+
+  private readonly loadReportNodeSubscription = this.loadReportNode$.subscribe(({ node, children }) => {
+    if (!node) {
+      return;
+    }
+    this.node = node;
+    this.children = children.filter((child) => child.resolvedArtefact !== null);
   });
 
   toggleShowArtefact(): void {
@@ -59,27 +83,5 @@ export class ReportNodeComponent {
         }),
       )
       .subscribe();
-  }
-
-  private loadReportNode(id?: string): void {
-    this.node = undefined;
-    this.children = [];
-
-    if (!id) {
-      return;
-    }
-
-    forkJoin({
-      node: this._api.getReportNode(id),
-      children: this._api.getReportNodeChildren(id),
-    })
-      .pipe(catchError(() => of({ node: undefined, children: [] as ReportNode[] })))
-      .subscribe(({ node, children }) => {
-        if (!node) {
-          return;
-        }
-        this.node = node;
-        this.children = children.filter((child) => child.resolvedArtefact !== null);
-      });
   }
 }
