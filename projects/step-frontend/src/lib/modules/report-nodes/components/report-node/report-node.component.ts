@@ -1,7 +1,7 @@
 import { Component, inject, input, model } from '@angular/core';
 import { ControllerService, DialogsService, ReportNode, CommonEntitiesUrlsService } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { Router } from '@angular/router';
 
@@ -29,10 +29,9 @@ export class ReportNodeComponent {
   hideSource: boolean = false;
 
   private readonly loadReportNode$ = toObservable(this.reportNodeId).pipe(
-    map((id) => {
+    tap(() => {
       this.node = undefined;
       this.children = [];
-      return id;
     }),
     switchMap((id) => {
       if (!id) {
