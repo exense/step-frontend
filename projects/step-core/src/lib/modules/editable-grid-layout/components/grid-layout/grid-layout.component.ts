@@ -111,14 +111,14 @@ export class GridLayoutComponent implements AfterViewInit {
   protected readonly applyAutoHeight = computed(() => {
     const autoHeightWidgetTypes = this.autoHeightWidgetTypes();
     const widgetPositions = Object.values(this._widgetPositions.positions());
-    const firstFullWidthPosition = widgetPositions.find(
+    return widgetPositions.some(
       (position) =>
         position.row === 1 &&
         position.heightInCells === 1 &&
         position.column === 1 &&
-        position.widthInCells === this._colCount,
+        position.widthInCells === this._colCount &&
+        autoHeightWidgetTypes.has(position.widgetType),
     );
-    return !!firstFullWidthPosition && autoHeightWidgetTypes.has(firstFullWidthPosition.widgetType);
   });
 
   protected readonly gridItems = computed(() => {
