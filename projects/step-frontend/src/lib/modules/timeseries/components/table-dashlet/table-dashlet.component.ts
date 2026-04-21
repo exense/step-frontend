@@ -314,13 +314,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
+      metricType: this.item().metricKey,
       groupDimensions: this.getGroupDimensions(context),
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
     };
     return this._timeSeriesService
-      .getMeasurements(request)
+      .fetchBucketsWithFallback(request)
       .pipe(map((response) => this.processResponse(response, context)));
   }
 

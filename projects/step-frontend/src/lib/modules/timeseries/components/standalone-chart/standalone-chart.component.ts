@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, effect, inject, input, untracked, viewChild } from '@angular/core';
 import {
   FilterBarItem,
   FilterBarItemType,
@@ -16,7 +16,7 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Axis } from 'uplot';
 import { StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
@@ -29,52 +29,58 @@ declare const uPlot: any;
   styleUrls: ['./standalone-chart.component.scss'],
   imports: [TimeSeriesChartComponent],
 })
-export class StandaloneChartComponent implements OnChanges {
+export class StandaloneChartComponent {
   private readonly barsFunction = uPlot.paths.bars;
-  @ViewChild('chart') chart!: TimeSeriesChartComponent;
+  private readonly chart = viewChild<TimeSeriesChartComponent>('chart');
 
-  @Input({ required: true }) metricKey!: string;
-  @Input({ required: true }) timeRange!: TimeRange;
-  @Input({ transform: (value: FilterBarItem[] | undefined | null) => value || [] }) filters: FilterBarItem[] = [];
-  @Input({ transform: (value: ChartAggregation | undefined | null) => value || ChartAggregation.AVG })
-  aggregation: ChartAggregation = ChartAggregation.AVG;
-  @Input({ transform: (value: number | undefined | null) => value || 90 }) pclValue: number = 90; // used only when aggregation is PERCENTILE
-  @Input({ transform: (value: string[] | undefined | null) => value || [] }) grouping: string[] = [];
-  @Input({ transform: (value: StandaloneChartConfig | undefined | null) => value || {} })
-  config: StandaloneChartConfig = {};
-  @Input({ transform: (value: TimeseriesColorsPool | undefined | null) => value || new TimeseriesColorsPool() })
-  colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
+  readonly metricKey = input.required<string>();
+  readonly timeRange = input.required<TimeRange>();
+  readonly filters = input<FilterBarItem[]>([]);
+  readonly aggregation = input<ChartAggregation>(ChartAggregation.AVG);
+  readonly pclValue = input<number>(90);
+  readonly grouping = input<string[]>([]);
+  readonly config = input<StandaloneChartConfig>({});
+  readonly colorsPool = input<TimeseriesColorsPool>(new TimeseriesColorsPool());
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>();
 
-  private _timeSeriesService = inject(TimeSeriesService);
-  private _uPlotUtils = inject(UPlotUtilsService);
+  private readonly _timeSeriesService = inject(TimeSeriesService);
+  private readonly _uPlotUtils = inject(UPlotUtilsService);
 
-  chartSettings?: TSChartSettings;
+  protected chartSettings?: TSChartSettings;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.fetchDataAndCreateChart(this.timeRange).subscribe();
-  }
+  private readonly _fetchEffect = effect(() => {
+    const timeRange = this.timeRange();
+    this.metricKey();
+    this.filters();
+    this.aggregation();
+    this.pclValue();
+    this.grouping();
+    this.config();
+    this.colorsPool();
+    untracked(() => this.fetchDataAndCreateChart(timeRange).subscribe());
+  });
 
-  private fetchDataAndCreateChart(range: TimeRange) {
+  private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
     if (range.from >= range.to) {
       throw new Error(`Invalid time range ${JSON.stringify(range)}`);
     }
-    const groupDimensions = this.grouping;
+    const groupDimensions = this.grouping();
     const request: FetchBucketsRequest = {
       start: range.from,
       end: range.to,
+      metricType: this.metricKey(),
       oqlFilter: this.composeRequestFilter(),
       groupDimensions: groupDimensions,
-      percentiles: this.getRequiredPercentiles(this.aggregation),
+      percentiles: this.getRequiredPercentiles(this.aggregation()),
     };
-    if (this.config.resolution) {
-      request.intervalSize = this.config.resolution;
+    if (this.config().resolution) {
+      request.intervalSize = this.config().resolution;
     } else {
       request.numberOfBuckets = 100;
     }
-    return this._timeSeriesService.getMeasurements(request).pipe(
+    return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
       tap((response) => {
         this.createChart(response);
       }),
@@ -83,34 +89,34 @@ export class StandaloneChartComponent implements OnChanges {
 
   private createChart(response: TimeSeriesAPIResponse): void {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const primaryAggregation = this.aggregation;
-    const hasZAxes = this.config.showZAxes;
+    const primaryAggregation = this.aggregation();
+    const hasZAxes = this.config().showZAxes;
     const zAxesAggregation = ChartAggregation.RATE;
     const zAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
-      const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
-      let labelItems = this.grouping.map((field) => response.matrixKeys[i]?.[field]);
-      if (this.grouping.length === 0) {
-        labelItems = [this.metricKey];
+      const metadata: any[] = [];
+      let labelItems = this.grouping().map((field) => response.matrixKeys[i]?.[field]);
+      if (this.grouping().length === 0) {
+        labelItems = [this.metricKey()];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const color = this.colorsPool.getSeriesColor(seriesKey).color;
+      const color = this.colorsPool().getSeriesColor(seriesKey).color;
 
       const seriesData: (number | undefined | null)[] = [];
       seriesBuckets.forEach((b, i) => {
         if (hasZAxes) {
-          const bucketValue = this.getBucketValue(b, zAxesAggregation);
+          const bucketValue = this.getBucketValue(b, zAxesAggregation, response.interval);
           if (zAxesData[i] == undefined) {
             zAxesData[i] = bucketValue;
           } else if (bucketValue) {
             zAxesData[i]! += bucketValue;
           }
         }
-        seriesData[i] = this.getBucketValue(b, primaryAggregation!);
+        seriesData[i] = this.getBucketValue(b, primaryAggregation!, response.interval);
       });
       const s: TSChartSeries = {
         id: seriesKey,
-        pxAlign: 1, // when not 0, the 0 values will be not visible on the chart when all axes are hidden
+        pxAlign: 1,
         min: 50,
         scale: 'y',
         labelItems: labelItems,
@@ -122,12 +128,12 @@ export class StandaloneChartComponent implements OnChanges {
         points: { show: false },
         show: true,
       };
-      if (this.config.colorizationType === 'FILL') {
+      if (this.config().colorizationType === 'FILL') {
         s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
       }
       return s;
     });
-    const primaryUnit = this.config.primaryAxesUnit;
+    const primaryUnit = this.config().primaryAxesUnit;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
 
     const axes: Axis[] = [
@@ -137,7 +143,7 @@ export class StandaloneChartComponent implements OnChanges {
         values: (u, vals) => {
           return vals.map((v: any) => TimeSeriesUtils.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
         },
-        show: this.config.showYAxes ?? true,
+        show: this.config().showYAxes ?? true,
       },
     ];
     if (hasZAxes) {
@@ -163,20 +169,20 @@ export class StandaloneChartComponent implements OnChanges {
     }
 
     this.chartSettings = {
-      title: this.config.title || '',
+      title: this.config().title || '',
       xAxesSettings: {
         values: xLabels,
-        show: this.config.showTimeAxes,
+        show: this.config().showTimeAxes,
       },
       series: series,
       tooltipOptions: {
-        enabled: this.config.showTooltip ?? true,
-        zAxisLabel: this.config.tooltipYAxesUnit,
+        enabled: this.config().showTooltip ?? true,
+        zAxisLabel: this.config().tooltipYAxesUnit,
         yAxisUnit: yAxesUnit,
       },
-      zoomEnabled: this.config.zoomEnabled,
-      showLegend: this.config.showLegend,
-      showCursor: this.config.showCursor,
+      zoomEnabled: this.config().zoomEnabled,
+      showLegend: this.config().showLegend,
+      showCursor: this.config().showCursor,
       axes: axes,
       truncated: response.truncated,
     };
@@ -184,12 +190,16 @@ export class StandaloneChartComponent implements OnChanges {
 
   private mergeLabelItems(items: (string | undefined)[]): string {
     if (items.length === 0) {
-      return this.metricKey;
+      return this.metricKey();
     }
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: ChartAggregation): number | undefined | null {
+  private getBucketValue(
+    b: BucketResponse,
+    aggregation: ChartAggregation,
+    bucketIntervalMs: number,
+  ): number | undefined | null {
     if (!b) {
       return 0;
     }
@@ -205,11 +215,14 @@ export class StandaloneChartComponent implements OnChanges {
       case 'COUNT':
         return b.count;
       case 'RATE':
+        if (this.metricKey() === 'counter') {
+          return b.sum / (bucketIntervalMs / 3_600_000);
+        }
         return b.throughputPerHour;
       case 'MEDIAN':
         return b.pclValues?.[50];
       case 'PERCENTILE':
-        return b.pclValues?.[this.pclValue];
+        return b.pclValues?.[this.pclValue()];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
@@ -240,12 +253,12 @@ export class StandaloneChartComponent implements OnChanges {
     return percentilesToRequest;
   }
 
-  handleZoomReset() {
+  protected handleZoomReset(): void {
     this.zoomReset.emit();
-    this.fetchDataAndCreateChart(this.timeRange).subscribe();
+    this.fetchDataAndCreateChart(this.timeRange()).subscribe();
   }
 
-  handleZoomChange(range: TimeRange) {
+  protected handleZoomChange(range: TimeRange): void {
     this.zoomChange.emit(range);
     this.fetchDataAndCreateChart(range).subscribe();
   }
@@ -255,10 +268,10 @@ export class StandaloneChartComponent implements OnChanges {
       attributeName: 'metricType',
       type: FilterBarItemType.FREE_TEXT,
       exactMatch: true,
-      freeTextValues: [`"${this.metricKey}"`],
+      freeTextValues: [`"${this.metricKey()}"`],
       searchEntities: [],
     };
-    const filters: FilterBarItem[] = [metricFilterItem, ...this.filters];
+    const filters: FilterBarItem[] = [metricFilterItem, ...this.filters()];
     return FilterUtils.filtersToOQL(filters, 'attributes');
   }
 }

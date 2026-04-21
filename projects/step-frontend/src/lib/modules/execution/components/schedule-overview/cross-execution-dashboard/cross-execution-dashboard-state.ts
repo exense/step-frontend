@@ -158,7 +158,7 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: ['result'],
       };
-      return this._timeSeriesService.getTimeSeries(request);
+      return this._timeSeriesService.fetchBuckets(request);
     }),
   );
 
@@ -192,7 +192,7 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
-      return this._timeSeriesService.getTimeSeries(request).pipe(
+      return this._timeSeriesService.fetchBuckets(request).pipe(
         map((response) => {
           const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
           const responseTimeData: (number | undefined | null)[] = [];

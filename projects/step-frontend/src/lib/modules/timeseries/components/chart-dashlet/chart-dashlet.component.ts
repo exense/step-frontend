@@ -346,7 +346,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
           metadata.push(b?.attributes);
           if (hasSecondaryAxes) {
-            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation!);
+            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
             if (secondaryAxesData[j] == undefined) {
               secondaryAxesData[j] = bucketValue;
             } else if (bucketValue) {
@@ -357,7 +357,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       }
       const seriesData: (number | undefined | null)[] = [];
       seriesBuckets.forEach((b, i) => {
-        let value = this.getBucketValue(b, primaryAggregation!);
+        let value = this.getBucketValue(b, primaryAggregation!, response.interval);
         if (value === undefined && !removeChartGaps) {
           value = 0;
         }
@@ -457,7 +457,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         oqlFilter: request.oqlFilter,
         params: selectedBucketAttributes,
       };
-      return this._timeSeriesService.getTimeSeries(isolateRequest).pipe(
+      return this._timeSeriesService.fetchBuckets(isolateRequest).pipe(
         map((response) => {
           return response.matrixKeys.map((attributes) => attributes['eId']);
         }),
@@ -559,6 +559,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const request: FetchBucketsRequest = {
       start: start,
       end: end,
+      metricType: this.item().metricKey,
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
@@ -574,7 +575,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
       request.collectAttributesValuesLimit = 10;
     }
-    return this._timeSeriesService.getMeasurements(request).pipe(
+    return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
       tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.collectionResolutionUsed = response.collectionResolution;
@@ -704,7 +705,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return percentilesToRequest;
   }
 
-  private getBucketValue(b: BucketResponse, aggregation: MetricAggregation): number | undefined | null {
+  private getBucketValue(
+    b: BucketResponse,
+    aggregation: MetricAggregation,
+    bucketIntervalMs: number,
+  ): number | undefined | null {
     if (!b) {
       return undefined;
     }
@@ -720,6 +725,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'COUNT':
         return b.count;
       case 'RATE':
+        if (this.item().metricKey === 'counter') {
+          return b.sum / (bucketIntervalMs / 3_600_000) / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
+        }
         return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
       case 'MEDIAN':
         return b.pclValues?.['50.0'];

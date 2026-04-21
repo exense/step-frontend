@@ -78,7 +78,7 @@
         <ng-container matColumnDef="data">
           <th mat-header-cell *matHeaderCellDef>Custom data</th>
           <td mat-cell *matCellDef="let measure">
-            @for (item of measure.data; track item.key) {
+            @for (item of measure.data | keyvalue; track item.key) {
               <span> {{ item.key }}={{ item.value }} </span>
             }
           </td>
@@ -95,11 +95,11 @@
     </div>
   </section>
 }
-@if (metricSamplesDataSource(); as metricSamplesDataSource) {
+@if (hasMetricSamples() && metricSamplesDataSource(); as metricSamplesDataSource) {
   <section class="data-container">
     <div class="container-title">
       <step-icon name="activity" />
-      Metric Samples
+      Metrics
     </div>
     <div>
       <step-table [dataSource]="metricSamplesDataSource" matSort>
