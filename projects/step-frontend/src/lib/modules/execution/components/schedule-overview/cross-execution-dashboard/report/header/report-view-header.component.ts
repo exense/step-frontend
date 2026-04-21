@@ -12,13 +12,13 @@ import { BucketResponse } from '@exense/step-core';
   standalone: false,
 })
 export class ReportViewHeaderComponent {
-  readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _state = inject(CrossExecutionDashboardState);
 
-  displayLoadingOnProgress = computed(() => {
+  protected readonly displayLoadingOnProgress = computed(() => {
     return this._state.lastRefreshTrigger() === 'manual';
   });
 
-  successRateValue$: Observable<string> = this._state.summaryData$.pipe(
+  protected successRateValue$: Observable<string> = this._state.summaryData$.pipe(
     map((summaryData: ReportNodeSummary) => {
       const passed = summaryData.items['PASSED'] || 0;
       if (summaryData.total === 0) {

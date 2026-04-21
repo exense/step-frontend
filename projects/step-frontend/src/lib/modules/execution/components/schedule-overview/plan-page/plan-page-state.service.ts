@@ -11,7 +11,7 @@ import { PLAN_ID } from '../../../services/plan-id.token';
 @Injectable()
 export class PlanPageStateService extends CrossExecutionDashboardState {
   readonly _planIdFn = inject(PLAN_ID);
-  viewType: Signal<CrossExecutionViewType> = signal('plan');
+  readonly viewType: Signal<CrossExecutionViewType> = signal('plan');
 
   readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._planIdFn() };
 

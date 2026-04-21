@@ -140,6 +140,13 @@ export class CommonEntitiesUrlsService {
     return `/plans/${id}/report`;
   }
 
+  crossExecutionRepositoryPageUrl(executionId: string): string {
+    if (!executionId) {
+      return '';
+    }
+    return `/repository/${executionId}/report`;
+  }
+
   executionList(): string {
     return '/executions/list';
   }

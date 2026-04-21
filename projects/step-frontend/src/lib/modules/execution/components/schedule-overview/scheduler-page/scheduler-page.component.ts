@@ -44,17 +44,17 @@ interface EntityWithKeywordsStats {
   ],
 })
 export class SchedulerPageComponent implements OnInit {
-  state = inject(CrossExecutionDashboardState);
-  readonly _taskIdFn = inject(SCHEDULE_ID);
-  private _schedulerService = inject(AugmentedSchedulerService);
+  private readonly _state = inject(CrossExecutionDashboardState);
+  private readonly _taskIdFn = inject(SCHEDULE_ID);
+  private readonly _schedulerService = inject(AugmentedSchedulerService);
 
   ngOnInit(): void {
     this._schedulerService.getExecutionTaskById(this._taskIdFn()).subscribe((task) => {
       if (task === undefined) {
         // the task was not found
-        this.state.task.set(null);
+        this._state.task.set(null);
       } else {
-        this.state.task.set(task);
+        this._state.task.set(task);
       }
     });
   }

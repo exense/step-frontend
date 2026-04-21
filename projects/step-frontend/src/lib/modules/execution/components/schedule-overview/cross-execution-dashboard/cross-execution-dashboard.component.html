@@ -7,6 +7,15 @@
       @if (_state.plan(); as plan) {
         <entity-icon entityName="plans" [entity]="plan"></entity-icon>
       }
+      @if (_state.execution(); as execution) {
+        <div>{{ execution | executionName }}</div>
+        @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
+          @if (repositoryParams.repositoryID !== 'local') {
+            <step-alt-execution-repository [repositoryParams]="repositoryParams" />
+          }
+        }
+        <step-alt-execution-repository-link [execution]="execution" />
+      }
 
       <div>{{ viewTitle() }}</div>
       @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {

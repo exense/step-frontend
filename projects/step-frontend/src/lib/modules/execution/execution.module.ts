@@ -186,6 +186,7 @@ import {
 import {
   StatusDistributionBadgeComponent
 } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
 
 @NgModule({
   declarations: [
@@ -279,6 +280,7 @@ import {
     SchedulerReportViewComponent,
     CrossExecutionDashboardComponent,
     SchedulerPageComponent,
+    RepositoryPageComponent,
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
@@ -526,6 +528,24 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'plans/:id/report',
       component: PlanPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
+      ],
+    });
+    this._viewRegistry.registerRoute({
+      path: 'repository/:id/report',
+      component: RepositoryPageComponent,
       children: [
         {
           path: '',

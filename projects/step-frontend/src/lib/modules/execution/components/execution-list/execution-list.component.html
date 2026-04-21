@@ -180,7 +180,7 @@
             mat-icon-button
             matTooltip="Open plan report"
             [disabled]="!('plan-read' | hasRight | async)"
-            [routerLink]="(element.importResult?.canonicalPlanName || element.planId) | crossExecutionPlanUrl"
+            [routerLink]="element.executionParameters?.repositoryObject && element.executionParameters?.repositoryObject?.repositoryID !== 'local' ? (element.id | crossExecutionRepositoryUrl) : (element.planId | crossExecutionPlanUrl)"
           >
             <step-icon name="file-07" />
           </a>

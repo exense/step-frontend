@@ -25,6 +25,17 @@ export class CrossExecutionDashboardComponent implements OnInit {
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
   protected readonly viewTitle = computed(() => {
+    switch (this._state.viewType()) {
+      case 'task':
+        let task = this._state.task();
+        break;
+      case 'plan':
+        const plan = this._state.plan();
+        break;
+      case 'repository':
+        const execution = this._state.execution();
+        break;
+    }
     const isTask = this._state.viewType() === 'task';
     let entity = isTask ? this._state.task() : this._state.plan();
     if (entity === undefined) {

@@ -52,7 +52,7 @@ interface EntityWithKeywordsStats {
 
 type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: Execution[] };
 
-export type CrossExecutionViewType = 'task' | 'plan';
+export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 
 export abstract class CrossExecutionDashboardState {
   public LAST_EXECUTIONS_TO_DISPLAY = 30;
@@ -62,8 +62,9 @@ export abstract class CrossExecutionDashboardState {
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
-  readonly plan = signal<Plan | null | undefined>(undefined);
+  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined); // set directly from the main component
+  readonly plan = signal<Plan | null | undefined>(undefined); // set directly from the main component
+  readonly execution = signal<Execution | null | undefined>(undefined); // used for repostiories. set directly from the main component
   readonly lastRefreshTrigger = signal<'manual' | 'auto'>('manual');
   readonly onRefreshTriggered = new Subject<TimeRange>();
   readonly onTimeSelectionChanged = new Subject<TimeRange>();
@@ -483,9 +484,9 @@ export abstract class CrossExecutionDashboardState {
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
     let entityParams = undefined;
     if (this.getViewType() === 'plan') {
-      entityParams = {planId: this.getEntityId()};
+      entityParams = { planId: this.getEntityId() };
     } else {
-      entityParams = {taskId: this.getEntityId()};
+      entityParams = { taskId: this.getEntityId() };
     }
     this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
