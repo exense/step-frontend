@@ -19,6 +19,7 @@
       <step-alt-execution-time
         [startTime]="reportNode.executionTime"
         [duration]="reportNode.duration"
+        [isRunning]="reportNode.status === 'RUNNING'"
         [timeOnly]="true"
       />
       <div class="btn-show-details-container">
