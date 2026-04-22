@@ -8,6 +8,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  output,
   Output,
   signal,
   SimpleChanges,
@@ -104,6 +105,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
+  readonly emptyStateChange = output<boolean>();
 
   readonly isLoading = signal<boolean>(true);
 
@@ -330,6 +332,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       tap((response) => {
         this.baseBuckets = response.buckets;
         this.truncated = response.truncated;
+        this.emptyStateChange.emit(response.buckets.length === 0);
       }),
     );
   }

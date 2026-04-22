@@ -120,6 +120,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+  readonly emptyStateChange = output<boolean>();
 
   readonly isLoading = signal<boolean>(false);
 
@@ -584,6 +585,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
         this.cachedRequest = request;
+        this.emptyStateChange.emit(response.matrix.length === 0);
       }),
       switchMap((response) => this.createChartSettings(response, request)),
     );
