@@ -10,6 +10,7 @@ import {
   output,
   signal,
   SimpleChanges,
+  untracked,
   viewChild,
 } from '@angular/core';
 import {
@@ -141,9 +142,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly itemChangeEffect = effect(() => {
     const item = this.item();
     if (this.firstEffectTriggered) {
-      this.prepareState(item);
-      this.refresh(true).subscribe(() => {
-        this._cd.markForCheck();
+      untracked(() => {
+        this.prepareState(item);
+        this.refresh(true).subscribe(() => {
+          this._cd.markForCheck();
+        });
       });
     }
     this.firstEffectTriggered = true;
