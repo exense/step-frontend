@@ -51,7 +51,7 @@
                   displayFormat="time"
                   [preserveDurationSpace]="true"
                   [startTime]="element.executionTime"
-                  [duration]="element.duration"
+                  [duration]="element | reportNodeDuration"
                   [isRunning]="element.status === 'RUNNING'"
                   [singleUnit]="true"
                 />

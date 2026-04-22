@@ -27,6 +27,10 @@ step-alt-execution-time {
       &.duration {
         flex: 1;
         text-align: center;
+
+        &.running {
+          color: map.get(var.$statuses, 'RUNNING');
+        }
       }
     }
   }
