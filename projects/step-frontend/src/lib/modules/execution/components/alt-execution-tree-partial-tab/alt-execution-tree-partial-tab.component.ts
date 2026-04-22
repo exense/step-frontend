@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { AugmentedControllerService, ElementSizeDirective } from '@exense/step-core';
 import { ActivatedRoute } from '@angular/router';
-import { filter, map, shareReplay, switchMap } from 'rxjs';
+import { catchError, filter, map, of, shareReplay, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 
@@ -24,12 +24,13 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
   );
 
   protected readonly reportNode$ = this.reportNodeId$.pipe(
-    switchMap((nodeId) => this._controllerService.getReportNode(nodeId)),
+    switchMap((nodeId) => this._controllerService.getReportNode(nodeId).pipe(catchError(() => of(undefined)))),
+    filter((reportNode): reportNode is NonNullable<typeof reportNode> => !!reportNode),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
-  protected showSpinner = signal(false);
+  protected readonly showSpinner = signal(false);
 
   ngOnInit(): void {
     this.initializeTab();

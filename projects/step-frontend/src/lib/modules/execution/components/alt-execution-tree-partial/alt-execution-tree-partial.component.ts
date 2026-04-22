@@ -48,29 +48,29 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   private _router = inject(Router);
 
-  private isRunningExecution = toSignal(
+  private readonly isRunningExecution = toSignal(
     this._executionState.execution$.pipe(map((execution) => execution.status === 'RUNNING')),
     { initialValue: false },
   );
 
-  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+  private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   readonly node = input.required<ReportNode>();
   readonly noPadding = input(false);
   readonly autoFocusNode = input(true);
   readonly showDetailsButton = input(false);
 
-  private isFirstLoad = signal(true);
+  private readonly isFirstLoad = signal(true);
   private lastLoadedReportNodeId?: string;
-  private loadInProgress = signal(false);
-  protected showSpinner = computed(() => {
+  private readonly loadInProgress = signal(false);
+  protected readonly showSpinner = computed(() => {
     const isFirstLoad = this.isFirstLoad();
     const isRunningExecution = this.isRunningExecution();
     const loadInProgress = this.loadInProgress();
     return (isFirstLoad || !isRunningExecution) && loadInProgress;
   });
 
-  private reportNode$ = toObservable(this.node);
+  private readonly reportNode$ = toObservable(this.node);
 
   private effectFocusNode = effect(() => {
     const foundItems = this._treeSearch.foundItems();
@@ -94,7 +94,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     this._treeUtils.cleanupImportantIds();
   }
 
-  focusAndSearch(query: string) {
+  focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }
 
@@ -133,17 +133,18 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
-            map((response) => {
-              if (!response?.aggregatedReportView) {
-                return undefined;
-              }
-
-              return {
-                ...response,
+            map((response) => ({
+              aggregatedReportView: response?.aggregatedReportView,
+              resolvedPartialPath: response?.resolvedPartialPath,
+              reportNode,
+            })),
+            catchError(() =>
+              of({
+                aggregatedReportView: undefined,
+                resolvedPartialPath: undefined,
                 reportNode,
-              };
-            }),
-            catchError(() => of(undefined)),
+              }),
+            ),
             finalize(() => {
               this.isFirstLoad.set(false);
               this.loadInProgress.set(false);
@@ -153,12 +154,14 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((result) => {
-        if (!result) {
+        if (!result?.aggregatedReportView) {
+          this._treeUtils.cleanupImportantIds();
+          this._treeState.init(undefined);
           return;
         }
         const { aggregatedReportView, resolvedPartialPath, reportNode } = result;
 
-        this._treeState.init(aggregatedReportView!, { resolvedPartialPath });
+        this._treeState.init(aggregatedReportView, { resolvedPartialPath });
 
         const treeNode = this.findTreeNode(reportNode);
 
