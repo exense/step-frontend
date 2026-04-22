@@ -19,6 +19,7 @@ import { ArrayFilterCondition } from '../shared/array-filter-condition';
 import { REQUEST_FILTERS_INTERCEPTORS } from './request-filter-interceptors.token';
 import { BooleanArrayFilterCondition } from '../shared/boolean-array-filter-condition';
 import { InFilterCondition } from '../shared/in-filter-condition';
+import { MatchAnyFilterCondition } from '../shared/match-any-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -41,6 +42,10 @@ export class FilterConditionFactoryService {
 
   arrayFilterCondition(items?: string[]): FilterCondition {
     return this.configureCondition(new ArrayFilterCondition(items));
+  }
+
+  matchAnyFilterCondition(fieldValues?: Record<string, string>): FilterCondition {
+    return this.configureCondition(new MatchAnyFilterCondition(fieldValues));
   }
 
   booleanArrayFilterCondition(items?: (string | boolean)[]): FilterCondition {

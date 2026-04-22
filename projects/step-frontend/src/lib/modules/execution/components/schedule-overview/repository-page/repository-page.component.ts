@@ -49,10 +49,13 @@ export class RepositoryPageComponent implements OnInit {
   _state = inject(CrossExecutionDashboardState);
   readonly _executionIdFn = inject(EXECUTION_ID);
   private _executionsService = inject(ExecutionsService);
+  private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {
     this._executionsService.getExecutionById(this._executionIdFn()).subscribe((execution) => {
       this._state.execution.set(execution);
+      this._planService.getPlanById(execution!.planId!).subscribe(plan => this._state.plan.set(plan));
+      // TODO refactor
     });
   }
 }

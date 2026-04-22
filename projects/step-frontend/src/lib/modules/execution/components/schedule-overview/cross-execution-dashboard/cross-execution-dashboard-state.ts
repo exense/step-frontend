@@ -77,7 +77,7 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): string;
   abstract readonly viewType: Signal<CrossExecutionViewType>;
-  abstract readonly executionsTableFilter: Record<string, SearchValue>;
+  abstract readonly executionsTableFilters: Signal<Record<string, SearchValue>>;
   abstract getViewType(): CrossExecutionViewType;
   abstract getEntityId(): string;
 

@@ -13,9 +13,7 @@ export class SchedulerPageStateService extends CrossExecutionDashboardState {
   readonly _taskIdFn = inject(SCHEDULE_ID);
   readonly viewType: Signal<CrossExecutionViewType> = signal('task');
 
-  readonly executionsTableFilter: Record<string, SearchValue> = {
-    executionTaskID: this._taskIdFn(),
-  };
+  readonly executionsTableFilters = signal({ executionTaskID: this._taskIdFn()});
 
   getEntityId(): string {
     return this._taskIdFn();

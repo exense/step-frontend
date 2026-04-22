@@ -13,7 +13,7 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
   readonly _planIdFn = inject(PLAN_ID);
   readonly viewType: Signal<CrossExecutionViewType> = signal('plan');
 
-  readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._planIdFn() };
+  readonly executionsTableFilters = signal({ planId: this._planIdFn() });
 
   getViewType(): CrossExecutionViewType {
     return 'plan';

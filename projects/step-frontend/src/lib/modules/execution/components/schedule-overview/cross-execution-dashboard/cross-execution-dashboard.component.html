@@ -5,21 +5,13 @@
         <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       }
       @if (_state.plan(); as plan) {
-        <entity-icon entityName="plans" [entity]="plan"></entity-icon>
-      }
-      @if (_state.execution(); as execution) {
-        <div>{{ execution | executionName }}</div>
-        @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
-          @if (repositoryParams.repositoryID !== 'local') {
-            <step-alt-execution-repository [repositoryParams]="repositoryParams" />
-          }
-        }
-        <step-alt-execution-repository-link [execution]="execution" />
+        <entity-icon entityName="plans" [entity]="plan" [iconMode]="true"></entity-icon>
       }
 
       <div>{{ viewTitle() }}</div>
+
       @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
-        @if (_state.plan() !== null) {
+        @if (_state.viewType() === 'plan' && _state.plan() !== null) {
           <a
             class="plan-link"
             [routerLink]="['/plans/editor', lastExecution.planId]"
@@ -28,6 +20,16 @@
           >
             <step-icon name="external-link" />
           </a>
+        }
+      }
+      @if (_state.viewType() === 'repository' ) {
+        @if (_state.execution(); as execution) {
+          @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
+            @if (repositoryParams.repositoryID !== 'local') {
+              <step-alt-execution-repository [repositoryParams]="repositoryParams" />
+            }
+          }
+          <step-alt-execution-repository-link [execution]="execution" />
         }
       }
     </h3>

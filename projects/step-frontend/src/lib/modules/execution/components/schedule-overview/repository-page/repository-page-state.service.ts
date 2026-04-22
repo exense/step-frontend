@@ -1,14 +1,27 @@
 import { CrossExecutionDashboardState, CrossExecutionViewType } from '../cross-execution-dashboard/cross-execution-dashboard-state';
-import { Execution, SearchValue, TimeRange } from '@exense/step-core';
-import { inject, signal, Signal } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Execution, FilterConditionFactoryService, SearchValue, TimeRange } from '@exense/step-core';
+import { computed, inject, signal, Signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, Observable, of, take } from 'rxjs';
 import { EXECUTION_ID } from '../../../services/execution-id.token';
 
 export class RepositoryPageStateService extends CrossExecutionDashboardState {
   readonly _executionIdFn = inject(EXECUTION_ID);
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly viewType: Signal<CrossExecutionViewType> = signal('repository');
 
-  readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._executionIdFn() };
+  // readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._executionIdFn() };
+
+  readonly executionsTableFilters = computed(() => {
+    let execution = this.execution();
+    if (execution) {
+      return {
+        planIdOrCanonicalPlanName: this._filterConditionFactory.matchAnyFilterCondition({ planId: execution.planId! }),
+      } as Record<string, SearchValue>;
+    } else {
+      return {};
+    }
+  });
 
   getViewType(): CrossExecutionViewType {
     return 'plan';
@@ -21,7 +34,7 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   getDashboardFilter(): string {
     let execution = this.execution();
     if (!execution) {
-      throw new Error("Execution is not already fetched");
+      throw new Error('Execution is not already fetched');
     }
     const canonicalPlanName = execution.importResult?.canonicalPlanName!;
     // TODO handle no canonicalPlan
@@ -29,7 +42,15 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecution(): Observable<Execution> {
-    return this._executionService.getLastExecutionsByPlan(this._executionIdFn(), 1).pipe(map((list) => list[0]));
+    const execution = this.execution();
+    if (execution) {
+      return of(execution);
+    }
+
+    return toObservable(this.execution).pipe(
+      filter((value): value is Execution => value != null),
+      take(1),
+    );
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
