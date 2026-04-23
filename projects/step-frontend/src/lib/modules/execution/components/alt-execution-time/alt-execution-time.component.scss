@@ -1,7 +1,8 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'sass:map';
 
 step-alt-execution-time {
-  section {
+  .chip-mode {
     background: var.$light-blue-gray;
     border-radius: 1.6rem;
     display: flex;
@@ -16,14 +17,54 @@ step-alt-execution-time {
 
     div {
       white-space: nowrap;
+
       &.date {
         background: var.$white;
         border-radius: 1.6rem;
         padding: 0.2rem 0.8rem;
       }
+
       &.duration {
         flex: 1;
         text-align: center;
+      }
+    }
+  }
+
+  .text-mode {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    cursor: pointer;
+
+    .date {
+      font-weight: 500;
+    }
+
+    .duration {
+      font-weight: 400;
+      min-width: 4.5rem;
+      padding-left: 0.5rem;
+
+      &.is-empty {
+        visibility: hidden;
+      }
+
+      &.chip {
+        color: var.$white;
+        background-color: map.get(var.$statuses, 'ENDED');
+        border-radius: 0.8rem;
+        min-width: 2.6rem;
+        padding: 0.3rem 1rem;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &.chip.running {
+        background-color: map.get(var.$statuses, 'RUNNING');
       }
     }
   }

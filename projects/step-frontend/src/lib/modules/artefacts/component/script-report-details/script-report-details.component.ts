@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
+import {
+  ArtefactInlineItemUtilsService,
+  ItemType,
+  BaseReportDetailsComponent,
+  ReportNodeWithArtefact,
+} from '@exense/step-core';
 import { ScriptArtefact } from '../../types/script.artefact';
 
 @Component({
@@ -21,6 +26,8 @@ export class ScriptReportDetailsComponent extends BaseReportDetailsComponent<Rep
       return undefined;
     }
 
-    return this._artefactInlineUtils.convert([['script', node.resolvedArtefact.script, 'log-in']]);
+    return this._artefactInlineUtils.convert([
+      { label: 'script', value: node.resolvedArtefact.script, itemType: ItemType.CONFIGURATION },
+    ]);
   });
 }

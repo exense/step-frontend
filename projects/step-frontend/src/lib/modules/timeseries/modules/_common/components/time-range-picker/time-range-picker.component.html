@@ -11,9 +11,9 @@
     } @else {
       <step-icon name="calendar" />
       <div class="text" [matTooltip]="mainPickerLabel()">
-        {{ (activeSelection()?.type === 'FULL' && fullRangeLabel) || mainPickerLabel() }}
+        {{ (activeSelection() && activeSelection().type === 'FULL' && fullRangeLabel) || mainPickerLabel() }}
       </div>
-      @if (activeSelection()?.type === 'ABSOLUTE' && hasFullRangeOption()) {
+      @if (activeSelection() && activeSelection().type === 'ABSOLUTE' && hasFullRangeOption()) {
         <div class="suffix-icon warn">
           <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>
         </div>
@@ -75,9 +75,11 @@
               <span>Last</span>
               <input [(ngModel)]="otherOptionValue" type="number" />
               <select [(ngModel)]="otherOptionUnit" id="timeUnit" class="time-unit-select">
-                <option *ngFor="let item of timeUnitOptions" [value]="item">
-                  {{ TIME_UNIT_LABELS_PLURAL[item] }}
-                </option>
+                @for (item of timeUnitOptions; track item) {
+                  <option [value]="item">
+                    {{ TIME_UNIT_LABELS_PLURAL[item] }}
+                  </option>
+                }
               </select>
             </div>
           </div>

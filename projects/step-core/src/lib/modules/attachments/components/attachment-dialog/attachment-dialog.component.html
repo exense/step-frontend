@@ -20,6 +20,7 @@
         mat-icon-button
         matTooltip="Open trace in the separate tab"
         matTooltipPosition="below"
+        [disabled]="!hasResourceReadPermission()"
         (click)="openTraceViewerInSeparateTab()"
       >
         <step-icon name="external-link" />
@@ -102,7 +103,15 @@
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Close</button>
     @if (attachmentType !== AttachmentType.SKIPPED && !isStreamingInProgress()) {
-      <button type="button" mat-flat-button color="primary" (click)="download()">Download</button>
+      <button
+        type="button"
+        mat-flat-button
+        color="primary"
+        [disabled]="!hasResourceReadPermission()"
+        (click)="download()"
+      >
+        Download
+      </button>
     }
   </div>
 </step-modal-window>

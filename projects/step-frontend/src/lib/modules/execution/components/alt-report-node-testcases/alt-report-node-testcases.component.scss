@@ -38,7 +38,7 @@ step-alt-report-node-testcases {
         right: 0;
         z-index: 0;
         background: var.$light-blue-gray;
-        border-radius: 4rem;
+        border-radius: 1rem;
       }
     }
   }
@@ -69,7 +69,6 @@ step-alt-report-node-testcases {
     }
 
     .chip {
-      background: var.$light-blue-gray;
       border-radius: 4rem;
       display: flex;
       padding-left: 1rem;

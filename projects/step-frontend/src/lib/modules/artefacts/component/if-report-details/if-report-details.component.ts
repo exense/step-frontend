@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemUtilsService,
+  ItemType,
   ArtefactService,
   BaseReportDetailsComponent,
   ReportNodeWithArtefact,
@@ -20,11 +21,13 @@ import { IfArtefact } from '../../types/if.artefact';
 export class IfReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<IfArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([['condition', artefact.condition, 'log-in']]);
+    return this._artefactInlineUtils.convert([
+      { label: 'condition', value: artefact.condition, itemType: ItemType.CONFIGURATION },
+    ]);
   });
 }

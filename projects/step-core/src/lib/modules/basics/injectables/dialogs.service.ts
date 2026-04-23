@@ -123,6 +123,7 @@ export class DialogsService {
         data: {
           messageHTML,
           title: 'Error',
+          hideCancelButton: true,
         },
       },
     );

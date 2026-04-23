@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
+import {
+  ArtefactInlineItemUtilsService,
+  BaseReportDetailsComponent,
+  ItemType,
+  ReportNodeWithArtefact,
+} from '@exense/step-core';
 import { AssertPerformanceArtefact } from '../../types/assert-performance.artefact';
 import { AssertPerformanceListService } from '../../injectables/assert-performance-list.service';
 
@@ -19,7 +24,7 @@ export class AssertPerformanceReportDetailsComponent extends BaseReportDetailsCo
   private _lists = inject(AssertPerformanceListService);
   private _artefactInlineUtilsService = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
@@ -29,15 +34,10 @@ export class AssertPerformanceReportDetailsComponent extends BaseReportDetailsCo
     const comparator = this._lists.operatorTypeTexts[artefact.comparator];
     const expectedValue = artefact.expectedValue;
     return this._artefactInlineUtilsService.convert([
-      ['aggregator', aggregator, 'log-in'],
-      ['filter', filter, 'log-in'],
-      ['comparator', comparator, 'log-in'],
-      {
-        label: 'expected value',
-        value: expectedValue,
-        timeValueUnit: 'ms',
-        icon: 'log-in',
-      },
+      { label: 'aggregator', value: aggregator, itemType: ItemType.CONFIGURATION },
+      { label: 'filter', value: filter, itemType: ItemType.CONFIGURATION },
+      { label: 'comparator', value: comparator, itemType: ItemType.CONFIGURATION },
+      { label: 'expected value', value: expectedValue, timeValueUnit: 'ms', itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

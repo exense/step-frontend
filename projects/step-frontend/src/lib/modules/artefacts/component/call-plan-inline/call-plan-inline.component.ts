@@ -6,6 +6,7 @@ import {
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
   DynamicValueString,
+  ItemType,
 } from '@exense/step-core';
 import { CallPlanArtefact } from '../../types/call-plan.artefact';
 
@@ -50,12 +51,11 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
     if (!callPlanInputs) {
       return [];
     }
-    const inputs: ArtefactInlineItemSource = Object.entries(callPlanInputs).map(([label, value]) => [
+    const inputs = Object.entries(callPlanInputs).map(([label, value]) => ({
       label,
       value,
-      'log-in',
-      'Input',
-    ]);
+      itemType: ItemType.CONFIGURATION,
+    }));
     return this._artefactInlineItemUtils.convert(inputs);
   }
 

@@ -72,7 +72,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     return (isFirstLoad || !isRunningExecution) && loadInProgress;
   });
 
-  private reportNode$ = toObservable(this.node);
+  private readonly reportNode$ = toObservable(this.node);
 
   private effectFocusNode = effect(() => {
     const foundItems = this._treeSearch.foundItems();
@@ -135,17 +135,18 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
-            map((response) => {
-              if (!response?.aggregatedReportView) {
-                return undefined;
-              }
-
-              return {
-                ...response,
+            map((response) => ({
+              aggregatedReportView: response?.aggregatedReportView,
+              resolvedPartialPath: response?.resolvedPartialPath,
+              reportNode,
+            })),
+            catchError(() =>
+              of({
+                aggregatedReportView: undefined,
+                resolvedPartialPath: undefined,
                 reportNode,
-              };
-            }),
-            catchError(() => of(undefined)),
+              }),
+            ),
             finalize(() => {
               this.isFirstLoad.set(false);
               this.loadInProgress.set(false);
@@ -155,12 +156,14 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((result) => {
-        if (!result) {
+        if (!result?.aggregatedReportView) {
+          this._treeUtils.cleanupImportantIds();
+          this._treeState.init(undefined);
           return;
         }
         const { aggregatedReportView, resolvedPartialPath, reportNode } = result;
 
-        this._treeState.init(aggregatedReportView!, { resolvedPartialPath });
+        this._treeState.init(aggregatedReportView, { resolvedPartialPath });
 
         const treeNode = this.findTreeNode(reportNode);
 

@@ -162,13 +162,14 @@ import { ReportViewHeaderComponent } from './components/schedule-overview/cross-
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
 import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
-import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
-import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
@@ -189,6 +190,8 @@ import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-repo
 import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
 import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
 import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -291,12 +294,11 @@ import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-re
     ReportViewHeaderComponent,
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
-    StatusDistributionBadgeComponent,
-    StatusDistributionTooltipComponent,
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
-    AggregatedTreeNodeStatusesPiechartComponent,
     ExecutionHistorySectionComponent,
+    ExecutionHistoryNodesComponent,
+    ExecutionHistoryNodeTooltipComponent,
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
   ],
@@ -328,6 +330,10 @@ import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-re
     CalcElementWidthDirective,
     CalcElementWidthItemDirective,
     CalcElementWidthAggregatorDirective,
+    AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryNodesComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
     AltExecutionTreeWidgetDirective,
     AltExecutionTreeSearchFocusDirective,
     ViewItemDefaultNamePipe,
@@ -365,6 +371,7 @@ import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-re
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
+    HistoryNodesComponent,
     AltReportWidgetTitleDirective,
     AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,

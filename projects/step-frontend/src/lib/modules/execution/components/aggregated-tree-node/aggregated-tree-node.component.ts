@@ -5,6 +5,7 @@ import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 import { ElementSizeService, TreeNodeData } from '@exense/step-core';
+import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -23,6 +24,7 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   // private _executionDialogs = inject(AltExecutionDialogsService);
   private _parentElementSize = inject(ElementSizeService, { skipSelf: true, optional: true });
   private _treeNodeData = inject(TreeNodeData);
+  protected readonly _useLargeView = inject(AGGREGATED_TREE_NODE_LARGE_VIEW);
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
   readonly openIterations = output<OpenIterationsEvent>();

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
   TimeUnitDictKey,
 } from '@exense/step-core';
@@ -21,7 +21,7 @@ import { SleepArtefact } from '../../types/sleep.artefact';
 export class SleepReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SleepArtefact>> {
   private _artefactInlineService = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
@@ -34,9 +34,9 @@ export class SleepReportDetailsComponent extends BaseReportDetailsComponent<Repo
         label: 'sleep',
         value: duration,
         timeValueUnit: unit.value as TimeUnitDictKey,
-        icon: 'log-in',
+        itemType: ItemType.CONFIGURATION,
       },
-      ['releaseToken', releaseTokens, 'log-in'],
+      { label: 'releaseToken', value: releaseTokens, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

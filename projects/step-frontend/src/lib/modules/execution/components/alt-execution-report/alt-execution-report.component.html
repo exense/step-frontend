@@ -1,7 +1,16 @@
-<step-grid-layout [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
+@if (hasNoLayout()) {
+  <div class="no-layout-message">
+    <h3>Configure a layout to see the Execution Report</h3>
+  </div>
+}
+<step-grid-layout
+  [class.small-screen]="!!(_isSmallScreen$ | async)"
+  [class.print]="_mode === ViewMode.PRINT"
+  [class.hidden]="hasNoLayout()"
+>
   @if (_state.errors$ | async; as errors) {
     <step-alt-execution-errors-widget
-      *stepGridItem="'errorsWidget'"
+      *stepGridItem="'errorsWidget'; autoHeightOnFirstRow: true"
       [errors]="errors"
       (showDetails)="scrollToErrorsSection()"
       (searchFor)="searchFor($event)"

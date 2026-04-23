@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { SequenceArtefact } from '../../types/sequence.artefact';
@@ -21,15 +21,15 @@ export class SequenceReportDetailsComponent extends BaseReportDetailsComponent<
 > {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
     }
 
     return this._artefactInlineUtils.convert([
-      ['continue on error', artefact.continueOnError, 'log-in'],
-      ['pacing', artefact.pacing, 'log-in'],
+      { label: 'continue on error', value: artefact.continueOnError, itemType: ItemType.CONFIGURATION },
+      { label: 'pacing', value: artefact.pacing, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

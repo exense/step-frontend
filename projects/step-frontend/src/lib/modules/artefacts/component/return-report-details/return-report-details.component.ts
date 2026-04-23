@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
+  ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
   DynamicValueString,
   DynamicValuesUtilsService,
-  JsonParserIconDictionaryConfig,
+  ItemType,
   ReportNodeWithArtefact,
   SimpleOrDynamicValue,
 } from '@exense/step-core';
@@ -21,34 +22,39 @@ import { ReturnArtefact } from '../../types/return.artefact';
 })
 export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ReturnArtefact>> {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);
+  private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);
 
-  protected outputItems = computed(() => {
-    const artefact = this.node()?.resolvedArtefact;
-    let result: Record<string, unknown> | undefined = undefined;
-    if (!artefact?.output?.value) {
-      return result;
+  private normalizeInlineValue(value: unknown): string | number | boolean | undefined {
+    if (value === null || value === undefined) {
+      return undefined;
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+    return JSON.stringify(value);
+  }
+
+  protected readonly outputItems = computed(() => {
+    const output = this.node()?.resolvedArtefact?.output?.value;
+    if (!output) {
+      return undefined;
     }
     try {
-      const json = JSON.parse(artefact.output.value);
+      const json = JSON.parse(output);
       if (Object.keys(json).length) {
-        result = Object.entries(json).reduce(
-          (res, [key, value]) => {
+        return this._artefactInlineItems.convert(
+          Object.entries(json).map(([key, value]) => {
             const isDynamic = this._dynamicValueUtils.isDynamicValue(value as SimpleOrDynamicValue);
-            res[key] = isDynamic
+            const preparedValue = isDynamic
               ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
               : value;
-            return res;
-          },
-          {} as Record<string, unknown>,
+            return { label: key, value: this.normalizeInlineValue(preparedValue), itemType: ItemType.RESULT };
+          }),
         );
       }
     } catch (e) {}
-    return result;
+    return undefined;
   });
-
-  protected readonly itemIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-out', tooltip: 'Output', levels: 0 },
-  ];
 
   protected copyOutput(): void {
     this.copyToClipboard(this.node()?.resolvedArtefact?.output?.value);

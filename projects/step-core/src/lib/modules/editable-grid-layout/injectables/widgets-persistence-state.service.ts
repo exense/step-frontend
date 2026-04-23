@@ -183,6 +183,10 @@ export class WidgetsPersistenceStateService {
       .pipe(map((presetId) => presetId ?? ''));
 
     forkJoin([presets$, preferredPreset$, defaultPreset$]).subscribe(([presets, preferredPreset, defaultPreset]) => {
+      if (!presets.length) {
+        this.isInitializedInternal.set(true);
+        return;
+      }
       const presetKes = new Set(presets.map((item) => item.key));
       if (preferredPreset && presetKes.has(preferredPreset)) {
         this.selectPreset(preferredPreset);

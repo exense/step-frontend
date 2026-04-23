@@ -1,3 +1,8 @@
+export enum ItemType {
+  CONFIGURATION = 'configuration',
+  RESULT = 'result',
+}
+
 export interface ArtefactInlineItemsResolvableField {
   value?: string | number | boolean | object;
   expression?: string;
@@ -9,6 +14,7 @@ export interface ArtefactInlineItemsResolvableField {
 }
 
 export interface ArtefactInlineItem {
+  itemType?: ItemType;
   icon?: string;
   iconTooltip?: string;
   label?: ArtefactInlineItemsResolvableField;

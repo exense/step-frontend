@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { DataSetArtefact } from '../../types/data-set.artefact';
@@ -31,7 +32,13 @@ export class DataSetReportDetailsComponent extends BaseReportDetailsComponent<Re
         return of(undefined);
       }
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource, true).pipe(
-        map((items) => [...items, ['for write', artefact?.dataSource?.forWrite, 'log-in']] as ArtefactInlineItemSource),
+        map(
+          (items) =>
+            [
+              ...items,
+              { label: 'for write', value: artefact?.dataSource?.forWrite, itemType: ItemType.CONFIGURATION },
+            ] as ArtefactInlineItemSource,
+        ),
         map((items) => this._artefactInlineUtils.convert(items)),
       );
     }),

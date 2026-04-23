@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-alt-report-node-keywords {
   display: flex;
   flex-direction: column;
@@ -10,11 +12,37 @@ step-alt-report-node-keywords {
 
     td {
       vertical-align: top;
-      padding-top: 0.5rem !important;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+    }
+
+    tr.content-row {
+      td.mat-mdc-cell {
+        transition: background-color 120ms ease;
+      }
+
+      &:not(:last-child) {
+        td.mat-mdc-cell {
+          border-bottom: 1px solid var.$gray-200;
+        }
+      }
+
+      &.row-highlight,
+      &:hover {
+        td.mat-mdc-cell {
+          background: var.$highlight !important;
+        }
+      }
     }
 
     td.data-cell {
       width: 100%;
+    }
+
+    td.actions-cell {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      vertical-align: middle;
     }
   }
 
@@ -30,6 +58,13 @@ step-alt-report-node-keywords {
       gap: 0.5rem;
       height: 2rem;
       margin: 0 0.5rem 0.2rem 0;
+
+      step-alt-execution-time {
+        display: flex;
+        width: 12rem;
+        overflow: hidden;
+      }
+
       .name {
         font-weight: 500;
         white-space: nowrap;
@@ -40,12 +75,18 @@ step-alt-report-node-keywords {
   }
 
   .actions {
+    display: flex;
+    align-items: center;
     gap: 1rem;
     margin-right: 1rem;
+    min-height: 2rem;
 
     & > button {
       width: 2rem !important;
       height: 2rem !important;
+      min-width: 2rem !important;
+      min-height: 2rem !important;
+      line-height: 2rem !important;
     }
   }
 }

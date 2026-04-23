@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { ForEachArtefact } from '../../types/for-each.artefact';
@@ -31,7 +32,13 @@ export class ForEachReportDetailsComponent extends BaseReportDetailsComponent<Re
         return of(undefined);
       }
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource, true).pipe(
-        map((items) => [['threads', artefact.threads, 'log-in'], ...items] as ArtefactInlineItemSource),
+        map(
+          (items) =>
+            [
+              { label: 'threads', value: artefact.threads, itemType: ItemType.CONFIGURATION },
+              ...items,
+            ] as ArtefactInlineItemSource,
+        ),
         map((items) => this._artefactInlineUtils.convert(items)),
       );
     }),

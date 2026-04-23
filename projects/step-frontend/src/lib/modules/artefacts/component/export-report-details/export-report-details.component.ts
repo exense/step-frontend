@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { ExportArtefact } from '../../types/export.artefact';
@@ -30,16 +30,16 @@ export class ExportReportDetailsComponent extends BaseReportDetailsComponent<Rep
     }
 
     const source: ArtefactInlineItemSource = [
-      ['value', artefact.value, 'log-in'],
-      ['file', artefact.file, 'log-in'],
+      { label: 'value', value: artefact.value, itemType: ItemType.CONFIGURATION },
+      { label: 'file', value: artefact.file, itemType: ItemType.CONFIGURATION },
     ];
 
     if (artefact.prefix?.value || artefact.prefix?.expression) {
-      source.push(['prefix', artefact.prefix, 'log-in']);
+      source.push({ label: 'prefix', value: artefact.prefix, itemType: ItemType.CONFIGURATION });
     }
 
     if (artefact.filter?.value || artefact.filter?.expression) {
-      source.push(['filter', artefact.filter, 'log-in']);
+      source.push({ label: 'filter', value: artefact.filter, itemType: ItemType.CONFIGURATION });
     }
 
     return this._artefactInlineItems.convert(source);

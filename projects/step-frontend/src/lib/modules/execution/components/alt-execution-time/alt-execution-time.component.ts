@@ -29,6 +29,12 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
+  readonly mode = input<'chip' | 'text'>('chip');
+  readonly displayFormat = input<'auto' | 'date' | 'time'>('auto');
+  readonly durationVariant = input<'plain' | 'chip'>('plain');
+  readonly preserveDurationSpace = input(false);
+  readonly shortenDurationMs = input(false);
+  readonly singleUnit = input(false);
   readonly popoverTitle = input<string | undefined>(undefined);
   readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
@@ -39,12 +45,16 @@ export class AltExecutionTimeComponent {
 
   protected readonly displayDate = computed(() => {
     const startTime = this.startTimeInput();
-    const isTimeOnly = this.timeOnly();
+    const displayFormat = this.displayFormat();
+    const isTimeOnly = this.timeOnly() || displayFormat === 'time';
     if (!startTime) {
       return '';
     }
     if (isTimeOnly) {
       return this._datePipe.transform(startTime, DateFormat.TIME);
+    }
+    if (displayFormat === 'date') {
+      return this._datePipe.transform(startTime, DateFormat.DATE);
     }
     const date = this._datePipe.transform(startTime, DateFormat.DATE_SHORT);
     return date === this.todayDate ? 'Today' : date;
@@ -78,12 +88,17 @@ export class AltExecutionTimeComponent {
       return '';
     }
 
-    return this._durationPipe.transform(endTime, startTime);
+    return this._durationPipe.transform(endTime, startTime, {
+      shortenMs: this.shortenDurationMs(),
+      displaySingle: this.singleUnit(),
+    });
   });
 
-  protected hasContent = computed(() => {
+  protected readonly hasContent = computed(() => {
     const displayDate = this.displayDate();
     const duration = this.duration();
     return !!displayDate || !!duration;
   });
+
+  protected readonly isChipMode = computed(() => this.mode() === 'chip');
 }

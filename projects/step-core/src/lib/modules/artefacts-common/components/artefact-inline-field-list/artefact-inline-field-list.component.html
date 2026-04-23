@@ -5,8 +5,13 @@
     }
   </section>
 }
-<section class="list" [class.vertical]="isVertical()">
-  <div #listPrefix>
+<section
+  class="list"
+  [class.vertical]="isVertical()"
+  [class.hide-icons]="hideIcons()"
+  [class.two-columns]="columnCount() === 2"
+>
+  <div #listPrefix class="prefix-container">
     <ng-content select="step-artefact-inline-field-list-prefix"></ng-content>
   </div>
   @for (item of displayItems(); track item.label) {

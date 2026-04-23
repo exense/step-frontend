@@ -33,7 +33,7 @@
     [tableParams]="keywordParameters()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
     [highlightedItem]="selectedReportNode()"
-    class="paddingless no-border hide-header no-highlight special-selection"
+    class="paddingless no-border hide-header no-highlight"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
@@ -48,10 +48,12 @@
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time
-                  class="special-selection"
+                  mode="text"
+                  displayFormat="time"
+                  [preserveDurationSpace]="true"
                   [startTime]="element.executionTime"
                   [duration]="element.duration"
-                  [timeOnly]="true"
+                  [singleUnit]="true"
                 />
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />

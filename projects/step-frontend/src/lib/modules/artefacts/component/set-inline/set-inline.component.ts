@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemsBuilderService,
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
+  ItemType,
 } from '@exense/step-core';
 import { SetArtefact } from '../../types/set.artefact';
 import { SetReportNode } from '../../types/set.report-node';
@@ -26,7 +27,7 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
         return undefined;
       }
       const { key, value } = artefact;
-      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']]);
+      return this._artefactInlineItemUtils.convert([{ label: key, value, itemType: ItemType.CONFIGURATION }]);
     })
     .extractReportNodeItems((reportNode) => {
       if (!reportNode) {
@@ -35,9 +36,8 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
       const { key: label, value } = reportNode;
       const labelExplicitExpression = reportNode.resolvedArtefact?.key?.expression;
       const valueExplicitExpression = reportNode.resolvedArtefact?.value?.expression;
-      const icon = 'log-in';
       return this._artefactInlineItemUtils.convert([
-        { label, value, icon, labelExplicitExpression, valueExplicitExpression },
+        { label, value, itemType: ItemType.CONFIGURATION, labelExplicitExpression, valueExplicitExpression },
       ]);
     });
 

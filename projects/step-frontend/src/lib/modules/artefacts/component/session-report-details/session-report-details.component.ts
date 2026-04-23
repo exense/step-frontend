@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
+  ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
   DynamicValueString,
   DynamicValuesUtilsService,
+  ItemType,
   ReportNodeWithArtefact,
   SimpleOrDynamicValue,
 } from '@exense/step-core';
@@ -20,29 +22,38 @@ import { SessionArtefact } from '../../types/session.artefact';
 })
 export class SessionReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SessionArtefact>> {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);
+  private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
-    let result: Record<string, unknown> | undefined = undefined;
+  private normalizeInlineValue(value: unknown): string | number | boolean | undefined {
+    if (value === null || value === undefined) {
+      return undefined;
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+    return JSON.stringify(value);
+  }
+
+  protected readonly outputItems = computed(() => {
     const token = this.node()?.resolvedArtefact?.token?.value;
     if (!token) {
-      return result;
+      return undefined;
     }
     try {
       const json = JSON.parse(token);
       if (Object.keys(json).length) {
-        result = Object.entries(json).reduce(
-          (res, [key, value]) => {
+        return this._artefactInlineItems.convert(
+          Object.entries(json).map(([key, value]) => {
             const isDynamic = this._dynamicValueUtils.isDynamicValue(value as SimpleOrDynamicValue);
-            res[key] = isDynamic
+            const preparedValue = isDynamic
               ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
               : value;
-            return res;
-          },
-          {} as Record<string, unknown>,
+            return { label: key, value: this.normalizeInlineValue(preparedValue), itemType: ItemType.RESULT };
+          }),
         );
       }
     } catch (e) {}
-    return result;
+    return undefined;
   });
 
   protected copyItems(): void {

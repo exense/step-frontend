@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
 } from '@exense/step-core';
 import { RetryIfFailsReportNode } from '../../types/retry-if-fails.report-node';
 
@@ -26,31 +27,29 @@ export class RetryIfFailsReportDetailsComponent extends BaseReportDetailsCompone
     }
     const source: ArtefactInlineItemSource = [];
     const artefact = node?.resolvedArtefact;
-    const icon = 'log-in';
-    const outputIcon = 'log-out';
     if (artefact) {
       source.push(
-        ['max tries', artefact.maxRetries, icon],
+        { label: 'max tries', value: artefact.maxRetries, itemType: ItemType.CONFIGURATION },
         {
           label: 'grace period',
           value: artefact.gracePeriod,
           timeValueUnit: 'ms',
-          icon,
+          itemType: ItemType.CONFIGURATION,
         },
         {
           label: 'timeout',
           value: artefact.timeout,
           timeValueUnit: 'ms',
-          icon,
+          itemType: ItemType.CONFIGURATION,
         },
-        ['release token', artefact.releaseTokens, icon],
-        ['report last try', artefact.reportLastTryOnly, icon],
+        { label: 'release token', value: artefact.releaseTokens, itemType: ItemType.CONFIGURATION },
+        { label: 'report last try', value: artefact.reportLastTryOnly, itemType: ItemType.CONFIGURATION },
       );
     }
     source.push(
-      ['tries', node.tries, outputIcon],
-      ['skipped', node.skipped, outputIcon],
-      ['release token', node.releasedToken, outputIcon],
+      { label: 'tries', value: node.tries, itemType: ItemType.RESULT },
+      { label: 'skipped', value: node.skipped, itemType: ItemType.RESULT },
+      { label: 'release token', value: node.releasedToken, itemType: ItemType.RESULT },
     );
     return this._artefactInlineUtils.convert(source);
   });

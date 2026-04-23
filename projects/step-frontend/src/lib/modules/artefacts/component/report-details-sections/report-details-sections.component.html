@@ -1,0 +1,17 @@
+@if (configurationItems().length) {
+  <section class="data-container details-container">
+    <div class="container-title">Configuration</div>
+    <step-artefact-inline-field-list
+      [items]="configurationItems()"
+      [isVertical]="true"
+      [hideIcons]="true"
+      [columnCount]="2"
+    />
+  </section>
+}
+@if (resultItems().length) {
+  <section class="data-container details-container">
+    <div class="container-title">Results</div>
+    <step-artefact-inline-field-list [items]="resultItems()" [isVertical]="true" [hideIcons]="true" [columnCount]="2" />
+  </section>
+}
