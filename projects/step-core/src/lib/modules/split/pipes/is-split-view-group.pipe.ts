@@ -6,7 +6,7 @@ import { StackViewInfo, StackViewInfoGroup } from '../types/stack-view-info';
 })
 export class IsSplitViewGroupPipe implements PipeTransform {
   transform(value?: StackViewInfo): StackViewInfoGroup | undefined {
-    if (!!(value as StackViewInfoGroup).children) {
+    if (!!value && !!(value as StackViewInfoGroup).children) {
       return value as StackViewInfoGroup;
     }
     return undefined;

@@ -9,6 +9,6 @@ export class ViewItemDefaultNamePipe implements PipeTransform {
     if (isFull) {
       return item.title ?? item.id;
     }
-    return item.title?.[0] ?? item.id?.[0];
+    return item.title?.[0] ?? item.id[0];
   }
 }

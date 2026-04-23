@@ -2,8 +2,10 @@
   height: 100%;
 }
 
+$group-margin: 1rem;
+
 section {
-  height: calc(100% - 1rem);
+  height: calc(100% - $group-margin);
   margin: 0.5rem;
   padding: 0.5rem;
 }

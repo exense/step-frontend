@@ -1,13 +1,16 @@
+<ng-template #breadcrumbTitle let-item>
+  @if (item.titleBreadcrumbsRef) {
+    <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
+  } @else if (item.titleTemplateRef) {
+    <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
+  } @else {
+    {{ item.title }}
+  }
+</ng-template>
 @for (item of views(); track item.id; let isLast = $last) {
   @if (isLast) {
     <div>
-      @if (item.titleBreadcrumbsRef) {
-        <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
-      } @else if (item.titleTemplateRef) {
-        <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
-      } @else {
-        {{ item.title }}
-      }
+      <ng-container *ngTemplateOutlet="breadcrumbTitle; context: { $implicit: item }" />
     </div>
   } @else {
     <button
@@ -17,13 +20,7 @@
       [matTooltip]="item.breadcrumbsTooltip"
       matTooltipPosition="below"
     >
-      @if (item.titleBreadcrumbsRef) {
-        <ng-container *ngTemplateOutlet="item.titleBreadcrumbsRef" />
-      } @else if (item.titleTemplateRef) {
-        <ng-container *ngTemplateOutlet="item.titleTemplateRef" />
-      } @else {
-        {{ item.title }}
-      }
+      <ng-container *ngTemplateOutlet="breadcrumbTitle; context: { $implicit: item }" />
     </button>
     <step-icon name="arrow-right" />
   }

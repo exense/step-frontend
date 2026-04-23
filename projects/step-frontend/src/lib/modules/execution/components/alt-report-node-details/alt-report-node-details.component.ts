@@ -60,7 +60,7 @@ export class AltReportNodeDetailsComponent {
     return reportNode as ReportNode;
   });
 
-  readonly opernIterations = output<OpenIterationsEvent>();
+  readonly openIterations = output<OpenIterationsEvent>();
   readonly openDetails = output<ReportNode>();
 
   private children$ = toObservable(this.reportNode).pipe(

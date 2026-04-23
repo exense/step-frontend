@@ -221,18 +221,20 @@ step-alt-execution-progress {
   }
 
   &.is-drilldown-opened {
-    height: calc(100vh - 6.4rem);
+    $header-height: 6.4rem;
+    height: calc(100vh - $header-height);
     overflow: hidden;
   }
 
   .node-details-drilldown {
+    $z-index-drilldown: 12;
     position: absolute;
     padding: 0 2.5rem;
     top: 0;
     left: 0;
     right: 0;
     height: 100%;
-    z-index: 12;
+    z-index: $z-index-drilldown;
   }
 }
 
