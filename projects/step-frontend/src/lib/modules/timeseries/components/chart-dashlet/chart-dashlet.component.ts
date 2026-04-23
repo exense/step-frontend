@@ -309,15 +309,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     if (this.item().masterChartId) {
       syncGroup = this.context().getSyncGroup(this.item().masterChartId!);
     }
-    const hasSteppedDisplay = this.item().metricKey === 'threadgroup';
-    const removeChartGaps = this.item().metricKey === 'threadgroup';
+    const primaryAxes = this.item().chartSettings!.primaryAxes!;
+    const primaryAggregation = primaryAxes.aggregation;
+    const hasSteppedDisplay = primaryAxes.displayType === 'STEPPED';
     const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
     const secondaryAxesAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const primaryAxes = this.item().chartSettings!.primaryAxes!;
-    const primaryAggregation = primaryAxes.aggregation;
+    const barPaths = this.barsFunction({ size: [0.9, 2000], radius: 0.2, gap: 1 });
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
@@ -327,24 +327,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       }
       const seriesKey = this.mergeLabelItems(labelItems);
       const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
-
-      if (removeChartGaps) {
-        let lastBucketValue: BucketResponse | undefined;
-        response.matrix[i].forEach((bucketValue: BucketResponse, j: number) => {
-          if (bucketValue) {
-            if (bucketValue.sum === 0) {
-              lastBucketValue = undefined;
-            } else {
-              lastBucketValue = bucketValue;
-            }
-          } else {
-            // empty bucket
-            if (lastBucketValue) {
-              response.matrix[i][j] = lastBucketValue;
-            }
-          }
-        });
-      }
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
@@ -359,14 +341,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           }
         });
       }
+      const isNullMeansZero =
+        primaryAggregation.type === 'RATE' ||
+        primaryAggregation.type === 'COUNT' ||
+        primaryAxes.displayType === 'BAR_CHART';
       const seriesData: (number | undefined | null)[] = [];
       seriesBuckets.forEach((b, i) => {
         let value = this.getBucketValue(b, primaryAggregation!, response.interval);
-        if (value === undefined && !removeChartGaps) {
+        if (value === undefined && isNullMeansZero) {
           value = 0;
         }
         seriesData[i] = value;
       });
+      const spanGaps = !isNullMeansZero;
       const s: TSChartSeries = {
         id: seriesKey,
         scale: 'y',
@@ -374,9 +361,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         legendName: seriesKey,
         data: seriesData,
         metadata: metadata,
+        spanGaps: spanGaps,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         strokeConfig: stroke,
-        points: { show: false },
+        points:
+          spanGaps && primaryAxes.displayType === 'LINE'
+            ? { show: true, size: 5, fill: stroke.color, width: 0 }
+            : { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
       switch (stroke.type) {
@@ -395,8 +386,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       if (primaryAxes.colorizationType === 'FILL') {
         s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
       }
-      if (hasSteppedDisplay) {
-        s.paths = this.stepped({ align: 1 });
+      switch (primaryAxes.displayType) {
+        case 'BAR_CHART':
+          s.paths = barPaths;
+          break;
+        case 'STEPPED':
+          s.paths = this.stepped({ align: 1 });
+          break;
       }
       return s;
     });
@@ -425,17 +421,31 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           ),
         grid: { show: false },
       });
-      series.unshift({
+      const secondaryAxesSettings = this.item().chartSettings!.secondaryAxes!;
+      const secondaryDisplayType = secondaryAxesSettings.displayType;
+      const secondaryNullMeansZero =
+        secondaryAxesAggregation?.type === 'RATE' ||
+        secondaryAxesAggregation?.type === 'COUNT' ||
+        secondaryDisplayType !== 'LINE';
+      const secondarySeries: TSChartSeries = {
         scale: 'z',
         labelItems: ['Total'],
         id: 'total',
         strokeConfig: { color: '', type: MarkerType.SQUARE },
         data: secondaryAxesData,
+        spanGaps: !secondaryNullMeansZero,
         value: (x, v: number) => Math.trunc(v) + ' total',
-        fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
-        paths: this.barsFunction({ size: [1, 100, 4], radius: 0.2, gap: 1 }),
         points: { show: false },
-      });
+      };
+      if (secondaryDisplayType !== 'LINE') {
+        secondarySeries.paths = barPaths;
+        secondarySeries.fill = TimeSeriesConfig.TOTAL_BARS_COLOR;
+      } else {
+        // scale:'z' series are skipped by the chart component's automatic stroke assignment, so set it explicitly
+        secondarySeries.stroke = TimeSeriesConfig.TOTAL_BARS_COLOR;
+        secondarySeries.fill = (self: any) => this._uPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR);
+      }
+      series.unshift(secondarySeries);
     }
 
     const fetchExecutionsFn: (idx: number, seriesId: string) => Observable<string[]> = (

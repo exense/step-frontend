@@ -7,7 +7,7 @@ import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type AxesSettings = {
   aggregation: MetricAggregation;
-  displayType: 'LINE' | 'BAR_CHART';
+  displayType: 'LINE' | 'BAR_CHART' | 'STEPPED';
   unit: string;
   renderingSettings?: MetricRenderingSettings;
   colorizationType: 'STROKE' | 'FILL';
