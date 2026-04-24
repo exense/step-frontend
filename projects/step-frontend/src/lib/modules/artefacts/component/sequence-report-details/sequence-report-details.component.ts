@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { SequenceArtefact } from '../../types/sequence.artefact';
@@ -28,8 +28,8 @@ export class SequenceReportDetailsComponent extends BaseReportDetailsComponent<
     }
 
     return this._artefactInlineUtils.convert([
-      ['continue on error', artefact.continueOnError, 'log-in'],
-      ['pacing', artefact.pacing, 'log-in'],
+      { label: 'continue on error', value: artefact.continueOnError, itemType: ItemType.configuration },
+      { label: 'pacing', value: artefact.pacing, itemType: ItemType.configuration },
     ]);
   });
 }

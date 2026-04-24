@@ -157,16 +157,14 @@ export class WidgetsPersistenceStateService {
   }
 
   selectPreset(presetId: string): void {
-    this._gridPersistence
-      .load(this._gridConfig.gridId, presetId)
-      .subscribe((preset) => {
-        if (!preset) {
-          this.selectFallbackPreset(presetId);
-          return;
-        }
-        this.selectedPresetInternal.set(preset);
-        this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
-      });
+    this._gridPersistence.load(this._gridConfig.gridId, presetId).subscribe((preset) => {
+      if (!preset) {
+        this.selectFallbackPreset(presetId);
+        return;
+      }
+      this.selectedPresetInternal.set(preset);
+      this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
+    });
   }
 
   private initialize(): void {
@@ -185,6 +183,10 @@ export class WidgetsPersistenceStateService {
       .pipe(map((presetId) => presetId ?? ''));
 
     forkJoin([presets$, preferredPreset$, defaultPreset$]).subscribe(([presets, preferredPreset, defaultPreset]) => {
+      if (!presets.length) {
+        this.isInitializedInternal.set(true);
+        return;
+      }
       const presetKes = new Set(presets.map((item) => item.key));
       if (preferredPreset && presetKes.has(preferredPreset)) {
         this.selectPreset(preferredPreset);

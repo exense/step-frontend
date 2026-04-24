@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   ElementRef,
   inject,
   OnDestroy,
@@ -18,6 +19,7 @@ import {
   IS_SMALL_SCREEN,
   ReportNode,
   TimeRange,
+  WidgetsPersistenceStateService,
 } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -54,7 +56,14 @@ export class AltExecutionReportComponent
   implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy, CanLeaveComponent
 {
   private _activatedRoute = inject(ActivatedRoute);
+  private _widgetsPersistence = inject(WidgetsPersistenceStateService);
   protected readonly _mode = inject(VIEW_MODE);
+  protected readonly hasNoLayout = computed(
+    () =>
+      this._widgetsPersistence.isInitialized() &&
+      !this._widgetsPersistence.selectedPreset() &&
+      !this._gridEditable.editMode(),
+  );
   private _router = inject(Router);
   private _gridEditable = inject(GridEditableService);
   private _dialogs = inject(DialogsService);

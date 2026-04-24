@@ -36,8 +36,12 @@ export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
   handleKeyboardEvent(event: KeyboardEvent): void {
     const isCtrl = event.metaKey || event.ctrlKey;
 
-    // If text selection exits, ignore this handler for ctrl+c & ctrl+v shortcuts, to prevent native event cancellation
-    const hasTextSelection = !!this._document.defaultView?.getSelection()?.toString();
+    // If an input element is focused, always defer to the browser's native copy/paste behaviour
+    const activeElement = this._document.activeElement;
+    const isInputFocused =
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLTextAreaElement ||
+      (activeElement instanceof HTMLElement && activeElement.isContentEditable);
 
     if (isCtrl && event.shiftKey) {
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
@@ -52,7 +56,7 @@ export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
         return;
       }
 
-      if (!hasTextSelection && this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
+      if (!isInputFocused && this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
         event.preventDefault();
         this._planEditorService.pasteAfter();
         return;
@@ -96,13 +100,13 @@ export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
         return;
       }
 
-      if (!hasTextSelection && this.checkKey(event, true, 'c', 'plan-write')) {
+      if (!isInputFocused && this.checkKey(event, true, 'c', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.copy();
         return;
       }
 
-      if (!hasTextSelection && this.checkKey(event, true, 'v', 'plan-write')) {
+      if (!isInputFocused && this.checkKey(event, true, 'v', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.paste();
         return;

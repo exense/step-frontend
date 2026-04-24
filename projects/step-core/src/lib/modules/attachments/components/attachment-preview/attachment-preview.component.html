@@ -48,6 +48,7 @@
           mat-flat-button
           matTooltip="Download"
           matTooltipPosition="below"
+          [disabled]="!hasResourceReadPermission()"
           (click)="download($event)"
         >
           <step-icon name="download" />

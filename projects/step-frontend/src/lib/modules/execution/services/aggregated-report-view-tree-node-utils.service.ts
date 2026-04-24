@@ -10,6 +10,7 @@ import {
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 import { v5 } from 'uuid';
 import { Status } from '../../_common/shared/status.enum';
+import { AGGREGATED_TREE_NODE_LARGE_VIEW } from './aggregated-tree-node-large-view.token';
 
 const HASH_NAMESPACE = 'e9903ee9-1674-45a6-a044-62702dfe0865';
 
@@ -18,6 +19,7 @@ export class AggregatedReportViewTreeNodeUtilsService
   implements TreeNodeUtilsService<AggregatedReportView, AggregatedTreeNode>
 {
   private _artefactTypes = inject(ArtefactService);
+  private _useLargeView = inject(AGGREGATED_TREE_NODE_LARGE_VIEW);
 
   private importantNodeIds = new Set<string>();
 
@@ -60,7 +62,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       children.push(afterContainer);
     }
 
-    const iconClassName = ['larger-icon'];
+    const iconClassName = this._useLargeView ? ['larger-icon'] : [];
     const statuses = Object.keys(item?.countByStatus ?? {}) as Status[];
     const priorityStatus = chooseStatusWithMostPriority(...statuses);
     if (priorityStatus) {
