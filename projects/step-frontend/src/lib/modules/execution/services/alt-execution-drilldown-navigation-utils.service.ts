@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { DrillDownStackItemConfig, DrillDownStackItemType } from '../shared/drilldown-stack-item';
 import { Status } from '../../_common/shared/status.enum';
 import { AbstractArtefact, ReportNodeWithArtefact } from '@exense/step-core';
+import { ALT_EXECUTION_DRILLDOWN_SEGMENTS_LIMIT } from './alt-execution-drilldown-segments-limit.token';
 
 export interface DrilldownAggregatedParams {
   searchStatus?: Status;
@@ -18,6 +19,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
   private _location = inject(Location);
   private _activatedRoute = inject(ActivatedRoute);
   private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
+  private _segmentsLimit = inject(ALT_EXECUTION_DRILLDOWN_SEGMENTS_LIMIT);
 
   getSingleReportNode(data: {
     countByStatus?: Record<string, number>;
@@ -55,18 +57,27 @@ export class AltExecutionDrilldownNavigationUtilsService {
   }
 
   changeDrilldownLocation(config: DrillDownStackItemConfig[], searchFor?: string): void {
-    const path = config
-      .map((item) => {
-        switch (item.type) {
-          case DrillDownStackItemType.ROOT:
-            return item.rootType as string;
-          case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
-            return ['aggregated', `${item.nodeId};${item?.searchStatus ?? ''};${item?.searchStatusCount ?? ''}`];
-          case DrillDownStackItemType.REPORT_NODE:
-            return ['report', item.nodeId];
-        }
-      })
-      .flat();
+    const segments = config.map((item) => {
+      switch (item.type) {
+        case DrillDownStackItemType.ROOT:
+          return item.rootType as string;
+        case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
+          return ['aggregated', `${item.nodeId};${item?.searchStatus ?? ''};${item?.searchStatusCount ?? ''}`];
+        case DrillDownStackItemType.REPORT_NODE:
+          return ['report', item.nodeId];
+      }
+    });
+
+    // root(1) + first(1) + segments(n) + last(n)
+    const allowedSize = 3 + this._segmentsLimit;
+    if (segments.length > allowedSize) {
+      // root(1) + first(1) + segments(n)
+      const deleteStart = 2 + this._segmentsLimit;
+      const deleteCount = segments.length - allowedSize;
+      segments.splice(deleteStart, deleteCount);
+    }
+
+    const path = segments.flat();
     path.unshift('node-details');
 
     let queryParams: Params | undefined;
