@@ -105,7 +105,9 @@ export const checkEntityGuardFactory =
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];
-        if (!result && emptyUrls.includes(_router.url)) {
+        const previousUrl = _router.getCurrentNavigation()?.previousNavigation?.finalUrl?.toString().split('?')[0];
+        const currentUrl = _router.url.split('?')[0];
+        if (!result && emptyUrls.includes(previousUrl ?? currentUrl)) {
           return _router.parseUrl(_defaultPage());
         }
         return result;

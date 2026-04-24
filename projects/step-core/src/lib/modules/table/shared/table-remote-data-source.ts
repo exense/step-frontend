@@ -5,6 +5,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  finalize,
   map,
   Observable,
   of,
@@ -153,7 +154,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this.terminateCurrentRequest();
       this.currentRequestTerminator$ = new Subject();
       this.requestRef$ = this.doRequest(x).pipe(
-        tap(() => {
+        finalize(() => {
           if (isProgressTriggered) {
             this.inProgressInternal$.next(false);
           }

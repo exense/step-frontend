@@ -15,11 +15,21 @@
             />
           }
           @if (attachmentType === AttachmentType.STREAMING_BINARY) {
-            <span stepUndraggedClick (undraggedClick)="downloadBinaryStream(att, $event)">
+            <span
+              [class.highlight-inline-item]="hasResourceReadPermission()"
+              [class.disabled-inline-item]="!hasResourceReadPermission()"
+              stepUndraggedClick
+              (undraggedClick)="downloadBinaryStream(att, $event)"
+            >
               <step-long-inline-text [text]="att.name" />
             </span>
           } @else {
-            <span class="highlight-inline-item" stepUndraggedClick (undraggedClick)="open(att, $event)">
+            <span
+              [class.highlight-inline-item]="hasResourceReadPermission()"
+              [class.disabled-inline-item]="!hasResourceReadPermission()"
+              stepUndraggedClick
+              (undraggedClick)="open(att, $event)"
+            >
               <step-long-inline-text [text]="att.name" />
             </span>
           }

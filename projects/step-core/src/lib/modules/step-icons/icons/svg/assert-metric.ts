@@ -1,0 +1,23 @@
+export const AssertMetric = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-assert-metric">
+    
+  <defs>
+    <style>
+      .assert-metric-st0 {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <path fill="currentColor" stroke-width="0" d="M10.3,12.97c-1.15,1.15-1.41.79-1.3-.79.05-.78,0-1.87.02-2.96,0-1.09-.01-1.66-.01-2.43,0-.55.45-1,1-1s1,.45,1,1c0,.78.02,1.35.01,2.44,0,1.09-.02,1.88-.02,2.66,0,.55.05.33-.7,1.08Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M17.84,22.42c-.55,0-1-.45-1-1v-7.45c0-.55.03-.79,1-1.76,1.19-1.19,1-.49,1,.83v8.38c0,.55-.45,1-1,1Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M6.14,11.43c-.69-.79-1.29-1.02-1.31-1.57V3.8c0-.63.45-1.14,1-1.14s1,.51,1,1.14v6.06c.03,2,.09,2.42-.69,1.57Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M5.84,22.42c-.55,0-1-.45-1-1v-2.31c0-1.32.04-1.93,1-1.06.72.66,1,.83,1,1.39v1.98c0,.55-.45,1-1,1Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M13.88,22.42c-.55,0-1-.45-1-1v-3.64c0-.55-.02-.48,1-1.5,1.11-1.11,1,.42,1,.97v4.17c0,.55-.45,1-1,1Z"/>
+  <polyline stroke="currentColor" class="assert-metric-st0" points="18.53 8.18 9.03 17.68 4.71 13.36"/>
+  <path fill="currentColor" stroke-width="0"  d="M10,22.37c-.55,0-1-.29-1-.85v-.35c0-.55.11-.33,1.02-1.15h0c1.08-1.08.98.25.98.8v.55c0,.55-.45,1-1,1Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M17.93,5.61c-1.08,1.31-1.08-.27-1.08-.94v-1.87c0-.67.44-1.22.99-1.23h0c.55,0,1,.53,1,1.2v1.56c0,.23-.32.55-.92,1.28h.01Z"/>
+  <path fill="currentColor" stroke-width="0"  d="M14.13,9.14c-1.56,1.56-1.26.28-1.26-1.25,0-.78,0-1.35.02-1.92,0-.56.02-1.12.02-1.89,0-.55.45-1,1-1s1,.45,1,1c0,.78,0,1.35-.02,1.92,0,.56-.02,1.12-.02,1.89,0,.55-.01.51-.74,1.25Z"/>
+
+</svg>`;

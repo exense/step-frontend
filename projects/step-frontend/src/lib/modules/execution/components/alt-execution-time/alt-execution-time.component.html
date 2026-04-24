@@ -1,15 +1,32 @@
 @if (hasContent()) {
   <step-popover yPosition="below">
-    <section>
-      <ng-content select="step-alt-execution-time-prefix" />
-      @if (displayDate(); as date) {
-        <div class="date">{{ date }}</div>
-      }
-      @if (duration(); as duration) {
-        <div class="duration">{{ duration }}</div>
-      }
-      <ng-content select="step-alt-execution-time-suffix" />
-    </section>
+    @if (isChipMode()) {
+      <section class="chip-mode">
+        <ng-content select="step-alt-execution-time-prefix" />
+        @if (displayDate(); as date) {
+          <div class="date">{{ date }}</div>
+        }
+        @if (duration(); as duration) {
+          <div class="duration">{{ duration }}</div>
+        }
+        <ng-content select="step-alt-execution-time-suffix" />
+      </section>
+    } @else {
+      <div class="text-mode">
+        @if (displayDate(); as date) {
+          <span class="date">{{ date }}</span>
+        }
+        @if (duration(); as duration) {
+          <span class="duration" [class.chip]="durationVariant() === 'chip'" [class.running]="isRunning()">
+            {{ duration }}
+          </span>
+        } @else if (preserveDurationSpace()) {
+          <span class="duration is-empty" [class.chip]="durationVariant() === 'chip'">
+            {{ '\u00A0' }}
+          </span>
+        }
+      </div>
+    }
     <step-popover-content>
       <ng-content select="step-alt-execution-time-popover-title" />
       <step-duration-description [startTime]="startTimeInput()" [endTime]="endTime()" [isRunning]="isRunning()" />

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent } from '@exense/step-core';
+import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ItemType } from '@exense/step-core';
 import { ThreadGroupReportNode } from '../../types/thread-group.report-node';
 
 @Component({
@@ -20,38 +20,17 @@ export class ThreadGroupReportDetailsComponent extends BaseReportDetailsComponen
     if (!artefact) {
       return undefined;
     }
-    const icon = 'log-in';
     return this._artefactInlineUtils.convert([
-      ['threads', artefact.users, icon],
-      {
-        label: 'pacing',
-        value: artefact.pacing,
-        timeValueUnit: 'ms',
-        icon,
-      },
-      {
-        label: 'ram up',
-        value: artefact.rampup,
-        timeValueUnit: 'ms',
-        icon,
-      },
-      ['pack', artefact.pack, icon],
-      {
-        label: 'start offset',
-        value: artefact.startOffset,
-        timeValueUnit: 'ms',
-        icon,
-      },
-      ['iterations', artefact.iterations, icon],
-      {
-        label: 'max duration',
-        value: artefact.maxDuration,
-        timeValueUnit: 'ms',
-        icon,
-      },
-      ['handle', artefact.localItem, icon],
-      ['user id variable', artefact.userItem, icon],
-      ['counter', artefact.item, icon],
+      { label: 'threads', value: artefact.users, itemType: ItemType.configuration },
+      { label: 'pacing', value: artefact.pacing, timeValueUnit: 'ms', itemType: ItemType.configuration },
+      { label: 'ram up', value: artefact.rampup, timeValueUnit: 'ms', itemType: ItemType.configuration },
+      { label: 'pack', value: artefact.pack, itemType: ItemType.configuration },
+      { label: 'start offset', value: artefact.startOffset, timeValueUnit: 'ms', itemType: ItemType.configuration },
+      { label: 'iterations', value: artefact.iterations, itemType: ItemType.configuration },
+      { label: 'max duration', value: artefact.maxDuration, timeValueUnit: 'ms', itemType: ItemType.configuration },
+      { label: 'handle', value: artefact.localItem, itemType: ItemType.configuration },
+      { label: 'user id variable', value: artefact.userItem, itemType: ItemType.configuration },
+      { label: 'counter', value: artefact.item, itemType: ItemType.configuration },
     ]);
   });
 }

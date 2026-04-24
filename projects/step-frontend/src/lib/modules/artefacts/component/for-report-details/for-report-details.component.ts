@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
 } from '@exense/step-core';
 import { ForReportNode } from '../../types/for.report-node';
 
@@ -27,17 +28,20 @@ export class ForReportDetailsComponent extends BaseReportDetailsComponent<ForRep
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        ['start', node.resolvedArtefact.dataSource.start, 'log-in'],
-        ['end', node.resolvedArtefact.dataSource.end, 'log-in'],
-        ['increment', node.resolvedArtefact.dataSource.inc, 'log-in'],
-        ['threads', node.resolvedArtefact.threads, 'log-in'],
-        ['max failures', node.resolvedArtefact.maxFailedLoops, 'log-in'],
-        ['handle', node.resolvedArtefact.item, 'log-in'],
-        ['user id variable', node.resolvedArtefact.userItem, 'log-in'],
-        ['counter', node.resolvedArtefact.globalCounter, 'log-in'],
+        { label: 'start', value: node.resolvedArtefact.dataSource.start, itemType: ItemType.configuration },
+        { label: 'end', value: node.resolvedArtefact.dataSource.end, itemType: ItemType.configuration },
+        { label: 'increment', value: node.resolvedArtefact.dataSource.inc, itemType: ItemType.configuration },
+        { label: 'threads', value: node.resolvedArtefact.threads, itemType: ItemType.configuration },
+        { label: 'max failures', value: node.resolvedArtefact.maxFailedLoops, itemType: ItemType.configuration },
+        { label: 'handle', value: node.resolvedArtefact.item, itemType: ItemType.configuration },
+        { label: 'user id variable', value: node.resolvedArtefact.userItem, itemType: ItemType.configuration },
+        { label: 'counter', value: node.resolvedArtefact.globalCounter, itemType: ItemType.configuration },
       );
     }
-    source.push(['count', node.count, 'log-out'], ['error count', node.errorCount, 'log-out']);
+    source.push(
+      { label: 'count', value: node.count, itemType: ItemType.result },
+      { label: 'error count', value: node.errorCount, itemType: ItemType.result },
+    );
     return this._artefactInlineUtils.convert(source);
   });
 }
