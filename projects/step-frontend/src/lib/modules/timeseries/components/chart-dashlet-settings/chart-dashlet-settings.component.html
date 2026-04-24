@@ -204,6 +204,12 @@
                   <span>Stepped</span>
                 </div>
               </mat-option>
+              <mat-option [value]="'STACKED_BAR'" class="option-with-icon">
+                <div class="inner">
+                  <step-icon name="bar-chart-2"></step-icon>
+                  <span>Stacked bars</span>
+                </div>
+              </mat-option>
             </mat-select>
           </step-form-field>
           <mat-menu #aggregateMenu="matMenu">
@@ -239,7 +245,7 @@
             >Secondary Axes
             <step-icon
               class="help-icon"
-              matTooltip="The secondary axes displays a single aggregated series computed from all primary series combined. It always uses a filled style to remain visible."
+              matTooltip="The secondary axis sums each group's aggregated value into a single combined series, thus showing the total aggregated values across series. It always uses a filled style."
               name="help-circle"
             ></step-icon>
           </step-label>

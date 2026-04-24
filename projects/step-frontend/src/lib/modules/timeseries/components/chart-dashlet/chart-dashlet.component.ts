@@ -36,7 +36,7 @@ import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChar
 import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
-import { Axis } from 'uplot';
+import { Axis, Band, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
@@ -317,7 +317,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const secondaryAxesAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const barPaths = this.barsFunction({ size: [0.9, 2000], radius: 0.2, gap: 1 });
+    const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
+    const stackedBarPaths = this.barsFunction({ size: [0.85, Infinity], align: 1, radius: 0.1 });
+    const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
+    const isRateOrCount = primaryAggregation.type === 'RATE' || primaryAggregation.type === 'COUNT';
+    const useForwardFill = isGauge && !isRateOrCount;
+    const isNullMeansZero =
+      isRateOrCount ||
+      (!isGauge && (primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'));
+    const spanGaps = !isNullMeansZero && !useForwardFill;
+    const isSecondaryRateOrCount =
+      secondaryAxesAggregation?.type === 'RATE' || secondaryAxesAggregation?.type === 'COUNT';
+    const useSecondaryForwardFill = isGauge && !isSecondaryRateOrCount;
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
@@ -329,31 +340,41 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
+        let lastSecondaryValue: number | undefined;
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
           metadata.push(b?.attributes);
           if (hasSecondaryAxes) {
-            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
-            if (secondaryAxesData[j] == undefined) {
+            let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
+            if (bucketValue == null && useSecondaryForwardFill) {
+              bucketValue = lastSecondaryValue;
+            }
+            if (bucketValue != null) {
+              lastSecondaryValue = bucketValue;
+            }
+            if (secondaryAxesData[j] == null) {
               secondaryAxesData[j] = bucketValue;
-            } else if (bucketValue) {
-              secondaryAxesData[j] = secondaryAxesData[j]! + bucketValue;
+            } else if (bucketValue != null) {
+              secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
             }
           }
         });
       }
-      const isNullMeansZero =
-        primaryAggregation.type === 'RATE' ||
-        primaryAggregation.type === 'COUNT' ||
-        primaryAxes.displayType === 'BAR_CHART';
       const seriesData: (number | undefined | null)[] = [];
+      let lastPrimaryValue: number | undefined;
       seriesBuckets.forEach((b, i) => {
         let value = this.getBucketValue(b, primaryAggregation!, response.interval);
-        if (value === undefined && isNullMeansZero) {
-          value = 0;
+        if (value === undefined) {
+          if (isNullMeansZero) {
+            value = 0;
+          } else if (useForwardFill) {
+            value = lastPrimaryValue;
+          }
+        }
+        if (value != null) {
+          lastPrimaryValue = value;
         }
         seriesData[i] = value;
       });
-      const spanGaps = !isNullMeansZero;
       const s: TSChartSeries = {
         id: seriesKey,
         scale: 'y',
@@ -383,7 +404,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           s.dash = [2, 2];
           break;
       }
-      if (primaryAxes.colorizationType === 'FILL') {
+      if (primaryAxes.colorizationType === 'FILL' && primaryAxes.displayType !== 'STACKED_BAR') {
         s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
       }
       switch (primaryAxes.displayType) {
@@ -396,6 +417,70 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       }
       return s;
     });
+
+    const edgeExtensionHook: Hooks.Arrays | undefined =
+      spanGaps && primaryAxes.displayType === 'LINE'
+        ? {
+            drawSeries: [
+              (u: any, seriesIdx: number) => {
+                if (!u.series[seriesIdx].show) return;
+                const ourSeries = series[seriesIdx - 1];
+                if (!ourSeries || ourSeries.scale !== 'y' || !ourSeries.spanGaps) return;
+                const yData = u.data[seriesIdx] as (number | null | undefined)[];
+                let firstIdx = -1;
+                let lastIdx = -1;
+                for (let k = 0; k < yData.length; k++) {
+                  if (yData[k] != null) {
+                    if (firstIdx === -1) firstIdx = k;
+                    lastIdx = k;
+                  }
+                }
+                if (firstIdx === -1 || (firstIdx === 0 && lastIdx === yData.length - 1)) return;
+                const xData = u.data[0] as number[];
+                const ctx = u.ctx as CanvasRenderingContext2D;
+                const dpr: number = devicePixelRatio || 1;
+                ctx.save();
+                ctx.strokeStyle = ourSeries.strokeConfig!.color + '70';
+                ctx.lineWidth = dpr;
+                ctx.setLineDash([4 * dpr, 4 * dpr]);
+                if (firstIdx > 0) {
+                  const yPos = u.valToPos(yData[firstIdx], 'y', true);
+                  const xPos = u.valToPos(xData[firstIdx], 'x', true);
+                  ctx.beginPath();
+                  ctx.moveTo(u.bbox.left, yPos);
+                  ctx.lineTo(xPos, yPos);
+                  ctx.stroke();
+                }
+                if (lastIdx < yData.length - 1) {
+                  const yPos = u.valToPos(yData[lastIdx], 'y', true);
+                  const xPos = u.valToPos(xData[lastIdx], 'x', true);
+                  ctx.beginPath();
+                  ctx.moveTo(xPos, yPos);
+                  ctx.lineTo(u.bbox.left + u.bbox.width, yPos);
+                  ctx.stroke();
+                }
+                ctx.restore();
+              },
+            ],
+          }
+        : undefined;
+
+    let bands: Band[] | undefined;
+    if (primaryAxes.displayType === 'STACKED_BAR') {
+      series.sort((a, b) => (a.id! < b.id! ? -1 : a.id! > b.id! ? 1 : 0));
+      series.forEach((s) => (s.originalData = [...s.data]));
+      this.cumulateSeriesData(series);
+      const skipSeries = hasSecondaryAxes ? 1 : 0;
+      series.forEach((s) => {
+        s.paths = stackedBarPaths;
+        s.fill = s.strokeConfig!.color + 'cc';
+        s.value = (self: any, x: number, seriesIdx: number, idx: number) =>
+          TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
+            this.calculateStackedValue(self, x, seriesIdx, idx, skipSeries),
+          );
+      });
+      bands = this.getStackedBands(series.length, skipSeries);
+    }
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
 
@@ -423,17 +508,30 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       });
       const secondaryAxesSettings = this.item().chartSettings!.secondaryAxes!;
       const secondaryDisplayType = secondaryAxesSettings.displayType;
-      const secondaryNullMeansZero =
-        secondaryAxesAggregation?.type === 'RATE' ||
-        secondaryAxesAggregation?.type === 'COUNT' ||
-        secondaryDisplayType !== 'LINE';
+      const secondaryNullMeansZero = isSecondaryRateOrCount || (!isGauge && secondaryDisplayType !== 'LINE');
+      if (useSecondaryForwardFill) {
+        let lastSecVal: number | undefined;
+        for (let k = 0; k < secondaryAxesData.length; k++) {
+          if (secondaryAxesData[k] == null) {
+            secondaryAxesData[k] = lastSecVal;
+          } else {
+            lastSecVal = secondaryAxesData[k] as number;
+          }
+        }
+      } else if (secondaryNullMeansZero) {
+        for (let k = 0; k < secondaryAxesData.length; k++) {
+          if (secondaryAxesData[k] == null) {
+            secondaryAxesData[k] = 0;
+          }
+        }
+      }
       const secondarySeries: TSChartSeries = {
         scale: 'z',
         labelItems: ['Total'],
         id: 'total',
         strokeConfig: { color: '', type: MarkerType.SQUARE },
         data: secondaryAxesData,
-        spanGaps: !secondaryNullMeansZero,
+        spanGaps: !secondaryNullMeansZero && !useSecondaryForwardFill,
         value: (x, v: number) => Math.trunc(v) + ' total',
         points: { show: false },
       };
@@ -495,6 +593,24 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           },
           showLegend: true,
           axes: axes,
+          bands: bands,
+          hooks: edgeExtensionHook,
+          scales:
+            primaryAxes.displayType === 'STACKED_BAR'
+              ? { y: { range: (_: any, _min: number, max: number) => [0, max] as [number, number] } }
+              : undefined,
+          cursor:
+            primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'
+              ? {
+                  dataIdx: (self: any, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
+                    const xData = self.data[0] as number[];
+                    let i = hoveredIdx;
+                    while (i > 0 && xData[i] > cursorXVal) i--;
+                    while (i < xData.length - 1 && xData[i + 1] <= cursorXVal) i++;
+                    return i;
+                  },
+                }
+              : undefined,
           truncated: response.truncated,
         };
       }),
@@ -528,9 +644,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case ChartAggregation.RATE:
         return 'Total Hits/' + aggregation.params?.['rateUnit'];
       case ChartAggregation.PERCENTILE:
-        return 'Overall PCL ' + aggregation.params?.['pclValue'];
+        return 'Total (PCL ' + aggregation.params?.['pclValue'] + ')';
       default:
-        return 'Overall ' + aggregation?.type;
+        return 'Total (' + aggregation?.type + ')';
     }
   }
 
@@ -759,6 +875,36 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     } else {
       return value;
     }
+  }
+
+  private cumulateSeriesData(series: TSChartSeries[]): void {
+    series.forEach((s, i) => {
+      if (i === 0) return;
+      s.data.forEach((_, j) => {
+        s.data[j] = (series[i - 1].data[j] as number) + (s.data[j] as number);
+      });
+    });
+  }
+
+  private calculateStackedValue(
+    self: any,
+    currentValue: number,
+    seriesIdx: number,
+    idx: number,
+    skipSeries: number,
+  ): number {
+    if (seriesIdx > 1 + skipSeries) {
+      return currentValue - (self.data[seriesIdx - 1][idx] || 0);
+    }
+    return currentValue;
+  }
+
+  private getStackedBands(count: number, skipSeries = 0): Band[] {
+    const bands: Band[] = [];
+    for (let i = count; i > 1; i--) {
+      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
+    }
+    return bands;
   }
 
   getType(): 'TABLE' | 'CHART' {
