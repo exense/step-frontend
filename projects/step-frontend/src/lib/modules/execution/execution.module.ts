@@ -191,13 +191,8 @@ import { AltIterationListTitleComponent } from './components/alt-iteration-list-
 import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
-import {
-  DrillDownAggregatedReportNodeStackItemConfig,
-  DrillDownStackItemConfig,
-  DrillDownStackItemType,
-} from './shared/drilldown-stack-item';
+import { DRILL_DOWN_ROOT_ID, DrillDownStackItemConfig, DrillDownStackItemType } from './shared/drilldown-stack-item';
 import { DrilldownRootType } from './shared/drilldown-root-type';
-import { ROOT_NODE_ID } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/azure-devops/types/root.constant';
 
 @NgModule({
   declarations: [
@@ -828,7 +823,7 @@ export class ExecutionModule {
                         {
                           type: DrillDownStackItemType.ROOT,
                           rootType,
-                          nodeId: ROOT_NODE_ID,
+                          nodeId: DRILL_DOWN_ROOT_ID,
                         },
                       ];
 
