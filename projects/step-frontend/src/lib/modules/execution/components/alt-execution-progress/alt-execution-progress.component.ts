@@ -80,6 +80,7 @@ import { ToggleRequestWarningDirective } from '../../directives/toggle-request-w
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 import { TimeRangeExt } from '../../shared/time-range-ext';
 import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
+import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -136,6 +137,7 @@ interface RefreshParams {
       },
     },
     AltExecutionReportPrintService,
+    AltExecutionDrilldownNavigationUtilsService,
     AltExecutionDialogsService,
     {
       provide: SchedulerInvokerService,

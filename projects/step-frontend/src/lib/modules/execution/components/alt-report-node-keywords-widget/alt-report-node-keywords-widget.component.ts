@@ -19,6 +19,6 @@ export class AltReportNodeKeywordsWidgetComponent {
   private _dialogs = inject(AltExecutionDialogsService);
 
   protected openDetails(node: ReportNode): void {
-    this._dialogs.openIterationDetails(node, DrilldownRootType.KEYWORDS);
+    this._dialogs.openIterationDetails(DrilldownRootType.KEYWORDS, node);
   }
 }

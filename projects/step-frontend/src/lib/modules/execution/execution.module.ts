@@ -14,31 +14,31 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import {
   AugmentedExecutionsService,
+  canLeaveComponent,
+  checkEntityGuardFactory,
+  CommonEntitiesUrlsService,
   DashletRegistryService,
+  DialogParentService,
   dialogRoute,
+  editScheduledTaskRoute,
   EntityRegistry,
+  EXECUTION_REPORT_GRID,
+  GridSettingsRegistryService,
   IncludeTestcases,
+  MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
-  schedulePlanRoute,
-  stepRouteAdditionalConfig,
-  TreeNodeUtilsService,
-  ViewRegistryService,
-  DialogParentService,
-  sequenceCanActivateGuards,
-  checkEntityGuardFactory,
-  CommonEntitiesUrlsService,
-  TestRunStatus,
   ReportNode,
-  SimpleOutletComponent,
-  editScheduledTaskRoute,
-  MultipleProjectsService,
+  schedulePlanRoute,
   SearchPaginatorComponent,
-  GridSettingsRegistryService,
-  EXECUTION_REPORT_GRID,
-  canLeaveComponent,
+  sequenceCanActivateGuards,
+  SimpleOutletComponent,
+  stepRouteAdditionalConfig,
+  TestRunStatus,
+  TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -185,13 +185,19 @@ import { AltReportNodeListSortDirective } from './directives/alt-report-node-lis
 import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
 import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
 import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
-import { DrilldownRootType } from './shared/drilldown-root-type';
 import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
 import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
 import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
 import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import {
+  DrillDownAggregatedReportNodeStackItemConfig,
+  DrillDownStackItemConfig,
+  DrillDownStackItemType,
+} from './shared/drilldown-stack-item';
+import { DrilldownRootType } from './shared/drilldown-root-type';
+import { ROOT_NODE_ID } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/azure-devops/types/root.constant';
 
 @NgModule({
   declarations: [
@@ -799,35 +805,57 @@ export class ExecutionModule {
               component: SimpleOutletComponent,
               children: [
                 {
-                  path: ':detailsId',
+                  matcher: (url) => {
+                    if (
+                      url[0].path === DrilldownRootType.TREE ||
+                      url[0].path === DrilldownRootType.TESTCASES ||
+                      url[0].path === DrilldownRootType.KEYWORDS
+                    ) {
+                      return { consumed: url };
+                    }
+                    return null;
+                  },
                   resolve: {
-                    aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
-                      const detailsId = route.params['detailsId'];
-                      return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
-                    },
-                    resolvedPartialPath: () =>
-                      inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
-                    reportNodeId: (route: ActivatedRouteSnapshot) => {
-                      const detailsId = route.params['detailsId'];
-                      return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                    },
-                    searchStatus: (route: ActivatedRouteSnapshot) => {
-                      const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                      return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
-                    },
-                    searchStatusCount: (route: ActivatedRouteSnapshot) => {
-                      const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                      const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
-                      const statusCount = parseInt(statusCountStr);
-                      return isNaN(statusCount) ? undefined : statusCount;
-                    },
-                    drilldownRootType: () => {
-                      const _router = inject(Router);
-                      const currentNavigation = _router.getCurrentNavigation();
-                      const drilldownRootType = currentNavigation?.extras?.state?.['drilldownRootType'] as
-                        | DrilldownRootType
-                        | undefined;
-                      return drilldownRootType;
+                    drilldownState: (route: ActivatedRouteSnapshot) => {
+                      const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
+                      const resolvedPartialPath = _aggregatedViewTreeStateContext.getState().resolvedPartialPath();
+
+                      const url = route.url;
+
+                      const rootType = url[0].path as DrilldownRootType;
+
+                      const result: DrillDownStackItemConfig[] = [
+                        {
+                          type: DrillDownStackItemType.ROOT,
+                          rootType,
+                          nodeId: ROOT_NODE_ID,
+                        },
+                      ];
+
+                      for (let i = 1; i < url.length; i += 2) {
+                        const type =
+                          url[i].path === 'report'
+                            ? DrillDownStackItemType.REPORT_NODE
+                            : DrillDownStackItemType.AGGREGATED_REPORT_NODE;
+                        const value = url[i + 1].path;
+                        if (type === DrillDownStackItemType.REPORT_NODE) {
+                          const nodeId = value;
+                          result.push({ type, nodeId });
+                        } else {
+                          const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
+                          let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
+                          searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
+                          result.push({
+                            type,
+                            nodeId,
+                            searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
+                            searchStatusCount,
+                            resolvedPartialPath,
+                          });
+                        }
+                      }
+
+                      return result;
                     },
                   },
                   component: AggregatedTreeNodeDrilldownComponent,

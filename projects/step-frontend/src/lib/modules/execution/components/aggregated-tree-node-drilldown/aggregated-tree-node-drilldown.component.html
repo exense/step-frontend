@@ -1,4 +1,4 @@
-<step-stack-view [withOverflow]="true" (removeItem)="removeItem($event)" (closeAll)="handleCloseAll()">
+<step-stack-view [withOverflow]="true" (removeItem)="removeItem($event, true)" (closeAll)="handleCloseAll()">
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
       @case (StackItemType.ROOT) {
@@ -96,7 +96,6 @@
                   stepTreeAutoChooseVirtualScroll="340px"
                   [applyVirtualScrollFrom]="150"
                   [showSpinnerWhileTreeInitialize]="true"
-                  [handleOpenIterationsManually]="true"
                   (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
                 />
               </section>

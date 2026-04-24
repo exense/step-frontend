@@ -6,7 +6,6 @@ import {
   inject,
   input,
   output,
-  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -20,7 +19,7 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { ERROR_STATUSES } from '../../../_common/shared/status.enum';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
-import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
+import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
@@ -44,7 +43,6 @@ enum TreeNodeAction {
 export class AltExecutionTreeComponent implements TreeActionsService {
   protected readonly _treeSate = inject(AggregatedReportViewTreeStateService);
   private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
-  private _executionDialogs = inject(AltExecutionDialogsService);
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
@@ -55,7 +53,6 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   });
 
   readonly showSpinnerWhileTreeInitialize = input(false);
-  readonly handleOpenIterationsManually = input(false);
   readonly openIterations = output<OpenIterationsEvent>();
 
   protected readonly showSpinner = computed(() => {
@@ -92,12 +89,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   }
 
   handleOpenIterations(event: OpenIterationsEvent): void {
-    const handleEventManually = untracked(() => this.handleOpenIterationsManually());
-    if (handleEventManually) {
-      this.openIterations.emit(event);
-      return;
-    }
-    this._executionDialogs.openIterations(event.node, event.restParams);
+    this.openIterations.emit(event);
   }
 
   proceedAction(actionId: string, node: TreeNode, multiple?: boolean): void {

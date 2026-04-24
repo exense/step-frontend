@@ -10,55 +10,34 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
-import { filter, map, switchMap } from 'rxjs';
+import { filter, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { ReportNode } from '@exense/step-core';
-import { Status } from '../../../_common/shared/status.enum';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
 import { AltExecutionDialogsService, PartialOpenIterationsParams } from '../../services/alt-execution-dialogs.service';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DrilldownRootType } from '../../shared/drilldown-root-type';
+import {
+  DrillDownAggregatedReportNodeStackItem,
+  DrillDownAggregatedReportNodeStackItemConfig,
+  DrillDownReportNodeStackItem,
+  DrillDownReportNodeStackItemConfig,
+  DrillDownRootStackItem,
+  DrillDownRootStackItemConfig,
+  DrillDownStackItem,
+  DrillDownStackItemConfig,
+  DrillDownStackItemType,
+} from '../../shared/drilldown-stack-item';
+import { ROOT_NODE_ID } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/azure-devops/types/root.constant';
+import { v4 } from 'uuid';
+import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
+import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 
 interface DrilldownData {
-  aggregatedNodeId?: string;
-  resolvedPartialPath?: string;
-  reportNodeId?: string;
-  searchStatus?: Status;
-  searchStatusCount?: number;
+  drilldownState: DrillDownStackItemConfig[];
 }
-
-enum StackItemType {
-  ROOT = 'root',
-  REPORT_NODE = 'reportNode',
-  AGGREGATED_REPORT_NODE = 'aggregatedReportNode',
-}
-
-const ROOT = 'root';
-
-type StackItem =
-  | {
-      id: string;
-      nodeId: string;
-      rootType: DrilldownRootType;
-      type: StackItemType.ROOT;
-    }
-  | {
-      id: string;
-      nodeId: string;
-      type: StackItemType.REPORT_NODE;
-      data: ReportNode;
-    }
-  | {
-      id: string;
-      nodeId: string;
-      type: StackItemType.AGGREGATED_REPORT_NODE;
-      data: AggregatedTreeNode;
-      resolvedPartialPath?: string;
-      searchStatus?: Status;
-      searchStatusCount?: number;
-    };
 
 const IS_DRILLDOWN_OPENED = 'is-drilldown-opened';
 
@@ -81,25 +60,24 @@ const IS_DRILLDOWN_OPENED = 'is-drilldown-opened';
       useValue: ViewMode.VIEW,
     },
     AltExecutionNodesHelperService,
+    AltExecutionDrilldownNavigationUtilsService,
     AltExecutionDialogsService,
   ],
 })
 export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
-  private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService);
-  private _dialogsService = inject(AltExecutionDialogsService);
-  private _nodeDetailsRelativeParent =
-    inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute.parent!.parent!;
+  private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
+  private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
 
-  protected readonly stackItems = signal<StackItem[]>([]);
-  protected readonly StackItemType = StackItemType;
+  protected readonly stackItems = signal<DrillDownStackItem[]>([]);
+  protected readonly StackItemType = DrillDownStackItemType;
 
   protected readonly selectedRootReportNodeId = computed(() => {
     const stackItems = this.stackItems();
     const [root, first] = stackItems;
-    if (root.type !== StackItemType.ROOT || root.rootType !== DrilldownRootType.KEYWORDS || !first) {
+    if (root.type !== DrillDownStackItemType.ROOT || root.rootType !== DrilldownRootType.KEYWORDS || !first) {
       return undefined;
     }
     return first.nodeId;
@@ -108,18 +86,14 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   protected readonly selectedAggregatedNodeId = computed(() => {
     const stackItems = this.stackItems();
     const [root, first] = stackItems;
-    if (root.type !== StackItemType.ROOT || root.rootType !== DrilldownRootType.TESTCASES || !first) {
+    if (root.type !== DrillDownStackItemType.ROOT || root.rootType !== DrilldownRootType.TESTCASES || !first) {
       return undefined;
     }
     return first.nodeId;
   });
 
-  private get stackItemsUntracked(): StackItem[] {
+  private get stackItemsUntracked(): DrillDownStackItem[] {
     return untracked(() => this.stackItems());
-  }
-
-  private get currentLength(): number {
-    return this.stackItemsUntracked.length;
   }
 
   private get executionProgressElement(): HTMLElement | null {
@@ -128,58 +102,51 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
 
   private readonly data$ = this._activatedRoute.data.pipe(map((data) => data as DrilldownData));
 
-  private readonly reportNodeSubscription = this.data$
+  private readonly updateStateSubscription = this.data$
     .pipe(
-      filter((data) => !!data.reportNodeId),
-      map((data) => data.reportNodeId),
-      switchMap((reportNodeId) => this._altExecutionNodesHelper.getReportNode(reportNodeId)),
-      filter((data) => !!data),
-      map(
-        (data) =>
-          ({
-            data,
-            id: `${data.id}_${this.currentLength}`,
-            nodeId: data.id,
-            type: StackItemType.REPORT_NODE,
-          }) as StackItem,
-      ),
-      takeUntilDestroyed(),
-    )
-    .subscribe((item) => {
-      this.stackItems.update((value) => [...value, item]);
-    });
-
-  private readonly aggregatedNodeSubscription = this.data$
-    .pipe(
-      filter((data) => !!data.aggregatedNodeId),
-      switchMap((data) => {
-        return this._altExecutionNodesHelper.getAggregatedNode(data.aggregatedNodeId).pipe(
-          map((node) => {
-            if (!node) {
-              return undefined;
+      filter((data) => !!data.drilldownState.length),
+      map((data) => data.drilldownState),
+      map((drillDownState) => {
+        const stateToConfigure: DrillDownStackItemConfig[] = [];
+        const items = this.stackItemsUntracked;
+        let keepIndex: number;
+        for (keepIndex = 0; keepIndex < items.length && keepIndex < stateToConfigure.length; keepIndex++) {
+          if (keepIndex === 0) {
+            const rootConfig = drillDownState[0] as DrillDownRootStackItemConfig;
+            const rootItem = items[0] as DrillDownRootStackItem;
+            if (rootConfig.rootType !== rootItem.rootType) {
+              break;
             }
-            const { resolvedPartialPath, searchStatus, searchStatusCount, aggregatedNodeId: nodeId } = data;
-            return {
-              id: `${nodeId}_${this.currentLength}`,
-              nodeId,
-              type: StackItemType.AGGREGATED_REPORT_NODE,
-              data: node,
-              resolvedPartialPath,
-              searchStatus,
-              searchStatusCount,
-            } as StackItem;
-          }),
+            continue;
+          }
+
+          if (
+            drillDownState[keepIndex].type !== items[keepIndex].type &&
+            drillDownState[keepIndex].nodeId !== items[keepIndex].nodeId
+          ) {
+            break;
+          }
+        }
+        const stateToSetup = drillDownState.slice(keepIndex);
+        return { stateToSetup, keepIndex };
+      }),
+      switchMap(({ stateToSetup, keepIndex }) => {
+        const newItems = stateToSetup.map((config) => this.getNode(config));
+        const newItemsResult$ = forkJoin(newItems);
+        return newItemsResult$.pipe(
+          map((resultItems) => resultItems.filter((item) => !!item)),
+          map((newItems) => ({ newItems, keepIndex })),
         );
       }),
-      filter((item) => !!item),
       takeUntilDestroyed(),
     )
-    .subscribe((item) => {
-      this.stackItems.update((value) => [...value, item]);
+    .subscribe(({ newItems, keepIndex }) => {
+      this.stackItems.update((items) => {
+        return [...items.slice(0, keepIndex), ...newItems];
+      });
     });
 
   ngOnInit(): void {
-    this.initializeRootElement();
     this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
   }
 
@@ -192,19 +159,20 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     this.removeItem(items[0].id);
   }
 
-  protected removeItem(id: string): void {
+  protected removeItem(id: string, withLocationUpdate?: boolean): void {
     const items = this.stackItemsUntracked;
     // By closing of the first item, close entire view
     if (items[0].id === id) {
-      this._router.navigate([{ outlets: { nodeDetails: null } }], {
-        relativeTo: this._nodeDetailsRelativeParent,
-        queryParamsHandling: 'merge',
-      });
+      this._drilldownNavigationUtils.closeDrilldown();
       return;
     }
     this.stackItems.update((value) => {
       const index = value.findIndex((item) => item.id === id);
-      return value.splice(0, index);
+      const result = value.splice(0, index);
+      if (withLocationUpdate) {
+        this._drilldownNavigationUtils.changeDrilldownLocation(result);
+      }
+      return result;
     });
   }
 
@@ -213,16 +181,37 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     parentStackItemId: string,
     params: PartialOpenIterationsParams = {},
   ): void {
-    const singleReportNode = this._dialogsService.getSingleReportNode(node);
+    const singleReportNode = this._drilldownNavigationUtils.getSingleReportNode(node);
     if (
       (singleReportNode && !this.isPossibleToInsertItem(singleReportNode.id!, parentStackItemId)) ||
       !this.isPossibleToInsertItem(node.id!, parentStackItemId)
     ) {
       return;
     }
+
+    if (singleReportNode) {
+      this.handleOpenDetails(singleReportNode, parentStackItemId);
+      return;
+    }
+
     this.removeAllAfterItem(parentStackItemId);
+
+    const newItem: DrillDownAggregatedReportNodeStackItem = {
+      type: DrillDownStackItemType.AGGREGATED_REPORT_NODE,
+      nodeId: node.id!,
+      data: node,
+      id: v4(),
+      searchStatus: params.nodeStatus,
+      searchStatusCount: params.nodeStatusCount,
+      resolvedPartialPath: untracked(() => this._treeStateContext.getState().resolvedPartialPath()),
+    };
+
     queueMicrotask(() => {
-      this._dialogsService.openIterations(node, params);
+      this.stackItems.update((value) => {
+        const result = [...value, newItem];
+        this._drilldownNavigationUtils.changeDrilldownLocation(result);
+        return result;
+      });
     });
   }
 
@@ -231,8 +220,20 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       return;
     }
     this.removeAllAfterItem(parentStackItemId);
+
+    const newItem: DrillDownReportNodeStackItem = {
+      type: DrillDownStackItemType.REPORT_NODE,
+      nodeId: node.id!,
+      data: node,
+      id: v4(),
+    };
+
     queueMicrotask(() => {
-      this._dialogsService.openIterationDetails(node);
+      this.stackItems.update((value) => {
+        const result = [...value, newItem];
+        this._drilldownNavigationUtils.changeDrilldownLocation(result);
+        return result;
+      });
     });
   }
 
@@ -266,17 +267,59 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     this.removeItem(nextItemId);
   }
 
-  private initializeRootElement(): void {
-    let rootType = this._activatedRoute.snapshot.data?.['drilldownRootType'] as DrilldownRootType | undefined;
-    rootType = rootType ?? DrilldownRootType.TREE;
-    this.stackItems.update((items) => {
-      if (items[0]?.type === StackItemType.ROOT) {
-        items = [{ ...items[0], rootType }, ...items.slice(1)];
-      } else {
-        items = [{ type: StackItemType.ROOT, id: ROOT, nodeId: ROOT, rootType }, ...items];
-      }
-      return items;
-    });
+  private getNode(config: DrillDownStackItemConfig): Observable<DrillDownStackItem | undefined> {
+    switch (config.type) {
+      case DrillDownStackItemType.ROOT:
+        return this.getRootNode(config);
+      case DrillDownStackItemType.REPORT_NODE:
+        return this.getReportNode(config);
+      case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
+        return this.getAggregatedReportNode(config);
+      default:
+        return of(undefined);
+    }
+  }
+
+  private getRootNode(config: DrillDownRootStackItemConfig): Observable<DrillDownRootStackItem> {
+    const result: DrillDownRootStackItem = {
+      ...config,
+      id: ROOT_NODE_ID,
+    };
+    return of(result);
+  }
+
+  private getReportNode(
+    config: DrillDownReportNodeStackItemConfig,
+  ): Observable<DrillDownReportNodeStackItem | undefined> {
+    return this._altExecutionNodesHelper.getReportNode(config.nodeId).pipe(
+      map((data) => {
+        if (!data) {
+          return undefined;
+        }
+        return {
+          ...config,
+          id: v4(),
+          data,
+        };
+      }),
+    );
+  }
+
+  private getAggregatedReportNode(
+    config: DrillDownAggregatedReportNodeStackItemConfig,
+  ): Observable<DrillDownAggregatedReportNodeStackItem | undefined> {
+    return this._altExecutionNodesHelper.getAggregatedNode(config.nodeId).pipe(
+      map((data) => {
+        if (!data) {
+          return undefined;
+        }
+        return {
+          ...config,
+          id: v4(),
+          data,
+        };
+      }),
+    );
   }
 
   protected readonly DrilldownRootType = DrilldownRootType;

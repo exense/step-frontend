@@ -22,10 +22,7 @@ export class AltExecutionTreeWidgetComponent {
   private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   handleOpenIterations(event: OpenIterationsEvent): void {
-    this._executionDialogs.openIterations(event.node, {
-      ...event.restParams,
-      drilldownRootType: DrilldownRootType.TREE,
-    });
+    this._executionDialogs.openIterations(DrilldownRootType.TREE, event.node, event.restParams);
   }
 
   focusAndSearch(query: string): void {

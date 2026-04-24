@@ -17,6 +17,6 @@ export class AltReportNodeTestcasesWidgetComponent {
   protected readonly _mode = inject(VIEW_MODE);
 
   protected handleOpenIteration({ node, restParams }: OpenIterationsEvent): void {
-    this._executionDialogs.openIterations(node, { ...restParams, drilldownRootType: DrilldownRootType.TESTCASES });
+    this._executionDialogs.openIterations(DrilldownRootType.TESTCASES, node, restParams);
   }
 }
