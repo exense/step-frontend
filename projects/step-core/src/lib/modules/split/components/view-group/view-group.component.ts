@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, TemplateRef } from '@angular/core';
 import { StackViewInfoGroup } from '../../types/stack-view-info';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ViewItemDefaultNamePipe } from '../../pipes/view-item-default-name.pipe';
@@ -11,6 +11,7 @@ import { ViewItemDefaultNamePipe } from '../../pipes/view-item-default-name.pipe
 })
 export class ViewGroupComponent {
   readonly group = input<StackViewInfoGroup | undefined>(undefined);
+  readonly viewGroupTooltip = input<TemplateRef<unknown> | undefined>(undefined);
 
   readonly openView = output<string>();
 

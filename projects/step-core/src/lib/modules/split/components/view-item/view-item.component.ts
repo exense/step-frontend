@@ -7,12 +7,16 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   imports: [StepBasicsModule],
   templateUrl: './view-item.component.html',
   styleUrl: './view-item.component.scss',
+  host: {
+    '[class.is-last]': 'isLast()',
+  },
   encapsulation: ViewEncapsulation.None,
 })
 export class ViewItemComponent {
   readonly view = input.required<StackViewInfo>();
   readonly canMinimize = input(false);
   readonly canMaximize = input(false);
+  readonly isLast = input(false);
   readonly remove = output();
   readonly minimize = output();
   readonly maximize = output();

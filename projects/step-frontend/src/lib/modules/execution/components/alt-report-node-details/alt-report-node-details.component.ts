@@ -135,6 +135,12 @@ export class AltReportNodeDetailsComponent {
     return artefactClass === 'TestCase';
   });
 
+  protected readonly hideFirstPanel = computed(() => {
+    const isTestCase = this.isTestCase();
+    const rootCauseErrors = this.rootCauseErrors();
+    return isTestCase && !rootCauseErrors?.length;
+  });
+
   protected readonly detailsComponent = computed(() => {
     const artefactClass = this.artefactClass();
     const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;

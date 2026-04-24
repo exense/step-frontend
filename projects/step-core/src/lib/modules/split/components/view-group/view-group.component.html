@@ -1,6 +1,15 @@
 <section>
   <div class="panel-header">
-    <div class="title">...</div>
+    @if (viewGroupTooltip(); as viewGroupTooltipTemplate) {
+      <step-popover>
+        <div class="title">...</div>
+        <step-popover-content>
+          <ng-container *ngTemplateOutlet="viewGroupTooltipTemplate" />
+        </step-popover-content>
+      </step-popover>
+    } @else {
+      <div class="title">...</div>
+    }
   </div>
   <div class="content">
     @for (item of items(); track item.id) {

@@ -2,6 +2,7 @@ import {
   afterNextRender,
   Component,
   computed,
+  contentChild,
   contentChildren,
   effect,
   ElementRef,
@@ -22,6 +23,7 @@ import { SplitComponent } from '../split/split.component';
 import { StackViewItemComponent } from '../stack-view-item/stack-view-item.component';
 import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-view-breadcrumbs.component';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { StackViewGroupTooltipDirective } from '../../directives/stack-view-group-tooltip.directive';
 
 @Component({
   selector: 'step-stack-view',
@@ -56,6 +58,7 @@ export class StackViewComponent {
   private readonly isRendered = signal(false);
   private readonly splitAreas = viewChildren(SplitAreaComponent);
   private readonly items = contentChildren(StackViewItemComponent);
+  protected readonly viewGroupTooltip = contentChild(StackViewGroupTooltipDirective);
 
   protected readonly isMaximized = this.isMaximizedInternal.asReadonly();
   protected readonly views = signal<StackViewInfo[]>([]);

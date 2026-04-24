@@ -6,25 +6,32 @@ step-view-item {
     margin: 0.5rem;
     padding: 0 0.5rem;
 
-    .header {
+    .item-header {
       align-items: center;
       gap: 0.5rem;
       justify-content: space-between;
+      display: flex;
+      margin-bottom: 1rem;
 
       & > div:first-child {
         flex: 1;
       }
 
-      .title {
+      .item-title {
         white-space: nowrap;
         font-size: 2rem;
         font-weight: bold;
       }
     }
 
-    .content {
+    .item-content {
       overflow-x: hidden;
       overflow-y: auto;
     }
+  }
+
+  &.is-last > section {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
   }
 }

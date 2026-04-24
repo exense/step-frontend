@@ -10,11 +10,16 @@ section {
   padding: 0.5rem;
 }
 
+.panel-header {
+  width: fit-content;
+}
+
 .title {
   white-space: nowrap;
   font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
+  cursor: default;
 }
 
 .content {

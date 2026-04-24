@@ -10,10 +10,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeComponent, TreeNode } from '@exense/step-core';
-import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -44,14 +41,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   protected readonly _treeSate = inject(AggregatedReportViewTreeStateService);
   private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
-  protected readonly _state = inject(AltExecutionStateService);
-  private _urlParamsService = inject(DashboardUrlParamsService);
   private readonly tree = viewChild('tree', { read: TreeComponent });
-
-  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
-    this._urlParamsService.patchUrlParams(range, undefined, true);
-  });
-
   readonly showSpinnerWhileTreeInitialize = input(false);
   readonly openIterations = output<OpenIterationsEvent>();
 

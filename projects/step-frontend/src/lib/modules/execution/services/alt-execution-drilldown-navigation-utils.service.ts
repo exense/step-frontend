@@ -92,9 +92,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
     });
     const url = this._router.serializeUrl(urlTree);
 
-    setTimeout(() => {
-      this._location.go(url);
-    }, 0);
+    this._location.go(url);
   }
 
   closeDrilldown(): void {

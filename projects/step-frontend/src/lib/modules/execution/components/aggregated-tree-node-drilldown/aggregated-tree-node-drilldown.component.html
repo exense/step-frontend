@@ -1,4 +1,8 @@
 <step-stack-view [withOverflow]="true" (removeItem)="removeItem($event, true)" (closeAll)="handleCloseAll()">
+  <div *stepStackViewGroupTooltip>
+    <strong>Minimized panels</strong><br />
+    <div>When opening more panels than fit the screen, previous panels will automatically be minimized</div>
+  </div>
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
       @case (StackItemType.ROOT) {

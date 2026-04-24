@@ -1,6 +1,6 @@
 <section>
-  <div class="header">
-    <div class="title">
+  <div class="item-header">
+    <div class="item-title">
       @if (titleTemplateRef(); as templateRef) {
         <ng-container *ngTemplateOutlet="templateRef" />
       } @else {
@@ -21,7 +21,7 @@
       <step-icon name="x" />
     </button>
   </div>
-  <div class="content">
+  <div class="item-content">
     @if (contentTemplateRef(); as templateRef) {
       <ng-container *ngTemplateOutlet="templateRef" />
     }
