@@ -20,6 +20,7 @@ import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relati
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DrilldownRootType } from '../../shared/drilldown-root-type';
 import {
+  DRILL_DOWN_ROOT_ID,
   DrillDownAggregatedReportNodeStackItem,
   DrillDownAggregatedReportNodeStackItemConfig,
   DrillDownReportNodeStackItem,
@@ -30,7 +31,6 @@ import {
   DrillDownStackItemConfig,
   DrillDownStackItemType,
 } from '../../shared/drilldown-stack-item';
-import { ROOT_NODE_ID } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/azure-devops/types/root.constant';
 import { v4 } from 'uuid';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
@@ -283,7 +283,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private getRootNode(config: DrillDownRootStackItemConfig): Observable<DrillDownRootStackItem> {
     const result: DrillDownRootStackItem = {
       ...config,
-      id: ROOT_NODE_ID,
+      id: DRILL_DOWN_ROOT_ID,
     };
     return of(result);
   }
