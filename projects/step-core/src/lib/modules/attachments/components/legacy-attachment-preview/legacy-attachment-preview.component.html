@@ -1,4 +1,7 @@
-<a [target]="hasResourceReadPermission() ? '_blank' : null" [href]="hasResourceReadPermission() ? (attachment() | attachmentUrl: true) : null">
+<a
+  [target]="hasResourceReadPermission() ? '_blank' : null"
+  [href]="hasResourceReadPermission() ? (attachment() | attachmentUrl: true) : null"
+>
   @if (attachment() | attachmentIsImage) {
     <img class="att-thumbnail" [src]="attachment() | attachmentUrl" />
   }

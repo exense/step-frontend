@@ -152,7 +152,7 @@
     <ng-container matColumnDef="history" stepActivityCol="History">
       <th mat-header-cell *matHeaderCellDef>
         <step-drag-column-caption
-        >History
+          >History
           <step-icon
             name="help-circle"
             matTooltip="Shows the results of prior plan executions. Each circle represents one execution."
@@ -161,10 +161,7 @@
       </th>
       <td mat-cell *matCellDef="let element" class="description-cell">
         @if (element.status !== 'RUNNING') {
-          <step-execution-history-nodes
-            [nodesCount]="8"
-            [execution]="element"
-          />
+          <step-execution-history-nodes [nodesCount]="8" [execution]="element" />
         }
       </td>
     </ng-container>

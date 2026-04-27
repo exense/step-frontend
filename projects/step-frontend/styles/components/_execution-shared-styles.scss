@@ -187,6 +187,7 @@
   }
 
   step-table.special-selection {
+    tr.row-highlight,
     tr:hover {
       td {
         position: relative;

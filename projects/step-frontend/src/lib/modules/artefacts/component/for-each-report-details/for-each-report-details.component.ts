@@ -32,7 +32,13 @@ export class ForEachReportDetailsComponent extends BaseReportDetailsComponent<Re
         return of(undefined);
       }
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource, true).pipe(
-        map((items) => [{ label: 'threads', value: artefact.threads, itemType: ItemType.configuration }, ...items] as ArtefactInlineItemSource),
+        map(
+          (items) =>
+            [
+              { label: 'threads', value: artefact.threads, itemType: ItemType.CONFIGURATION },
+              ...items,
+            ] as ArtefactInlineItemSource,
+        ),
         map((items) => this._artefactInlineUtils.convert(items)),
       );
     }),

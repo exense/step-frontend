@@ -15,9 +15,10 @@ import { AGGREGATED_TREE_NODE_LARGE_VIEW } from './aggregated-tree-node-large-vi
 const HASH_NAMESPACE = 'e9903ee9-1674-45a6-a044-62702dfe0865';
 
 @Injectable()
-export class AggregatedReportViewTreeNodeUtilsService
-  implements TreeNodeUtilsService<AggregatedReportView, AggregatedTreeNode>
-{
+export class AggregatedReportViewTreeNodeUtilsService implements TreeNodeUtilsService<
+  AggregatedReportView,
+  AggregatedTreeNode
+> {
   private _artefactTypes = inject(ArtefactService);
   private _useLargeView = inject(AGGREGATED_TREE_NODE_LARGE_VIEW);
 

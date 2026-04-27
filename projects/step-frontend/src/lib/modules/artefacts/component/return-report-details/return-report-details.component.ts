@@ -34,7 +34,7 @@ export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<Rep
     return JSON.stringify(value);
   }
 
-  protected outputItems = computed(() => {
+  protected readonly outputItems = computed(() => {
     const output = this.node()?.resolvedArtefact?.output?.value;
     if (!output) {
       return undefined;
@@ -48,7 +48,7 @@ export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<Rep
             const preparedValue = isDynamic
               ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
               : value;
-            return { label: key, value: this.normalizeInlineValue(preparedValue), itemType: ItemType.result };
+            return { label: key, value: this.normalizeInlineValue(preparedValue), itemType: ItemType.RESULT };
           }),
         );
       }

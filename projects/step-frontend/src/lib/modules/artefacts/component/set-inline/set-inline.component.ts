@@ -27,7 +27,7 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
         return undefined;
       }
       const { key, value } = artefact;
-      return this._artefactInlineItemUtils.convert([{ label: key, value, itemType: ItemType.configuration }]);
+      return this._artefactInlineItemUtils.convert([{ label: key, value, itemType: ItemType.CONFIGURATION }]);
     })
     .extractReportNodeItems((reportNode) => {
       if (!reportNode) {
@@ -37,7 +37,7 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
       const labelExplicitExpression = reportNode.resolvedArtefact?.key?.expression;
       const valueExplicitExpression = reportNode.resolvedArtefact?.value?.expression;
       return this._artefactInlineItemUtils.convert([
-        { label, value, itemType: ItemType.configuration, labelExplicitExpression, valueExplicitExpression },
+        { label, value, itemType: ItemType.CONFIGURATION, labelExplicitExpression, valueExplicitExpression },
       ]);
     });
 

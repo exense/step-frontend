@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, Signal } from '@angular/core';
 import { Execution, STATUS_COLORS, StepBasicsModule } from '@exense/step-core';
-import {ExecutionNodeItem} from "./ExecutionNodeItem";
-
+import { ExecutionNodeItem } from './ExecutionNodeItem';
 
 @Component({
   selector: 'step-execution-history-nodes',

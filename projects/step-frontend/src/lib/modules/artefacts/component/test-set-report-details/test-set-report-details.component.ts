@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemUtilsService, ItemType,
+  ArtefactInlineItemUtilsService,
+  ItemType,
   ArtefactService,
   BaseReportDetailsComponent,
   ReportNodeWithArtefact,
@@ -25,6 +26,8 @@ export class TestSetReportDetailsComponent extends BaseReportDetailsComponent<Re
     if (!artefact) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([{ label: 'threads', value: artefact.threads, itemType: ItemType.configuration }]);
+    return this._artefactInlineUtils.convert([
+      { label: 'threads', value: artefact.threads, itemType: ItemType.CONFIGURATION },
+    ]);
   });
 }

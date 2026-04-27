@@ -1,62 +1,38 @@
-<step-alt-report-node-list
-  sortByColumn="executionTime"
-  [mode]="_mode"
-  matSort
-  matSortActive="executionTime"
-  matSortDirection="desc"
-  [matSortDisableClear]="true"
-  stepElementSize
+<step-table
+  #table
+  [dataSource]="(_state.datasource$ | async)!"
+  [tableParams]="(_state.tableParams$ | async)!"
+  [calculateCounts]="calculateCounts()"
+  [indicatorMode]="TableIndicatorMode.SPINNER"
+  [highlightedItem]="selectedReportId()"
+  [highlightedItemExtractor]="extractReportId"
+  class="paddingless no-border hide-header no-highlight"
 >
-  <step-table
-    #table
-    [dataSource]="(dataSource$ | async)!"
-    [tableParams]="(keywordsParameters$ | async)!"
-    [calculateCounts]="calculateCounts()"
-    [indicatorMode]="TableIndicatorMode.SPINNER"
-    class="paddingless no-border hide-header no-highlight"
-  >
-    <ng-container matColumnDef="executionTime">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="data-cell details-trigger" mat-cell *matCellDef="let element" stepUndraggedClick (undraggedClick)="openDetails(element)">
-        <div>
-          <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
-            <ng-container *stepArtefactInlineDetailsHeader>
-              <div class="larger-view artefact-header">
-                <step-alt-execution-time
-                  mode="text"
-                  displayFormat="time"
-                  [preserveDurationSpace]="true"
-                  [startTime]="element.executionTime"
-                  [duration]="element.duration"
-                  [singleUnit]="true"
-                />
-                <step-report-node-icon [node]="element" />
-                <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-                <span class="name">{{ element.name }}</span>
-              </div>
-            </ng-container>
-          </step-artefact-inline-details>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="actions-cell" mat-cell *matCellDef="let element">
-        <step-btn-group class="actions">
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Show this node in tree view"
-            matTooltipPosition="below"
-            (click)="openKeywordInTreeView.emit(element)"
-          >
-            <step-icon name="git-pull-request" />
-          </button>
-        </step-btn-group>
-      </td>
-    </ng-container>
-    <ng-container *stepTablePaginatorContent>
-      <step-table-counts-toggle [enabled]="calculateCounts()" itemsLabel="steps" (toggle)="toggleCountsCalculation()" />
-    </ng-container>
-  </step-table>
-</step-alt-report-node-list>
+  <ng-container matColumnDef="executionTime">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td class="data-cell" mat-cell *matCellDef="let element">
+      <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
+        <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
+          <ng-container *stepArtefactInlineDetailsHeader>
+            <div class="larger-view artefact-header">
+              <step-alt-execution-time
+                mode="text"
+                displayFormat="time"
+                [preserveDurationSpace]="true"
+                [startTime]="element.executionTime"
+                [duration]="element.duration"
+                [singleUnit]="true"
+              />
+              <step-report-node-icon [node]="element" />
+              <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+              <span class="name">{{ element.name }}</span>
+            </div>
+          </ng-container>
+        </step-artefact-inline-details>
+      </div>
+    </td>
+  </ng-container>
+  <ng-container *stepTablePaginatorContent>
+    <step-table-counts-toggle [enabled]="calculateCounts()" itemsLabel="steps" (toggle)="toggleCountsCalculation()" />
+  </ng-container>
+</step-table>

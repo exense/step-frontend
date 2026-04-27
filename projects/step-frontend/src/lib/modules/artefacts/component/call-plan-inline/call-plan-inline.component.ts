@@ -54,7 +54,7 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
     const inputs = Object.entries(callPlanInputs).map(([label, value]) => ({
       label,
       value,
-      itemType: ItemType.configuration,
+      itemType: ItemType.CONFIGURATION,
     }));
     return this._artefactInlineItemUtils.convert(inputs);
   }

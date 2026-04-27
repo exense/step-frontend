@@ -178,15 +178,16 @@
             >
               <step-icon name="trash-2" />
             </button>
-            <button
-              data-step-testid="more-packages-btn"
-              *ngIf="entityMenu.hasContent"
-              mat-icon-button
-              [matMenuTriggerFor]="entityMenu.menu!"
-              [matMenuTriggerData]="{ element }"
-            >
-              <step-icon name="more-horizontal" />
-            </button>
+            @if (entityMenu.hasContent) {
+              <button
+                data-step-testid="more-packages-btn"
+                mat-icon-button
+                [matMenuTriggerFor]="entityMenu.menu!"
+                [matMenuTriggerData]="{ element }"
+              >
+                <step-icon name="more-horizontal" />
+              </button>
+            }
           </step-btn-group>
         </td>
       </ng-container>

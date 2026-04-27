@@ -88,10 +88,13 @@ export class AltExecutionTimeComponent {
       return '';
     }
 
-    return this._durationPipe.transform(endTime, startTime, { shortenMs: this.shortenDurationMs(), displaySingle: this.singleUnit() });
+    return this._durationPipe.transform(endTime, startTime, {
+      shortenMs: this.shortenDurationMs(),
+      displaySingle: this.singleUnit(),
+    });
   });
 
-  protected hasContent = computed(() => {
+  protected readonly hasContent = computed(() => {
     const displayDate = this.displayDate();
     const duration = this.duration();
     return !!displayDate || !!duration;

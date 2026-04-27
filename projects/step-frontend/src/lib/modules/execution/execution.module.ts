@@ -14,31 +14,31 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import {
   AugmentedExecutionsService,
+  canLeaveComponent,
+  checkEntityGuardFactory,
+  CommonEntitiesUrlsService,
   DashletRegistryService,
+  DialogParentService,
   dialogRoute,
+  editScheduledTaskRoute,
   EntityRegistry,
+  EXECUTION_REPORT_GRID,
+  GridSettingsRegistryService,
   IncludeTestcases,
+  MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
-  schedulePlanRoute,
-  stepRouteAdditionalConfig,
-  TreeNodeUtilsService,
-  ViewRegistryService,
-  DialogParentService,
-  TreeStateService,
-  sequenceCanActivateGuards,
-  checkEntityGuardFactory,
-  CommonEntitiesUrlsService,
-  TestRunStatus,
   ReportNode,
-  SimpleOutletComponent,
-  editScheduledTaskRoute,
-  MultipleProjectsService,
+  schedulePlanRoute,
   SearchPaginatorComponent,
-  GridSettingsRegistryService,
-  EXECUTION_REPORT_GRID,
-  canLeaveComponent,
+  sequenceCanActivateGuards,
+  SimpleOutletComponent,
+  stepRouteAdditionalConfig,
+  TestRunStatus,
+  TreeNodeUtilsService,
+  ViewItemDefaultNamePipe,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -67,7 +67,7 @@ import { AltExecutionProgressComponent } from './components/alt-execution-progre
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
-import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
+import { AltReportNodeListWidgetComponent } from './components/alt-report-node-list-widget/alt-report-node-list-widget.component';
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
 import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
@@ -75,11 +75,10 @@ import { AltReportCurrentOperationsComponent } from './components/alt-report-cur
 import { AltReportWidgetComponent } from './components/alt-report-widget/alt-report-widget.component';
 import { AltReportWidgetFilterDirective } from './directives/alt-report-widget-filter.directive';
 import { AltReportWidgetContentDirective } from './directives/alt-report-widget-content.directive';
-import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
-import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
+import { AltReportNodeKeywordsWidgetComponent } from './components/alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -89,7 +88,7 @@ import { ExecutionActionsExecuteContentDirective } from './directives/execution-
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { legacyExecutionGuard } from './guards/legacy-execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
-import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-drilldown/alt-report-node-details.component';
+import { AltReportNodeDetailsComponent } from './components/alt-report-node-details/alt-report-node-details.component';
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
@@ -104,7 +103,6 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
-  AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
@@ -112,13 +110,11 @@ import {
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
-import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
-import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
@@ -180,12 +176,23 @@ import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-v
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import {
-  StatusDistributionBadgeComponent
-} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
-import {
-  ExecutionHistoryNodeTooltipComponent
-} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
+import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
+import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
+import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
+import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
+import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
+import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
+import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
+import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
+import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
+import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
+import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { DRILL_DOWN_ROOT_ID, DrillDownStackItemConfig, DrillDownStackItemType } from './shared/drilldown-stack-item';
+import { DrilldownRootType } from './shared/drilldown-root-type';
 
 @NgModule({
   declarations: [
@@ -227,7 +234,7 @@ import {
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
-    AltReportNodeListComponent,
+    AltReportNodeListWidgetComponent,
     AltExecutionTimeComponent,
     AltReportPerformanceOverviewChartComponent,
     AltReportCurrentOperationsComponent,
@@ -237,27 +244,29 @@ import {
     AltReportWidgetTitleDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
-    AltReportNodesTestcasesComponent,
+    AltReportNodeKeywordsWidgetComponent,
+    AltReportNodeTestcasesComponent,
+    AltReportNodeDetailsTestcasesStepsComponent,
+    AltReportNodeTestcasesWidgetComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltExecutionTreePartialComponent,
-    AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
+    AltExecutionTreeControlPanelComponent,
     AltReportNodeStatusFilterComponent,
     AltReportNodeArtefactFilterComponent,
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
-    AltExecutionTreePartialTabComponent,
     AltExecutionRepositoryLinkComponent,
+    AltIterationListTitleComponent,
     ExecutionDetailsComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
-    AggregatedTreeNodeDialogComponent,
     ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
@@ -291,6 +300,8 @@ import {
     ExecutionHistorySectionComponent,
     ExecutionHistoryNodesComponent,
     ExecutionHistoryNodeTooltipComponent,
+    AltReportNodeHeaderComponent,
+    AggregatedTreeNodeDrilldownComponent,
   ],
   imports: [
     StepCommonModule,
@@ -324,6 +335,13 @@ import {
     HistoryNodesComponent,
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
+    AltExecutionTreeWidgetDirective,
+    AltExecutionTreeSearchFocusDirective,
+    ViewItemDefaultNamePipe,
+    AltReportNodeListSortDirective,
+    AltReportNodeSearchComponent,
+    AltReportNodeListProvideKeywordsDirective,
+    AltReportNodeListProvideTestcasesDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -341,12 +359,10 @@ import {
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
-    AltExecutionTreePartialTabComponent,
     AltExecutionReportControlsComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
-    AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
@@ -360,6 +376,7 @@ import {
     AltReportWidgetTitleDirective,
     AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,
+    AltExecutionTreeControlPanelComponent,
   ],
   providers: [
     {
@@ -618,10 +635,6 @@ export class ExecutionModule {
               useExisting: AggregatedReportViewTreeNodeUtilsService,
             },
             {
-              provide: AGGREGATED_TREE_TAB_STATE,
-              useClass: AggregatedReportViewTreeStateService,
-            },
-            {
               provide: AGGREGATED_TREE_WIDGET_STATE,
               useClass: AggregatedReportViewTreeStateService,
             },
@@ -635,7 +648,6 @@ export class ExecutionModule {
               inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
-            () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
             () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
             () => inject(AltReportNodeDetailsStateService).cleanup(),
             () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
@@ -705,48 +717,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionReportComponent,
-                },
-              ],
-            },
-            {
-              path: 'tree',
-              canActivate: [
-                () => {
-                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const _treeState = inject(AGGREGATED_TREE_TAB_STATE);
-                  _ctx.setState(_treeState);
-                  return true;
-                },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionTreeTabComponent,
-                },
-              ],
-            },
-            {
-              path: 'sub-tree/:reportNodeId',
-              providers: [
-                AggregatedReportViewTreeStateService,
-                {
-                  provide: TreeStateService,
-                  useExisting: AggregatedReportViewTreeStateService,
-                },
-              ],
-              canActivate: [
-                () => {
-                  const _ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const _treeState = inject(AggregatedReportViewTreeStateService);
-                  _ctx.setState(_treeState);
-                  return true;
-                },
-              ],
-              canDeactivate: [() => inject(TreeStateService).cleanup()],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionTreePartialTabComponent,
                 },
               ],
             },
@@ -829,51 +799,68 @@ export class ExecutionModule {
               outlet: 'nodeDetails',
               component: SimpleOutletComponent,
               children: [
-                dialogRoute(
-                  {
-                    path: ':detailsId',
-                    resolve: {
-                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
-                      },
-                      resolvedPartialPath: () =>
-                        inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
-                      reportNodeId: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                      },
-                      searchStatus: (route: ActivatedRouteSnapshot) => {
-                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                        return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
-                      },
-                      searchStatusCount: (route: ActivatedRouteSnapshot) => {
-                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                        const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
-                        const statusCount = parseInt(statusCountStr);
-                        return isNaN(statusCount) ? undefined : statusCount;
-                      },
-                    },
-                    dialogComponent: AggregatedTreeNodeDialogComponent,
-                    children: [
-                      dialogRoute({
-                        path: 'plan-node',
-                        dialogComponent: PlanNodeDetailsDialogComponent,
-                      }),
-                    ],
+                {
+                  matcher: (url) => {
+                    if (
+                      url[0].path === DrilldownRootType.TREE ||
+                      url[0].path === DrilldownRootType.TESTCASES ||
+                      url[0].path === DrilldownRootType.KEYWORDS
+                    ) {
+                      return { consumed: url };
+                    }
+                    return null;
                   },
-                  {
-                    hasBackdrop: false,
-                    height: '100%',
-                    width: '40%',
-                    panelClass: 'side-dialog',
-                    position: {
-                      right: '0',
-                      top: '0',
-                      bottom: '0',
+                  resolve: {
+                    drilldownState: (route: ActivatedRouteSnapshot) => {
+                      const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
+                      const resolvedPartialPath = _aggregatedViewTreeStateContext.getState().resolvedPartialPath();
+
+                      const url = route.url;
+
+                      const rootType = url[0].path as DrilldownRootType;
+
+                      const result: DrillDownStackItemConfig[] = [
+                        {
+                          type: DrillDownStackItemType.ROOT,
+                          rootType,
+                          nodeId: DRILL_DOWN_ROOT_ID,
+                        },
+                      ];
+
+                      for (let i = 1; i < url.length; i += 2) {
+                        const type =
+                          url[i].path === 'report'
+                            ? DrillDownStackItemType.REPORT_NODE
+                            : DrillDownStackItemType.AGGREGATED_REPORT_NODE;
+                        const value = url[i + 1].path;
+                        if (type === DrillDownStackItemType.REPORT_NODE) {
+                          const nodeId = value;
+                          result.push({ type, nodeId });
+                        } else {
+                          const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
+                          let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
+                          searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
+                          result.push({
+                            type,
+                            nodeId,
+                            searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
+                            searchStatusCount,
+                            resolvedPartialPath,
+                          });
+                        }
+                      }
+
+                      return result;
                     },
                   },
-                ),
+                  component: AggregatedTreeNodeDrilldownComponent,
+                  children: [
+                    dialogRoute({
+                      path: 'plan-node',
+                      dialogComponent: PlanNodeDetailsDialogComponent,
+                    }),
+                  ],
+                },
               ],
             },
             {

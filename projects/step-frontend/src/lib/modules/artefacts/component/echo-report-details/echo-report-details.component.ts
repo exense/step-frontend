@@ -1,9 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import {
-  ArtefactInlineItemUtilsService,
-  BaseReportDetailsComponent,
-  ItemType,
-} from '@exense/step-core';
+import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ItemType } from '@exense/step-core';
 import { EchoReportNode } from '../../types/echo.report-node';
 
 @Component({
@@ -19,12 +15,12 @@ import { EchoReportNode } from '../../types/echo.report-node';
 export class EchoReportDetailsComponent extends BaseReportDetailsComponent<EchoReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const node = this.node();
     const echo = node?.echo;
     const echoExpression = node?.resolvedArtefact?.text?.expression;
     return this._artefactInlineUtils.convert([
-      { label: 'text', value: echo, valueExplicitExpression: echoExpression, itemType: ItemType.configuration },
+      { label: 'text', value: echo, valueExplicitExpression: echoExpression, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

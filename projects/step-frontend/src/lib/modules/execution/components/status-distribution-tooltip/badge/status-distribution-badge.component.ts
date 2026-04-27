@@ -12,11 +12,11 @@ import { Status } from '../../../../_common/shared/status.enum';
 export class StatusDistributionBadgeComponent {
   private _statusColors = inject(STATUS_COLORS);
 
-  status = input.required<string>();
-  count = input.required<number>();
-  percentage = input.required<number>();
+  readonly status = input.required<string>();
+  readonly count = input.required<number>();
+  readonly percentage = input.required<number>();
 
-  formattedPercentage = computed(() => {
+  readonly formattedPercentage = computed(() => {
     return this.percentage().toFixed(2);
   });
 

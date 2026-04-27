@@ -1,0 +1,29 @@
+<section>
+  <div class="item-header">
+    <div class="item-title">
+      @if (titleTemplateRef(); as templateRef) {
+        <ng-container *ngTemplateOutlet="templateRef" />
+      } @else {
+        <span>{{ title() }}</span>
+      }
+    </div>
+    @if (canMinimize()) {
+      <button mat-icon-button (click)="minimize.emit()">
+        <step-icon name="minimize-2" />
+      </button>
+    }
+    @if (canMaximize()) {
+      <button mat-icon-button (click)="maximize.emit()">
+        <step-icon name="maximize-2" />
+      </button>
+    }
+    <button mat-icon-button (click)="remove.emit()">
+      <step-icon name="x" />
+    </button>
+  </div>
+  <div class="item-content">
+    @if (contentTemplateRef(); as templateRef) {
+      <ng-container *ngTemplateOutlet="templateRef" />
+    }
+  </div>
+</section>

@@ -28,19 +28,19 @@ export class ForReportDetailsComponent extends BaseReportDetailsComponent<ForRep
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        { label: 'start', value: node.resolvedArtefact.dataSource.start, itemType: ItemType.configuration },
-        { label: 'end', value: node.resolvedArtefact.dataSource.end, itemType: ItemType.configuration },
-        { label: 'increment', value: node.resolvedArtefact.dataSource.inc, itemType: ItemType.configuration },
-        { label: 'threads', value: node.resolvedArtefact.threads, itemType: ItemType.configuration },
-        { label: 'max failures', value: node.resolvedArtefact.maxFailedLoops, itemType: ItemType.configuration },
-        { label: 'handle', value: node.resolvedArtefact.item, itemType: ItemType.configuration },
-        { label: 'user id variable', value: node.resolvedArtefact.userItem, itemType: ItemType.configuration },
-        { label: 'counter', value: node.resolvedArtefact.globalCounter, itemType: ItemType.configuration },
+        { label: 'start', value: node.resolvedArtefact.dataSource.start, itemType: ItemType.CONFIGURATION },
+        { label: 'end', value: node.resolvedArtefact.dataSource.end, itemType: ItemType.CONFIGURATION },
+        { label: 'increment', value: node.resolvedArtefact.dataSource.inc, itemType: ItemType.CONFIGURATION },
+        { label: 'threads', value: node.resolvedArtefact.threads, itemType: ItemType.CONFIGURATION },
+        { label: 'max failures', value: node.resolvedArtefact.maxFailedLoops, itemType: ItemType.CONFIGURATION },
+        { label: 'handle', value: node.resolvedArtefact.item, itemType: ItemType.CONFIGURATION },
+        { label: 'user id variable', value: node.resolvedArtefact.userItem, itemType: ItemType.CONFIGURATION },
+        { label: 'counter', value: node.resolvedArtefact.globalCounter, itemType: ItemType.CONFIGURATION },
       );
     }
     source.push(
-      { label: 'count', value: node.count, itemType: ItemType.result },
-      { label: 'error count', value: node.errorCount, itemType: ItemType.result },
+      { label: 'count', value: node.count, itemType: ItemType.RESULT },
+      { label: 'error count', value: node.errorCount, itemType: ItemType.RESULT },
     );
     return this._artefactInlineUtils.convert(source);
   });

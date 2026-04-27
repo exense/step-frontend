@@ -1,7 +1,7 @@
 <section class="grid-cells">
-  @if(addCellCoordinates(); as coords) {
+  @if (addCellCoordinates(); as coords) {
     <div class="grid-cell" [style.grid-area]="coords">
-      <step-grid-add-widget/>
+      <step-grid-add-widget />
     </div>
   }
 </section>
@@ -25,15 +25,15 @@
       >
         <step-icon name="plus" />
       </button>
-      @if(item.isEmpty) {
+      @if (item.isEmpty) {
         <button
-            type="button"
-            mat-icon-button
-            color="warn"
-            matTooltip="Remove row"
-            matTooltipPosition="left"
-            class="remove-row"
-            (click)="removeRow(item.index)"
+          type="button"
+          mat-icon-button
+          color="warn"
+          matTooltip="Remove row"
+          matTooltipPosition="left"
+          class="remove-row"
+          (click)="removeRow(item.index)"
         >
           <step-icon name="minus" />
         </button>

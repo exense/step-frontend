@@ -45,7 +45,7 @@
       *matRowDef="let row; columns: displayColumns()"
       class="content-row"
       [stepRow]="row"
-      [class.row-highlight]="row === highlightedItem"
+      [class.row-highlight]="(row | extractHighlightedItem) === highlightedItem()"
       [class.row-deactivated]="row.customFields && row.customFields.activated === false"
     ></tr>
     <tr class="mat-mdc-row no-data-row" *matNoDataRow>

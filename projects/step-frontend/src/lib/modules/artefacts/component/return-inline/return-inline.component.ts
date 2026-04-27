@@ -40,11 +40,11 @@ export class ReturnInlineComponent extends BaseInlineArtefactComponent<ReturnArt
       const outputs = Object.entries(returnOutputs).map(([label, value]) => ({
         label,
         value,
-        itemType: ItemType.result,
+        itemType: ItemType.RESULT,
       }));
 
       return this._artefactInlineUtils.convert(outputs);
     });
 
-  protected items = computed(() => this._itemsBuilder.build(this.currentContext()));
+  protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));
 }

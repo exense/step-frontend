@@ -7,6 +7,7 @@ step-alt-execution-progress {
   flex-direction: column;
   gap: 2rem;
   padding: 0 2.5rem;
+  position: relative;
 
   &.small-screen {
     padding: 0.75rem 2.25rem;
@@ -217,6 +218,23 @@ step-alt-execution-progress {
     step-icon {
       color: var.$orange;
     }
+  }
+
+  &.is-drilldown-opened {
+    $header-height: 6.4rem;
+    height: calc(100vh - $header-height);
+    overflow: hidden;
+  }
+
+  .node-details-drilldown {
+    $z-index-drilldown: 12;
+    position: absolute;
+    padding: 0 2.5rem;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    z-index: $z-index-drilldown;
   }
 }
 

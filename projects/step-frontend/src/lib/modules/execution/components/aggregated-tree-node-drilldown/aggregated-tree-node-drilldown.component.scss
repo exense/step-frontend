@@ -1,0 +1,41 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-aggregated-tree-node-drilldown {
+  background: var.$white;
+
+  .root-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    &.nodes-list-title > div {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    step-alr-report-widget-sort {
+      display: flex;
+      height: 2.5rem;
+    }
+  }
+
+  .root-content step-alt-execution-tree {
+    min-height: 30rem;
+  }
+
+  .breadcrumb-title {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    white-space: nowrap;
+  }
+
+  .miniature {
+    step-icon {
+      @include core.step-icon-size(2.5rem, true);
+    }
+  }
+}

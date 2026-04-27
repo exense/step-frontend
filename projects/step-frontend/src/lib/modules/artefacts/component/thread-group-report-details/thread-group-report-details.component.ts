@@ -21,16 +21,16 @@ export class ThreadGroupReportDetailsComponent extends BaseReportDetailsComponen
       return undefined;
     }
     return this._artefactInlineUtils.convert([
-      { label: 'threads', value: artefact.users, itemType: ItemType.configuration },
-      { label: 'pacing', value: artefact.pacing, timeValueUnit: 'ms', itemType: ItemType.configuration },
-      { label: 'ram up', value: artefact.rampup, timeValueUnit: 'ms', itemType: ItemType.configuration },
-      { label: 'pack', value: artefact.pack, itemType: ItemType.configuration },
-      { label: 'start offset', value: artefact.startOffset, timeValueUnit: 'ms', itemType: ItemType.configuration },
-      { label: 'iterations', value: artefact.iterations, itemType: ItemType.configuration },
-      { label: 'max duration', value: artefact.maxDuration, timeValueUnit: 'ms', itemType: ItemType.configuration },
-      { label: 'handle', value: artefact.localItem, itemType: ItemType.configuration },
-      { label: 'user id variable', value: artefact.userItem, itemType: ItemType.configuration },
-      { label: 'counter', value: artefact.item, itemType: ItemType.configuration },
+      { label: 'threads', value: artefact.users, itemType: ItemType.CONFIGURATION },
+      { label: 'pacing', value: artefact.pacing, timeValueUnit: 'ms', itemType: ItemType.CONFIGURATION },
+      { label: 'ram up', value: artefact.rampup, timeValueUnit: 'ms', itemType: ItemType.CONFIGURATION },
+      { label: 'pack', value: artefact.pack, itemType: ItemType.CONFIGURATION },
+      { label: 'start offset', value: artefact.startOffset, timeValueUnit: 'ms', itemType: ItemType.CONFIGURATION },
+      { label: 'iterations', value: artefact.iterations, itemType: ItemType.CONFIGURATION },
+      { label: 'max duration', value: artefact.maxDuration, timeValueUnit: 'ms', itemType: ItemType.CONFIGURATION },
+      { label: 'handle', value: artefact.localItem, itemType: ItemType.CONFIGURATION },
+      { label: 'user id variable', value: artefact.userItem, itemType: ItemType.CONFIGURATION },
+      { label: 'counter', value: artefact.item, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

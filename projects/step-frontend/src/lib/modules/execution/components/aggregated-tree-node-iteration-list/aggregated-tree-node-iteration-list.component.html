@@ -32,6 +32,7 @@
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
     [indicatorMode]="TableIndicatorMode.SPINNER"
+    [highlightedItem]="selectedReportNode()"
     class="paddingless no-border hide-header no-highlight"
   >
     <ng-container matColumnDef="executionTime">
@@ -61,22 +62,6 @@
             </ng-container>
           </step-artefact-inline-details>
         </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="actions-cell" mat-cell *matCellDef="let element">
-        <step-btn-group class="actions">
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Open tree for this iteration"
-            matTooltipPosition="below"
-            (click)="openTreeView.emit(element)"
-          >
-            <step-icon name="git-pull-request" />
-          </button>
-        </step-btn-group>
       </td>
     </ng-container>
     <ng-container *stepTablePaginatorPrefix>

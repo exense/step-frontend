@@ -21,15 +21,15 @@ export class SequenceReportDetailsComponent extends BaseReportDetailsComponent<
 > {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
     }
 
     return this._artefactInlineUtils.convert([
-      { label: 'continue on error', value: artefact.continueOnError, itemType: ItemType.configuration },
-      { label: 'pacing', value: artefact.pacing, itemType: ItemType.configuration },
+      { label: 'continue on error', value: artefact.continueOnError, itemType: ItemType.CONFIGURATION },
+      { label: 'pacing', value: artefact.pacing, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

@@ -54,9 +54,9 @@ export class AttachmentDialogComponent implements OnInit {
   private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
-  private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
-  private richEditor = viewChild('richEditor', { read: RichEditorComponent });
-  private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
+  private readonly traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
+  private readonly richEditor = viewChild('richEditor', { read: RichEditorComponent });
+  private readonly streamingText = viewChild('streamingText', { read: StreamingTextComponent });
   private streamingAttachmentLineChunkSize$ = this._userService.getPreferences().pipe(
     map((preferences) => preferences?.preferences?.['attachment_line_chunk_size'] ?? ''),
     map((lineChunkSize) => parseInt(lineChunkSize)),
@@ -66,7 +66,7 @@ export class AttachmentDialogComponent implements OnInit {
     initialValue: undefined,
   });
 
-  private streamingStatus = computed(() => this.streamingText()?.status?.());
+  private readonly streamingStatus = computed(() => this.streamingText()?.status?.());
 
   protected readonly isStreamingInProgress = computed(() => {
     const status = this.streamingStatus();

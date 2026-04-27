@@ -1,75 +1,102 @@
-import { AfterViewInit, Component, HostBinding, HostListener, inject } from '@angular/core';
-import { SplitAreaComponent } from '../split-area/split-area.component';
+import { Component, computed, inject, signal, untracked } from '@angular/core';
 import { SplitComponent } from '../split/split.component';
+import { SplitAreaComponent } from '../split-area/split-area.component';
 
 @Component({
   selector: 'step-split-gutter',
   templateUrl: './split-gutter.component.html',
   styleUrls: ['./split-gutter.component.scss'],
+  host: {
+    '[class.active]': 'active()',
+    '(mousedown)': 'handleMouseDown($event)',
+    '(window:mousemove)': 'handleMouseMove($event)',
+    '(window:mouseup)': 'handleMouseUp()',
+  },
 })
-export class SplitGutterComponent implements AfterViewInit {
+export class SplitGutterComponent {
   private _splitComponent = inject(SplitComponent);
-  private leftArea?: SplitAreaComponent;
-  private rightArea?: SplitAreaComponent;
   private eventX?: number;
   private leftAreaWidth?: number;
   private rightAreaWidth?: number;
 
-  @HostBinding('class.active')
-  active?: boolean;
+  protected readonly active = signal(false);
 
-  ngAfterViewInit(): void {
-    if (!this._splitComponent.areas || !this._splitComponent.gutters) {
+  private readonly allGutters = computed(() => this._splitComponent.gutters());
+  private readonly allAreas = computed(() => this._splitComponent.areas());
+
+  private readonly gutterIndex = computed(() => {
+    const gutters = this.allGutters() ?? [];
+    return gutters.indexOf(this);
+  });
+
+  private readonly leftArea = computed(() => {
+    const areas = this.allAreas();
+    const gutterIndex = this.gutterIndex();
+    let result: SplitAreaComponent | undefined = undefined;
+    if (!areas.length || gutterIndex < 0) {
+      return result;
+    }
+    for (let i = gutterIndex; i >= 0; i--) {
+      if (!areas[i].isFixed) {
+        result = areas[i];
+        break;
+      }
+    }
+    return result;
+  });
+
+  private readonly rightArea = computed(() => {
+    const areas = this.allAreas();
+    const gutterIndex = this.gutterIndex();
+    let result: SplitAreaComponent | undefined = undefined;
+    if (!areas.length || gutterIndex < 0) {
+      return result;
+    }
+    for (let i = gutterIndex + 1; i < areas.length; i++) {
+      if (!areas[i].isFixed) {
+        result = areas[i];
+        break;
+      }
+    }
+    return result;
+  });
+
+  updateSizes(): void {
+    const leftArea = untracked(() => this.leftArea());
+    const rightArea = untracked(() => this.rightArea());
+
+    if (!leftArea || !rightArea) {
       return;
     }
+    this.leftAreaWidth = leftArea.width;
+    this.rightAreaWidth = rightArea.width;
 
-    const gutters = this._splitComponent.gutters.toArray();
-    const areas = this._splitComponent.areas.toArray();
-    const index = gutters.indexOf(this);
-
-    this.leftArea = areas[index];
-    this.rightArea = areas[index + 1];
+    leftArea.setSize(this.leftAreaWidth!);
+    rightArea.setSize(this.rightAreaWidth!);
   }
 
-  setAreaWidths(): void {
-    if (!this.leftArea || !this.rightArea) {
-      return;
-    }
-
-    this.leftAreaWidth = this.leftArea.width;
-    this.rightAreaWidth = this.rightArea.width;
-  }
-
-  setFlex(): void {
-    this.leftArea?.setSize(this.leftAreaWidth!);
-    this.rightArea?.setSize(this.rightAreaWidth!);
-  }
-
-  @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent): void {
+  protected handleMouseDown(event: MouseEvent): void {
     event.preventDefault();
 
-    this.active = true;
+    this.active.set(true);
     this.eventX = event.clientX;
 
-    if (!this._splitComponent.gutters) {
+    const gutters = untracked(() => this.allGutters());
+
+    if (!gutters.length) {
       return;
     }
 
-    this._splitComponent.gutters.forEach((gutter) => {
-      gutter.setAreaWidths();
-    });
-    this._splitComponent.gutters.forEach((gutter) => {
-      gutter.setFlex();
-    });
+    gutters.forEach((gutter) => gutter.updateSizes());
   }
 
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
+  protected handleMouseMove(event: MouseEvent): void {
+    const leftArea = untracked(() => this.leftArea());
+    const rightArea = untracked(() => this.rightArea());
     if (
       this.eventX === undefined ||
-      !this.leftArea ||
-      !this.rightArea ||
+      !leftArea ||
+      !rightArea ||
       this.leftAreaWidth === undefined ||
       this.rightAreaWidth === undefined
     ) {
@@ -89,13 +116,12 @@ export class SplitGutterComponent implements AfterViewInit {
     const leftAreaWidth = this.leftAreaWidth - delta;
     const rightAreaWidth = this.rightAreaWidth + delta;
 
-    this.leftArea?.setSize(leftAreaWidth);
-    this.rightArea?.setSize(rightAreaWidth);
+    leftArea?.setSize?.(leftAreaWidth);
+    rightArea?.setSize?.(rightAreaWidth);
   }
 
-  @HostListener('window:mouseup')
-  onMouseUp(): void {
-    delete this.active;
+  protected handleMouseUp(): void {
+    this.active.set(false);
     delete this.eventX;
     delete this.leftAreaWidth;
     delete this.rightAreaWidth;

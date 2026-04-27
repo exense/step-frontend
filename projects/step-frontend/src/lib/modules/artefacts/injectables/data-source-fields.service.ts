@@ -72,7 +72,7 @@ export class DataSourceFieldsService {
   }
 
   private createExcelFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return this.resolveResource(dataSource.file).pipe(
       map((excelFile) => {
         const result: ArtefactInlineItemSource = [
@@ -92,7 +92,7 @@ export class DataSourceFieldsService {
   }
 
   private createCsvFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return this.resolveResource(dataSource.file).pipe(
       map((csvFile) => [
         { label: 'csv file', value: csvFile, itemType },
@@ -106,7 +106,7 @@ export class DataSourceFieldsService {
   }
 
   private createSqlFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return of([
       { label: 'connection string', value: dataSource.connectionString, itemType },
       { label: 'driver class', value: dataSource.driverClass, itemType },
@@ -129,7 +129,7 @@ export class DataSourceFieldsService {
   }
 
   private createGSheetFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return this.resolveResource(dataSource.serviceAccountKey).pipe(
       map((serviceAccountKeyFile) => [
         { label: 'service account key file', value: serviceAccountKeyFile, itemType },
@@ -144,7 +144,7 @@ export class DataSourceFieldsService {
   }
 
   private createSequenceFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return of([
       { label: 'start', value: dataSource.start, itemType },
       { label: 'end', value: dataSource.end, itemType },
@@ -157,7 +157,7 @@ export class DataSourceFieldsService {
   }
 
   private createJsonArrayFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return of([{ label: 'json', value: dataSource.json, itemType }]);
   }
 
@@ -166,7 +166,7 @@ export class DataSourceFieldsService {
   }
 
   private createJsonFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return of([{ label: 'json string', value: dataSource.json, itemType }]);
   }
 
@@ -175,8 +175,10 @@ export class DataSourceFieldsService {
   }
 
   private createFileFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
-    return this.resolveResource(dataSource.file).pipe(map((flatFile) => [{ label: 'flat file', value: flatFile, itemType }]));
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
+    return this.resolveResource(dataSource.file).pipe(
+      map((flatFile) => [{ label: 'flat file', value: flatFile, itemType }]),
+    );
   }
 
   private extractFileSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
@@ -184,7 +186,7 @@ export class DataSourceFieldsService {
   }
 
   private createFolderFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const itemType = withIcon ? ItemType.configuration : undefined;
+    const itemType = withIcon ? ItemType.CONFIGURATION : undefined;
     return of([{ label: 'directory', value: dataSource.folder, itemType }]);
   }
 
