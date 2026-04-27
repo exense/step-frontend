@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output, effect, inject, input, untracked, viewChild } from '@angular/core';
+import { Component, computed, EventEmitter, Output, inject, input, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   FilterBarItem,
   FilterBarItemType,
@@ -16,7 +17,7 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { Axis } from 'uplot';
 import { StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
@@ -50,17 +51,23 @@ export class StandaloneChartComponent {
 
   protected chartSettings?: TSChartSettings;
 
-  private readonly _fetchEffect = effect(() => {
-    const timeRange = this.timeRange();
-    this.metricKey();
-    this.filters();
-    this.aggregation();
-    this.pclValue();
-    this.grouping();
-    this.config();
-    this.colorsPool();
-    untracked(() => this.fetchDataAndCreateChart(timeRange).subscribe());
-  });
+  private readonly _fetchParams = computed(() => ({
+    timeRange: this.timeRange(),
+    metricKey: this.metricKey(),
+    filters: this.filters(),
+    aggregation: this.aggregation(),
+    pclValue: this.pclValue(),
+    grouping: this.grouping(),
+    config: this.config(),
+    colorsPool: this.colorsPool(),
+  }));
+
+  private readonly _fetchSub = toObservable(this._fetchParams)
+    .pipe(
+      switchMap(({ timeRange }) => this.fetchDataAndCreateChart(timeRange)),
+      takeUntilDestroyed(),
+    )
+    .subscribe();
 
   private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
     if (range.from >= range.to) {

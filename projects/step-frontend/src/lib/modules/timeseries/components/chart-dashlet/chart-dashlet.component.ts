@@ -1,7 +1,6 @@
 import {
   ChangeDetectorRef,
   Component,
-  effect,
   inject,
   input,
   Input,
@@ -10,9 +9,9 @@ import {
   output,
   signal,
   SimpleChanges,
-  untracked,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   AxesSettings,
   BucketResponse,
@@ -33,7 +32,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, skip, Subscription, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis, Band, Hooks } from 'uplot';
@@ -138,20 +137,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   showHigherResolutionWarning = false;
   collectionResolutionUsed: number = 0;
 
-  firstEffectTriggered = false;
-
-  readonly itemChangeEffect = effect(() => {
-    const item = this.item();
-    if (this.firstEffectTriggered) {
-      untracked(() => {
+  private readonly _itemChangeSub = toObservable(this.item)
+    .pipe(
+      skip(1),
+      switchMap((item) => {
         this.prepareState(item);
-        this.refresh(true).subscribe(() => {
-          this._cd.markForCheck();
-        });
-      });
-    }
-    this.firstEffectTriggered = true;
-  });
+        return this.refresh(true);
+      }),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this._cd.markForCheck());
 
   ngOnInit(): void {
     if (!this.item() || !this.context() || !this.height()) {
