@@ -40,6 +40,7 @@ import {
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   GridPersistenceStateService,
+  GRID_ELEMENT_HEADER_ACTIONS,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
@@ -83,6 +84,8 @@ import { ToggleRequestWarningDirective } from '../../directives/toggle-request-w
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 import { TimeRangeExt } from '../../shared/time-range-ext';
 import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { AltExecutionReportGridSettingsActionComponent } from '../alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -157,6 +160,15 @@ interface RefreshParams {
       provide: GridPersistenceStateService,
       useClass: ExecutionReportGridPersistenceStateService,
     },
+    {
+      provide: GRID_ELEMENT_HEADER_ACTIONS,
+      useValue: {
+        component: AltExecutionReportGridSettingsActionComponent,
+        widgetTypes: ['executionTree', 'keywordsList'],
+      },
+      multi: true,
+    },
+    AltExecutionReportSettingsService,
     ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   standalone: false,

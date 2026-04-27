@@ -22,10 +22,11 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
   readonly reportInfo = input<R | undefined>(undefined);
   readonly isVertical = input(false);
   readonly overflowContent = input(false);
+  readonly details = input<readonly string[] | undefined>(undefined);
 
-  private header = contentChild(ArtefactInlineDetailsHeaderDirective);
+  private readonly header = contentChild(ArtefactInlineDetailsHeaderDirective);
 
-  private artefactClass = computed(() => {
+  private readonly artefactClass = computed(() => {
     const aggregatedInfo = this.aggregatedInfo();
     const reportInfo = this.reportInfo();
     return aggregatedInfo?.originalArtefact?._class ?? reportInfo?.resolvedArtefact?._class;
@@ -35,11 +36,12 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
     const aggregatedInfo = this.aggregatedInfo();
     const reportInfo = this.reportInfo();
     const isVertical = this.isVertical();
+    const details = this.details();
     const headerTemplate = this.header()?.templateRef;
-    return { headerTemplate, aggregatedInfo, reportInfo, isVertical };
+    return { headerTemplate, aggregatedInfo, reportInfo, isVertical, details };
   });
 
-  protected componentToRender = computed(() => {
+  protected readonly componentToRender = computed(() => {
     const artefactClass = this.artefactClass();
     const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
     return meta?.inlineComponent;

@@ -7,6 +7,9 @@
   [matSortDisableClear]="true"
   stepElementSize
 >
+  <step-alt-report-widget-filter>
+    <step-alt-execution-report-settings widgetType="keywordsList" />
+  </step-alt-report-widget-filter>
   <step-table
     #table
     [dataSource]="(dataSource$ | async)!"
@@ -17,9 +20,20 @@
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
-      <td class="data-cell details-trigger" mat-cell *matCellDef="let element" stepUndraggedClick (undraggedClick)="openDetails(element)">
+      <td
+        class="data-cell details-trigger"
+        mat-cell
+        *matCellDef="let element"
+        stepUndraggedClick
+        (undraggedClick)="openDetails(element)"
+      >
         <div>
-          <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
+          <step-artefact-inline-details
+            parentElementSize
+            [reportInfo]="element"
+            [details]="details()"
+            class="smaller-view shift-rows"
+          >
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time

@@ -1,0 +1,21 @@
+<step-popover [mode]="PopoverMode.CLICK" yPosition="below" [whiteBackground]="true" [smallFont]="false">
+  <button
+    type="button"
+    mat-icon-button
+    [color]="hasDetails() ? 'primary' : 'default'"
+    matTooltip="Detail levels"
+    matTooltipPosition="below"
+  >
+    <step-icon name="grid" />
+  </button>
+  <step-popover-content>
+    <section class="details-settings" (click)="$event.stopPropagation()">
+      <strong>Detail levels</strong>
+      @for (option of detailOptions; track option.key) {
+        <mat-checkbox color="primary" [ngModel]="isChecked(option.key)" (ngModelChange)="onToggle(option.key, $event)">
+          {{ option.label }}
+        </mat-checkbox>
+      }
+    </section>
+  </step-popover-content>
+</step-popover>

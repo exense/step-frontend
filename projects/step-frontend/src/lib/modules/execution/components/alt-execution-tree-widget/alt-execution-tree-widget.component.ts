@@ -10,6 +10,7 @@ import { AltReportNodesStateService } from '../../services/alt-report-nodes-stat
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -39,12 +40,14 @@ import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggr
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
+  protected readonly details = this._reportSettings.details('executionTree');
 
-  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+  private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
-  private effectFocusNode = effect(() => {
+  private readonly effectFocusNode = effect(() => {
     const foundItems = this._treeSearch.foundItems();
     const pageIndex = this._treeSearch.pageIndex();
     if (!foundItems) {
@@ -58,7 +61,7 @@ export class AltExecutionTreeWidgetComponent {
     });
   });
 
-  focusAndSearch(query: string) {
+  focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }
 

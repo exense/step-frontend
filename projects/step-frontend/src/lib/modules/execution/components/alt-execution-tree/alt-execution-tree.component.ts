@@ -44,13 +44,14 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private tree = viewChild('tree', { read: TreeComponent });
+  private readonly tree = viewChild('tree', { read: TreeComponent });
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
     this._urlParamsService.patchUrlParams(range, undefined, true);
   });
 
   readonly showSpinnerWhileTreeInitialize = input(false);
+  readonly details = input<readonly string[] | undefined>(undefined);
 
   protected readonly showSpinner = computed(() => {
     const showSpinnerForEmptyTree = this.showSpinnerWhileTreeInitialize();

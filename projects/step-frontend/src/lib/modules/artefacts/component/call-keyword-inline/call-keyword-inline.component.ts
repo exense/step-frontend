@@ -10,6 +10,7 @@ import {
 } from '@exense/step-core';
 import { KeywordArtefact } from '../../types/keyword.artefact';
 import { KeywordReportNode } from '../../types/keyword.report-node';
+import { hasAltExecutionReportDetail } from '../../../execution/shared/alt-execution-report-details';
 
 @Component({
   selector: 'step-call-keyword-inline',
@@ -39,6 +40,15 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   protected readonly inputItems = computed(() => this.inputItemsBuilder.build(this.currentContext()));
 
   protected readonly outputItems = computed(() => this.outputItemsBuilder.build(this.currentContext()));
+  protected readonly details = computed(() => this.currentContext()?.details);
+  protected readonly showFullInputsOutputs = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullInputsOutputs'),
+  );
+  protected readonly showAgentRouting = computed(() => hasAltExecutionReportDetail(this.details(), 'agentRouting'));
+  protected readonly reportNode = computed(
+    () => this.currentContext()?.aggregatedInfo?.singleInstanceReportNode ?? this.currentContext()?.reportInfo,
+  );
+  protected readonly routingItems = computed(() => this.getRoutingItems(this.reportNode()));
 
   private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {
     const keywordInputs = this._dynamicValueUtils.parseJson<DynamicValueString>(artefact?.argument?.value);
@@ -77,5 +87,26 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     }
     const outputValues: ArtefactInlineItemSource = Object.entries(outputParams).map(([key, value]) => [key, value]);
     return this._artefactInlineUtils.convert(outputValues);
+  }
+
+  private getRoutingItems(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+    if (!reportNode) {
+      return undefined;
+    }
+
+    const items: ArtefactInlineItem[] = [];
+    if (reportNode.agentUrl) {
+      items.push({
+        label: { value: 'Agent', isResolved: true },
+        value: { value: reportNode.agentUrl, isResolved: true },
+      });
+    }
+    if (reportNode.tokenId) {
+      items.push({
+        label: { value: 'Token ID', isResolved: true },
+        value: { value: reportNode.tokenId, isResolved: true },
+      });
+    }
+    return items.length ? items : undefined;
   }
 }

@@ -82,6 +82,8 @@ import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
+import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
+import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
@@ -180,12 +182,8 @@ import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-v
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import {
-  StatusDistributionBadgeComponent
-} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
-import {
-  ExecutionHistoryNodeTooltipComponent
-} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -225,6 +223,8 @@ import {
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportControlsComponent,
+    AltExecutionReportSettingsComponent,
+    AltExecutionReportGridSettingsActionComponent,
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
     AltReportNodeListComponent,

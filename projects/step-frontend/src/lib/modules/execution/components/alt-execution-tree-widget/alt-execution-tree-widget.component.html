@@ -36,10 +36,12 @@
       prevTooltip="show previous error"
       nextTooltip="show next error"
     />
+    <step-alt-execution-report-settings widgetType="executionTree" />
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <step-alt-execution-tree
       #tree
+      [details]="details()"
       stepTreeAutoChooseVirtualScroll="340px"
       [applyVirtualScrollFrom]="150"
       [showSpinnerWhileTreeInitialize]="true"

@@ -26,6 +26,7 @@
       </step-prefix>
       <input type="text" class="search-input" [formControl]="searchCtrl" placeholder="Search" />
     </step-form-field>
+    <step-alt-execution-report-settings widgetType="executionTree" />
   </div>
   <step-table
     #table
@@ -42,6 +43,7 @@
             parentElementSize
             [offset]="100"
             [reportInfo]="element"
+            [details]="details()"
             class="shift-rows smaller-view"
           >
             <ng-container *stepArtefactInlineDetailsHeader>

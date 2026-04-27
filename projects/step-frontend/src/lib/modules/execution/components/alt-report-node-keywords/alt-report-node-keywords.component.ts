@@ -20,6 +20,7 @@ import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -50,6 +51,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _screenApiService = inject(AugmentedScreenService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
 
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
@@ -58,6 +60,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
+  protected readonly details = this._reportSettings.details('keywordsList');
 
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 

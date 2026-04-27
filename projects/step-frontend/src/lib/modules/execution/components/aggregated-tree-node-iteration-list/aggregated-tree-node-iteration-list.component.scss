@@ -90,6 +90,10 @@ step-aggregated-tree-node-iteration-list {
     padding-right: 2rem;
     align-items: center;
 
+    & > step-alt-execution-report-settings {
+      margin-left: auto;
+    }
+
     .sort-container {
       flex: 1;
     }

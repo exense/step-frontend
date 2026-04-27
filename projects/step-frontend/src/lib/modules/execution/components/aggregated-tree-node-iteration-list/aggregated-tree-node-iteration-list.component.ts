@@ -38,6 +38,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 
 const PAGE_SIZE = 25;
 
@@ -65,19 +66,20 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
 
   readonly statuses = REPORT_NODE_STATUS;
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
-  private matSort = viewChild(MatSort);
+  private readonly matSort = viewChild(MatSort);
 
-  protected sort = signal<SortDirection>('desc');
+  protected readonly sort = signal<SortDirection>('desc');
 
-  private effectSort = effect(() => {
+  private readonly effectSort = effect(() => {
     const sort = this.sort();
     const mastSort = this.matSort();
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
@@ -90,8 +92,9 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   readonly showDetails = output<ReportNode>();
 
   readonly openTreeView = output<ReportNode>();
+  protected readonly details = this._reportSettings.details('executionTree');
 
-  private artefactHash = computed(() => this.node().artefactHash);
+  private readonly artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -99,7 +102,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     return this.getReportNodeDataSource(artefactHash, resolvedPartialPath);
   });
 
-  private dataSource$ = toObservable(this.dataSource);
+  private readonly dataSource$ = toObservable(this.dataSource);
   private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
@@ -113,7 +116,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly searchCtrl = this._fb.control('');
 
-  private searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
+  private readonly searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
     initialValue: this.searchCtrl.value,
   });
 
@@ -128,12 +131,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
-  private effectSyncStatus = effect(() => {
+  private readonly effectSyncStatus = effect(() => {
     const initialStatus = this.initialStatus();
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  private readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;

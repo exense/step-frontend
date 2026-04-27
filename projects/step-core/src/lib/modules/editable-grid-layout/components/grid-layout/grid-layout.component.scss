@@ -57,9 +57,37 @@ step-grid-layout {
         position: absolute;
         z-index: 6;
         right: 1rem;
-        top: calc(50% - 1rem);
+        top: 50%;
+        transform: translateY(-50%);
         line-height: 1;
         font-size: initial;
+      }
+
+      step-grid-element-header-actions {
+        position: absolute;
+        z-index: 6;
+        right: 4.4rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
+        font-size: initial;
+
+        button[mat-icon-button] {
+          width: 2rem;
+          height: 2rem;
+          padding: 0;
+          min-width: 2rem;
+          min-height: 2rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .mdc-icon-button {
+          padding: 0;
+        }
       }
     }
 

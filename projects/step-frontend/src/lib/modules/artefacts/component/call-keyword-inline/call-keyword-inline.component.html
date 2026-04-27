@@ -1,27 +1,62 @@
-@if (inputItems(); as inputItems) {
-  <step-artefact-inline-field-list
-    class="bold-labels"
-    [items]="inputItems"
-    hiddenItemsTooltipSuffix="additional input(s)"
-  >
-    <step-artefact-inline-field-list-prefix>
-      <step-artefact-inline-details-header [template]="headerTemplate()" />
-    </step-artefact-inline-field-list-prefix>
-  </step-artefact-inline-field-list>
-}
-@if (outputItems(); as outputItems) {
-  <step-artefact-inline-field-list
-    class="bold-labels"
-    [items]="outputItems"
-    hiddenItemsTooltipSuffix="additional output(s)"
-  >
-    <step-artefact-inline-field-list-prefix>
-      <step-artefact-inline-details-header [template]="headerTemplate()" [isVisible]="!inputItems()?.length" />
-      <step-icon name="log-out" matTooltip="Outputs" />
-    </step-artefact-inline-field-list-prefix>
-  </step-artefact-inline-field-list>
-}
-@if (!inputItems()?.length && !outputItems()?.length) {
+@if (!showFullInputsOutputs()) {
+  @if (inputItems(); as inputItems) {
+    <step-artefact-inline-field-list
+      class="bold-labels"
+      [items]="inputItems"
+      hiddenItemsTooltipSuffix="additional input(s)"
+    >
+      <step-artefact-inline-field-list-prefix>
+        <step-artefact-inline-details-header [template]="headerTemplate()" />
+      </step-artefact-inline-field-list-prefix>
+    </step-artefact-inline-field-list>
+  }
+  @if (outputItems(); as outputItems) {
+    <step-artefact-inline-field-list
+      class="bold-labels compact-secondary-row"
+      [items]="outputItems"
+      hiddenItemsTooltipSuffix="additional output(s)"
+    >
+      <step-artefact-inline-field-list-prefix>
+        <step-artefact-inline-details-header [template]="headerTemplate()" [isVisible]="!inputItems()?.length" />
+        <step-icon name="log-out" matTooltip="Outputs" />
+      </step-artefact-inline-field-list-prefix>
+    </step-artefact-inline-field-list>
+  }
+  @if (!inputItems()?.length && !outputItems()?.length) {
+    <step-artefact-inline-details-header [template]="headerTemplate()" />
+  }
+} @else {
   <step-artefact-inline-details-header [template]="headerTemplate()" />
+  @if (inputItems(); as inputItems) {
+    <step-artefact-inline-field-list
+      class="bold-labels detailed-mode"
+      [items]="inputItems"
+      [isVertical]="true"
+      hiddenItemsTooltipSuffix="additional input(s)"
+    >
+      <step-artefact-inline-field-list-prefix>
+        <step-icon name="log-in" matTooltip="Inputs" />
+      </step-artefact-inline-field-list-prefix>
+    </step-artefact-inline-field-list>
+  }
+  @if (outputItems(); as outputItems) {
+    <step-artefact-inline-field-list
+      class="bold-labels detailed-mode"
+      [items]="outputItems"
+      [isVertical]="true"
+      hiddenItemsTooltipSuffix="additional output(s)"
+    >
+      <step-artefact-inline-field-list-prefix>
+        <step-icon name="log-out" matTooltip="Outputs" />
+      </step-artefact-inline-field-list-prefix>
+    </step-artefact-inline-field-list>
+  }
+}
+@if (showAgentRouting() && routingItems(); as routingItems) {
+  <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
+    <step-artefact-inline-field-list-prefix>
+      <step-icon name="routing" matTooltip="Keyword routing" />
+    </step-artefact-inline-field-list-prefix>
+  </step-artefact-inline-field-list>
 }
 <step-artefact-inline-additional-info [context]="currentContext()" />
