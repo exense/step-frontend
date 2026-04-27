@@ -469,6 +469,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     if (primaryAxes.displayType === 'STACKED_BAR') {
       series.sort((a, b) => (a.id! < b.id! ? -1 : a.id! > b.id! ? 1 : 0));
       series.forEach((s) => (s.originalData = [...s.data]));
+      series.forEach((s) => {
+        s.data = s.data.map((v) => v ?? 0);
+      });
       this.cumulateSeriesData(series);
       const skipSeries = hasSecondaryAxes ? 1 : 0;
       series.forEach((s) => {
@@ -600,7 +603,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
               ? { y: { range: (_: any, _min: number, max: number) => [0, max] as [number, number] } }
               : undefined,
           cursor:
-            primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'
+            primaryAxes.displayType === 'BAR_CHART' ||
+            primaryAxes.displayType === 'STACKED_BAR' ||
+            (hasSecondaryAxes && this.item().chartSettings!.secondaryAxes!.displayType !== 'LINE')
               ? {
                   dataIdx: (self: any, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
                     const xData = self.data[0] as number[];
