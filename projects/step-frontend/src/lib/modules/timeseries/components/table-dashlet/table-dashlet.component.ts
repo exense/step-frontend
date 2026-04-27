@@ -8,6 +8,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  output,
   Output,
   signal,
   SimpleChanges,
@@ -104,6 +105,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
+  readonly emptyStateChange = output<boolean>();
 
   readonly isLoading = signal<boolean>(true);
 
@@ -314,13 +316,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
+      metricType: this.item().metricKey,
       groupDimensions: this.getGroupDimensions(context),
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
     };
     return this._timeSeriesService
-      .getMeasurements(request)
+      .fetchBucketsWithFallback(request)
       .pipe(map((response) => this.processResponse(response, context)));
   }
 
@@ -329,6 +332,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       tap((response) => {
         this.baseBuckets = response.buckets;
         this.truncated = response.truncated;
+        this.emptyStateChange.emit(response.buckets.length === 0);
       }),
     );
   }

@@ -16,5 +16,6 @@ export type MetricType = {
   defaultAggregation: MetricAggregation;
   defaultGroupingAttributes: Array<string>;
   renderingSettings: MetricRenderingSettings;
+  instrumentType?: 'gauge' | 'counter' | 'histogram';
   id?: string;
 };

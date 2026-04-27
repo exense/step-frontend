@@ -71,7 +71,7 @@ export class ChartStandardTooltipComponent {
     // x series is not included here
     for (let i = 0; i < chartSeries.length; i++) {
       const series = chartSeries[i];
-      const bucketValue = series.data[idx];
+      const bucketValue = (series.originalData ?? series.data)[idx];
       if (series.show) {
         if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY) {
           if (bucketValue != undefined) {

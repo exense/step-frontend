@@ -126,6 +126,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   compareModeEnabled = false;
   resolution?: number;
+  protected emptyItemIds = new Set<string>();
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -513,6 +514,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return indexedEntities;
       }),
     );
+  }
+
+  protected handleDashletEmptyState(id: string, isEmpty: boolean): void {
+    if (isEmpty) {
+      this.emptyItemIds.add(id);
+    } else {
+      this.emptyItemIds.delete(id);
+    }
   }
 
   protected handleChartDelete(index: number) {

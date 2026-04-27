@@ -95,7 +95,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
       .build();
-    return this._timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService.fetchBuckets(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = response.matrix[0]?.map((b) => b?.throughputPerHour || 0) || [];
