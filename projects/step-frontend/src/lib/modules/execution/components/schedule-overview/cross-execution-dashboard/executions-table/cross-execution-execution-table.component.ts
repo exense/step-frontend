@@ -68,7 +68,7 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
     }
     const combinedFilters: Record<string, SearchValue> = {
       startTime: this._filterConditionFactory.dateRangeFilterCondition(range),
-      // ...filters,
+      ...filters,
     };
     return combinedFilters;
   });

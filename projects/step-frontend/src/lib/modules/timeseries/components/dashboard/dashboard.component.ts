@@ -105,6 +105,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() storageId?: string; // for persistence across views
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
+  readonly hiddenFiltersOQL = input<string>();
   @Input() showExecutionLinks = true;
   initialTimeRange = input.required<TimeRange>();
 
@@ -399,6 +400,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               mode: TsFilteringMode.STANDARD,
               filterItems: visibleFilters,
               hiddenFilters: this.hiddenFilters,
+              hiddenFiltersOql: this.hiddenFiltersOQL()
             },
             resolution: this.resolution,
             metrics: this.metricTypes,

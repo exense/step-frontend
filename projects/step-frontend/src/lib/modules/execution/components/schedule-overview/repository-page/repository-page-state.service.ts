@@ -14,9 +14,13 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
 
   readonly executionsTableFilters = computed(() => {
     let execution = this.execution();
+    const canonicalPlanName = execution!.importResult!.canonicalPlanName!;
     if (execution) {
       return {
-        planIdOrCanonicalPlanName: this._filterConditionFactory.matchAnyFilterCondition({ planId: execution.planId! }),
+        planIdOrCanonicalPlanName: this._filterConditionFactory.matchAnyFilterCondition({
+          planId: execution.planId!,
+          'importResult.canonicalPlanName': canonicalPlanName,
+        }),
       } as Record<string, SearchValue>;
     } else {
       return {};

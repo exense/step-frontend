@@ -46,6 +46,7 @@ export abstract class ChartDashlet {
 
     if (globalFiltering.mode === TsFilteringMode.STANDARD) {
       return new OQLBuilder()
+        .append(globalFiltering.hiddenFiltersOql)
         .append(metricOql)
         .append(localFiltersOql)
         .append(FilterUtils.filtersToOQL(globalFiltering.hiddenFilters, 'attributes'))

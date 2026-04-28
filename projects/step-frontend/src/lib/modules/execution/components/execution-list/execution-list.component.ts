@@ -2,19 +2,21 @@ import { Component, computed, effect, inject, OnDestroy, signal, viewChild, View
 import {
   AugmentedExecutionsService,
   BulkSelectionType,
-  DateFormat,
+  DateFormat, DialogsService,
   EntitySelectionState,
   entitySelectionStateProvider,
+  Execution,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   MultiLevelArrayFilterComponent,
+  Plan,
   REQUEST_FILTERS_INTERCEPTORS,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ERROR_STATUSES, EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, exhaustMap, of, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, exhaustMap, map, of, pipe, startWith, switchMap, tap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -54,6 +56,7 @@ export class ExecutionListComponent implements OnDestroy {
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
+  readonly _dialogs = inject(DialogsService);
 
   autoRefreshDisabled: boolean = false;
 
@@ -89,6 +92,30 @@ export class ExecutionListComponent implements OnDestroy {
   });
 
   protected readonly calculateCounts = signal(false);
+
+
+  protected deleteExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showDeleteWarning(1, `Execution "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed
+            ? this._augmentedExecutionsService.deleteExecution(execution.id!).pipe(map(() => true))
+            : of(false),
+        ),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
+  }
+
+  private updateDataSourceAfterChange = pipe(
+    tap((changeResult?: Plan | boolean | string[]) => {
+      if (changeResult) {
+        this.dataSource.reload();
+      }
+    }),
+  );
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();

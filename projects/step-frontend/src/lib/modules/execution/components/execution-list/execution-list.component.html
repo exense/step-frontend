@@ -184,6 +184,15 @@
           >
             <step-icon name="file-07" />
           </a>
+          <button
+            data-step-testid="delete-execution-btn"
+            mat-icon-button
+            matTooltip="Delete execution"
+            [disabled]="!('execution-delete' | hasRight | async)"
+            (click)="deleteExecution(element)"
+          >
+            <step-icon name="trash-2" />
+          </button>
         </step-btn-group>
       </td>
     </ng-container>
