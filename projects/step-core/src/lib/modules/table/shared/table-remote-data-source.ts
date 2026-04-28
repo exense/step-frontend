@@ -151,6 +151,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
       const isProgressTriggered = !x.hideProgress;
 
+      if (!isProgressTriggered) {
+        this.inProgressInternal$.next(false);
+      }
+
       this.terminateCurrentRequest();
       this.currentRequestTerminator$ = new Subject();
       this.requestRef$ = this.doRequest(x).pipe(
