@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, map, shareReplay } from 'rxjs';
+import { BehaviorSubject, catchError, map, of, shareReplay } from 'rxjs';
 import { AugmentedBookmarksService } from '../../../client/step-client-module';
 import { switchMap } from 'rxjs/operators';
 
@@ -15,7 +15,7 @@ export class BookmarkService implements OnDestroy {
     switchMap(() =>
       this._bookmarksApi.getUserBookmarkTable({
         skip: 0,
-        limit: 0,
+        limit: 10,
         sort: [
           {
             field: 'label',
@@ -25,6 +25,7 @@ export class BookmarkService implements OnDestroy {
       }),
     ),
     map((table) => table.data),
+    catchError(() => of(undefined)),
     shareReplay(1),
   );
 
