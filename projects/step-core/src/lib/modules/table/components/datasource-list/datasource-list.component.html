@@ -4,18 +4,31 @@
   </section>
 }
 <section class="list-container">
-  @if (listItemTemplate(); as templateRef) {
-    @if (hasItems()) {
-      @for (item of items(); track trackByFn($index, item)) {
-        <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item, $index: $index }" />
+  @if (
+    _tableIndicator.useSkeletonPlaceholder() &&
+    (_tableIndicator.inProgress() || _tableDataSource.emptyState() === EmptyState.INITIAL)
+  ) {
+    <section class="skeleton-container" aria-hidden="true">
+      @for (skeletonRow of [1, 2, 3, 4, 5]; track skeletonRow) {
+        <div class="skeleton-row">
+          <div class="skeleton-line full"></div>
+        </div>
       }
-    } @else {
-      @switch (_tableDataSource.emptyState()) {
-        @case (EmptyState.INITIAL) {
-          <div class="no-data"></div>
+    </section>
+  } @else {
+    @if (listItemTemplate(); as templateRef) {
+      @if (hasItems()) {
+        @for (item of items(); track trackByFn($index, item)) {
+          <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item, $index: $index }" />
         }
-        @case (EmptyState.NO_MATCHING_RECORDS) {
-          <div class="no-data">No matching records found</div>
+      } @else {
+        @switch (_tableDataSource.emptyState()) {
+          @case (EmptyState.INITIAL) {
+            <div class="no-data"></div>
+          }
+          @case (EmptyState.NO_MATCHING_RECORDS) {
+            <div class="no-data">No matching records found</div>
+          }
         }
       }
     }

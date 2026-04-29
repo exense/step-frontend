@@ -80,7 +80,14 @@ export class AltExecutionReportComponent
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
 
-  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => (testCases?.length ?? 0) > 1));
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(
+    map((testCases) => {
+      if (!testCases?.length) return false;
+      if (testCases.length > 1) return true;
+      const totalCount = Object.values(testCases[0].countByStatus ?? {}).reduce((sum, n) => sum + n, 0);
+      return totalCount > 1;
+    }),
+  );
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
