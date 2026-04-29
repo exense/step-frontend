@@ -27,6 +27,10 @@ step-alt-execution-time {
       &.duration {
         flex: 1;
         text-align: center;
+
+        &.running {
+          color: map.get(var.$statuses, 'RUNNING');
+        }
       }
     }
   }
@@ -45,7 +49,7 @@ step-alt-execution-time {
     .duration {
       font-weight: 400;
       min-width: 4.5rem;
-      padding-left: .5rem;
+      padding-left: 0.5rem;
 
       &.is-empty {
         visibility: hidden;
@@ -65,6 +69,10 @@ step-alt-execution-time {
 
       &.chip.running {
         background-color: map.get(var.$statuses, 'RUNNING');
+      }
+
+      &.running:not(.chip) {
+        color: map.get(var.$statuses, 'RUNNING');
       }
     }
   }
