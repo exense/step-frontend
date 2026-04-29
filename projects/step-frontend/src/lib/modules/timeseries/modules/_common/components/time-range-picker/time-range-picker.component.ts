@@ -107,7 +107,7 @@ export class TimeRangePickerComponent implements OnInit {
     return { value: displayValue, unit: displayUnit };
   }
 
-  applyRelativeTimeRange() {
+  applyRelativeTimeRange(): void {
     if (this.draftSelection()?.type === 'FULL') {
       this.emitSelectionChange({ type: 'FULL' });
       this.closeMenu();
@@ -123,7 +123,7 @@ export class TimeRangePickerComponent implements OnInit {
     this.closeMenu();
   }
 
-  fillInputs(range?: TimeRange) {
+  fillInputs(range?: TimeRange): void {
     if (range) {
       this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(range.from));
       this.toDateString = TimeSeriesUtils.formatInputDate(new Date(range.to));
@@ -143,11 +143,11 @@ export class TimeRangePickerComponent implements OnInit {
     return this.selectOptions().some((option) => option.type === 'FULL');
   });
 
-  handleMenuClose() {
+  handleMenuClose(): void {
     this.dateTimeInputsLocked = false;
   }
 
-  handleMenuOpen() {
+  handleMenuOpen(): void {
     // make sure fresh data is displayed
     let activeSelection = this.activeSelection();
     this.draftSelection.set({ ...activeSelection });
@@ -170,7 +170,7 @@ export class TimeRangePickerComponent implements OnInit {
     }
   }
 
-  onFromInputLeave() {
+  onFromInputLeave(): void {
     const inputDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
 
     if (inputDate) {
@@ -188,7 +188,7 @@ export class TimeRangePickerComponent implements OnInit {
     }
   }
 
-  onToInputLeave() {
+  onToInputLeave(): void {
     const inputDate = TimeSeriesUtils.parseFormattedDate(this.toDateString);
     if (inputDate) {
       this.toDate = DateTime.fromJSDate(inputDate);
@@ -205,7 +205,7 @@ export class TimeRangePickerComponent implements OnInit {
     }
   }
 
-  applyAbsoluteInterval() {
+  applyAbsoluteInterval(): void {
     let from = 0;
     let to = 0;
     const fromDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
@@ -254,11 +254,11 @@ export class TimeRangePickerComponent implements OnInit {
     }
   }
 
-  onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
+  onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection): void {
     this.emitSelectionChange(option);
   }
 
-  emitSelectionChange(selection: TimeRangePickerSelection) {
+  emitSelectionChange(selection: TimeRangePickerSelection): void {
     this.selectionChange.emit(selection);
     this.closeMenu();
   }
@@ -270,7 +270,7 @@ export class TimeRangePickerComponent implements OnInit {
     this.fromDateString = TimeSeriesUtils.formatInputDate(date.toJSDate());
   }
 
-  setToDate(date?: DateTime | null) {
+  setToDate(date?: DateTime | null): void {
     if (!date) {
       return;
     }
@@ -279,7 +279,7 @@ export class TimeRangePickerComponent implements OnInit {
     this.toDateString = TimeSeriesUtils.formatInputDate(jsDate);
   }
 
-  closeMenu() {
+  closeMenu(): void {
     this.menuTrigger.closeMenu();
   }
 }

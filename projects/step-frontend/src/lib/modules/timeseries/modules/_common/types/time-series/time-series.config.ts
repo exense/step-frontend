@@ -82,24 +82,6 @@ export class TimeSeriesConfig {
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 hours', timeInMs: this.ONE_HOUR_MS * 2 } },
   ];
 
-  /**
-   * @Deprecated. Has to be removed after legacy dashboard is replaced.
-   */
-  static readonly KNOWN_ATTRIBUTES: MetricAttribute[] = [
-    {
-      displayName: 'Status',
-      name: 'rnStatus',
-      type: 'TEXT',
-      metadata: { knownValues: ['PASSED', 'FAILED', 'TECHNICAL_ERROR', 'INTERRUPTED'] },
-    },
-    { displayName: 'Type', name: 'type', type: 'TEXT', metadata: { knownValues: ['keyword', 'custom'] } },
-    { displayName: 'Origin', name: 'origin', type: 'TEXT', metadata: {} },
-    { displayName: 'Task', name: 'taskId', type: 'TEXT', metadata: { entity: 'task' } },
-    { displayName: 'Execution', name: 'eId', type: 'TEXT', metadata: { entity: 'execution' } },
-    { displayName: 'Plan', name: 'planId', type: 'TEXT', metadata: { entity: 'plan' } },
-    { displayName: 'Name', name: 'name', type: 'TEXT', metadata: {} },
-  ];
-
   static readonly AXES_FORMATTING_FUNCTIONS = {
     bigNumber: (num: number) => {
       if (num && num < 10) {
@@ -127,9 +109,4 @@ export class TimeSeriesConfig {
         : '0 ms';
     },
   };
-}
-
-export interface RefreshInterval {
-  label: string;
-  value: number; // 0 if it's off
 }

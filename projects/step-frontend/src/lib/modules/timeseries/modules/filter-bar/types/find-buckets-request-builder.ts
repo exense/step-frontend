@@ -130,6 +130,7 @@ export class FindBucketsRequestBuilder {
     const oql = new OQLBuilder()
       .open('and')
       .append(customAttributesOql)
+      .append(this.filteringSettings?.hiddenFiltersOql)
       .append(FilterUtils.filtersToOQL(hiddenFilters, this.attributesPrefix)) // always include hidden filters
       .append(
         isOqlMode

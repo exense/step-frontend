@@ -176,6 +176,26 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group [stepEntityRef]="element">
           <a
+            data-step-testid="execute-plan-btn"
+            mat-icon-button
+            matTooltip="Restart execution"
+            [disabled]="!('plan-execute' | hasRight | async)"
+            (click)="restartExecution(element)"
+          >
+            <step-icon name="play-circle" />
+          </a>
+          <button
+            type="button"
+            mat-icon-button
+            aria-label="Left Align"
+            matTooltip="Stop execution"
+            matTooltipPosition="below"
+            [disabled]="!('plan-execute' | hasRight | async) || (element.status === 'ENDED' || element.status === 'ABORTING' || element.status === 'FORCING_ABORT')"
+            (click)="stopExecution(element)"
+          >
+            <step-icon name="stop-circle" aria-hidden="true" />
+          </button>
+          <a
             stepTestId="cross-execution-plan-btn"
             mat-icon-button
             matTooltip="Open plan report"

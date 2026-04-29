@@ -106,12 +106,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   readonly hiddenFiltersOQL = input<string>();
+  readonly disabledFilterOptions = input<string[]>([]);
   @Input() showExecutionLinks = true;
-  initialTimeRange = input.required<TimeRange>();
+  readonly initialTimeRange = input.required<TimeRange>();
 
-  timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
+  protected timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
-  fullRangeSelected: boolean = true;
+  protected fullRangeSelected: boolean = true;
 
   /** @Output **/
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
@@ -122,20 +123,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly dashboardUpdate = output<DashboardView>();
 
   private exportInProgress = false;
-  dashboard!: DashboardView;
-  dashboardBackup!: DashboardView;
+  protected dashboard!: DashboardView;
+  protected dashboardBackup!: DashboardView;
+  protected compareModeEnabled = false;
+  protected resolution?: number;
+  protected editMode = false;
+  protected metricTypes?: MetricType[];
+  protected hasWritePermission = false;
 
-  compareModeEnabled = false;
-  resolution?: number;
-
-  editMode = false;
-  metricTypes?: MetricType[];
-
-  hasWritePermission = false;
-
-  mainEngine!: DashboardStateEngine;
-  compareEngine?: DashboardStateEngine;
-  compareModeChangesSubscription?: Subscription;
+  protected mainEngine!: DashboardStateEngine;
+  protected compareEngine?: DashboardStateEngine;
+  protected compareModeChangesSubscription?: Subscription;
 
   public updateFullTimeRange(
     timeRange: TimeRange,
@@ -167,18 +165,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * This method is used to notify the parent component that the user wants to change the full time-range, to his current sub-selection
    * @protected
    */
-  protected emitFullRangeUpdateRequest() {
+  protected emitFullRangeUpdateRequest(): void {
     if (!this.fullRangeSelected) {
       this.mainEngine.state.lastChangeType = 'manual';
       this.fullRangeUpdateRequest.emit(this.mainEngine.state.context.getSelectedTimeRange());
     }
   }
 
-  protected handleMainFullRangeChangeRequest(range: TimeRange) {
+  protected handleMainFullRangeChangeRequest(range: TimeRange): void {
     this.fullRangeUpdateRequest.emit(range);
   }
 
-  protected handleCompareFullRangeChange(range: TimeRange) {
+  protected handleCompareFullRangeChange(range: TimeRange): void {
     this.compareEngine?.state.context.updateFullRangeAndSelection(range);
   }
 
@@ -209,22 +207,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
 
-  protected handleGroupingChange(engine: DashboardStateEngine, groupDimensions: string[]) {
+  protected handleGroupingChange(engine: DashboardStateEngine, groupDimensions: string[]): void {
     engine.state.lastChangeType = 'manual';
     engine.state.context.updateGrouping(groupDimensions);
   }
 
-  protected handleFiltersChange(engine: DashboardStateEngine, filters: TsFilteringSettings) {
+  protected handleFiltersChange(engine: DashboardStateEngine, filters: TsFilteringSettings): void {
     engine.state.lastChangeType = 'manual';
     engine.state.context.setFilteringSettings(filters);
   }
 
-  protected handleZoomReset() {
+  protected handleZoomReset(): void {
     this.zoomReset.emit();
     this.mainEngine.state.context.resetZoom();
   }
 
-  private initStateFromContext(context: TimeSeriesContext, editMode?: boolean) {
+  private initStateFromContext(context: TimeSeriesContext, editMode?: boolean): void {
     this.resolution = context.getChartsResolution();
     const state: DashboardState = {
       context: context,
@@ -242,7 +240,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected handleResolutionChange(resolution: number) {
+  protected handleResolutionChange(resolution: number): void {
     if (resolution > 0 && resolution < 1000) {
       // minimum value should be one second
       return;
@@ -255,17 +253,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected enableEditMode() {
+  protected enableEditMode(): void {
     this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
   }
 
-  protected cancelEditMode() {
+  protected cancelEditMode(): void {
     this.dashboard = { ...this.dashboardBackup };
     this.editMode = false;
   }
 
-  protected saveEditChanges() {
+  protected saveEditChanges(): void {
     this.editMode = false;
     this.dashboard.grouping = this.mainEngine.state.context.getGroupDimensions();
     this.dashboard.resolution = this.resolution;
@@ -279,7 +277,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.dashboardUpdate.emit(this.dashboard);
   }
 
-  protected addTableDashlet(metric: MetricType) {
+  protected addTableDashlet(metric: MetricType): void {
     let tableItem: DashboardItem = {
       id: 'table-' + new Date().getTime(),
       type: 'TABLE',
@@ -381,11 +379,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       FilterUtils.filterItemIsValid,
     );
 
-    const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
+    let visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
       dashboard.filters,
       this.hiddenFilters,
     );
+    let disabledFilterOptions: string[] = this.disabledFilterOptions();
+    disabledFilterOptions.forEach(disabledAttribute => {
+      visibleFilters = visibleFilters.filter(f => f.attributeName !== disabledAttribute);
+    });
     return this.fetchFilterEntities(visibleFilters).pipe(
       map((empty) => {
         return this._timeSeriesContextFactory.createContext(
@@ -400,7 +402,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               mode: TsFilteringMode.STANDARD,
               filterItems: visibleFilters,
               hiddenFilters: this.hiddenFilters,
-              hiddenFiltersOql: this.hiddenFiltersOQL()
+              hiddenFiltersOql: this.hiddenFiltersOQL(),
             },
             resolution: this.resolution,
             metrics: this.metricTypes,
@@ -577,7 +579,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createCompareModeFilters() {
+  private createCompareModeFilters(): TsFilteringSettings {
     const clonedSettings: TsFilteringSettings = JSON.parse(
       JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
     );
@@ -597,7 +599,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return clonedSettings;
   }
 
-  private enableCompareMode() {
+  private enableCompareMode(): void {
     if (this.compareModeChangesSubscription) {
       this.compareModeChangesSubscription.unsubscribe();
       this.compareModeChangesSubscription = undefined;
@@ -652,7 +654,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.dashboard.dashlets.flatMap((d) => d.attributes);
   }
 
-  private removeOneTimeUrlParams() {
+  private removeOneTimeUrlParams(): void {
     const currentParams = { ...this._route.snapshot.queryParams };
     currentParams[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + 'edit'] = null;
 
@@ -664,7 +666,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  protected resetDashboard() {
+  protected resetDashboard(): void {
     this._timeSeriesContextFactory.destroyContext(this.storageId);
     this.dashboard = undefined as any;
     this.dashboardBackup = undefined as any;

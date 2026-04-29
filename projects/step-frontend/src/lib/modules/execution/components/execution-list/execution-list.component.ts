@@ -46,14 +46,14 @@ import { FormControl } from '@angular/forms';
 })
 export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
-  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
-  readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
+  protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  protected readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
-  readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
-  readonly DateFormat = DateFormat;
-  readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
-  readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
+  protected readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
+  protected readonly DateFormat = DateFormat;
+  protected readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
+  protected readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
   readonly _dialogs = inject(DialogsService);
@@ -93,6 +93,41 @@ export class ExecutionListComponent implements OnDestroy {
 
   protected readonly calculateCounts = signal(false);
 
+  protected restartExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showWarning(`Are you sure you want to restart Execution ${name}?`)
+      .pipe(
+        switchMap((confirmed) =>
+          confirmed
+            ? this._augmentedExecutionsService.restartExecutions({
+                ids: [execution.id!],
+                targetType: 'LIST',
+                preview: false,
+              })
+            : of(false),
+        ),
+      )
+      .subscribe();
+  }
+
+  protected stopExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showWarning(`Are you sure you want to stop Execution ${name}?`)
+      .pipe(
+        switchMap((confirmed) =>
+          confirmed
+            ? this._augmentedExecutionsService.stopExecutions({
+                ids: [execution.id!],
+                targetType: 'LIST',
+                preview: false,
+              })
+            : of(false),
+        ),
+      )
+      .subscribe();
+  }
 
   protected deleteExecution(execution: Execution): void {
     const name = execution.description;
