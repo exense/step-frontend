@@ -53,7 +53,11 @@ export class SchedulerReportViewComponent implements OnInit {
     ),
   );
 
-  switchReportNodesChart(type: ReportNodesChartType) {
+  switchReportNodesChart(type: ReportNodesChartType): void {
+    if (this.reportNodesChartType() === type) {
+      // nothing happened
+      return;
+    }
     this._state.lastRefreshTrigger.set('manual');
     if (type === 'keywords') {
       this._state.keywordsCountChartLoading.set(true);

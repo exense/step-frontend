@@ -12,6 +12,8 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
 
   // readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._executionIdFn() };
 
+  dashboardDisabledFilters: string[] = ['planId'];
+
   readonly executionsTableFilters = computed(() => {
     let execution = this.execution();
     const canonicalPlanName = execution!.importResult!.canonicalPlanName!;
@@ -28,7 +30,7 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   });
 
   getViewType(): CrossExecutionViewType {
-    return 'plan';
+    return 'repository';
   }
 
   getEntityId(): string {
@@ -58,6 +60,12 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    return this._executionService.getLastExecutionsByPlan(this._executionIdFn(), 30, timeRange.from, timeRange.to);
+    let execution = this.execution();
+    if (!execution) {
+      throw new Error('Execution is not already fetched');
+    }
+    return this._executionService.searchByCanonicalPlanName(
+      execution.importResult!.canonicalPlanName! || 'empty',
+    );
   }
 }

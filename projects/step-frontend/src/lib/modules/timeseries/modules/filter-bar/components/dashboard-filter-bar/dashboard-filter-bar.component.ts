@@ -69,6 +69,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
   @Input() editMode = false;
+  readonly disabledFilterOptions = input<string[]>([]);
 
   /**
    * Output used to notify when the full time range of the dashboard should be changed. This is currently triggered only via "use selected execution's time range" filters.
@@ -147,7 +148,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
           customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
         }
         this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
-        this.filterOptions = this.collectUnusedAttributes();
+        this.filterOptions = this.collectFilterOptions();
       });
 
     this.emitFilterChange$
@@ -170,26 +171,37 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  private collectUnusedAttributes(): MetricAttribute[] {
+  private collectFilterOptions(): MetricAttribute[] {
     const hiddenFilters = this.context().getFilteringSettings().hiddenFilters || [];
+    const disabledFilterOptionsMap = this.disabledFilterOptions().reduce(
+      (acc: Record<string, boolean>, filterOption: string) => {
+        acc[filterOption] = true;
+        acc[ATTRIBUTES_REMOVAL_FUNCTION(filterOption)] = true;
+        return acc;
+      },
+      {},
+    );
+
     return this.context()
       .getAllAttributes()
       .filter(
         (attr) =>
           !this._internalFilters.find((item) => attr.name === item.attributeName) &&
-          !hiddenFilters.find((item) => attr.name === item.attributeName),
+          !hiddenFilters.find((item) => attr.name === item.attributeName) &&
+          !disabledFilterOptionsMap[attr.name] &&
+          !disabledFilterOptionsMap[ATTRIBUTES_REMOVAL_FUNCTION(attr.name)],
       );
   }
 
-  getValidFilters(): FilterBarItem[] {
+  protected getValidFilters(): FilterBarItem[] {
     return this._internalFilters.filter(FilterUtils.filterItemIsValid);
   }
 
-  handleOqlChange(event: any): void {
+  protected handleOqlChange(event: any): void {
     this.invalidOql = false;
   }
 
-  toggleOQLMode(mode: number): void {
+  protected toggleOQLMode(mode: number): void {
     this.activeMode = mode as TsFilteringMode;
     if (this.activeMode === TsFilteringMode.OQL) {
       this.oqlValue = FilterUtils.filtersToOQL(
@@ -201,11 +213,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  disableOqlMode(): void {
+  protected disableOqlMode(): void {
     this.activeMode = TsFilteringMode.STANDARD;
   }
 
-  composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
+  protected composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
     const filtersOql =
       this.activeMode === TsFilteringMode.OQL
@@ -223,14 +235,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       searchEntities: [],
     }));
     const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX);
-    let finalOQL = new OQLBuilder()
-      .append(filtersOql)
-      .append(groupingOql)
-      .build();
+    let finalOQL = new OQLBuilder().append(filtersOql).append(groupingOql).build();
     return this._timeSeriesService.verifyOql(finalOQL);
   }
 
-  handleGroupingChange(dimensions: string[]): void {
+  protected handleGroupingChange(dimensions: string[]): void {
     this.activeGrouping = dimensions;
     this.composeAndVerifyFullOql(dimensions).subscribe((response) => {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
@@ -244,7 +253,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  emitFiltersChange(): void {
+  protected emitFiltersChange(): void {
     const filteringSettings = this.context().getFilteringSettings();
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
@@ -256,7 +265,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.filtersChange.emit(settings);
   }
 
-  manuallyApplyFilters(): void {
+  protected manuallyApplyFilters(): void {
     if (this.haveNewGrouping()) {
       this.groupingChange.emit(this.activeGrouping);
       // this.context().updateGrouping(this.activeGrouping);
@@ -279,7 +288,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleFilterChange(index: number, item: FilterBarItem): void {
+  protected handleFilterChange(index: number, item: FilterBarItem): void {
     this._internalFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
@@ -354,7 +363,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
     this._internalFilters.splice(index, 1);
     this._internalFilters = [...this._internalFilters];
-    this.filterOptions = this.collectUnusedAttributes();
+    this.filterOptions = this.collectFilterOptions();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
@@ -362,7 +371,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   private addFilter(item: FilterBarItem): void {
     this._internalFilters = [...this._internalFilters, item];
-    this.filterOptions = this.collectUnusedAttributes();
+    this.filterOptions = this.collectFilterOptions();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
   }

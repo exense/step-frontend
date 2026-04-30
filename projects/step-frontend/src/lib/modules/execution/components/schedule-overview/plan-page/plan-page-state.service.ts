@@ -15,6 +15,8 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
 
   readonly executionsTableFilters = signal({ planId: this._planIdFn() });
 
+  dashboardDisabledFilters: string[] = ['planId'];
+
   getViewType(): CrossExecutionViewType {
     return 'plan';
   }
@@ -29,7 +31,7 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecution(): Observable<Execution> {
-    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 1).pipe(map(list => list[0]));
+    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 1).pipe(map((list) => list[0]));
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {

@@ -14,6 +14,7 @@ import {
 } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
+  AugmentedExecutionsService,
   AugmentedTimeSeriesService,
   BucketResponse,
   Execution,
@@ -57,7 +58,7 @@ export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 export abstract class CrossExecutionDashboardState {
   public LAST_EXECUTIONS_TO_DISPLAY = 30;
 
-  protected _executionService = inject(ExecutionsService);
+  protected _executionService = inject(AugmentedExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
@@ -80,6 +81,7 @@ export abstract class CrossExecutionDashboardState {
   abstract readonly executionsTableFilters: Signal<Record<string, SearchValue>>;
   abstract getViewType(): CrossExecutionViewType;
   abstract getEntityId(): string;
+  abstract dashboardDisabledFilters: string[];
 
   readonly executionsChartLoading = signal<boolean>(false);
   readonly summaryWidgetLoading = signal<boolean>(false);
@@ -483,10 +485,17 @@ export abstract class CrossExecutionDashboardState {
 
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
     let entityParams = undefined;
-    if (this.getViewType() === 'plan') {
-      entityParams = { planId: this.getEntityId() };
-    } else {
-      entityParams = { taskId: this.getEntityId() };
+    switch (this.getViewType()) {
+      case "task":
+        entityParams = { taskId: this.getEntityId() };
+        break;
+      case "plan":
+        entityParams = { planId: this.getEntityId() };
+        break;
+      case "repository":
+        entityParams = { canonicalPlanName: this.execution()!.importResult!.canonicalPlanName };
+        break;
+
     }
     this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
@@ -575,7 +584,6 @@ export abstract class CrossExecutionDashboardState {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
         values: (u, vals) => vals,
-        incrs: [1],
       },
     ];
 

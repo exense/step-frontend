@@ -62,6 +62,7 @@
               [context]="mainEngine.state.context"
               [compactView]="compareModeEnabled"
               [showHiddenFilters]="compareModeEnabled"
+              [disabledFilterOptions]="disabledFilterOptions()"
               (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
               (groupingChange)="handleGroupingChange(mainEngine, $event)"
               (filtersChange)="handleFiltersChange(mainEngine, $event)"

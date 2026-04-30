@@ -101,7 +101,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
-  id = input.required<string>(); // dashboard id
+  readonly id = input.required<string>(); // dashboard id
   @Input() storageId?: string; // for persistence across views
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];

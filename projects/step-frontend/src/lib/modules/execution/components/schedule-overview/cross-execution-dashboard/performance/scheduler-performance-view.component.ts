@@ -23,18 +23,17 @@ export class SchedulerPerformanceViewComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
   protected readonly timeRange = signal<TimeRangePickerSelection | undefined>(undefined);
 
-  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
+  private readonly dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
 
   protected isLoading = false;
 
   protected dashboardId?: string;
   protected dashboardFilters: FilterBarItem[] = [];
 
-  readonly activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
+  protected readonly activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
 
   constructor() {
     this.dashboardId = this._authService.getConf()!.miscParams![TimeSeriesConfig.PARAM_KEY_ANALYTICS_DASHBOARD_ID];
-    this.dashboardFilters = []; // TODO this._state.getDashboardFilter()
   }
 
   ngOnInit(): void {
@@ -47,15 +46,15 @@ export class SchedulerPerformanceViewComponent implements OnInit {
     });
   }
 
-  handleDashboardSettingsChange(context: TimeSeriesContext): void {
+  protected handleDashboardSettingsChange(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, false);
   }
 
-  handleDashboardSettingsInit(context: TimeSeriesContext): void {
+  protected handleDashboardSettingsInit(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, true);
   }
 
-  handleFullRangeChangeRequest(range: TimeRange): void {
+  protected handleFullRangeChangeRequest(range: TimeRange): void {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
