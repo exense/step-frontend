@@ -112,7 +112,6 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
-import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
@@ -857,12 +856,6 @@ export class ExecutionModule {
                     },
                   },
                   component: AggregatedTreeNodeDrilldownComponent,
-                  children: [
-                    dialogRoute({
-                      path: 'plan-node',
-                      dialogComponent: PlanNodeDetailsDialogComponent,
-                    }),
-                  ],
                 },
               ],
             },
