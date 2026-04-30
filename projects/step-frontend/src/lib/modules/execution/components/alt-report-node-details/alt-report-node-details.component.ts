@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
@@ -59,6 +59,11 @@ export class AltReportNodeDetailsComponent {
   readonly showArtefact = input(false);
 
   private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
+  protected readonly isTreeHidden = signal(true);
+
+  protected toggleTreeVisibility(): void {
+    this.isTreeHidden.update((value) => !value);
+  }
 
   protected readonly reportNode = computed(() => {
     const reportNode = this._nodeDetailsDirective.reportNode();
@@ -85,12 +90,9 @@ export class AltReportNodeDetailsComponent {
     }),
   );
 
-  searchFor($event: string): void {
-    if (!this.partialTree()) {
-      return;
-    }
-
-    this.partialTree()!.focusAndSearch($event);
+  protected searchFor($event: string): void {
+    const tree = untracked(() => this.partialTree());
+    tree?.focusAndSearch?.($event);
   }
 
   private readonly aggregatedNode = computed(() => {

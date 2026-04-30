@@ -1,4 +1,22 @@
 @if (reportNode(); as node) {
+  <section class="tree-collapse-container collapsed" [class.collapsed]="isTreeHidden()" stepElementSize>
+    <step-icon name="tree" />
+    <strong>Open drilldown tree</strong>
+    <span>Inspect the executed path for this iteration</span>
+    <button mat-icon-button class="tree-toggle" (click)="toggleTreeVisibility()">
+      <step-icon [name]="isTreeHidden() ? 'chevron-right' : 'chevron-down'" />
+    </button>
+    @if (!isTreeHidden()) {
+      <step-alt-execution-tree-partial
+        #partialTree
+        [node]="node"
+        [noPadding]="true"
+        [showDetailsButton]="true"
+        [autoFocusNode]="false"
+        (openIterations)="openIterations.emit($event)"
+      />
+    }
+  </section>
   @if (!hideFirstPanel()) {
     <div class="grid">
       @if (rootCauseErrors(); as rootCauseErrors) {
@@ -69,27 +87,6 @@
       </step-alt-report-node-details-testcases-steps>
     }
   }
-  <div class="tree-container execution-report-node-details" stepElementSize>
-    <div class="data-container">
-      <div class="container-title">
-        <span>Partial execution tree</span>
-        <step-icon
-          name="alert-circle"
-          matTooltip="This is a partial execution tree showing the selected node in context. It includes the path from the root to the selected node, the selected node’s children, and — if the node is part of an iterative structure (like a ThreadGroup) — its direct siblings to provide full loop context."
-          matTooltipPosition="below"
-        />
-        <div class="gap"></div>
-      </div>
-      <step-alt-execution-tree-partial
-        #partialTree
-        [node]="node"
-        [noPadding]="true"
-        [showDetailsButton]="true"
-        [autoFocusNode]="false"
-        (openIterations)="openIterations.emit($event)"
-      />
-    </div>
-  </div>
   <div class="execution-report-node-details" stepElementSize>
     <step-execution-history-section [artefactHashContainer]="artefactHashContainer()" />
   </div>
