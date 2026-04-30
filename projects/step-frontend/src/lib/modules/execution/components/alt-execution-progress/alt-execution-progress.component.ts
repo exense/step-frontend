@@ -50,10 +50,11 @@ import {
   SystemService,
   TableDataSource,
   TableLocalDataSource,
+  TableRemoteDataSourceFactoryService,
   TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -80,6 +81,7 @@ import { ToggleRequestWarningDirective } from '../../directives/toggle-request-w
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 import { TimeRangeExt } from '../../shared/time-range-ext';
 import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
+import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 
 enum UpdateSelection {
@@ -172,6 +174,7 @@ export class AltExecutionProgressComponent
   private _plansApi = inject(AugmentedPlansService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
+  private _tableRemoteDataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
@@ -323,6 +326,9 @@ export class AltExecutionProgressComponent
     shareReplay(1),
   );
 
+  private readonly testCasesDisplayMode = signal(TestCasesDisplayMode.AGGREGATED);
+  readonly testCasesDisplayMode$ = toObservable(this.testCasesDisplayMode);
+
   protected testCasesForRelaunch$ = this.testCases$.pipe(
     map((testCases) => testCases.map((item) => item.singleInstanceReportNode).filter((item) => !!item)),
     map((testCases) => {
@@ -343,11 +349,33 @@ export class AltExecutionProgressComponent
     }),
   );
 
-  private testCasesDataSource?: TableDataSource<AggregatedReportView>;
-  readonly testCasesDataSource$ = this.testCases$.pipe(
-    tap(() => this.testCasesDataSource?.destroy()),
-    map((nodes) => this.createAggregatedReportViewDatasource(nodes ?? []).sharable()),
-    tap((dataSource) => (this.testCasesDataSource = dataSource)),
+  readonly testCasesTableParameters$ = this.execution$.pipe(
+    map((execution) => {
+      return {
+        type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
+        eid: execution.id,
+      } as KeywordParameters;
+    }),
+    distinctUntilChanged((a, b) => a.eid === b.eid),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  private aggregatedTestCasesDataSource?: TableDataSource<AggregatedReportView>;
+  private testCaseIterationsDataSource?: TableDataSource<ReportNode>;
+  readonly testCasesDataSource$ = this.testCasesDisplayMode$.pipe(
+    switchMap((displayMode) => {
+      if (displayMode === TestCasesDisplayMode.INDIVIDUAL) {
+        return of(this.getOrCreateTestCaseIterationsDatasource());
+      }
+
+      return this.testCases$.pipe(
+        tap(() => this.aggregatedTestCasesDataSource?.destroy()),
+        map((nodes) => this.createAggregatedReportViewDatasource(nodes ?? []).sharable()),
+        tap((dataSource) => (this.aggregatedTestCasesDataSource = dataSource)),
+      );
+    }),
+    map((dataSource) => dataSource as TableDataSource<AggregatedReportView | ReportNode>),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -467,7 +495,8 @@ export class AltExecutionProgressComponent
 
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
-    this.testCasesDataSource?.destroy();
+    this.aggregatedTestCasesDataSource?.destroy();
+    this.testCaseIterationsDataSource?.destroy();
   }
 
   private setupTreeRefresh(): void {
@@ -546,6 +575,31 @@ export class AltExecutionProgressComponent
             .toLowerCase(),
         )
         .build(),
+    );
+  }
+
+  private getOrCreateTestCaseIterationsDatasource(): TableDataSource<ReportNode> {
+    if (!this.testCaseIterationsDataSource) {
+      this.testCaseIterationsDataSource = this._tableRemoteDataSourceFactory
+        .createDataSource<ReportNode>(
+          AugmentedExecutionsService.REPORTS_TABLE_ID,
+          {
+            name: 'name',
+            status: 'status',
+            executionTime: 'executionTime',
+          },
+          {
+            _class: 'step.artefacts.reports.TestCaseReportNode',
+          },
+        )
+        .sharable();
+    }
+    return this.testCaseIterationsDataSource;
+  }
+
+  toggleTestCasesDisplayMode(): void {
+    this.testCasesDisplayMode.update((mode) =>
+      mode === TestCasesDisplayMode.AGGREGATED ? TestCasesDisplayMode.INDIVIDUAL : TestCasesDisplayMode.AGGREGATED,
     );
   }
 

@@ -89,7 +89,7 @@ interface ProcessedBucketResponse {
   templateUrl: './table-dashlet.component.html',
   styleUrls: ['./table-dashlet.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip, ChartSkeletonComponent],
+  imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
   standalone: true,
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {

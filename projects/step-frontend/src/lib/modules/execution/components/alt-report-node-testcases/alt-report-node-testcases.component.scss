@@ -1,6 +1,4 @@
 @use 'projects/step-core/styles/core-variables' as var;
-@use 'projects/step-frontend/styles/common-mixins' as common;
-
 step-alt-report-node-testcases {
   display: flex;
   flex-direction: column;
@@ -96,6 +94,20 @@ step-alt-report-node-testcases {
         display: none;
       }
     }
+
+    .single-error {
+      margin-left: 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.2rem;
+      color: var.$red-650;
+    }
+  }
+
+  .mat-mdc-card-header step-alt-report-widget-filter .mat-mdc-icon-button.mat-mdc-button-base {
+    width: 3.5rem;
+    height: 3.5rem;
   }
 
   .actions {

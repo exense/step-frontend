@@ -22,7 +22,6 @@ import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from '../../injectables/grid-layout-config.token';
 import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
-import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
 import { GridBackgroundComponent } from '../grid-background/grid-background.component';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -42,7 +41,6 @@ interface GridItem {
   imports: [
     StepBasicsModule,
     GridResizerComponent,
-    GridElementTitleComponent,
     GridDragHandleComponent,
     GridBackgroundComponent,
     GridElementComponent,

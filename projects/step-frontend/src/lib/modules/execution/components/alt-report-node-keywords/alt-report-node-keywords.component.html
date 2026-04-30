@@ -21,6 +21,7 @@
                 [preserveDurationSpace]="true"
                 [startTime]="element.executionTime"
                 [duration]="element.duration"
+                [isRunning]="element.status === 'RUNNING'"
                 [singleUnit]="true"
               />
               <step-report-node-icon [node]="element" />

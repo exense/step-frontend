@@ -1,5 +1,13 @@
 step-execution-duration {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
   step-alt-execution-time {
     margin-right: 0.5rem;
+
+    .duration {
+      font-weight: 500 !important;
+    }
   }
 }

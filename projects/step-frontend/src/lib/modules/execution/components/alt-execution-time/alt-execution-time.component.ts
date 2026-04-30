@@ -77,6 +77,10 @@ export class AltExecutionTimeComponent {
       return startTime + duration;
     }
 
+    if (this.isRunning() && startTime !== undefined) {
+      return new Date().getTime();
+    }
+
     return undefined;
   });
 
