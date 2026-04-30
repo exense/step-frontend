@@ -804,9 +804,10 @@ export class ExecutionModule {
                 {
                   matcher: (url) => {
                     if (
-                      url[0].path === DrilldownRootType.TREE ||
-                      url[0].path === DrilldownRootType.TESTCASES ||
-                      url[0].path === DrilldownRootType.KEYWORDS
+                      url.length > 0 &&
+                      (url[0].path === DrilldownRootType.TREE ||
+                        url[0].path === DrilldownRootType.TESTCASES ||
+                        url[0].path === DrilldownRootType.KEYWORDS)
                     ) {
                       return { consumed: url };
                     }
