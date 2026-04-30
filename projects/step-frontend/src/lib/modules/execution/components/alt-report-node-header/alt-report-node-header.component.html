@@ -9,10 +9,7 @@
       mat-icon-button
       matTooltip="Show plan node details"
       matTooltipPosition="below"
-      [routerLink]="['.', 'plan-node']"
-      [relativeTo]="_activatedRoute"
-      [queryParams]="{ reportNodeId: reportNode.id }"
-      queryParamsHandling="merge"
+      (click)="openPlanDialog()"
     >
       <step-icon name="external-link" />
     </button>

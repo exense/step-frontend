@@ -1,7 +1,8 @@
-import { Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, untracked, ViewEncapsulation } from '@angular/core';
 import { AltReportNodeDetailsDirective } from '../../directives/alt-report-node-details.directive';
 import { ReportNode } from '@exense/step-core';
-import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { PlanNodeDetailsDialogComponent } from '../plan-node-details-dialog/plan-node-details-dialog.component';
 
 @Component({
   selector: 'step-alt-report-node-header',
@@ -18,9 +19,15 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class AltReportNodeHeaderComponent {
   private _reportNodeDetailsDirective = inject(AltReportNodeDetailsDirective);
-  protected readonly _activatedRoute = inject(ActivatedRoute);
+  private _matDialog = inject(MatDialog);
+
   protected readonly reportNode = computed(() => {
     const reportNode = this._reportNodeDetailsDirective.reportNode();
     return reportNode as ReportNode;
   });
+
+  protected openPlanDialog(): void {
+    const reportNode = untracked(() => this.reportNode());
+    this._matDialog.open(PlanNodeDetailsDialogComponent, { data: { reportNode } });
+  }
 }

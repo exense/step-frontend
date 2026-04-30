@@ -55,7 +55,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     nodeOrParams: AggregatedTreeNode | OpenIterationsParams,
     restParams?: PartialOpenIterationsParams,
   ): void {
-    if (arguments.length === 2) {
+    if (arguments.length === 3) {
       const node = nodeOrParams as AggregatedTreeNode;
       restParams = restParams ?? {};
       const { id: aggregatedNodeId, countByStatus, singleInstanceReportNode } = node;
