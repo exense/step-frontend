@@ -3,6 +3,7 @@ import {
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
+  ItemType,
 } from '@exense/step-core';
 import { WhileReportNode } from '../../types/while.report-node';
 
@@ -27,15 +28,18 @@ export class WhileReportDetailsComponent extends BaseReportDetailsComponent<Whil
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        ['condition', node.resolvedArtefact.condition, 'log-in'],
-        ['post condition', node.resolvedArtefact.postCondition, 'log-in'],
-        ['pacing', node.resolvedArtefact.pacing, 'log-in'],
-        ['timeout', node.resolvedArtefact.timeout, 'log-in'],
-        ['max iterations', node.resolvedArtefact.maxIterations, 'log-in'],
+        { label: 'condition', value: node.resolvedArtefact.condition, itemType: ItemType.configuration },
+        { label: 'post condition', value: node.resolvedArtefact.postCondition, itemType: ItemType.configuration },
+        { label: 'pacing', value: node.resolvedArtefact.pacing, itemType: ItemType.configuration },
+        { label: 'timeout', value: node.resolvedArtefact.timeout, itemType: ItemType.configuration },
+        { label: 'max iterations', value: node.resolvedArtefact.maxIterations, itemType: ItemType.configuration },
       );
     }
 
-    source.push(['count', node.count, 'log-out'], ['error count', node.errorCount, 'log-out']);
+    source.push(
+      { label: 'count', value: node.count, itemType: ItemType.result },
+      { label: 'error count', value: node.errorCount, itemType: ItemType.result },
+    );
 
     return this._artefactInlineUtils.convert(source);
   });

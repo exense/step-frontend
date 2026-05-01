@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
-  JsonParserIconDictionaryConfig,
+  ItemType,
 } from '@exense/step-core';
 import { SetReportNode } from '../../types/set.report-node';
 
@@ -28,8 +27,8 @@ export class SetReportDetailsComponent extends BaseReportDetailsComponent<SetRep
 
     const { key, value } = node;
     return this._artefactInlineService.convert([
-      ['key', key, 'log-in'],
-      ['value', value, 'log-in'],
+      { label: 'key', value: key, itemType: ItemType.configuration },
+      { label: 'value', value, itemType: ItemType.configuration },
     ]);
   });
 }

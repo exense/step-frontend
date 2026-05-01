@@ -17,7 +17,7 @@ export class TablePartIndicatorDirective {
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
 
-  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
+  readonly useSkeletonPlaceholder = linkedSignal(() => {
     const indicatorMode = this.indicatorMode();
     return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
   });

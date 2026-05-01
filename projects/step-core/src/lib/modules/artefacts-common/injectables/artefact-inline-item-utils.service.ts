@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
-import { ArtefactInlineItem, ArtefactInlineItemsResolvableField } from '../types/artefact-inline-item';
+import { ArtefactInlineItem, ArtefactInlineItemsResolvableField, ItemType } from '../types/artefact-inline-item';
 import { TimeUnitDictKey, DynamicValuesUtilsService } from '../../basics/step-basics.module';
 
 type DynamicValue = DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
 type PossibleValue = string | number | boolean | DynamicValue | undefined;
 
 export interface ArtefactInlineItemConfig {
+  itemType?: ItemType;
   label?: PossibleValue;
   /** @deprecated **/
   labelTooltip?: string;
@@ -54,7 +55,7 @@ export class ArtefactInlineItemUtilsService {
           ? this.prepareTimeValue(config.value as DynamicValueInteger, config.timeValueUnit)
           : this.prepareDynamicValue(config.value);
 
-      const { icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip, hideColon, margin } = config;
+      const { itemType, icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip, hideColon, margin } = config;
 
       if (label) {
         label.tooltip = labelTooltip;
@@ -71,6 +72,7 @@ export class ArtefactInlineItemUtilsService {
       }
 
       return {
+        itemType,
         label,
         value,
         icon,

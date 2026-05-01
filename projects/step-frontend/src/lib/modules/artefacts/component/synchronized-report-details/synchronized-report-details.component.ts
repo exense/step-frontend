@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseReportDetailsComponent,
+  ItemType,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { Synchronized } from '../../types/synchronized.artefact';
@@ -29,8 +29,8 @@ export class SynchronizedReportDetailsComponent extends BaseReportDetailsCompone
       return undefined;
     }
     return this._artefactInlineUtils.convert([
-      ['lock name', artefact.lockName, 'log-in'],
-      ['global lock', artefact.globalLock, 'log-in'],
+      { label: 'lock name', value: artefact.lockName, itemType: ItemType.configuration },
+      { label: 'global lock', value: artefact.globalLock, itemType: ItemType.configuration },
     ]);
   });
 }

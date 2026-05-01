@@ -60,7 +60,6 @@
   .execution-report-node-inline-details {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
 
     step-icon {
       @include core.step-icon-size(1.6rem);
@@ -222,7 +221,6 @@
   content: ' ';
   position: absolute;
   display: block;
-  background: linear-gradient(to right, var.$light-blue-gray $percent, var.$transparent);
   top: 0;
   bottom: 0;
   left: 100%;

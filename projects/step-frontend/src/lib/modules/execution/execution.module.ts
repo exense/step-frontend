@@ -38,7 +38,6 @@ import {
   GridSettingsRegistryService,
   EXECUTION_REPORT_GRID,
   canLeaveComponent,
-  SearchPaginatorComponent, EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -141,6 +140,7 @@ import { AltReportNodeArtefactFilterComponent } from './components/alt-report-no
 import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
+import { ReportNodeDurationPipe } from './pipes/report-node-duration.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
@@ -180,12 +180,8 @@ import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-v
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import {
-  ExecutionHistoryNodeTooltipComponent
-} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
-import {
-  StatusDistributionBadgeComponent
-} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
 import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
 
 @NgModule({
@@ -272,6 +268,7 @@ import { RepositoryPageComponent } from './components/schedule-overview/reposito
     ExecutionDurationSimpleComponent,
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
+    ReportNodeDurationPipe,
     LegacyExecutionViewComponent,
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,

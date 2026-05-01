@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
-import { DateFormat, Execution } from '@exense/step-core';
+import { Execution } from '@exense/step-core';
 
 @Component({
   selector: 'step-execution-duration',
@@ -10,8 +10,6 @@ import { DateFormat, Execution } from '@exense/step-core';
   standalone: false,
 })
 export class ExecutionDurationComponent {
-  protected readonly DateFormat = DateFormat;
-
   /** @Input() **/
   readonly execution = input<Execution>();
 

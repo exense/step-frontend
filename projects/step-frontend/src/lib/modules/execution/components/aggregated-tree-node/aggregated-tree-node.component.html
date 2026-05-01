@@ -4,7 +4,7 @@
       <div class="aggregated-info" stepUndraggedClick (undraggedClick)="showDetails(undefined, undefined, $event)">
         <step-artefact-inline-details class="shift-rows smaller-view" [aggregatedInfo]="node">
           <ng-container *stepArtefactInlineDetailsHeader>
-            <div class="node-header larger-view">
+            <div class="node-header" [class.larger-view]="useLargeView">
               <step-aggregated-status
                 [hasDescendantInvocations]="node?.hasDescendantInvocations"
                 [countByStatus]="node?.countByStatus"

@@ -1,11 +1,6 @@
 <ng-template #tplLabel>
   @if (hasLabel()) {
-    <label #elLabel class="field-label" [class.not-resolved-text]="!isLabelResolved()">
-      {{ itemLabel() }}
-      @if (showColon()) {
-        {{ ':' }}
-      }
-    </label>
+    <label #elLabel class="field-label" [class.not-resolved-text]="!isLabelResolved()">{{ itemLabel() }}{{ showColon() ? ':' : '' }}</label>
   }
 </ng-template>
 <ng-template #tplValue>

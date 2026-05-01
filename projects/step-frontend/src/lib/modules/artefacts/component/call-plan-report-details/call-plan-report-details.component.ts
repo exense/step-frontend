@@ -62,7 +62,7 @@ export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
   ];
 
   protected readonly inputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-in', tooltip: 'Input', levels: 0 },
+    { key: '*', icon: 'download', tooltip: 'Input', levels: 0 },
   ];
 
   protected copySearchCriteria(): void {

@@ -18,7 +18,8 @@
       <span>{{ reportNode.name }}</span>
       <step-alt-execution-time
         [startTime]="reportNode.executionTime"
-        [duration]="reportNode.duration"
+        [duration]="reportNode | reportNodeDuration"
+        [isRunning]="reportNode.status === 'RUNNING'"
         [timeOnly]="true"
       />
       <div class="btn-show-details-container">

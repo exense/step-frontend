@@ -14,6 +14,7 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
+import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 
 @Component({
   selector: 'step-alt-report-node-details',
@@ -33,6 +34,10 @@ import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/
     {
       provide: CLICK_STRATEGY,
       useValue: ClickStrategyType.DOUBLE_CLICK,
+    },
+    {
+      provide: AGGREGATED_TREE_NODE_LARGE_VIEW,
+      useValue: false,
     },
   ],
   standalone: false,

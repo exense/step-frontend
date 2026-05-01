@@ -5,6 +5,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  finalize,
   map,
   Observable,
   of,
@@ -132,6 +133,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this.isSkipOngoingRequest = false;
     }),
     filter((x) => !!x),
+    tap((x) => {
+      if (x.immediateHideProgress) {
+        this.inProgressInternal$.next(false);
+      }
+
+      if (!x.hideProgress) {
+        this.inProgressInternal$.next(true);
+      }
+    }),
     debounceTime(500),
     switchMap((x) => {
       if (!x.isForce && this.requestRef$) {
@@ -139,19 +149,16 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         return this.requestRef$;
       }
 
-      if (x.immediateHideProgress) {
-        this.inProgressInternal$.next(false);
-      }
-
       const isProgressTriggered = !x.hideProgress;
-      if (isProgressTriggered) {
-        this.inProgressInternal$.next(true);
+
+      if (!isProgressTriggered) {
+        this.inProgressInternal$.next(false);
       }
 
       this.terminateCurrentRequest();
       this.currentRequestTerminator$ = new Subject();
       this.requestRef$ = this.doRequest(x).pipe(
-        tap(() => {
+        finalize(() => {
           if (isProgressTriggered) {
             this.inProgressInternal$.next(false);
           }
@@ -185,7 +192,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     filter((forceNavigate) => forceNavigate === true),
   );
 
-  private filters: { [key: string]: SearchValue } = {};
+  private filters: Record<string, SearchValue> = {};
 
   constructor(
     readonly tableId: string,

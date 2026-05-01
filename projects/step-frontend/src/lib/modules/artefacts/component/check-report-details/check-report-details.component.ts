@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemSource,
-  ArtefactInlineItemUtilsService,
+  ArtefactInlineItemUtilsService, ItemType,
   BaseReportDetailsComponent,
   ReportNode,
   ReportNodeWithArtefact,
@@ -27,6 +27,6 @@ export class CheckReportDetailsComponent extends BaseReportDetailsComponent<Repo
     if (!artefact?.expression) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([['expression', artefact.expression, 'log-in']]);
+    return this._artefactInlineUtils.convert([{ label: 'expression', value: artefact.expression, itemType: ItemType.configuration }]);
   });
 }

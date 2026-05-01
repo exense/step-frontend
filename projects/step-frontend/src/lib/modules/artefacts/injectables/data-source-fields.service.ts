@@ -6,6 +6,7 @@ import {
   AugmentedResourcesService,
   DynamicSimpleValue,
   DynamicValueString,
+  ItemType,
   ResourceInputUtilsService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe } from 'rxjs';
@@ -65,19 +66,21 @@ export class DataSourceFieldsService {
         return this.extractFileSearchFields(dataSource);
       case DataSourceType.FOLDER:
         return this.extractFolderSearchFields(dataSource);
+      default:
+        return [];
     }
   }
 
   private createExcelFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
+    const itemType = withIcon ? ItemType.configuration : undefined;
     return this.resolveResource(dataSource.file).pipe(
       map((excelFile) => {
         const result: ArtefactInlineItemSource = [
-          ['excel file', excelFile, icon],
-          ['worksheet', dataSource.worksheet, icon],
+          { label: 'excel file', value: excelFile, itemType },
+          { label: 'worksheet', value: dataSource.worksheet, itemType },
         ];
         if (dataSource.headers.dynamic || dataSource.headers.value) {
-          result.push(['headers', dataSource.headers, icon]);
+          result.push({ label: 'headers', value: dataSource.headers, itemType });
         }
         return result;
       }),
@@ -89,11 +92,11 @@ export class DataSourceFieldsService {
   }
 
   private createCsvFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
+    const itemType = withIcon ? ItemType.configuration : undefined;
     return this.resolveResource(dataSource.file).pipe(
       map((csvFile) => [
-        ['csv file', csvFile, icon],
-        ['delimiter', dataSource.delimiter, icon],
+        { label: 'csv file', value: csvFile, itemType },
+        { label: 'delimiter', value: dataSource.delimiter, itemType },
       ]),
     );
   }
@@ -103,14 +106,14 @@ export class DataSourceFieldsService {
   }
 
   private createSqlFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
+    const itemType = withIcon ? ItemType.configuration : undefined;
     return of([
-      ['connection string', dataSource.connectionString, icon],
-      ['driver class', dataSource.driverClass, icon],
-      ['query', dataSource.query, icon],
-      ['user', dataSource.user, icon],
-      ['password', dataSource.password, icon],
-      ['primary write key', dataSource.writePKey, icon],
+      { label: 'connection string', value: dataSource.connectionString, itemType },
+      { label: 'driver class', value: dataSource.driverClass, itemType },
+      { label: 'query', value: dataSource.query, itemType },
+      { label: 'user', value: dataSource.user, itemType },
+      { label: 'password', value: dataSource.password, itemType },
+      { label: 'primary write key', value: dataSource.writePKey, itemType },
     ]);
   }
 
@@ -126,12 +129,12 @@ export class DataSourceFieldsService {
   }
 
   private createGSheetFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
+    const itemType = withIcon ? ItemType.configuration : undefined;
     return this.resolveResource(dataSource.serviceAccountKey).pipe(
       map((serviceAccountKeyFile) => [
-        ['service account key file', serviceAccountKeyFile, icon],
-        ['file id', dataSource.fileId, icon],
-        ['tab name', dataSource.tabName, icon],
+        { label: 'service account key file', value: serviceAccountKeyFile, itemType },
+        { label: 'file id', value: dataSource.fileId, itemType },
+        { label: 'tab name', value: dataSource.tabName, itemType },
       ]),
     );
   }
@@ -141,11 +144,11 @@ export class DataSourceFieldsService {
   }
 
   private createSequenceFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
+    const itemType = withIcon ? ItemType.configuration : undefined;
     return of([
-      ['start', dataSource.start, icon],
-      ['end', dataSource.end, icon],
-      ['inc', dataSource.inc, icon],
+      { label: 'start', value: dataSource.start, itemType },
+      { label: 'end', value: dataSource.end, itemType },
+      { label: 'inc', value: dataSource.inc, itemType },
     ]);
   }
 
@@ -154,8 +157,8 @@ export class DataSourceFieldsService {
   }
 
   private createJsonArrayFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
-    return of([['json', dataSource.json, icon]]);
+    const itemType = withIcon ? ItemType.configuration : undefined;
+    return of([{ label: 'json', value: dataSource.json, itemType }]);
   }
 
   private extractJsonArraySearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
@@ -163,8 +166,8 @@ export class DataSourceFieldsService {
   }
 
   private createJsonFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
-    return of([['json string', dataSource.json, icon]]);
+    const itemType = withIcon ? ItemType.configuration : undefined;
+    return of([{ label: 'json string', value: dataSource.json, itemType }]);
   }
 
   private extractJsonSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
@@ -172,8 +175,8 @@ export class DataSourceFieldsService {
   }
 
   private createFileFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
-    return this.resolveResource(dataSource.file).pipe(map((flatFile) => [['flat file', flatFile, icon]]));
+    const itemType = withIcon ? ItemType.configuration : undefined;
+    return this.resolveResource(dataSource.file).pipe(map((flatFile) => [{ label: 'flat file', value: flatFile, itemType }]));
   }
 
   private extractFileSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
@@ -181,8 +184,8 @@ export class DataSourceFieldsService {
   }
 
   private createFolderFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
-    const icon = withIcon ? 'log-in' : undefined;
-    return of([['directory', dataSource.folder, icon]]);
+    const itemType = withIcon ? ItemType.configuration : undefined;
+    return of([{ label: 'directory', value: dataSource.folder, itemType }]);
   }
 
   private extractFolderSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {

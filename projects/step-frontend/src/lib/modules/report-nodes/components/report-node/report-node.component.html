@@ -1,31 +1,38 @@
-<ng-container *ngIf="node">
-  <div *ngIf="node.resolvedArtefact?.customAttributes?.['source'] as artefactSource">
+@if (node) {
+  @if (node.resolvedArtefact?.customAttributes?.['source']; as artefactSource) {
     <div class="report-node-header report-node-link">
       <a href="#" (click)="hideSource = !hideSource; (false)">Source</a>
-      <div *ngIf="!hideSource">{{ artefactSource }}</div>
+      @if (!hideSource) {
+        <div>{{ artefactSource }}</div>
+      }
     </div>
-  </div>
-  <div class="node-details-container" [ngSwitch]="node._class">
-    <step-retry-if-fail *ngSwitchCase="ReportNodeType.RETRY_IF_FAILS_REPORT_NODE" [node]="node"> </step-retry-if-fail>
-    <step-wait-for-event *ngSwitchCase="ReportNodeType.WAIT_FOR_EVENT_REPORT_NODE" [node]="node"> </step-wait-for-event>
-    <step-call-function-report-node
-      *ngSwitchCase="ReportNodeType.CALL_FUNCTION_REPORT_NODE"
-      [node]="node"
-      [children]="children"
-    >
-    </step-call-function-report-node>
-    <ng-container *ngSwitchDefault> </ng-container>
+  }
+  <div class="node-details-container">
+    @switch (node._class) {
+      @case (ReportNodeType.RETRY_IF_FAILS_REPORT_NODE) {
+        <step-retry-if-fail [node]="node"> </step-retry-if-fail>
+      }
+      @case (ReportNodeType.WAIT_FOR_EVENT_REPORT_NODE) {
+        <step-wait-for-event [node]="node"> </step-wait-for-event>
+      }
+      @case (ReportNodeType.CALL_FUNCTION_REPORT_NODE) {
+        <step-call-function-report-node [node]="node" [children]="children"> </step-call-function-report-node>
+      }
+      @default {}
+    }
   </div>
   <div class="report-node-header report-node-link">
     <a href="#" (click)="toggleShowArtefact(); (false)">
-      <step-icon [name]="showArtefact ? 'chevron-down' : 'chevron-right'"></step-icon>
+      <step-icon [name]="showArtefact() ? 'chevron-down' : 'chevron-right'"></step-icon>
       Plan node
     </a>
     (<a href="#" (click)="openPlan(); (false)">Show in plan</a>)
   </div>
-  <mat-card *ngIf="showArtefact">
-    <mat-card-content>
-      <step-artefact-details [artefact]="node.resolvedArtefact" [readonly]="true"> </step-artefact-details>
-    </mat-card-content>
-  </mat-card>
-</ng-container>
+  @if (showArtefact()) {
+    <mat-card>
+      <mat-card-content>
+        <step-artefact-details [artefact]="node.resolvedArtefact" [readonly]="true"> </step-artefact-details>
+      </mat-card-content>
+    </mat-card>
+  }
+}

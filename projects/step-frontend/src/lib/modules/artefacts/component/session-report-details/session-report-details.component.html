@@ -1,6 +1,6 @@
-@if (items(); as items) {
-  <section class="json-container">
-    <step-json-view-expanded [data]="items" [limit]="7" labelExpand="Expand" labelCollapse="Collapse" />
+@if (outputItems(); as outputs) {
+  <section class="results-container">
+    <step-report-details-sections [items]="outputs" />
     <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyItems()">
       <step-icon name="copy" />
     </button>
