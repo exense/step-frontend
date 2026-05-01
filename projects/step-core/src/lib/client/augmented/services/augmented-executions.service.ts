@@ -19,7 +19,6 @@ import { CompareCondition } from '../../../modules/basics/types/compare-conditio
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
-import { SearchValue } from '../../../modules/table/shared/search-value';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService implements HttpOverrideResponseInterceptor {

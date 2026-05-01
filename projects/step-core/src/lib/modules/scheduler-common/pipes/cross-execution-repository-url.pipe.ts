@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { CommonEntitiesUrlsService } from '@exense/step-core';
+import { CommonEntitiesUrlsService } from '../../basics/step-basics.module';
 
 @Pipe({
   name: 'crossExecutionRepositoryUrl',

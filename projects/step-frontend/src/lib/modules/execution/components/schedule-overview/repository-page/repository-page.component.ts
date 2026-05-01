@@ -1,21 +1,11 @@
-import { Component, DestroyRef, effect, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
 import { AugmentedPlansService, AugmentedSchedulerService, ExecutionsService, PlansService } from '@exense/step-core';
-import { PLAN_ID } from '../../../services/plan-id.token';
 import { RepositoryPageStateService } from './repository-page-state.service';
 import { EXECUTION_ID } from '../../../services/execution-id.token';
-
-declare const uPlot: any;
-
-interface EntityWithKeywordsStats {
-  entity: string;
-  timestamp: number;
-  statuses: Record<string, number>;
-}
 
 @Component({
   selector: 'step-scheduler-page',

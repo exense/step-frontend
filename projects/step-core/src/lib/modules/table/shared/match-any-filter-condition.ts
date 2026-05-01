@@ -1,6 +1,7 @@
-import { CompareCondition, FilterConditionType, TableRequestFilter } from '@exense/step-core';
+import { CompareCondition } from '../../basics/step-basics.module';
+import { TableRequestFilter } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
-
+import { FilterConditionType } from './filter-condition-type.enum';
 
 export class MatchAnyFilterCondition extends FilterCondition<Record<string, string>> {
   filterConditionType: FilterConditionType = FilterConditionType.ARRAY;

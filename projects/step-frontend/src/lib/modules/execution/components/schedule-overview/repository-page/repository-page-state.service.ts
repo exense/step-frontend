@@ -10,8 +10,6 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly viewType: Signal<CrossExecutionViewType> = signal('repository');
 
-  // readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._executionIdFn() };
-
   dashboardDisabledFilters: string[] = ['planId'];
 
   readonly executionsTableFilters = computed(() => {
