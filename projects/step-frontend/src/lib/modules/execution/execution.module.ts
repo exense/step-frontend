@@ -38,6 +38,8 @@ import {
   GridSettingsRegistryService,
   EXECUTION_REPORT_GRID,
   canLeaveComponent,
+  SearchPaginatorComponent,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
