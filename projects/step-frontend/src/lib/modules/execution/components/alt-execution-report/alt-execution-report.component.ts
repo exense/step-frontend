@@ -35,6 +35,7 @@ import {
   AggregatedTreeNodeDialogHooksService,
   AggregatedTreeNodeDialogHooksStrategy,
 } from '../../services/aggregated-tree-node-dialog-hooks.service';
+import { ReportNodeSummary } from '../../shared/report-node-summary';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -79,6 +80,7 @@ export class AltExecutionReportComponent
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
+  protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(
     map((testCases) => {
