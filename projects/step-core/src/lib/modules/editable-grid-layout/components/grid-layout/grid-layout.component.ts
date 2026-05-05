@@ -35,6 +35,7 @@ interface GridItem {
   widgetId: string;
   widgetType: string;
   heightInCells: number;
+  isSupported: boolean;
   templateRef?: TemplateRef<any>;
 }
 
@@ -137,8 +138,9 @@ export class GridLayoutComponent implements AfterViewInit {
       const widgetId = position.id;
       const widgetType = position.widgetType;
       const heightInCells = position.heightInCells;
+      const isSupported = !!this._gridLayoutConfig.defaultElementParamsMap[widgetType];
       const templateRef = templateDictionary[widgetType];
-      return { widgetId, widgetType, heightInCells, templateRef } as GridItem;
+      return { widgetId, widgetType, heightInCells, isSupported, templateRef } as GridItem;
     });
 
     return gridItems.filter((item) => !!item);
