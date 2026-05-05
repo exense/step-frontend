@@ -255,9 +255,11 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return res;
     }, new Set<number>());
 
-    const hiddenRows = new Set<number>();
+    const hiddenRowsAboveByRow: number[] = [];
+    let hiddenRowsCount = 0;
 
     for (let row = 1; row <= fieldBottom; row++) {
+      hiddenRowsAboveByRow[row] = hiddenRowsCount;
       let hasRenderedWidget = false;
       for (let col = 1; col <= this._colCount; col++) {
         const index = this.getFieldIndex(row, col);
@@ -268,9 +270,10 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         }
       }
       if (!hasRenderedWidget) {
-        hiddenRows.add(row);
+        hiddenRowsCount++;
       }
     }
+    hiddenRowsAboveByRow[fieldBottom + 1] = hiddenRowsCount;
 
     const result = positions.reduce(
       (res, position) => {
@@ -280,7 +283,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         }
 
         const updatesPos = position.clone();
-        const hiddenRowsAbove = Array.from(hiddenRows).filter((row) => row < updatesPos.row).length;
+        const hiddenRowsAbove = hiddenRowsAboveByRow[Math.min(updatesPos.row, fieldBottom + 1)] ?? 0;
         updatesPos.row = Math.max(1, updatesPos.row - hiddenRowsAbove);
         res[position.id] = updatesPos;
 
