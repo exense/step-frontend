@@ -52,8 +52,12 @@ export class AutomationPackageFilterComponent
   private _popoverOverlay = inject<PopoverOverlay>(PopoverOverlayService);
   private _entityAutomationPackageService = inject(EntityAutomationPackageService);
 
-  protected selectedIds: string[] = [];
+  protected selectedIds?: string[] = [];
   protected tooltipText$: Observable<string> = of(DEFAULT_TOOLTIP);
+
+  protected get selectedIdsBadge(): number | null {
+    return this.selectedIds?.length || null;
+  }
 
   override ngOnInit(): void {
     super.ngOnInit();
@@ -66,6 +70,7 @@ export class AutomationPackageFilterComponent
     this.refreshTooltip$.complete();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   override assignValue(value?: string): void {
     super.assignValue(value);
     this.selectedIds = this.filterControl.value;
@@ -73,7 +78,7 @@ export class AutomationPackageFilterComponent
     this._cd.detectChanges();
   }
 
-  showPopover(): void {
+  protected showPopover(): void {
     this.terminatePopoverStreams();
 
     const component = this._popoverOverlay.open(AutomationPackageFilterPopoverComponent, this._elRef).getComponent();
@@ -86,7 +91,7 @@ export class AutomationPackageFilterComponent
 
     component.select(this.filterControl.value as string[]);
     component.selected$.pipe(takeUntil(this.popoverStreamsTerminator$)).subscribe((selectedIds) => {
-      if (this.compareArrays<string>(this.selectedIds, selectedIds) === false) {
+      if (this.compareArrays<string>(this.selectedIds ?? [], selectedIds) === false) {
         this.filterControl.setValue(selectedIds);
         this.selectedIds = selectedIds;
         this._cd.detectChanges();
