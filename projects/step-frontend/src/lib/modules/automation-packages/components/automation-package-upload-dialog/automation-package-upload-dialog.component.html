@@ -13,7 +13,7 @@
           This automation package would also update other packages. Select "Force" to proceed.
         </step-alert>
       }
-      @if (!isNewPackage && !automationPackage?.automationPackageResource) {
+      @if (!isNewPackage && !automationPackage.automationPackageResource) {
         <step-alert [type]="AlertType.WARNING">
           The Automation Package file is not available anymore, please select and upload it again.
           <step-icon
@@ -256,7 +256,7 @@
               </div>
             </section>
             <section class="criteria-body" formArrayName="routing">
-              @for (group of routing.controls; track $index; let i = $index) {
+              @for (group of routing.controls; track group; let i = $index) {
                 <div [formGroupName]="i" class="criterion-row">
                   <step-form-field>
                     <input type="text" placeholder="Key" formControlName="key" />
