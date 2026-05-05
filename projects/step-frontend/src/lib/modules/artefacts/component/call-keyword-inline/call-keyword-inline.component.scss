@@ -33,7 +33,7 @@
     column-gap: var(--detailed-inline-icon-gap);
     row-gap: 0;
     align-items: start;
-    margin-left: calc(-1 * (var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap)));
+    margin-left: -2.5rem;
     width: calc(100% + var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap));
   }
 

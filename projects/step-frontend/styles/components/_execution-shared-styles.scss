@@ -31,7 +31,7 @@
 @mixin highlight-inline-item {
   .highlight-inline-item {
     border-radius: 1rem;
-    padding: 0.2rem 0.3rem 0.2rem 0.3rem;
+    padding-left: 0.2rem;
     margin-left: 0.1rem;
     margin-right: var(--style__margin, 0rem) !important;
     cursor: pointer;
