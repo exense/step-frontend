@@ -85,6 +85,10 @@ export class DatasourceListComponent<T> implements TableSearch, TableReload {
     }
   });
 
+  private effectInitialized = effect(() => {
+    this._tableDataSource.initialize(this._tablePagination.paginatorReady());
+  });
+
   private readonly lisItemTemplateDirective = contentChild(DatasourceListItemDirective);
   protected readonly listItemTemplate = computed(() => {
     const listItemTemplateDirective = this.lisItemTemplateDirective();
