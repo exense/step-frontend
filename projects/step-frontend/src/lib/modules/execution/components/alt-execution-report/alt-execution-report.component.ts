@@ -62,7 +62,7 @@ export class AltExecutionReportComponent
   protected readonly hasNoLayout = computed(
     () =>
       this._widgetsPersistence.isInitialized() &&
-      !this._widgetsPersistence.selectedPreset() &&
+      !this._widgetsPersistence.gridPresets().length &&
       !this._gridEditable.editMode(),
   );
   private _router = inject(Router);
