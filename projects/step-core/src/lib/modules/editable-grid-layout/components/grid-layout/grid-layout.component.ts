@@ -34,6 +34,7 @@ import { first, forkJoin, switchMap } from 'rxjs';
 interface GridItem {
   widgetId: string;
   widgetType: string;
+  heightInCells: number;
   templateRef?: TemplateRef<any>;
 }
 
@@ -135,8 +136,9 @@ export class GridLayoutComponent implements AfterViewInit {
     const gridItems = widgetPositions.map((position) => {
       const widgetId = position.id;
       const widgetType = position.widgetType;
+      const heightInCells = position.heightInCells;
       const templateRef = templateDictionary[widgetType];
-      return { widgetId, widgetType, templateRef } as GridItem;
+      return { widgetId, widgetType, heightInCells, templateRef } as GridItem;
     });
 
     return gridItems.filter((item) => !!item);

@@ -25,7 +25,8 @@
     }
     @if (_testCasesState.summary$ | async; as testCasesSummary) {
       <step-alt-report-node-summary
-        *stepGridItem="'testCasesSummary'"
+        *stepGridItem="'testCasesSummary'; let rowHeightInCells = heightInCells"
+        [heightInCells]="rowHeightInCells"
         totalTooltip="Total number of test cases"
         totalForecastTooltip="Forecast number of test cases"
         [summary]="testCasesSummary"
@@ -36,7 +37,8 @@
   }
   @if (_keywordsState.summary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary
-      *stepGridItem="'keywordsSummary'"
+      *stepGridItem="'keywordsSummary'; let rowHeightInCells = heightInCells"
+      [heightInCells]="rowHeightInCells"
       totalTooltip="Total number of keyword calls"
       totalForecastTooltip="Forecast number of keyword calls"
       [summary]="keywordsSummary"
