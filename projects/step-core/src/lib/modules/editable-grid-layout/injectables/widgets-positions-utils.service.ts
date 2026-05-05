@@ -255,22 +255,20 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return res;
     }, new Set<number>());
 
-    // This arrays show, how many rows are skipped above each row
-    const hiddenRowsState: number[] = new Array(fieldBottom);
+    const hiddenRows = new Set<number>();
 
     for (let row = 1; row <= fieldBottom; row++) {
-      let hiddenColCount = 0;
+      let hasRenderedWidget = false;
       for (let col = 1; col <= this._colCount; col++) {
         const index = this.getFieldIndex(row, col);
         const widgetId = field[index];
-        if (hiddenWidgetsNumIds.has(widgetId) || widgetId === EMPTY) {
-          hiddenColCount++;
+        if (widgetId !== EMPTY && !hiddenWidgetsNumIds.has(widgetId)) {
+          hasRenderedWidget = true;
+          break;
         }
       }
-      const rowIndex = row - 1;
-      hiddenRowsState[rowIndex] = rowIndex === 0 ? 0 : hiddenRowsState[rowIndex - 1];
-      if (hiddenColCount === this._colCount) {
-        hiddenRowsState[rowIndex]++;
+      if (!hasRenderedWidget) {
+        hiddenRows.add(row);
       }
     }
 
@@ -282,8 +280,8 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         }
 
         const updatesPos = position.clone();
-        const hiddenRows = hiddenRowsState[updatesPos.row - 1];
-        updatesPos.row -= hiddenRows;
+        const hiddenRowsAbove = Array.from(hiddenRows).filter((row) => row < updatesPos.row).length;
+        updatesPos.row = Math.max(1, updatesPos.row - hiddenRowsAbove);
         res[position.id] = updatesPos;
 
         return res;
