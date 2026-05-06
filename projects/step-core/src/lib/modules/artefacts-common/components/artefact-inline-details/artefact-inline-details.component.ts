@@ -23,6 +23,7 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
   readonly isVertical = input(false);
   readonly overflowContent = input(false);
   readonly details = input<readonly string[] | undefined>(undefined);
+  readonly suppressAdditionalInfoDescription = input(false);
 
   private readonly header = contentChild(ArtefactInlineDetailsHeaderDirective);
 
@@ -37,8 +38,9 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
     const reportInfo = this.reportInfo();
     const isVertical = this.isVertical();
     const details = this.details();
+    const suppressAdditionalInfoDescription = this.suppressAdditionalInfoDescription();
     const headerTemplate = this.header()?.templateRef;
-    return { headerTemplate, aggregatedInfo, reportInfo, isVertical, details };
+    return { headerTemplate, aggregatedInfo, reportInfo, isVertical, details, suppressAdditionalInfoDescription };
   });
 
   protected readonly componentToRender = computed(() => {

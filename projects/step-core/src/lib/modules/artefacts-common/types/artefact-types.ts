@@ -17,4 +17,5 @@ export interface InlineArtefactContext<A extends AbstractArtefact, R extends Rep
   isVertical?: boolean;
   headerTemplate?: TemplateRef<unknown>;
   details?: readonly string[];
+  suppressAdditionalInfoDescription?: boolean;
 }

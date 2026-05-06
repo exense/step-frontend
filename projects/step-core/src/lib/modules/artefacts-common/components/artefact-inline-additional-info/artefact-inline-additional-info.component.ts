@@ -36,7 +36,7 @@ export class ArtefactInlineAdditionalInfoComponent {
   protected readonly description = computed(() => {
     const ctx = this.context();
     const details = ctx?.details;
-    if (!hasDetail(details, 'description')) {
+    if (!hasDetail(details, 'description') || ctx?.suppressAdditionalInfoDescription) {
       return undefined;
     }
     return ctx?.aggregatedInfo?.originalArtefact?.description ?? ctx?.reportInfo?.resolvedArtefact?.description;

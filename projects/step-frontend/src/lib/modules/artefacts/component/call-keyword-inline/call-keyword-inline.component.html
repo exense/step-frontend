@@ -1,13 +1,23 @@
 @if (!showFullInputsOutputs()) {
+  @if (showInlineDescription()) {
+    <step-artefact-inline-details-header [template]="headerTemplate()" />
+  }
   @if (inputItems(); as inputItems) {
     <step-artefact-inline-field-list
       class="bold-labels"
+      [class.compact-secondary-row]="showInlineDescription()"
       [items]="inputItems"
       hiddenItemsTooltipSuffix="additional input(s)"
     >
-      <step-artefact-inline-field-list-prefix>
-        <step-artefact-inline-details-header [template]="headerTemplate()" />
-      </step-artefact-inline-field-list-prefix>
+      @if (!showInlineDescription()) {
+        <step-artefact-inline-field-list-prefix>
+          <step-artefact-inline-details-header [template]="headerTemplate()" />
+        </step-artefact-inline-field-list-prefix>
+      } @else {
+        <step-artefact-inline-field-list-prefix>
+          <step-icon name="log-in" matTooltip="Inputs" />
+        </step-artefact-inline-field-list-prefix>
+      }
     </step-artefact-inline-field-list>
   }
   @if (outputItems(); as outputItems) {
@@ -17,13 +27,18 @@
       hiddenItemsTooltipSuffix="additional output(s)"
     >
       <step-artefact-inline-field-list-prefix>
-        <step-artefact-inline-details-header [template]="headerTemplate()" [isVisible]="!inputItems()?.length" />
+        <step-artefact-inline-details-header
+          [template]="headerTemplate()"
+          [isVisible]="!showInlineDescription() && !inputItems()?.length"
+        />
         <step-icon name="log-out" matTooltip="Outputs" />
       </step-artefact-inline-field-list-prefix>
     </step-artefact-inline-field-list>
   }
   @if (!inputItems()?.length && !outputItems()?.length) {
-    <step-artefact-inline-details-header [template]="headerTemplate()" />
+    @if (!showInlineDescription()) {
+      <step-artefact-inline-details-header [template]="headerTemplate()" />
+    }
   }
 } @else {
   <step-artefact-inline-details-header [template]="headerTemplate()" />

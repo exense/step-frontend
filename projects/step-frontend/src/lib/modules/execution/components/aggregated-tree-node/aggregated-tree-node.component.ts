@@ -1,11 +1,12 @@
 import { Component, computed, forwardRef, inject, input, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AggregatedTreeNode, AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 import { ElementSizeService, TreeNodeData } from '@exense/step-core';
 import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -53,6 +54,8 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     return selectedNodes.includes(nodeId);
   });
 
+  protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
+
   protected readonly detailsTooltip = 'Open execution details';
 
   protected showDetails(status?: Status, count?: number, event?: MouseEvent): void {
@@ -67,5 +70,9 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     }
     this._treeState.selectNode(node);
     this._executionDialogs.openIterations(node, { nodeStatus: status, nodeStatusCount: count });
+  }
+
+  protected isKeywordNode(node: AggregatedTreeNode): boolean {
+    return node.originalArtefact?._class === 'CallKeyword';
   }
 }

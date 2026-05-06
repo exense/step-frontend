@@ -1,4 +1,4 @@
-import { Component, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, output, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedScreenService,
   ItemsPerPageService,
@@ -21,6 +21,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -61,6 +62,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
   protected readonly details = this._reportSettings.details('keywordsList');
+  protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
 
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
@@ -69,6 +71,10 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected openDetails(node: ReportNode): void {
     this._dialogs.openIterationDetails(node);
+  }
+
+  protected getDescription(node: ReportNode): string | undefined {
+    return this.showDescription() ? node.resolvedArtefact?.description : undefined;
   }
 
   protected toggleCountsCalculation(): void {
