@@ -52,11 +52,11 @@ export class AutomationPackageFilterComponent
   private _popoverOverlay = inject<PopoverOverlay>(PopoverOverlayService);
   private _entityAutomationPackageService = inject(EntityAutomationPackageService);
 
-  protected selectedIds?: string[] = [];
+  protected selectedIds: string[] = [];
   protected tooltipText$: Observable<string> = of(DEFAULT_TOOLTIP);
 
   protected get selectedIdsBadge(): number | null {
-    return this.selectedIds?.length || null;
+    return this.selectedIds.length || null;
   }
 
   override ngOnInit(): void {
@@ -91,7 +91,7 @@ export class AutomationPackageFilterComponent
 
     component.select(this.filterControl.value as string[]);
     component.selected$.pipe(takeUntil(this.popoverStreamsTerminator$)).subscribe((selectedIds) => {
-      if (this.compareArrays<string>(this.selectedIds ?? [], selectedIds) === false) {
+      if (this.compareArrays<string>(this.selectedIds, selectedIds) === false) {
         this.filterControl.setValue(selectedIds);
         this.selectedIds = selectedIds;
         this._cd.detectChanges();
