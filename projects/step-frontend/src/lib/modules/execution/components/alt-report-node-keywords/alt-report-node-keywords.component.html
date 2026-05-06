@@ -32,7 +32,6 @@
             parentElementSize
             [reportInfo]="element"
             [details]="details()"
-            [suppressAdditionalInfoDescription]="showDescription()"
             class="smaller-view"
           >
             <ng-container *stepArtefactInlineDetailsHeader>
@@ -49,7 +48,11 @@
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>
                 @if (getDescription(element); as description) {
-                  <span class="description">{{ description }}</span>
+                  @if (showDescription()) {
+                    <span class="description">{{ description | treeNodeDescription: false }}</span>
+                  } @else {
+                    <span class="description">{{ description | treeNodeDescription }}</span>
+                  }
                 }
               </div>
             </ng-container>

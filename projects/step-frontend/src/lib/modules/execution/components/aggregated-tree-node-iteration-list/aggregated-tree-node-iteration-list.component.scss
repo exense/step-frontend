@@ -77,6 +77,16 @@ step-aggregated-tree-node-iteration-list {
         line-height: 1.5;
         align-self: baseline;
       }
+
+      .description {
+        min-width: 0;
+        overflow: hidden;
+        color: var.$gray-500;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.5;
+        align-self: baseline;
+      }
     }
   }
 

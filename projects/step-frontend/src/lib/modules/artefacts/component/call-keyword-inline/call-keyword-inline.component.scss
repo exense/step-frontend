@@ -1,6 +1,6 @@
 :host {
-  --detailed-inline-icon-width: 1.6rem;
-  --detailed-inline-icon-gap: 0.5rem;
+  --detailed-inline-icon-width: var(--inline-secondary-icon-width, 1.6rem);
+  --detailed-inline-icon-gap: var(--inline-secondary-icon-gap, 0.5rem);
 }
 
 :host ::ng-deep step-artefact-inline-field-list.detailed-mode {
@@ -27,5 +27,6 @@
     grid-column: 2;
     min-width: 0;
     width: 100%;
+    margin-bottom: 0 !important;
   }
 }

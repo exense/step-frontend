@@ -6,6 +6,7 @@ import { ATTACHMENTS_EXPORTS } from '../../../attachments';
 import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
 
 const hasDetail = (details: readonly string[] | undefined, key: string): boolean => !!details?.includes(key);
+type DescriptionMode = 'all' | 'only' | 'exclude';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
@@ -20,23 +21,33 @@ const hasDetail = (details: readonly string[] | undefined, key: string): boolean
 })
 export class ArtefactInlineAdditionalInfoComponent {
   readonly context = input<InlineArtefactContext<AbstractArtefact>>();
+  readonly descriptionMode = input<DescriptionMode>('all');
 
   protected readonly attachmentMetas = computed(() => {
+    if (this.descriptionMode() === 'only') {
+      return [];
+    }
     const ctx = this.context();
     const reportNode = ctx?.aggregatedInfo?.singleInstanceReportNode ?? ctx?.reportInfo;
     return reportNode?.attachments ?? [];
   });
 
   protected readonly error = computed(() => {
+    if (this.descriptionMode() === 'only') {
+      return undefined;
+    }
     const ctx = this.context();
     const reportNode = ctx?.aggregatedInfo?.singleInstanceReportNode ?? ctx?.reportInfo;
     return reportNode?.error?.msg;
   });
 
   protected readonly description = computed(() => {
+    if (this.descriptionMode() === 'exclude') {
+      return undefined;
+    }
     const ctx = this.context();
     const details = ctx?.details;
-    if (!hasDetail(details, 'description') || ctx?.suppressAdditionalInfoDescription) {
+    if (!hasDetail(details, 'fullDescription') || ctx?.suppressAdditionalInfoDescription) {
       return undefined;
     }
     return ctx?.aggregatedInfo?.originalArtefact?.description ?? ctx?.reportInfo?.resolvedArtefact?.description;

@@ -39,6 +39,7 @@ import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
 const PAGE_SIZE = 25;
 
@@ -93,6 +94,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   readonly openTreeView = output<ReportNode>();
   protected readonly details = this._reportSettings.details('executionTree');
+  protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   private readonly artefactHash = computed(() => this.node().artefactHash);
 
@@ -195,6 +200,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected openNodeDetails(node: ReportNode): void {
     this.showDetails.emit(node);
+  }
+
+  protected getDescription(node: ReportNode): string | undefined {
+    return this.showFullDescription() ? undefined : node.resolvedArtefact?.description;
   }
 
   protected toggleSort(): void {

@@ -55,6 +55,9 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   });
 
   protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   protected readonly detailsTooltip = 'Open execution details';
 
@@ -70,9 +73,5 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     }
     this._treeState.selectNode(node);
     this._executionDialogs.openIterations(node, { nodeStatus: status, nodeStatusCount: count });
-  }
-
-  protected isKeywordNode(node: AggregatedTreeNode): boolean {
-    return node.originalArtefact?._class === 'CallKeyword';
   }
 }

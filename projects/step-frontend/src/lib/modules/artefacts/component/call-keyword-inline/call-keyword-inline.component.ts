@@ -46,6 +46,9 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   );
   protected readonly showAgentRouting = computed(() => hasAltExecutionReportDetail(this.details(), 'agentRouting'));
   protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
   protected readonly reportNode = computed(
     () => this.currentContext()?.aggregatedInfo?.singleInstanceReportNode ?? this.currentContext()?.reportInfo,
   );
@@ -53,7 +56,9 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     const ctx = this.currentContext();
     return ctx?.aggregatedInfo?.originalArtefact?.description ?? ctx?.reportInfo?.resolvedArtefact?.description;
   });
-  protected readonly showInlineDescription = computed(() => this.showDescription() && !!this.description());
+  protected readonly showInlineDescription = computed(
+    () => this.showDescription() && !this.showFullDescription() && !!this.description(),
+  );
   protected readonly routingItems = computed(() => this.getRoutingItems(this.reportNode()));
 
   private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {

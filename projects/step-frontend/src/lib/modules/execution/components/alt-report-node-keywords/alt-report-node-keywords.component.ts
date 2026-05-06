@@ -63,6 +63,9 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   protected readonly calculateCounts = signal(false);
   protected readonly details = this._reportSettings.details('keywordsList');
   protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
@@ -74,7 +77,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   }
 
   protected getDescription(node: ReportNode): string | undefined {
-    return this.showDescription() ? node.resolvedArtefact?.description : undefined;
+    return this.showFullDescription() ? undefined : node.resolvedArtefact?.description;
   }
 
   protected toggleCountsCalculation(): void {

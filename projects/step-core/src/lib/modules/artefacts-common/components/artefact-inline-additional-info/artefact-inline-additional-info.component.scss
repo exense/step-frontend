@@ -1,13 +1,14 @@
-:host {
-  --inline-additional-icon-width: 1.6rem;
-  --inline-additional-icon-gap: 0.5rem;
+.etc-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--inline-secondary-icon-gap, 0.5rem);
 }
 
 .description-container,
 .error-container {
   display: grid;
-  grid-template-columns: var(--inline-additional-icon-width) minmax(0, 1fr);
-  column-gap: 0.5rem;
+  grid-template-columns: var(--inline-secondary-icon-width, 1.6rem) minmax(0, 1fr);
+  column-gap: var(--inline-secondary-icon-gap, 0.5rem);
   align-items: start;
   justify-items: start;
   justify-content: start;
@@ -18,8 +19,8 @@
 .description-container > step-icon,
 .error-container > step-icon {
   grid-column: 1;
-  width: var(--inline-additional-icon-width);
-  min-width: var(--inline-additional-icon-width);
+  width: var(--inline-secondary-icon-width, 1.6rem);
+  min-width: var(--inline-secondary-icon-width, 1.6rem);
   justify-self: start;
   align-self: start;
 }

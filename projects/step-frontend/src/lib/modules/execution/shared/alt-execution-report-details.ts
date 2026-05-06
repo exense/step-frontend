@@ -3,6 +3,7 @@ export const ALT_EXECUTION_REPORT_DETAIL_KEYS = [
   'agentRouting',
   'fullInputsOutputs',
   'description',
+  'fullDescription',
 ] as const;
 
 export type AltExecutionReportDetailKey = (typeof ALT_EXECUTION_REPORT_DETAIL_KEYS)[number];

@@ -41,6 +41,8 @@ export class AltExecutionReportSettingsComponent {
         return 'Full Inputs / Outputs';
       case 'description':
         return 'Description';
+      case 'fullDescription':
+        return 'Full Description';
     }
   }
 }

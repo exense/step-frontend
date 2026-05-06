@@ -59,6 +59,13 @@
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>
+                @if (getDescription(element); as description) {
+                  @if (showDescription()) {
+                    <span class="description">{{ description | treeNodeDescription: false }}</span>
+                  } @else {
+                    <span class="description">{{ description | treeNodeDescription }}</span>
+                  }
+                }
               </div>
             </ng-container>
           </step-artefact-inline-details>

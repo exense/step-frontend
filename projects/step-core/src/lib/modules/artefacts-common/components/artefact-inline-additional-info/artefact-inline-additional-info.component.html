@@ -8,9 +8,7 @@
     @if (description(); as description) {
       <div class="description-container">
         <step-icon name="align-left" matTooltip="Description" />
-        <div class="description-text">
-          {{ description }}
-        </div>
+        <div class="description-text" [innerHTML]="description"></div>
       </div>
     }
     @if (error(); as error) {
