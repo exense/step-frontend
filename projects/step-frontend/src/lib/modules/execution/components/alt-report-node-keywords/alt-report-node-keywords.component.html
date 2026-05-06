@@ -27,23 +27,24 @@
         stepUndraggedClick
         (undraggedClick)="openDetails(element)"
       >
-        <div>
+        <div class="step-row-content">
+          <step-alt-execution-time
+            class="step-time"
+            mode="text"
+            displayFormat="time"
+            [preserveDurationSpace]="true"
+            [startTime]="element.executionTime"
+            [duration]="element.duration"
+            [singleUnit]="true"
+          />
           <step-artefact-inline-details
+            class="smaller-view step-entity"
             parentElementSize
             [reportInfo]="element"
             [details]="details()"
-            class="smaller-view"
           >
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header" [class.has-description]="getDescription(element)">
-                <step-alt-execution-time
-                  mode="text"
-                  displayFormat="time"
-                  [preserveDurationSpace]="true"
-                  [startTime]="element.executionTime"
-                  [duration]="element.duration"
-                  [singleUnit]="true"
-                />
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>
