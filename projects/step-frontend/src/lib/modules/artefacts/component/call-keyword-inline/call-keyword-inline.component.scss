@@ -3,27 +3,6 @@
   --detailed-inline-icon-gap: 0.5rem;
 }
 
-:host ::ng-deep step-artefact-inline-field-list.compact-secondary-row {
-  width: 100%;
-
-  section.list:not(.vertical):not(.invisible-items) {
-    position: relative;
-    padding-left: calc(var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap));
-    margin-left: calc(-1 * (var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap)));
-    width: calc(100% + var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap));
-  }
-
-  .prefix-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    min-width: var(--detailed-inline-icon-width);
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-  }
-}
-
 :host ::ng-deep step-artefact-inline-field-list.detailed-mode {
   width: 100%;
 
@@ -33,8 +12,7 @@
     column-gap: var(--detailed-inline-icon-gap);
     row-gap: 0;
     align-items: start;
-    margin-left: -2.5rem;
-    width: calc(100% + var(--detailed-inline-icon-width) + var(--detailed-inline-icon-gap));
+    width: 100%;
   }
 
   .prefix-container {

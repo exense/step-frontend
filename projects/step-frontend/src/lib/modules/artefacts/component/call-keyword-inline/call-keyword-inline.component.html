@@ -5,7 +5,6 @@
   @if (inputItems(); as inputItems) {
     <step-artefact-inline-field-list
       class="bold-labels"
-      [class.compact-secondary-row]="showInlineDescription()"
       [items]="inputItems"
       hiddenItemsTooltipSuffix="additional input(s)"
     >
@@ -22,15 +21,14 @@
   }
   @if (outputItems(); as outputItems) {
     <step-artefact-inline-field-list
-      class="bold-labels compact-secondary-row"
+      class="bold-labels"
       [items]="outputItems"
       hiddenItemsTooltipSuffix="additional output(s)"
     >
       <step-artefact-inline-field-list-prefix>
-        <step-artefact-inline-details-header
-          [template]="headerTemplate()"
-          [isVisible]="!showInlineDescription() && !inputItems()?.length"
-        />
+        @if (!showInlineDescription() && !inputItems()?.length) {
+          <step-artefact-inline-details-header [template]="headerTemplate()" />
+        }
         <step-icon name="log-out" matTooltip="Outputs" />
       </step-artefact-inline-field-list-prefix>
     </step-artefact-inline-field-list>
