@@ -65,7 +65,7 @@
     </step-artefact-inline-field-list>
   }
 }
-<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
+<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="descriptionAndError" />
 @if (showAgentRouting() && routingItems(); as routingItems) {
   <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
     <step-artefact-inline-field-list-prefix>
@@ -73,4 +73,4 @@
     </step-artefact-inline-field-list-prefix>
   </step-artefact-inline-field-list>
 }
-<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="exclude" />
+<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="attachmentsOnly" />

@@ -1,7 +1,7 @@
 @if (hasData()) {
   <section class="etc-container">
     @if (showAttachmentPreview()) {
-      <step-legacy-attachments-preview [attachments]="attachmentMetas()" />
+      <step-report-details-attachments [attachments]="attachmentMetas()" />
     } @else {
       <step-attachment-inline-preview-list [attachmentMetas]="attachmentMetas()" />
     }

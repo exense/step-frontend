@@ -26,7 +26,7 @@ import { AuthService } from '../../../auth';
       '(isStreamingFailed() || isStreamingInProgress() || showDownload()) && attachmentType() !== AttachmentType.SKIPPED',
     '[class.with-border]': 'withBorder()',
     '[class.has-pointer]': 'canOpenDetails()',
-    '(undraggedClick)': 'open()',
+    '(undraggedClick)': 'open($event)',
     '[matTooltip]': 'attachmentTooltip()',
   },
   hostDirectives: [
@@ -89,7 +89,10 @@ export class AttachmentPreviewComponent {
     return this.hasResourceReadPermission() && attachmentType !== AttachmentType.STREAMING_BINARY;
   });
 
-  protected open(): void {
+  protected open($event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
     if (!this.canOpenDetails()) {
       return;
     }

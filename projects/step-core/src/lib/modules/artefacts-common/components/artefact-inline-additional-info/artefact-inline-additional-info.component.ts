@@ -4,13 +4,14 @@ import { AbstractArtefact } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ATTACHMENTS_EXPORTS } from '../../../attachments';
 import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
+import { ReportDetailsAttachmentsComponent } from '../report-details-attachments/report-details-attachments.component';
 
 const hasDetail = (details: readonly string[] | undefined, key: string): boolean => !!details?.includes(key);
-type DescriptionMode = 'all' | 'only' | 'exclude';
+type DescriptionMode = 'all' | 'only' | 'exclude' | 'descriptionAndError' | 'attachmentsOnly';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
-  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS, ClampFadeDirective],
+  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS, ClampFadeDirective, ReportDetailsAttachmentsComponent],
   templateUrl: './artefact-inline-additional-info.component.html',
   styleUrl: './artefact-inline-additional-info.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -24,7 +25,8 @@ export class ArtefactInlineAdditionalInfoComponent {
   readonly descriptionMode = input<DescriptionMode>('all');
 
   protected readonly attachmentMetas = computed(() => {
-    if (this.descriptionMode() === 'only') {
+    const descriptionMode = this.descriptionMode();
+    if (descriptionMode === 'only' || descriptionMode === 'descriptionAndError') {
       return [];
     }
     const ctx = this.context();
@@ -33,7 +35,8 @@ export class ArtefactInlineAdditionalInfoComponent {
   });
 
   protected readonly error = computed(() => {
-    if (this.descriptionMode() === 'only') {
+    const descriptionMode = this.descriptionMode();
+    if (descriptionMode === 'only' || descriptionMode === 'attachmentsOnly') {
       return undefined;
     }
     const ctx = this.context();
@@ -42,7 +45,8 @@ export class ArtefactInlineAdditionalInfoComponent {
   });
 
   protected readonly description = computed(() => {
-    if (this.descriptionMode() === 'exclude') {
+    const descriptionMode = this.descriptionMode();
+    if (descriptionMode === 'exclude' || descriptionMode === 'attachmentsOnly') {
       return undefined;
     }
     const ctx = this.context();
