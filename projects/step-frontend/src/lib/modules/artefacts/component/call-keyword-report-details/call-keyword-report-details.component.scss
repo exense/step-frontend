@@ -1,0 +1,13 @@
+:host {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.keyword-description {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

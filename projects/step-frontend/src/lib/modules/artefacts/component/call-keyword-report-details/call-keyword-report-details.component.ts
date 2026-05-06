@@ -41,7 +41,9 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     initialValue: undefined,
   });
 
-  protected keywordInputs = computed(() => {
+  protected readonly description = computed(() => this.node()?.resolvedArtefact?.description);
+
+  protected readonly keywordInputs = computed(() => {
     const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.input) {
@@ -56,7 +58,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     return result;
   });
 
-  protected keywordOutputs = computed(() => {
+  protected readonly keywordOutputs = computed(() => {
     const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.output) {
@@ -90,7 +92,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   /**
    * Extract nodeId, to prevent unnecessary dataSource recreation
    * **/
-  private nodeId = computed(() => {
+  private readonly nodeId = computed(() => {
     const node = this.node();
     return node?.id;
   });
