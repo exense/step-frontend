@@ -2,7 +2,6 @@ export const ALT_EXECUTION_REPORT_DETAIL_KEYS = [
   'attachmentPreview',
   'agentRouting',
   'fullInputsOutputs',
-  'description',
   'fullDescription',
 ] as const;
 

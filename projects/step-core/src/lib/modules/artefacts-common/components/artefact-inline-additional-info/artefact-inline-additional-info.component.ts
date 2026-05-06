@@ -7,7 +7,7 @@ import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive'
 import { ReportDetailsAttachmentsComponent } from '../report-details-attachments/report-details-attachments.component';
 
 const hasDetail = (details: readonly string[] | undefined, key: string): boolean => !!details?.includes(key);
-type DescriptionMode = 'all' | 'only' | 'exclude' | 'descriptionAndError' | 'attachmentsOnly';
+type DescriptionMode = 'all' | 'only' | 'exclude' | 'descriptionAndError' | 'attachmentsOnly' | 'errorOnly';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
@@ -26,7 +26,7 @@ export class ArtefactInlineAdditionalInfoComponent {
 
   protected readonly attachmentMetas = computed(() => {
     const descriptionMode = this.descriptionMode();
-    if (descriptionMode === 'only' || descriptionMode === 'descriptionAndError') {
+    if (descriptionMode === 'only' || descriptionMode === 'descriptionAndError' || descriptionMode === 'errorOnly') {
       return [];
     }
     const ctx = this.context();
@@ -46,7 +46,7 @@ export class ArtefactInlineAdditionalInfoComponent {
 
   protected readonly description = computed(() => {
     const descriptionMode = this.descriptionMode();
-    if (descriptionMode === 'exclude' || descriptionMode === 'attachmentsOnly') {
+    if (descriptionMode === 'exclude' || descriptionMode === 'attachmentsOnly' || descriptionMode === 'errorOnly') {
       return undefined;
     }
     const ctx = this.context();

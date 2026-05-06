@@ -39,8 +39,6 @@ export class AltExecutionReportSettingsComponent {
         return 'Agent routing';
       case 'fullInputsOutputs':
         return 'Full Inputs / Outputs';
-      case 'description':
-        return 'Description';
       case 'fullDescription':
         return 'Full Description';
     }

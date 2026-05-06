@@ -54,7 +54,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     return selectedNodes.includes(nodeId);
   });
 
-  protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
   protected readonly showFullDescription = computed(() =>
     hasAltExecutionReportDetail(this.details(), 'fullDescription'),
   );

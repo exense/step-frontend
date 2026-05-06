@@ -94,7 +94,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   readonly openTreeView = output<ReportNode>();
   protected readonly details = this._reportSettings.details('executionTree');
-  protected readonly showDescription = computed(() => hasAltExecutionReportDetail(this.details(), 'description'));
   protected readonly showFullDescription = computed(() =>
     hasAltExecutionReportDetail(this.details(), 'fullDescription'),
   );

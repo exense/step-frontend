@@ -12,15 +12,9 @@
               />
               <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
               @if (!showFullDescription() && node?.originalArtefact?.description) {
-                @if (showDescription()) {
-                  <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">
-                    {{ node?.originalArtefact?.description | treeNodeDescription: false }}
-                  </span>
-                } @else {
-                  <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
-                    node?.originalArtefact?.description | treeNodeDescription
-                  }}</span>
-                }
+                <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">
+                  {{ node?.originalArtefact?.description | treeNodeDescription: false }}
+                </span>
               }
             </div>
           </ng-container>

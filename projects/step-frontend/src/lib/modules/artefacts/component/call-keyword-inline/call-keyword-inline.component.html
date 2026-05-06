@@ -1,6 +1,7 @@
 @if (!showFullInputsOutputs()) {
-  @if (showInlineDescription()) {
+  @if (hasDescription()) {
     <step-artefact-inline-details-header [template]="headerTemplate()" />
+    <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
   }
   @if (inputItems(); as inputItems) {
     <step-artefact-inline-field-list
@@ -8,7 +9,7 @@
       [items]="inputItems"
       hiddenItemsTooltipSuffix="additional input(s)"
     >
-      @if (!showInlineDescription()) {
+      @if (!hasDescription()) {
         <step-artefact-inline-field-list-prefix>
           <step-artefact-inline-details-header [template]="headerTemplate()" />
         </step-artefact-inline-field-list-prefix>
@@ -26,7 +27,7 @@
       hiddenItemsTooltipSuffix="additional output(s)"
     >
       <step-artefact-inline-field-list-prefix>
-        @if (!showInlineDescription() && !inputItems()?.length) {
+        @if (!hasDescription() && !inputItems()?.length) {
           <step-artefact-inline-details-header [template]="headerTemplate()" />
         }
         <step-icon name="log-out" matTooltip="Outputs" />
@@ -34,12 +35,13 @@
     </step-artefact-inline-field-list>
   }
   @if (!inputItems()?.length && !outputItems()?.length) {
-    @if (!showInlineDescription()) {
+    @if (!hasDescription()) {
       <step-artefact-inline-details-header [template]="headerTemplate()" />
     }
   }
 } @else {
   <step-artefact-inline-details-header [template]="headerTemplate()" />
+  <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
   @if (inputItems(); as inputItems) {
     <step-artefact-inline-field-list
       class="bold-labels detailed-mode"
@@ -65,7 +67,7 @@
     </step-artefact-inline-field-list>
   }
 }
-<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="descriptionAndError" />
+<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="errorOnly" />
 @if (showAgentRouting() && routingItems(); as routingItems) {
   <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
     <step-artefact-inline-field-list-prefix>
