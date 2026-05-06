@@ -6,6 +6,7 @@ import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
 import { AugmentedPlansService, AugmentedSchedulerService, ExecutionsService, PlansService } from '@exense/step-core';
 import { RepositoryPageStateService } from './repository-page-state.service';
 import { EXECUTION_ID } from '../../../services/execution-id.token';
+import { switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'step-scheduler-page',
@@ -42,10 +43,13 @@ export class RepositoryPageComponent implements OnInit {
   private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {
-    this._executionsService.getExecutionById(this._executionIdFn()).subscribe((execution) => {
-      this._state.execution.set(execution);
-      this._planService.getPlanById(execution!.planId!).subscribe(plan => this._state.plan.set(plan));
-      // TODO refactor
-    });
+    this._executionsService
+      .getExecutionById(this._executionIdFn())
+      .pipe(
+        tap((execution) => this._state.execution.set(execution)),
+        switchMap((execution) => this._planService.getPlanById(execution!.planId!)),
+        tap((plan) => this._state.plan.set(plan)),
+      )
+      .subscribe();
   }
 }
