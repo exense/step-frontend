@@ -67,7 +67,18 @@
     </step-artefact-inline-field-list>
   }
 }
-<step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="errorOnly" />
+@if (assertionErrors(); as assertionErrors) {
+  @if (assertionErrors.length) {
+    <div class="assertion-errors">
+      @for (errorNode of assertionErrors; track errorNode.id) {
+        <step-report-node-error [node]="errorNode" />
+      }
+    </div>
+  }
+}
+@if (!hasAssertionErrors()) {
+  <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="errorOnly" />
+}
 @if (showAgentRouting() && routingItems(); as routingItems) {
   <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
     <step-artefact-inline-field-list-prefix>

@@ -33,3 +33,9 @@
     margin-bottom: 0 !important;
   }
 }
+
+.assertion-errors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--inline-secondary-icon-gap, 0.5rem);
+}

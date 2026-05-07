@@ -371,6 +371,7 @@ export class AltExecutionProgressComponent
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
+        enrichCallKeywordWithAssertionErrors: true,
       } as KeywordParameters;
     }),
     distinctUntilChanged((a, b) => a.eid === b.eid),

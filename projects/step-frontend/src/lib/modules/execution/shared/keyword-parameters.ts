@@ -4,4 +4,5 @@ export interface KeywordParameters extends TableParameters {
   readonly type: string;
   readonly eid?: string;
   readonly testcases?: ReadonlyArray<string>;
+  readonly enrichCallKeywordWithAssertionErrors?: boolean;
 }

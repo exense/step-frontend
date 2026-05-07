@@ -29,19 +29,19 @@
     </button>
   </section>
 }
-@if (failedChildren(); as children) {
-  @if (children.length) {
+@if (failedChildren(); as failedChildren) {
+  @if (failedChildren.length) {
     <section class="data-container">
       <div>
-        @for (child of children; track child.id) {
+        @for (child of failedChildren; track child.id) {
           <step-report-node-error [node]="child" />
         }
       </div>
     </section>
   }
-}
-@if (node()?.error) {
-  <step-report-details-error [node]="node()" />
+  @if (!failedChildren.length && node()?.error) {
+    <step-report-details-error [node]="node()" />
+  }
 }
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
