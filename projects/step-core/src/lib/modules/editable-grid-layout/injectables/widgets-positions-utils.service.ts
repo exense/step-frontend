@@ -255,24 +255,25 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return res;
     }, new Set<number>());
 
-    // This arrays show, how many rows are skipped above each row
-    const hiddenRowsState: number[] = new Array(fieldBottom);
+    const hiddenRowsAboveByRow: number[] = [];
+    let hiddenRowsCount = 0;
 
     for (let row = 1; row <= fieldBottom; row++) {
-      let hiddenColCount = 0;
+      hiddenRowsAboveByRow[row] = hiddenRowsCount;
+      let hasRenderedWidget = false;
       for (let col = 1; col <= this._colCount; col++) {
         const index = this.getFieldIndex(row, col);
         const widgetId = field[index];
-        if (hiddenWidgetsNumIds.has(widgetId) || widgetId === EMPTY) {
-          hiddenColCount++;
+        if (widgetId !== EMPTY && !hiddenWidgetsNumIds.has(widgetId)) {
+          hasRenderedWidget = true;
+          break;
         }
       }
-      const rowIndex = row - 1;
-      hiddenRowsState[rowIndex] = rowIndex === 0 ? 0 : hiddenRowsState[rowIndex - 1];
-      if (hiddenColCount === this._colCount) {
-        hiddenRowsState[rowIndex]++;
+      if (!hasRenderedWidget) {
+        hiddenRowsCount++;
       }
     }
+    hiddenRowsAboveByRow[fieldBottom + 1] = hiddenRowsCount;
 
     const result = positions.reduce(
       (res, position) => {
@@ -282,8 +283,8 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         }
 
         const updatesPos = position.clone();
-        const hiddenRows = hiddenRowsState[updatesPos.row - 1];
-        updatesPos.row -= hiddenRows;
+        const hiddenRowsAbove = hiddenRowsAboveByRow[Math.min(updatesPos.row, fieldBottom + 1)] ?? 0;
+        updatesPos.row = Math.max(1, updatesPos.row - hiddenRowsAbove);
         res[position.id] = updatesPos;
 
         return res;

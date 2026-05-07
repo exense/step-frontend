@@ -55,6 +55,10 @@ export class AutomationPackageFilterComponent
   protected selectedIds: string[] = [];
   protected tooltipText$: Observable<string> = of(DEFAULT_TOOLTIP);
 
+  protected get selectedIdsBadge(): number | null {
+    return this.selectedIds.length || null;
+  }
+
   override ngOnInit(): void {
     super.ngOnInit();
     this.setupTooltip();
@@ -66,6 +70,7 @@ export class AutomationPackageFilterComponent
     this.refreshTooltip$.complete();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   override assignValue(value?: string): void {
     super.assignValue(value);
     this.selectedIds = this.filterControl.value;
@@ -73,7 +78,7 @@ export class AutomationPackageFilterComponent
     this._cd.detectChanges();
   }
 
-  showPopover(): void {
+  protected showPopover(): void {
     this.terminatePopoverStreams();
 
     const component = this._popoverOverlay.open(AutomationPackageFilterPopoverComponent, this._elRef).getComponent();
