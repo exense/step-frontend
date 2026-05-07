@@ -17,7 +17,13 @@
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
-      <td class="data-cell details-trigger" mat-cell *matCellDef="let element" stepUndraggedClick (undraggedClick)="openDetails(element)">
+      <td
+        class="data-cell details-trigger"
+        mat-cell
+        *matCellDef="let element"
+        stepUndraggedClick
+        (undraggedClick)="openDetails(element)"
+      >
         <div>
           <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
             <ng-container *stepArtefactInlineDetailsHeader>
@@ -27,7 +33,8 @@
                   displayFormat="time"
                   [preserveDurationSpace]="true"
                   [startTime]="element.executionTime"
-                  [duration]="element.duration"
+                  [duration]="element | reportNodeDuration"
+                  [isRunning]="element.status === 'RUNNING'"
                   [singleUnit]="true"
                 />
                 <step-report-node-icon [node]="element" />

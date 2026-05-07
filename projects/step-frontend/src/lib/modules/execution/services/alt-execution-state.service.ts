@@ -11,6 +11,7 @@ import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../_common/shared/status.enum';
 import { TimeRangeExt } from '../shared/time-range-ext';
+import { TestCasesDisplayMode } from '../shared/test-cases-display-mode';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
@@ -22,9 +23,12 @@ export abstract class AltExecutionStateService {
   abstract readonly errors$: Observable<TimeSeriesErrorEntry[] | undefined>;
   abstract readonly availableErrorTypes$: Observable<Status[]>;
   abstract readonly testCases$: Observable<AggregatedReportView[] | undefined>;
-  abstract readonly testCasesDataSource$: Observable<TableDataSource<AggregatedReportView>>;
+  abstract readonly testCasesDataSource$: Observable<TableDataSource<AggregatedReportView | ReportNode>>;
+  abstract readonly testCasesTableParameters$: Observable<KeywordParameters>;
+  abstract readonly testCasesDisplayMode$: Observable<TestCasesDisplayMode>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
   abstract readonly timeRange$: Observable<TimeRangeExt | undefined>;
+  abstract toggleTestCasesDisplayMode(): void;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
   abstract selectFullRange(): void;
 }

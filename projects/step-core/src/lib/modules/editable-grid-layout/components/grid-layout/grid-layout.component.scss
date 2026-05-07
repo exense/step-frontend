@@ -12,6 +12,10 @@ step-grid-layout {
   column-gap: sizes.$column-gap;
   position: relative;
 
+  &:not(.edit-mode).first-row-auto-height {
+    grid-template-rows: auto;
+  }
+
   &.hidden {
     visibility: hidden;
   }

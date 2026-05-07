@@ -1,13 +1,10 @@
-@if ((execution()?.endTime && execution()?.startTime) || isRunning()) {
+@if (execution()?.startTime) {
   <step-alt-execution-time
     mode="text"
     displayFormat="date"
-    durationVariant="chip"
     [shortenDurationMs]="true"
     [startTime]="execution()?.startTime"
     [endTime]="endTime()"
     [isRunning]="isRunning()"
   />
-} @else {
-  <step-alt-execution-time mode="text" displayFormat="date" [startTime]="execution()?.startTime" />
 }

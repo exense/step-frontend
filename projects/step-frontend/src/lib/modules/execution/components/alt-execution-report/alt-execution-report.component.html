@@ -10,7 +10,7 @@
 >
   @if (_state.errors$ | async; as errors) {
     <step-alt-execution-errors-widget
-      *stepGridItem="'errorsWidget'"
+      *stepGridItem="'errorsWidget'; autoHeightOnFirstRow: true"
       [errors]="errors"
       (showDetails)="scrollToErrorsSection()"
       (searchFor)="searchFor($event)"

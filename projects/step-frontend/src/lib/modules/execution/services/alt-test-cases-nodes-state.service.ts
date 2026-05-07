@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AltReportNodesStateService } from './alt-report-nodes-state.service';
 import { AltExecutionStateService } from './alt-execution-state.service';
-import { AggregatedReportView, Execution, FetchBucketsRequest, TimeRange } from '@exense/step-core';
+import { AggregatedReportView, Execution, FetchBucketsRequest, ReportNode, TimeRange } from '@exense/step-core';
 
 @Injectable()
-export class AltTestCasesNodesStateService extends AltReportNodesStateService<AggregatedReportView> {
-  constructor(_executionState: AltExecutionStateService) {
-    super(_executionState.testCasesDataSource$, 'testCases');
+export class AltTestCasesNodesStateService extends AltReportNodesStateService<AggregatedReportView | ReportNode> {
+  constructor() {
+    super(inject(AltExecutionStateService).testCasesDataSource$, 'testCases');
   }
 
   protected readonly statusDistributionViewId = 'statusDistributionForTestcases';
