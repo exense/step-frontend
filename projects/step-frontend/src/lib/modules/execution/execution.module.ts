@@ -143,6 +143,7 @@ import { AltReportNodeArtefactFilterComponent } from './components/alt-report-no
 import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
+import { ReportNodeDurationPipe } from './pipes/report-node-duration.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
@@ -271,6 +272,7 @@ import { ExecutionHistoryNodeTooltipComponent } from './components/execution-his
     ExecutionDurationSimpleComponent,
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
+    ReportNodeDurationPipe,
     LegacyExecutionViewComponent,
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,

@@ -133,6 +133,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this.isSkipOngoingRequest = false;
     }),
     filter((x) => !!x),
+    tap((x) => {
+      if (x.immediateHideProgress) {
+        this.inProgressInternal$.next(false);
+      }
+
+      if (!x.hideProgress) {
+        this.inProgressInternal$.next(true);
+      }
+    }),
     debounceTime(500),
     switchMap((x) => {
       if (!x.isForce && this.requestRef$) {
@@ -140,13 +149,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         return this.requestRef$;
       }
 
-      if (x.immediateHideProgress) {
-        this.inProgressInternal$.next(false);
-      }
-
       const isProgressTriggered = !x.hideProgress;
-      if (isProgressTriggered) {
-        this.inProgressInternal$.next(true);
+
+      if (!isProgressTriggered) {
+        this.inProgressInternal$.next(false);
       }
 
       this.terminateCurrentRequest();

@@ -29,12 +29,12 @@
       >
         <div class="step-row-content">
           <step-alt-execution-time
-            class="step-time"
             mode="text"
             displayFormat="time"
             [preserveDurationSpace]="true"
             [startTime]="element.executionTime"
-            [duration]="element.duration"
+            [duration]="element | reportNodeDuration"
+            [isRunning]="element.status === 'RUNNING'"
             [singleUnit]="true"
           />
           <step-artefact-inline-details
