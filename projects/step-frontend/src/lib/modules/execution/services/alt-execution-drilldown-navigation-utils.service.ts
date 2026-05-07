@@ -3,7 +3,11 @@ import { NODE_DETAILS_RELATIVE_PARENT } from './node-details-relative-parent.tok
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DrilldownRootType } from '../shared/drilldown-root-type';
 import { Location } from '@angular/common';
-import { DrillDownStackItemConfig, DrillDownStackItemType } from '../shared/drilldown-stack-item';
+import {
+  DrillDownStackItemConfig,
+  DrillDownStackItemType,
+  DrillDownStackItemTypeWORoot,
+} from '../shared/drilldown-stack-item';
 import { Status } from '../../_common/shared/status.enum';
 import { AbstractArtefact, ReportNodeWithArtefact } from '@exense/step-core';
 import { ALT_EXECUTION_DRILLDOWN_SEGMENTS_LIMIT } from './alt-execution-drilldown-segments-limit.token';
@@ -35,7 +39,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
 
   openDrilldown(
     drilldownRootType: DrilldownRootType,
-    type: 'report' | 'aggregated',
+    type: DrillDownStackItemTypeWORoot,
     detailsId: string,
     params: DrilldownAggregatedParams = {},
     searchFor?: string,
@@ -45,7 +49,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
       queryParams = { searchFor };
     }
     let detailsValueId: string = detailsId;
-    if (type === 'aggregated') {
+    if (type === DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
       detailsValueId += `;${params?.searchStatus ?? ''};${params?.statusCount ?? ''}`;
     }
     const nodeDetails = ['node-details', drilldownRootType, type, detailsValueId];
@@ -62,9 +66,14 @@ export class AltExecutionDrilldownNavigationUtilsService {
         case DrillDownStackItemType.ROOT:
           return item.rootType as string;
         case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
-          return ['aggregated', `${item.nodeId};${item?.searchStatus ?? ''};${item?.searchStatusCount ?? ''}`];
+          return [
+            DrillDownStackItemType.AGGREGATED_REPORT_NODE,
+            `${item.nodeId};${item?.searchStatus ?? ''};${item?.searchStatusCount ?? ''}`,
+          ];
         case DrillDownStackItemType.REPORT_NODE:
-          return ['report', item.nodeId];
+          return [DrillDownStackItemType.REPORT_NODE, item.nodeId];
+        case DrillDownStackItemType.PARTIAL_TREE:
+          return [DrillDownStackItemType.PARTIAL_TREE, item.nodeId];
       }
     });
 

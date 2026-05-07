@@ -16,6 +16,7 @@ export class ViewItemComponent {
   readonly view = input.required<StackViewInfo>();
   readonly canMinimize = input(false);
   readonly canMaximize = input(false);
+  readonly canClose = input(false);
   readonly isLast = input(false);
   readonly remove = output();
   readonly minimize = output();

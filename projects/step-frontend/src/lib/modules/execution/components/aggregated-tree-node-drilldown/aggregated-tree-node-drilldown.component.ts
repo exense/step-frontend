@@ -23,6 +23,8 @@ import {
   DRILL_DOWN_ROOT_ID,
   DrillDownAggregatedReportNodeStackItem,
   DrillDownAggregatedReportNodeStackItemConfig,
+  DrillDownReportNodePartialTreeStackItem,
+  DrillDownReportNodePartialTreeStackItemConfig,
   DrillDownReportNodeStackItem,
   DrillDownReportNodeStackItemConfig,
   DrillDownRootStackItem,
@@ -183,8 +185,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   ): void {
     const singleReportNode = this._drilldownNavigationUtils.getSingleReportNode(node);
     if (
-      (singleReportNode && !this.isPossibleToInsertItem(singleReportNode.id!, parentStackItemId)) ||
-      !this.isPossibleToInsertItem(node.id!, parentStackItemId)
+      (singleReportNode &&
+        !this.isPossibleToInsertItem(singleReportNode.id!, DrillDownStackItemType.REPORT_NODE, parentStackItemId)) ||
+      !this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.AGGREGATED_REPORT_NODE, parentStackItemId)
     ) {
       return;
     }
@@ -216,7 +219,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   }
 
   protected handleOpenDetails(node: ReportNode, parentStackItemId: string): void {
-    if (!this.isPossibleToInsertItem(node.id!, parentStackItemId)) {
+    if (!this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.REPORT_NODE, parentStackItemId)) {
       return;
     }
     this.removeAllAfterItem(parentStackItemId);
@@ -237,18 +240,42 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     });
   }
 
-  private isPossibleToInsertItem(nodeId: string, parentStackItemId: string): boolean {
+  protected handlePartialTree(node: ReportNode, parentStackItemId: string): void {
+    if (!this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.PARTIAL_TREE, parentStackItemId)) {
+      return;
+    }
+    this.removeAllAfterItem(parentStackItemId);
+
+    const newItem: DrillDownReportNodePartialTreeStackItem = {
+      type: DrillDownStackItemType.PARTIAL_TREE,
+      nodeId: node.id!,
+      data: node,
+      id: v4(),
+    };
+
+    queueMicrotask(() => {
+      this.stackItems.update((value) => {
+        const result = [...value, newItem];
+        this._drilldownNavigationUtils.changeDrilldownLocation(result);
+        return result;
+      });
+    });
+  }
+
+  private isPossibleToInsertItem(nodeId: string, type: DrillDownStackItemType, parentStackItemId: string): boolean {
     // Prevents to open two same items twice one after another
     let itemsToCheck = [...this.stackItemsUntracked];
     const parentIndex = itemsToCheck.findIndex((item) => item.id === parentStackItemId);
     if (parentIndex < 0) {
       return true;
     }
-    if (itemsToCheck[parentIndex + 1]?.nodeId === nodeId) {
+    const firstChild = itemsToCheck[parentIndex + 1];
+    if (firstChild?.nodeId === nodeId && firstChild?.type === type) {
       return false;
     }
     itemsToCheck = itemsToCheck.splice(0, parentIndex + 1);
-    if (itemsToCheck[itemsToCheck.length - 1].nodeId === nodeId) {
+    const lastItem = itemsToCheck[itemsToCheck.length - 1];
+    if (lastItem.nodeId === nodeId && lastItem.type === type) {
       return false;
     }
     return true;
@@ -272,6 +299,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       case DrillDownStackItemType.ROOT:
         return this.getRootNode(config);
       case DrillDownStackItemType.REPORT_NODE:
+      case DrillDownStackItemType.PARTIAL_TREE:
         return this.getReportNode(config);
       case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
         return this.getAggregatedReportNode(config);
@@ -289,8 +317,8 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   }
 
   private getReportNode(
-    config: DrillDownReportNodeStackItemConfig,
-  ): Observable<DrillDownReportNodeStackItem | undefined> {
+    config: DrillDownReportNodeStackItemConfig | DrillDownReportNodePartialTreeStackItemConfig,
+  ): Observable<DrillDownReportNodeStackItem | DrillDownReportNodePartialTreeStackItem | undefined> {
     return this._altExecutionNodesHelper.getReportNode(config.nodeId).pipe(
       map((data) => {
         if (!data) {

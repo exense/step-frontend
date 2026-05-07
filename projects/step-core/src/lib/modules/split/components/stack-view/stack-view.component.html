@@ -1,5 +1,9 @@
 <step-stack-view-breadcrumbs [views]="views()" (openView)="openView($event)" />
-<button type="button" mat-button mat-raised-button (click)="closeAll.emit()">Close All</button>
+@if (templateCloseAll(); as templateCloseAll) {
+  <ng-container *ngTemplateOutlet="templateCloseAll" />
+} @else {
+  <button type="button" mat-button mat-raised-button (click)="closeAll.emit()">Close All</button>
+}
 <step-split [class.with-overflow]="withOverflow()">
   @for (view of viewsAndGroups(); track view.id; let isLast = $last; let isFirst = $first) {
     @if (view | isSplitViewGroup; as group) {
@@ -14,6 +18,7 @@
       <step-split-area sizeType="flex">
         <step-view-item
           [view]="view"
+          [canClose]="canClosePanels()"
           [canMinimize]="isMaximized() && isLast && !isFirst"
           [canMaximize]="!isMaximized() && isLast && !isFirst"
           [isLast]="isLast"

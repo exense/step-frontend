@@ -1,21 +1,11 @@
 @if (reportNode(); as node) {
-  <section class="tree-collapse-container collapsed" [class.collapsed]="isTreeHidden()" stepElementSize>
+  <section class="tree-collapse-container collapsed" stepElementSize>
     <step-icon name="tree" />
     <strong>Open drilldown tree</strong>
     <span>Inspect the executed path for this iteration</span>
-    <button mat-icon-button class="tree-toggle" (click)="toggleTreeVisibility()">
-      <step-icon [name]="isTreeHidden() ? 'chevron-right' : 'chevron-down'" />
+    <button mat-icon-button class="tree-toggle" (click)="openPartialTree.emit(node)">
+      <step-icon name="chevron-right" />
     </button>
-    @if (!isTreeHidden()) {
-      <step-alt-execution-tree-partial
-        #partialTree
-        [node]="node"
-        [noPadding]="true"
-        [showDetailsButton]="true"
-        [autoFocusNode]="false"
-        (openIterations)="openIterations.emit($event)"
-      />
-    }
   </section>
   @if (!hideFirstPanel()) {
     <div class="grid">

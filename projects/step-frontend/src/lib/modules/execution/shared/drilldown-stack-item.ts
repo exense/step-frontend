@@ -7,9 +7,15 @@ export const DRILL_DOWN_ROOT_ID = 'root';
 
 export enum DrillDownStackItemType {
   ROOT = 'root',
-  REPORT_NODE = 'reportNode',
-  AGGREGATED_REPORT_NODE = 'aggregatedReportNode',
+  REPORT_NODE = 'report',
+  AGGREGATED_REPORT_NODE = 'aggregated',
+  PARTIAL_TREE = 'tree',
 }
+
+export type DrillDownStackItemTypeWORoot =
+  | DrillDownStackItemType.REPORT_NODE
+  | DrillDownStackItemType.AGGREGATED_REPORT_NODE
+  | DrillDownStackItemType.PARTIAL_TREE;
 
 export interface DrillDownRootStackItemConfig {
   type: DrillDownStackItemType.ROOT;
@@ -19,6 +25,11 @@ export interface DrillDownRootStackItemConfig {
 
 export interface DrillDownReportNodeStackItemConfig {
   type: DrillDownStackItemType.REPORT_NODE;
+  nodeId: string;
+}
+
+export interface DrillDownReportNodePartialTreeStackItemConfig {
+  type: DrillDownStackItemType.PARTIAL_TREE;
   nodeId: string;
 }
 
@@ -33,13 +44,19 @@ export interface DrillDownAggregatedReportNodeStackItemConfig {
 export type DrillDownStackItemConfig =
   | DrillDownRootStackItemConfig
   | DrillDownReportNodeStackItemConfig
-  | DrillDownAggregatedReportNodeStackItemConfig;
+  | DrillDownAggregatedReportNodeStackItemConfig
+  | DrillDownReportNodePartialTreeStackItemConfig;
 
 export interface DrillDownRootStackItem extends DrillDownRootStackItemConfig {
   id: string;
 }
 
 export interface DrillDownReportNodeStackItem extends DrillDownReportNodeStackItemConfig {
+  id: string;
+  data: ReportNode;
+}
+
+export interface DrillDownReportNodePartialTreeStackItem extends DrillDownReportNodePartialTreeStackItemConfig {
   id: string;
   data: ReportNode;
 }
@@ -52,4 +69,5 @@ export interface DrillDownAggregatedReportNodeStackItem extends DrillDownAggrega
 export type DrillDownStackItem =
   | DrillDownRootStackItem
   | DrillDownReportNodeStackItem
+  | DrillDownReportNodePartialTreeStackItem
   | DrillDownAggregatedReportNodeStackItem;

@@ -5,6 +5,8 @@ step-view-item {
     height: calc(100% - 1rem);
     margin: 0.5rem;
     padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
 
     .item-header {
       align-items: center;
@@ -25,6 +27,7 @@ step-view-item {
     }
 
     .item-content {
+      flex: 1;
       overflow-x: hidden;
       overflow-y: auto;
     }

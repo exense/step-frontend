@@ -191,8 +191,14 @@ import { AltIterationListTitleComponent } from './components/alt-iteration-list-
 import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
-import { DRILL_DOWN_ROOT_ID, DrillDownStackItemConfig, DrillDownStackItemType } from './shared/drilldown-stack-item';
+import {
+  DRILL_DOWN_ROOT_ID,
+  DrillDownStackItemConfig,
+  DrillDownStackItemType,
+  DrillDownStackItemTypeWORoot,
+} from './shared/drilldown-stack-item';
 import { DrilldownRootType } from './shared/drilldown-root-type';
+import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 
 @NgModule({
   declarations: [
@@ -343,6 +349,7 @@ import { DrilldownRootType } from './shared/drilldown-root-type';
     AltReportNodeSearchComponent,
     AltReportNodeListProvideKeywordsDirective,
     AltReportNodeListProvideTestcasesDirective,
+    DrilldownPartialTreeStateDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -830,10 +837,18 @@ export class ExecutionModule {
                       ];
 
                       for (let i = 1; i < url.length; i += 2) {
-                        const type =
-                          url[i].path === 'report'
-                            ? DrillDownStackItemType.REPORT_NODE
-                            : DrillDownStackItemType.AGGREGATED_REPORT_NODE;
+                        let type: DrillDownStackItemTypeWORoot;
+                        switch (url[i].path) {
+                          case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
+                          case DrillDownStackItemType.REPORT_NODE:
+                          case DrillDownStackItemType.PARTIAL_TREE:
+                            type = url[i].path as DrillDownStackItemTypeWORoot;
+                            break;
+                          default:
+                            type = DrillDownStackItemType.REPORT_NODE;
+                            break;
+                        }
+
                         const value = url[i + 1].path;
                         if (type === DrillDownStackItemType.REPORT_NODE) {
                           const nodeId = value;

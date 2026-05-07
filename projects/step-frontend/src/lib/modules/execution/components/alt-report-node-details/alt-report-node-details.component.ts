@@ -1,45 +1,28 @@
-import { Component, computed, inject, input, output, signal, untracked, viewChild } from '@angular/core';
+import { Component, computed, inject, input, output, untracked, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
   CLICK_STRATEGY,
   ClickStrategyType,
   ReportNode,
-  TreeNodeUtilsService,
-  TreeStateService,
 } from '@exense/step-core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { KeyValue } from '@angular/common';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
-import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 import { AltReportNodeDetailsDirective } from '../../directives/alt-report-node-details.directive';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
+import { DrilldownPartialTreeStateDirective } from '../../directives/drilldown-partial-tree-state.directive';
 
 @Component({
   selector: 'step-alt-report-node-details',
   templateUrl: './alt-report-node-details.component.html',
   styleUrl: './alt-report-node-details.component.scss',
   providers: [
-    AggregatedReportViewTreeNodeUtilsService,
-    {
-      provide: TreeNodeUtilsService,
-      useExisting: AggregatedReportViewTreeNodeUtilsService,
-    },
-    AggregatedReportViewTreeStateService,
-    {
-      provide: TreeStateService,
-      useExisting: AggregatedReportViewTreeStateService,
-    },
     {
       provide: CLICK_STRATEGY,
       useValue: ClickStrategyType.DOUBLE_CLICK,
-    },
-    {
-      provide: AGGREGATED_TREE_NODE_LARGE_VIEW,
-      useValue: false,
     },
   ],
   standalone: false,
@@ -48,6 +31,7 @@ import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.servic
       directive: AltReportNodeDetailsDirective,
       inputs: ['node'],
     },
+    DrilldownPartialTreeStateDirective,
   ],
 })
 export class AltReportNodeDetailsComponent {
@@ -59,11 +43,6 @@ export class AltReportNodeDetailsComponent {
   readonly showArtefact = input(false);
 
   private readonly partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
-  protected readonly isTreeHidden = signal(true);
-
-  protected toggleTreeVisibility(): void {
-    this.isTreeHidden.update((value) => !value);
-  }
 
   protected readonly reportNode = computed(() => {
     const reportNode = this._nodeDetailsDirective.reportNode();
@@ -72,6 +51,7 @@ export class AltReportNodeDetailsComponent {
 
   readonly openIterations = output<OpenIterationsEvent>();
   readonly openDetails = output<ReportNode>();
+  readonly openPartialTree = output<ReportNode>();
 
   private children$ = toObservable(this.reportNode).pipe(
     switchMap((node) => {
@@ -110,6 +90,10 @@ export class AltReportNodeDetailsComponent {
   protected readonly children = toSignal(this.children$, { initialValue: [] });
   protected readonly artefactClass = computed(() => this.reportNode().resolvedArtefact?._class);
 
+  /**
+   * todo: As tree has been moved to a separate component, rootCauseErrors will never work
+   * Later the new REST endpoint should appear, to retrieve it
+   * **/
   protected readonly rootCauseErrors = computed(() => {
     const treeNode = this.aggregatedNode();
     const artefactClass = this.artefactClass();

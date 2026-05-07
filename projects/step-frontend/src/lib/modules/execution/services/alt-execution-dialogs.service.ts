@@ -14,6 +14,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { AltExecutionNodesHelperService } from './alt-execution-nodes-helper.service';
 import { DrilldownRootType } from '../shared/drilldown-root-type';
 import { AltExecutionDrilldownNavigationUtilsService } from './alt-execution-drilldown-navigation-utils.service';
+import { DrillDownStackItemType } from '../shared/drilldown-stack-item';
 
 export interface OpenIterationsParams {
   aggregatedNodeId: string;
@@ -23,11 +24,12 @@ export interface OpenIterationsParams {
   reportNodeId?: string;
   nodeStatusCount?: number;
   searchFor?: string;
+  openPartialTree?: boolean;
 }
 
 export type PartialOpenIterationsParams = Pick<
   OpenIterationsParams,
-  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
+  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor' | 'openPartialTree'
 >;
 
 export interface OpenIterationsEvent {
@@ -68,26 +70,30 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       return;
     }
 
-    const { aggregatedNodeId, reportNodeId, nodeStatus, nodeStatusCount, searchFor } =
+    const { aggregatedNodeId, reportNodeId, nodeStatus, nodeStatusCount, searchFor, openPartialTree } =
       nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
-      this.navigateToIterationDetails(drilldownRootType, reportNodeId, undefined);
+      this.navigateToIterationDetails(drilldownRootType, reportNodeId, undefined, openPartialTree);
       return;
     }
     const reportNode = this._drilldownNavigationUtils.getSingleReportNode(nodeOrParams);
     if (!!reportNode) {
       this._reportNodeDetails?.setReportNode?.(reportNode);
       this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
-      this.navigateToIterationDetails(drilldownRootType, reportNode.id!, searchFor);
+      this.navigateToIterationDetails(drilldownRootType, reportNode.id!, searchFor, openPartialTree);
       return;
     }
     this.navigateToIterationList(drilldownRootType, aggregatedNodeId, nodeStatus, nodeStatusCount);
   }
 
-  openIterationDetails<T extends ReportNode>(drilldownRootType: DrilldownRootType, reportNode: T): void {
+  openIterationDetails<T extends ReportNode>(
+    drilldownRootType: DrilldownRootType,
+    reportNode: T,
+    openPartialTree?: boolean,
+  ): void {
     this._reportNodeDetails?.setReportNode?.(reportNode);
     this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
-    this.navigateToIterationDetails(drilldownRootType, reportNode.id!);
+    this.navigateToIterationDetails(drilldownRootType, reportNode.id!, undefined, openPartialTree);
   }
 
   openScheduler(task: ExecutiontTaskParameters): void {
@@ -103,17 +109,39 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     searchStatus?: Status,
     searchStatusCount?: number,
   ): void {
-    this._drilldownNavigationUtils.openDrilldown(drilldownRootType, 'aggregated', aggregatedNodeId, {
-      searchStatus,
-      statusCount: searchStatusCount,
-    });
+    this._drilldownNavigationUtils.openDrilldown(
+      drilldownRootType,
+      DrillDownStackItemType.AGGREGATED_REPORT_NODE,
+      aggregatedNodeId,
+      {
+        searchStatus,
+        statusCount: searchStatusCount,
+      },
+    );
   }
 
   private navigateToIterationDetails(
     drilldownRootType: DrilldownRootType,
     reportNodeId: string,
     searchFor?: string,
+    openPartialTree?: boolean,
   ): void {
-    this._drilldownNavigationUtils.openDrilldown(drilldownRootType, 'report', reportNodeId, undefined, searchFor);
+    if (openPartialTree) {
+      this._drilldownNavigationUtils.openDrilldown(
+        drilldownRootType,
+        DrillDownStackItemType.PARTIAL_TREE,
+        reportNodeId,
+        undefined,
+        searchFor,
+      );
+    } else {
+      this._drilldownNavigationUtils.openDrilldown(
+        drilldownRootType,
+        DrillDownStackItemType.REPORT_NODE,
+        reportNodeId,
+        undefined,
+        searchFor,
+      );
+    }
   }
 }

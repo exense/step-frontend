@@ -17,9 +17,11 @@
         <step-icon name="maximize-2" />
       </button>
     }
-    <button mat-icon-button (click)="remove.emit()">
-      <step-icon name="x" />
-    </button>
+    @if (canClose()) {
+      <button mat-icon-button (click)="remove.emit()">
+        <step-icon name="x" />
+      </button>
+    }
   </div>
   <div class="item-content">
     @if (contentTemplateRef(); as templateRef) {

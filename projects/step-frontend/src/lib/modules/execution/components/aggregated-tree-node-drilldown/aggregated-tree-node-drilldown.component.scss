@@ -38,4 +38,8 @@ step-aggregated-tree-node-drilldown {
       @include core.step-icon-size(2.5rem, true);
     }
   }
+
+  .close-all {
+    text-align: right;
+  }
 }

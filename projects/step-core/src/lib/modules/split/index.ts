@@ -9,6 +9,7 @@ import { StackViewBreadcrumbsTitleDirective } from './directives/stack-view-brea
 import { StackViewItemMiniatureDirective } from './directives/stack-view-item-miniature.directive';
 import { ViewItemDefaultNamePipe } from './pipes/view-item-default-name.pipe';
 import { StackViewGroupTooltipDirective } from './directives/stack-view-group-tooltip.directive';
+import { StackViewCloseAllDirective } from './directives/stack-view-close-all.directive';
 
 export * from './components/split/split.component';
 export * from './components/split-area/split-area.component';
@@ -24,6 +25,7 @@ export * from './directives/stack-view-item-content.directive';
 export * from './directives/stack-view-breadcrumbs-title.directive';
 export * from './directives/stack-view-item-miniature.directive';
 export * from './directives/stack-view-group-tooltip.directive';
+export * from './directives/stack-view-close-all.directive';
 
 export const SPLIT_EXPORTS = [
   SplitComponent,
@@ -36,5 +38,6 @@ export const SPLIT_EXPORTS = [
   StackViewBreadcrumbsTitleDirective,
   StackViewItemMiniatureDirective,
   StackViewGroupTooltipDirective,
+  StackViewCloseAllDirective,
   ViewItemDefaultNamePipe,
 ];

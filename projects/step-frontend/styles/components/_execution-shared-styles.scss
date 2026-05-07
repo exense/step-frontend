@@ -118,10 +118,18 @@
     & > step-icon {
       @include core.step-icon-size(2.5rem, true);
     }
+  }
+
+  .standalone-tree-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
     step-alt-execution-tree-partial {
       margin-top: 2rem;
-      grid-column: 1 / 4;
+      display: block;
+      min-height: 5rem;
+      height: 100%;
     }
   }
 
