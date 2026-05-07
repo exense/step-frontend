@@ -166,6 +166,10 @@ step-grid-layout {
       step-icon[name='help-circle'] {
         pointer-events: auto;
       }
+
+      step-icon[name='alert-triangle'] {
+        color: var.$orange-100;
+      }
     }
 
     step-grid-drag-handle > section {
