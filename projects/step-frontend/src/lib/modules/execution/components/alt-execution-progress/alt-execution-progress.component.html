@@ -88,7 +88,7 @@
       <step-execution-legacy-switcher [execution]="execution" />
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="without-borders">
+          <step-btn-group class="without-borders with-form-field-corners">
             <step-autorefresh-toggle
               [model]="activeExecution.autoRefreshModel"
               buttonType="stroke"
@@ -101,7 +101,7 @@
           </step-btn-group>
         }
       }
-      <step-btn-group class="with-round-borders">
+      <step-btn-group class="with-form-field-borders">
         <ng-container
           stepExecutionCommands
           #commands="StepExecutionCommands"
