@@ -6,14 +6,26 @@ import {
   Measure,
   ReportNode,
   TableDataSource,
+  TableLocalDataSource,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 import { DOCUMENT } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
+
+interface MetricSample {
+  sampleTime: number;
+  name: string;
+  count: number;
+  sum: number;
+  max: number;
+  type: 'COUNTER' | 'GAUGE' | 'HISTOGRAM';
+  labels?: Record<string, string>;
+}
 
 @Component({
   selector: 'step-call-keyword-report-details',
@@ -28,6 +40,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   private _controllerService = inject(AugmentedControllerService);
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _http = inject(HttpClient);
   private _window = inject(DOCUMENT).defaultView!;
 
   private reportNodesToRender = new Set([
@@ -41,7 +54,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     initialValue: undefined,
   });
 
-  protected keywordInputs = computed(() => {
+  protected readonly keywordInputs = computed(() => {
     const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.input) {
@@ -56,7 +69,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     return result;
   });
 
-  protected keywordOutputs = computed(() => {
+  protected readonly keywordOutputs = computed(() => {
     const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.output) {
@@ -90,7 +103,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   /**
    * Extract nodeId, to prevent unnecessary dataSource recreation
    * **/
-  private nodeId = computed(() => {
+  private readonly nodeId = computed(() => {
     const node = this.node();
     return node?.id;
   });
@@ -101,6 +114,36 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
       return undefined;
     }
     return this.createMeasurementsDataSource(id);
+  });
+
+  private readonly metricSamplesData = toSignal(
+    toObservable(this.node).pipe(
+      switchMap((node) =>
+        node?.id
+          ? this._http
+              .get<MetricSample[]>(`/rest/raw-samples/metric-samples/${node.id}/aggregated`)
+              .pipe(catchError(() => of<MetricSample[]>([])))
+          : of<MetricSample[]>([]),
+      ),
+    ),
+    { initialValue: [] as MetricSample[] },
+  );
+
+  protected readonly hasMetricSamples = computed(() => this.metricSamplesData().length > 0);
+
+  protected readonly metricSamplesDataSource = computed(() => {
+    const data = this.metricSamplesData();
+    if (!data.length) {
+      return undefined;
+    }
+    return new TableLocalDataSource(
+      data,
+      TableLocalDataSource.configBuilder<MetricSample>()
+        .addSortNumberPredicate('sampleTime', (item) => item.sampleTime)
+        .addSortStringPredicate('name', (item) => item.name)
+        .addSortNumberPredicate('count', (item) => item.count)
+        .build(),
+    );
   });
 
   /**

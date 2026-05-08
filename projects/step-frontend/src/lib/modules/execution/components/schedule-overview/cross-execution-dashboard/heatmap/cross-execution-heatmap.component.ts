@@ -156,7 +156,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
         maxNumberOfSeries: HEATMAP_MAX_SERIES_COUNT,
       };
 
-      return this._timeSeriesService.getTimeSeries(request).pipe(
+      return this._timeSeriesService.fetchBuckets(request).pipe(
         map((response: TimeSeriesAPIResponse) => {
           if (response.truncated) {
             return { truncated: true, data: { columns: [], rows: [] } };
