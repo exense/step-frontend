@@ -29,7 +29,7 @@
                 <step-icon name="list" />
                 <span>Steps</span>
               </div>
-              <section *stepStackViewItemTitle class="root-title nodes-list-title">
+              <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
                 <div>
                   <span>Steps</span>
                   @if (keywordsSort.showSort()) {
@@ -52,9 +52,15 @@
                   (openDetails)="handleOpenDetails($event, item.id)"
                 />
               </section>
-              <div class="miniature" *stepStackViewItemMiniature matTooltip="Steps" matTooltipPosition="below">
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Steps"
+                matTooltipPosition="below"
+              >
                 <step-icon name="list" />
-              </div>
+              </button>
             </step-stack-view-item>
           }
           @case (DrilldownRootType.TESTCASES) {
@@ -67,7 +73,7 @@
                 <step-icon name="list" />
                 <span>Testcases</span>
               </div>
-              <section *stepStackViewItemTitle class="root-title nodes-list-title">
+              <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
                 <div>Test Cases</div>
                 <div>
                   <step-alt-report-node-status-filter />
@@ -80,9 +86,15 @@
                   (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
                 />
               </section>
-              <div class="miniature" *stepStackViewItemMiniature matTooltip="Steps" matTooltipPosition="below">
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Steps"
+                matTooltipPosition="below"
+              >
                 <step-icon name="list" />
-              </div>
+              </button>
             </step-stack-view-item>
           }
           @case (DrilldownRootType.TREE) {
@@ -95,7 +107,7 @@
                 <step-icon name="tree" />
                 <span>Execution Tree</span>
               </div>
-              <section *stepStackViewItemTitle class="root-title">
+              <section *stepStackViewItemTitle class="stack-view-title">
                 <div>Execution Tree</div>
                 <step-alt-execution-tree-control-panel />
               </section>
@@ -108,9 +120,15 @@
                   (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
                 />
               </section>
-              <div class="miniature" *stepStackViewItemMiniature matTooltip="Execution Tree" matTooltipPosition="below">
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Execution Tree"
+                matTooltipPosition="below"
+              >
                 <step-icon name="tree" />
-              </div>
+              </button>
             </step-stack-view-item>
           }
         }
@@ -136,14 +154,15 @@
               (showDetails)="handleOpenDetails($event, item.id)"
             />
           </section>
-          <div
+          <button
+            mat-stroked-button
             class="miniature"
             *stepStackViewItemMiniature
             [matTooltip]="'Iterations of ' + $any(item).data.name"
             matTooltipPosition="below"
           >
             <step-icon name="list" />
-          </div>
+          </button>
         </step-stack-view-item>
       }
       @case (StackItemType.REPORT_NODE) {
@@ -167,32 +186,37 @@
               (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
             />
           </ng-container>
-          <div
+          <button
+            mat-stroked-button
             class="miniature"
             *stepStackViewItemMiniature
             [matTooltip]="'Details of ' + $any(item).data.name"
             matTooltipPosition="below"
           >
             <step-icon name="sidebar" />
-          </div>
+          </button>
         </step-stack-view-item>
       }
       @case (StackItemType.PARTIAL_TREE) {
         <step-stack-view-item
           [itemId]="item.id"
-          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Partial Tree)'"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Drilldown Tree)'"
+          stepDrilldownPartialTreeState
         >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
             <step-icon name="tree" />
-            <span>Partial tree of {{ $any(item).data.name }}</span>
+            <span>Drilldown tree of {{ $any(item).data.name }}</span>
           </div>
-          <ng-container *stepStackViewItemTitle>
-            <step-alt-report-node-header [node]="$any(item).data" />
-          </ng-container>
+          <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
+            <div>
+              <step-icon name="tree" />
+              <span>{{ $any(item).data.name }}</span>
+            </div>
+            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" />
+          </section>
           <ng-container *stepStackViewItemContent>
             <section class="standalone-tree-container">
               <step-alt-execution-tree-partial
-                stepDrilldownPartialTreeState
                 [node]="$any(item).data"
                 [noPadding]="true"
                 [showDetailsButton]="true"
@@ -201,14 +225,15 @@
               />
             </section>
           </ng-container>
-          <div
+          <button
+            mat-stroked-button
             class="miniature"
             *stepStackViewItemMiniature
-            [matTooltip]="'Partial tree of ' + $any(item).data.name"
+            [matTooltip]="'Drilldown tree of ' + $any(item).data.name"
             matTooltipPosition="below"
           >
             <step-icon name="tree" />
-          </div>
+          </button>
         </step-stack-view-item>
       }
     }

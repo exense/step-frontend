@@ -4,13 +4,13 @@
 step-aggregated-tree-node-drilldown {
   background: var.$white;
 
-  .root-title {
+  .stack-view-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
 
-    &.nodes-list-title > div {
+    &.with-subtitle > div {
       display: flex;
       align-items: center;
       gap: 1rem;

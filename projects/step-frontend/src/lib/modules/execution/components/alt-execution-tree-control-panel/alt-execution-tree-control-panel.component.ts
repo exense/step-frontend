@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
   SearchFieldComponent,
@@ -21,6 +21,8 @@ export class AltExecutionTreeControlPanelComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
+
+  readonly hideCollapseButtons = input(false);
 
   protected collapseAll(): void {
     this._treeState.collapseAll();

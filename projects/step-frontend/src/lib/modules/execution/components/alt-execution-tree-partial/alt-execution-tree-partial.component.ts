@@ -21,7 +21,6 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
-import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { Router } from '@angular/router';
 import { Status } from '../../../_common/shared/status.enum';
@@ -32,7 +31,6 @@ import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.servic
   templateUrl: './alt-execution-tree-partial.component.html',
   styleUrl: './alt-execution-tree-partial.component.scss',
   encapsulation: ViewEncapsulation.None,
-  providers: [AggregatedReportViewTreeSearchFacadeService],
   host: {
     '[class.no-padding]': 'noPadding()',
   },
@@ -45,7 +43,6 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
-  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   private _router = inject(Router);
 
   readonly openIterations = output<OpenIterationsEvent>();
@@ -102,14 +99,6 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   protected openDetails(node: AggregatedTreeNode): void {
     this.openIterations.emit({ node, restParams: {} });
-  }
-
-  protected toggleErrorSearch(): void {
-    this._treeState.toggleErrorSearch();
-  }
-
-  protected exitRootCauseSearch(): void {
-    this._treeState.clearErrorLeafs();
   }
 
   private setupTree(): void {

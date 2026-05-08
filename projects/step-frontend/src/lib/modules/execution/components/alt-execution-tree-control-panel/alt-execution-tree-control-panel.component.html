@@ -1,11 +1,19 @@
-<step-btn-group class="with-round-borders shrink collapse-buttons">
-  <button type="button" mat-stroked-button (click)="collapseAll()" matTooltip="Collapse All" matTooltipPosition="below">
-    <step-icon name="collapse-all" />
-  </button>
-  <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
-    <step-icon name="expand-all" />
-  </button>
-</step-btn-group>
+@if (!hideCollapseButtons()) {
+  <step-btn-group class="with-round-borders shrink collapse-buttons">
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="collapseAll()"
+      matTooltip="Collapse All"
+      matTooltipPosition="below"
+    >
+      <step-icon name="collapse-all" />
+    </button>
+    <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
+      <step-icon name="expand-all" />
+    </button>
+  </step-btn-group>
+}
 <step-search-field
   [formControl]="_treeSearch.searchCtrl"
   [(searchIndex)]="_treeSearch.pageIndex"

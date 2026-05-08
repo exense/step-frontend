@@ -1,9 +1,9 @@
 @if (reportNode(); as node) {
-  <section class="tree-collapse-container collapsed" stepElementSize>
+  <section class="tree-collapse-container" stepElementSize (click)="openPartialTree.emit(node)">
     <step-icon name="tree" />
     <strong>Open drilldown tree</strong>
     <span>Inspect the executed path for this iteration</span>
-    <button mat-icon-button class="tree-toggle" (click)="openPartialTree.emit(node)">
+    <button mat-icon-button class="tree-toggle">
       <step-icon name="chevron-right" />
     </button>
   </section>
