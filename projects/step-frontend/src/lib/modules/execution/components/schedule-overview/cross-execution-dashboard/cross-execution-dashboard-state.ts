@@ -42,7 +42,7 @@ import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 0 });
+const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.85, Infinity], align: 1, radius: 0.1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -158,7 +158,7 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: ['result'],
       };
-      return this._timeSeriesService.getTimeSeries(request);
+      return this._timeSeriesService.fetchBuckets(request);
     }),
   );
 
@@ -192,7 +192,7 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
-      return this._timeSeriesService.getTimeSeries(request).pipe(
+      return this._timeSeriesService.fetchBuckets(request).pipe(
         map((response) => {
           const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
           const responseTimeData: (number | undefined | null)[] = [];
@@ -271,9 +271,16 @@ export abstract class CrossExecutionDashboardState {
             },
             cursor: {
               points: {
-                size: (u, seriesIdx) => (seriesIdx > series.length ? 0 : 7), // don't show marker for response-time series
+                size: (u, seriesIdx) => (seriesIdx > series.length ? 0 : 7),
               },
               lock: true,
+              dataIdx: (self: any, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
+                const xData = self.data[0] as number[];
+                let i = hoveredIdx;
+                while (i > 0 && xData[i] > cursorXVal) i--;
+                while (i < xData.length - 1 && xData[i + 1] <= cursorXVal) i++;
+                return i;
+              },
             },
             scales: {
               x: {},

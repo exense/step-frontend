@@ -26,4 +26,5 @@ export type DashboardItem = {
   chartSettings?: ChartSettings;
   tableSettings?: TableDashletSettings;
   size: number;
+  omitWhenEmpty?: boolean;
 };

@@ -41,18 +41,18 @@ export class ExecutionsChartTooltipComponent {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _executionService = inject(ExecutionsService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _state = inject(CrossExecutionDashboardState);
 
-  reposition = output<void>();
+  readonly reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
   readonly scaleKey = input.required<string>();
 
-  selectedSeries?: TransformedSeries;
-  selectedSeriesExecutions: ExecutionItem[] = [];
-  executionsListTruncated: boolean = false;
+  protected selectedSeries?: TransformedSeries;
+  protected selectedSeriesExecutions: ExecutionItem[] = [];
+  protected executionsListTruncated: boolean = false;
 
-  readonly timeRange = computed(() => {
+  protected readonly timeRange = computed(() => {
     const contextData = this.data();
     const bucketRange = (contextData?.xValues[1] || 0) - (contextData?.xValues[0] || 0);
 
@@ -65,7 +65,7 @@ export class ExecutionsChartTooltipComponent {
     return `${new Date(bucketStart).toLocaleString()} - ${new Date(bucketEnd).toLocaleString()}`;
   });
 
-  readonly responseTime = computed(() => {
+  protected readonly responseTime = computed(() => {
     const contextData = this.data();
     if (!contextData || !contextData.idx) {
       return;
@@ -75,7 +75,7 @@ export class ExecutionsChartTooltipComponent {
     return ms !== undefined ? TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(ms!) : undefined;
   });
 
-  readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
+  protected readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
     const contextData = this.data();
     this.selectedSeriesExecutions = [];
     this.executionsListTruncated = false;
@@ -104,13 +104,13 @@ export class ExecutionsChartTooltipComponent {
     return transformedSeries;
   });
 
-  selectSeries(series: TransformedSeries) {
+  protected selectSeries(series: TransformedSeries): void {
     this.selectedSeries = series;
     // wait for the rendering to takes effect
     this.fetchExecutionsForSelectedItem(series, () => setTimeout(() => this.reposition.emit(), 200));
   }
 
-  fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void) {
+  protected fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void): void {
     const data = this.data()!;
     const bucketInterval = data.xValues[1] - data.xValues[0];
     const limit = 10;
@@ -133,7 +133,7 @@ export class ExecutionsChartTooltipComponent {
       maxNumberOfSeries: limit,
     };
     this._timeSeriesService
-      .getTimeSeries(request)
+      .fetchBuckets(request)
       .pipe(
         switchMap((timeSeriesResponse) => {
           const eIds = timeSeriesResponse.matrixKeys.map((attr) => attr['eId']);
@@ -158,7 +158,7 @@ export class ExecutionsChartTooltipComponent {
       });
   }
 
-  jumpToExecution(execution: ExecutionItem) {
+  protected jumpToExecution(execution: ExecutionItem): void {
     window.open(`#/executions/${execution.id!}/report`);
   }
 }

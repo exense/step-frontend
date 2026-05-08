@@ -1,5 +1,5 @@
 @use 'projects/step-frontend/styles/common-mixins';
-@import 'projects/step-frontend/styles/fonts-setup';
+@use 'projects/step-frontend/styles/fonts-setup';
 
 @include common-mixins.common-styles();
 @include common-mixins.ts-tooltip();

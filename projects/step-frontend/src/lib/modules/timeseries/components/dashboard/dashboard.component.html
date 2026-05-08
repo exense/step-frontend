@@ -103,53 +103,57 @@
     @if (mainEngine.state) {
       <div class="dashlet-container">
         @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
-          @if (dashlet.type === 'CHART') {
-            <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
-              <step-chart-dashlet
-                #chart
-                [editMode]="editMode"
-                [showExecutionLinks]="showExecutionLinks"
-                [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
-                [item]="dashlet"
-                [context]="mainEngine.state.context"
-                [height]="DASHLET_HEIGHT"
-                (remove)="handleChartDelete(i)"
-                (shiftLeft)="handleChartShiftLeft(i)"
-                (shiftRight)="handleChartShiftRight(i)"
-                (zoomReset)="handleZoomReset()"
-              />
-            </div>
-            @if (compareModeEnabled) {
-              <div class="dashlet">
-                <div class="compare-mode-tag">Compare</div>
+          @if (!dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
+            @if (dashlet.type === 'CHART') {
+              <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
                 <step-chart-dashlet
-                  #compareChart
-                  [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
+                  #chart
                   [editMode]="editMode"
+                  [showExecutionLinks]="showExecutionLinks"
+                  [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                   [item]="dashlet"
-                  [context]="compareEngine!.state.context"
+                  [context]="mainEngine.state.context"
                   [height]="DASHLET_HEIGHT"
                   (remove)="handleChartDelete(i)"
                   (shiftLeft)="handleChartShiftLeft(i)"
                   (shiftRight)="handleChartShiftRight(i)"
+                  (zoomReset)="handleZoomReset()"
+                  (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
+                />
+              </div>
+              @if (compareModeEnabled) {
+                <div class="dashlet">
+                  <div class="compare-mode-tag">Compare</div>
+                  <step-chart-dashlet
+                    #compareChart
+                    [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
+                    [editMode]="editMode"
+                    [item]="dashlet"
+                    [context]="compareEngine!.state.context"
+                    [height]="DASHLET_HEIGHT"
+                    (remove)="handleChartDelete(i)"
+                    (shiftLeft)="handleChartShiftLeft(i)"
+                    (shiftRight)="handleChartShiftRight(i)"
+                  />
+                </div>
+              }
+            } @else if (dashlet.type === 'TABLE') {
+              <div class="dashlet" [class.size-full]="compareModeEnabled || dashlet.size === 2">
+                <step-table-dashlet
+                  #chart
+                  [item]="dashlet"
+                  [showLoadingSpinnerWhileLoading]="
+                    mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
+                  "
+                  [context]="mainEngine.state.context"
+                  [editMode]="editMode"
+                  (remove)="handleChartDelete(i)"
+                  (shiftLeft)="handleChartShiftLeft(i)"
+                  (shiftRight)="handleChartShiftRight(i)"
+                  (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
                 />
               </div>
             }
-          } @else if (dashlet.type === 'TABLE') {
-            <div class="dashlet" [class.size-full]="compareModeEnabled || dashlet.size === 2">
-              <step-table-dashlet
-                #chart
-                [item]="dashlet"
-                [showLoadingSpinnerWhileLoading]="
-                  mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
-                "
-                [context]="mainEngine.state.context"
-                [editMode]="editMode"
-                (remove)="handleChartDelete(i)"
-                (shiftLeft)="handleChartShiftLeft(i)"
-                (shiftRight)="handleChartShiftRight(i)"
-              />
-            </div>
           }
         }
         @if (!editMode && !dashboard.dashlets.length) {

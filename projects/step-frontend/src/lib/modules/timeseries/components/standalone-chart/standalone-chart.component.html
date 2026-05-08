@@ -4,6 +4,6 @@
     (zoomChange)="handleZoomChange($event)"
     (zoomReset)="handleZoomReset()"
     [settings]="chartSettings!"
-    [height]="config.height ?? 0"
+    [height]="config().height ?? 0"
   />
 }

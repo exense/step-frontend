@@ -49,7 +49,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
+import { forkJoin, map, merge, Observable, of, Subscription, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -126,6 +126,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   compareModeEnabled = false;
   resolution?: number;
+  protected emptyItemIds = new Set<string>();
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -200,6 +201,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.contextSettingsChanged.emit(context);
           this.fullRangeSelected = context.isFullRangeSelected();
         });
+        merge(
+          context.onGroupingChange(),
+          context.onFilteringChange(),
+          context.onChartsResolutionChange(),
+          context.onTimeSelectionChange(),
+          context.onFullRangeChange(),
+        )
+          .pipe(takeUntilDestroyed(this._destroyRef))
+          .subscribe(() => this.emptyItemIds.clear());
         this.contextSettingsInit.emit(context);
         context.onTimeSelectionChange().subscribe((range) => {
           this.zoomChange.emit(range);
@@ -513,6 +523,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return indexedEntities;
       }),
     );
+  }
+
+  protected handleDashletEmptyState(id: string, isEmpty: boolean): void {
+    if (isEmpty) {
+      this.emptyItemIds.add(id);
+    } else {
+      this.emptyItemIds.delete(id);
+    }
   }
 
   protected handleChartDelete(index: number) {

@@ -152,8 +152,8 @@ step-alt-execution-progress {
         border-right: 0.1rem solid var.$gray-300;
         background: var.$gray-200;
         padding-left: 0.5rem;
-        border-top-left-radius: 1.7rem;
-        border-bottom-left-radius: 1.7rem;
+        border-top-left-radius: var(--form-field-border-radius, 0.8rem);
+        border-bottom-left-radius: var(--form-field-border-radius, 0.8rem);
       }
     }
 

@@ -183,6 +183,35 @@
               [(ngModel)]="item.chartSettings!.primaryAxes.unit"
             />
           </step-form-field>
+          <step-form-field>
+            <step-label>Display</step-label>
+            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
+              <mat-option [value]="'LINE'" class="option-with-icon">
+                <div class="inner">
+                  <step-icon name="trending-up"></step-icon>
+                  <span>Line</span>
+                </div>
+              </mat-option>
+              <mat-option [value]="'BAR_CHART'" class="option-with-icon">
+                <div class="inner">
+                  <step-icon name="bar-chart-2"></step-icon>
+                  <span>Bar</span>
+                </div>
+              </mat-option>
+              <mat-option [value]="'STEPPED'" class="option-with-icon">
+                <div class="inner">
+                  <step-icon name="trending-up"></step-icon>
+                  <span>Stepped</span>
+                </div>
+              </mat-option>
+              <mat-option [value]="'STACKED_BAR'" class="option-with-icon">
+                <div class="inner">
+                  <step-icon name="bar-chart-2"></step-icon>
+                  <span>Stacked bars</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </step-form-field>
           <mat-menu #aggregateMenu="matMenu">
             <step-timeseries-aggregate-picker
               [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
@@ -190,6 +219,15 @@
               (aggregateChange)="handlePrimaryAggregationChange($event)"
             />
           </mat-menu>
+        </div>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Colorization</step-label>
+            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes!.colorizationType" name="colorizationType">
+              <mat-option [value]="'STROKE'">Stroke only</mat-option>
+              <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
+            </mat-select>
+          </step-form-field>
         </div>
         <step-form-field>
           <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
@@ -203,7 +241,14 @@
         </step-form-field>
         <mat-divider />
         <div>
-          <step-label>Secondary Axes</step-label>
+          <step-label
+            >Secondary Axes
+            <step-icon
+              class="help-icon"
+              matTooltip="The secondary axis sums each group's aggregated value into a single combined series, thus showing the total aggregated values across series. It always uses a filled style."
+              name="help-circle"
+            ></step-icon>
+          </step-label>
         </div>
         <div class="form-row">
           <step-form-field>
@@ -228,7 +273,25 @@
               />
             </mat-menu>
           </step-form-field>
-          <div></div>
+          @if (item.chartSettings!.secondaryAxes) {
+            <step-form-field>
+              <step-label>Display</step-label>
+              <mat-select [(ngModel)]="item.chartSettings!.secondaryAxes.displayType" name="secondaryDisplayType">
+                <mat-option [value]="'BAR_CHART'" class="option-with-icon">
+                  <div class="inner">
+                    <step-icon name="bar-chart-2"></step-icon>
+                    <span>Bar</span>
+                  </div>
+                </mat-option>
+                <mat-option [value]="'LINE'" class="option-with-icon">
+                  <div class="inner">
+                    <step-icon name="trending-up"></step-icon>
+                    <span>Line</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+            </step-form-field>
+          }
         </div>
         <mat-divider />
         <step-label>Visual settings</step-label>
@@ -238,30 +301,6 @@
             <mat-select [(ngModel)]="item.size" name="item.size">
               <mat-option [value]="1">50%</mat-option>
               <mat-option [value]="2">100%</mat-option>
-            </mat-select>
-          </step-form-field>
-          <step-form-field>
-            <step-label>Chart display</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
-              <mat-option [value]="'LINE'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="trending-up"></step-icon>
-                  <span>Line chart</span>
-                </div>
-              </mat-option>
-              <mat-option [disabled]="true" [value]="'BAR_CHART'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="bar-chart-2"></step-icon>
-                  <span>Bar chart</span>
-                </div>
-              </mat-option>
-            </mat-select>
-          </step-form-field>
-          <step-form-field>
-            <step-label>Colorization</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes!.colorizationType" name="size">
-              <mat-option [value]="'STROKE'">Stroke only</mat-option>
-              <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
             </mat-select>
           </step-form-field>
         </div>
