@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal, untracked } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output, untracked } from '@angular/core';
 import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -10,6 +10,7 @@ import {
   GridPresetSaveDialogResult,
 } from '../grid-preset-save-dialog/grid-preset-save-dialog.component';
 import { AuthService } from '../../../auth';
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'step-grid-control-tool',
@@ -29,10 +30,27 @@ export class GridControlToolComponent {
   readonly layoutDeletePermission = input<string>();
   readonly layoutSharedWritePermission = input<string>();
   readonly layoutSharedDeletePermission = input<string>();
+  readonly extraItem = input<string | undefined>();
+  readonly extraItemChange = output<string | undefined>();
+
+  readonly extraItems = input<KeyValue<string, string>[]>([]);
+
+  protected readonly extraItemsKeys = computed(() => {
+    const extraItems = this.extraItems();
+    const keys = extraItems.map((item) => item.key);
+    return new Set<string | undefined>(keys);
+  });
 
   protected readonly selectedPresetId = linkedSignal(() => {
+    const extraItem = this.extraItem();
     const preset = this._widgetPersistence.selectedPreset();
-    return preset?.id;
+    return extraItem ?? preset?.id;
+  });
+
+  protected readonly isExtraItemSelected = computed(() => {
+    const selectedPresetId = this.selectedPresetId();
+    const extraItemsKeys = this.extraItemsKeys();
+    return extraItemsKeys.has(selectedPresetId);
   });
 
   protected readonly isShared = computed(() => {
@@ -50,8 +68,18 @@ export class GridControlToolComponent {
   protected readonly canReadLayouts = computed(() => this.hasPermission(this.layoutReadPermission()));
   protected readonly canSaveAsNew = computed(() => this.hasPermission(this.layoutWritePermission()));
   protected readonly canEditGrid = computed(() => {
-    return this.canSave() || this.canDeleteCurrentLayout();
+    const canSave = this.canSave();
+    const canDeleteCurrentLayout = this.canOverrideCurrentLayout();
+    const isExtraItemSelected = this.isExtraItemSelected();
+    return !isExtraItemSelected && (canSave || canDeleteCurrentLayout);
   });
+
+  protected readonly hasItems = computed(() => {
+    const presets = this.presets();
+    const extraItems = this.extraItems();
+    return presets.length > 0 || extraItems.length > 0;
+  });
+
   protected readonly canDeleteCurrentLayout = computed(() => {
     const preset = this._widgetPersistence.selectedPreset();
     if (!preset || preset.visibility === 'Preset') {
@@ -76,9 +104,21 @@ export class GridControlToolComponent {
 
   protected handlePresetSelection(presetId: string): void {
     const isEdit = untracked(() => this.isEdit());
+    const extraItemKeys = untracked(() => this.extraItemsKeys());
+
+    const isCurrentExtraItems = untracked(() => this.isExtraItemSelected());
+    const isExtraItem = extraItemKeys.has(presetId);
+
     if (!isEdit) {
       this.selectedPresetId.set(presetId);
-      this._widgetPersistence.selectPreset(presetId);
+      if (isExtraItem) {
+        this.extraItemChange.emit(presetId);
+      } else {
+        if (isCurrentExtraItems) {
+          this.extraItemChange.emit(undefined);
+        }
+        this._widgetPersistence.selectPreset(presetId);
+      }
       return;
     }
 
@@ -92,7 +132,15 @@ export class GridControlToolComponent {
 
     changeConfirmed$.subscribe((isConfirmed) => {
       if (isConfirmed) {
-        this._widgetPersistence.selectPreset(presetId);
+        if (isExtraItem) {
+          this.extraItemChange.emit(presetId);
+          this.selectedPresetId.set(presetId);
+        } else {
+          if (isCurrentExtraItems) {
+            this.extraItemChange.emit(undefined);
+          }
+          this._widgetPersistence.selectPreset(presetId);
+        }
       } else {
         const preset = untracked(() => this._widgetPersistence.selectedPreset());
         this.selectedPresetId.set(preset?.id);

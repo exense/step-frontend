@@ -199,6 +199,7 @@ import {
 } from './shared/drilldown-stack-item';
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
+import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
 
 @NgModule({
   declarations: [
@@ -309,6 +310,7 @@ import { DrilldownPartialTreeStateDirective } from './directives/drilldown-parti
     ExecutionHistoryNodeTooltipComponent,
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
+    AltExecutionAnalyticsControlsComponent,
   ],
   imports: [
     StepCommonModule,
@@ -370,6 +372,7 @@ import { DrilldownPartialTreeStateDirective } from './directives/drilldown-parti
     AltExecutionReportControlsComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
+    AltExecutionAnalyticsControlsComponent,
     AltExecutionTreeComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeDetailsComponent,
@@ -730,7 +733,17 @@ export class ExecutionModule {
             },
             {
               path: 'analytics',
-              component: AltExecutionAnalyticsComponent,
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionAnalyticsComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionAnalyticsControlsComponent,
+                  outlet: 'controls',
+                },
+              ],
             },
             schedulePlanRoute('modal'),
             dialogRoute({
