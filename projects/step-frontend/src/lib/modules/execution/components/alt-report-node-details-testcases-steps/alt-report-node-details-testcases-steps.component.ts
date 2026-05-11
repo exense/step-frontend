@@ -1,14 +1,14 @@
-import { Component, effect, inject, input, OnInit, output, signal, untracked } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { AltTestCasesDetailsNodesStateService } from '../../services/alt-test-cases-details-nodes-state.service';
 import { AltReportNodeListProvideTestcasesDetailsDirective } from '../../directives/alt-report-node-list-provide-testcases-details.directive';
-import { ReportNode } from '@exense/step-core';
+import { ElementSizeDirective, ReportNode } from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-report-node-details-testcases-steps',
   templateUrl: './alt-report-node-details-testcases-steps.component.html',
   styleUrl: './alt-report-node-details-testcases-steps.component.scss',
   standalone: false,
-  hostDirectives: [AltReportNodeListProvideTestcasesDetailsDirective],
+  hostDirectives: [AltReportNodeListProvideTestcasesDetailsDirective, ElementSizeDirective],
 })
 export class AltReportNodeDetailsTestcasesStepsComponent {
   protected readonly _state = inject(AltTestCasesDetailsNodesStateService);

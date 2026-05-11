@@ -1,12 +1,4 @@
 @if (reportNode(); as node) {
-  <section class="tree-collapse-container" stepElementSize (click)="openPartialTree.emit(node)">
-    <step-icon name="tree" />
-    <strong>Open drilldown tree</strong>
-    <span>Inspect the executed path for this iteration</span>
-    <button mat-icon-button class="tree-toggle">
-      <step-icon name="chevron-right" />
-    </button>
-  </section>
   @if (!hideFirstPanel()) {
     <div class="grid">
       @if (rootCauseErrors(); as rootCauseErrors) {
@@ -67,11 +59,25 @@
         class="execution-report-node-details"
         [testCaseId]="artefactID"
         (openDetails)="openDetails.emit($event)"
+        stepAltReportNodeListSort
+        sortByColumn="executionTime"
+        matSort
+        matSortActive="executionTime"
+        matSortDirection="desc"
+        [matSortDisableClear]="true"
+        #stepsSort="AltReportNodeListSort"
       >
         <div class="data-container">
           <div class="container-title">
             <step-icon name="list" />
             <span>Steps</span>
+            @if (stepsSort.showSort()) {
+              <step-alt-report-widget-sort>
+                <button type="button" mat-icon-button (click)="stepsSort.toggleSort()">
+                  <step-icon [name]="stepsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+                </button>
+              </step-alt-report-widget-sort>
+            }
           </div>
         </div>
       </step-alt-report-node-details-testcases-steps>
@@ -80,4 +86,12 @@
   <div class="execution-report-node-details" stepElementSize>
     <step-execution-history-section [artefactHashContainer]="artefactHashContainer()" />
   </div>
+  <section class="tree-collapse-container" stepElementSize (click)="openPartialTree.emit(node)">
+    <step-icon name="tree" />
+    <strong>Open drilldown tree</strong>
+    <span>Inspect the executed path for this iteration</span>
+    <button mat-icon-button class="tree-toggle">
+      <step-icon name="chevron-right" />
+    </button>
+  </section>
 }

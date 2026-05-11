@@ -12,7 +12,7 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
       <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
-        <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
+        <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view">
           <ng-container *stepArtefactInlineDetailsHeader>
             <div class="larger-view artefact-header">
               <step-alt-execution-time
