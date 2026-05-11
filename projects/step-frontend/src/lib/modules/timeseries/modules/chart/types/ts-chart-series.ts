@@ -4,6 +4,7 @@ import { SeriesStroke } from '../../_common/types/time-series/series-stroke';
 export interface TSChartSeries extends Series {
   id: string;
   data: (number | null | undefined)[];
+  originalData?: (number | null | undefined)[]; // pre-cumulation data, set for STACKED_BAR series
   stroke?: string | never;
   strokeConfig?: SeriesStroke;
   metadata?: Record<string, any>[];
