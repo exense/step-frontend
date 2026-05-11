@@ -30,10 +30,12 @@ export class GridControlToolComponent {
   readonly layoutDeletePermission = input<string>();
   readonly layoutSharedWritePermission = input<string>();
   readonly layoutSharedDeletePermission = input<string>();
-  readonly extraItem = input<string | undefined>();
+  readonly selectedExtraItem = input<string | undefined>();
   readonly extraItemChange = output<string | undefined>();
 
   readonly extraItems = input<KeyValue<string, string>[]>([]);
+
+  readonly hintEditGrid = input<string>();
 
   protected readonly extraItemsKeys = computed(() => {
     const extraItems = this.extraItems();
@@ -42,9 +44,9 @@ export class GridControlToolComponent {
   });
 
   protected readonly selectedPresetId = linkedSignal(() => {
-    const extraItem = this.extraItem();
+    const selectedExtraItem = this.selectedExtraItem();
     const preset = this._widgetPersistence.selectedPreset();
-    return extraItem ?? preset?.id;
+    return selectedExtraItem ?? preset?.id;
   });
 
   protected readonly isExtraItemSelected = computed(() => {
@@ -70,8 +72,7 @@ export class GridControlToolComponent {
   protected readonly canEditGrid = computed(() => {
     const canSave = this.canSave();
     const canDeleteCurrentLayout = this.canOverrideCurrentLayout();
-    const isExtraItemSelected = this.isExtraItemSelected();
-    return !isExtraItemSelected && (canSave || canDeleteCurrentLayout);
+    return canSave || canDeleteCurrentLayout;
   });
 
   protected readonly hasItems = computed(() => {

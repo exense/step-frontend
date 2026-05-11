@@ -17,7 +17,7 @@ export class AltExecutionReportControlsComponent {
   protected _printService = inject(AltExecutionReportPrintService);
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  protected readonly gridExtraItems: KeyValue<string, string>[] = [{ key: 'performance', value: 'Performance' }];
+  protected readonly gridExtraItems: KeyValue<string, string>[] = [{ key: 'performance', value: 'Performance Layout' }];
 
   protected openPerformancePage(extraPresetId?: string): any {
     if (extraPresetId !== 'performance') {

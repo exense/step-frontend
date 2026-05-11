@@ -60,14 +60,8 @@
       </step-suffix>
     }
   } @else if (canEditGrid()) {
-    <step-suffix class="button-suffix">
-      <button
-        type="button"
-        mat-stroked-button
-        (click)="toggleEditMode()"
-        matTooltip="Edit grid"
-        matTooltipPosition="below"
-      >
+    <step-suffix class="button-suffix" [matTooltip]="hintEditGrid()" matTooltipPosition="below">
+      <button type="button" mat-stroked-button [disabled]="isExtraItemSelected()" (click)="toggleEditMode()">
         <step-icon name="settings" />
       </button>
     </step-suffix>
