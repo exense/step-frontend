@@ -465,8 +465,28 @@ export class ExecutionsService {
       url: `/executions/search/last/by/plan/${planId}`,
       mediaType: 'application/json',
       query: {
-        limit, from, to
-      }
+        limit,
+        from,
+        to,
+      },
+    });
+  }
+
+  public getLastExecutionsByCanonicalPlanName(
+    canonicalPlanName: string,
+    limit: number,
+    from?: number,
+    to?: number,
+  ): Observable<Execution[]> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: `/executions/search/last/by/canonical-plan/${canonicalPlanName}`,
+      mediaType: 'application/json',
+      query: {
+        limit,
+        from,
+        to,
+      },
     });
   }
 }

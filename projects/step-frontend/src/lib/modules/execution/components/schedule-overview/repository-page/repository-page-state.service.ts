@@ -13,18 +13,15 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   dashboardDisabledFilters: string[] = ['planId'];
 
   readonly executionsTableFilters = computed(() => {
-    let execution = this.execution();
-    const canonicalPlanName = execution!.importResult!.canonicalPlanName!;
-    if (execution) {
-      return {
-        planIdOrCanonicalPlanName: this._filterConditionFactory.matchAnyFilterCondition({
-          planId: execution.planId!,
-          'importResult.canonicalPlanName': canonicalPlanName,
-        }),
-      } as Record<string, SearchValue>;
-    } else {
-      return {};
-    }
+    const execution = this.getExecutionOrThrow();
+    const canonicalPlanName = this.getCanonicalPlanNameOrThrow();
+
+    return {
+      planIdOrCanonicalPlanName: this._filterConditionFactory.matchAnyFilterCondition({
+        planId: execution.planId!,
+        'importResult.canonicalPlanName': canonicalPlanName,
+      }),
+    } as Record<string, SearchValue>;
   });
 
   getViewType(): CrossExecutionViewType {
@@ -36,12 +33,8 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   getDashboardFilter(): string {
-    let execution = this.execution();
-    if (!execution) {
-      throw new Error('Execution is not already fetched');
-    }
-    const canonicalPlanName = execution.importResult?.canonicalPlanName!;
-    // TODO handle no canonicalPlan
+    const execution = this.getExecutionOrThrow();
+    const canonicalPlanName = this.getCanonicalPlanNameOrThrow();
     return `(attributes.planId = \"${execution.planId}\" or attributes.canonicalPlanName = \"${canonicalPlanName}\")`;
   }
 
@@ -58,12 +51,24 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    let execution = this.execution();
+    return this._executionService.searchByCanonicalPlanName(this.getCanonicalPlanNameOrThrow());
+  }
+
+  private getExecutionOrThrow(): Execution {
+    const execution = this.execution();
     if (!execution) {
-      throw new Error('Execution is not already fetched');
+      throw new Error('Execution is not yet fetched');
     }
-    return this._executionService.searchByCanonicalPlanName(
-      execution.importResult!.canonicalPlanName! || 'empty',
-    );
+
+    return execution;
+  }
+
+  private getCanonicalPlanNameOrThrow(): string {
+    const canonicalPlanName = this.getExecutionOrThrow().importResult?.canonicalPlanName;
+    if (!canonicalPlanName) {
+      throw new Error('Execution canonical plan name is not available');
+    }
+
+    return canonicalPlanName;
   }
 }

@@ -121,7 +121,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     const filter: FieldFilter = {
       field: 'importResult.canonicalPlanName',
       regex: false,
-      value: `${canonicalPlanName}`,
+      value: canonicalPlanName,
     };
     return this._tableApiWrapper
       .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [filter] })
