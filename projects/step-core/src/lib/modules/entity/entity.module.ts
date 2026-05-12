@@ -72,4 +72,3 @@ export * from './types/entity-object';
 export * from './types/entity-meta';
 export * from './types/select-entity-of-type-result.interface';
 export * from './types/select-entity-context.interface';
-export * from './injectables/entity-menu-view-container-ref.token';

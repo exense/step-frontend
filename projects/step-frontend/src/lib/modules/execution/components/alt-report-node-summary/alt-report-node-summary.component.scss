@@ -64,7 +64,16 @@ step-alt-report-node-summary {
       align-items: stretch; // makes all badges fill the same width
     }
   }
+  &.summary-height-2 {
+    step-doughnut-chart {
+      section.chart-container {
+        max-height: 20rem;
+        width: min(20rem, 100%);
+      }
+    }
+  }
 }
+
 @media print {
   step-alt-report-node-summary step-alt-report-widget {
     min-height: 44rem !important;

@@ -22,7 +22,6 @@ import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 import { GridEditableService } from '../../injectables/grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from '../../injectables/grid-layout-config.token';
 import { GridResizerComponent } from '../grid-resizer/grid-resizer.component';
-import { GridElementTitleComponent } from '../grid-element-title/grid-element-title.component';
 import { GridDragHandleComponent } from '../grid-drag-handle/grid-drag-handle.component';
 import { GridBackgroundComponent } from '../grid-background/grid-background.component';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -34,6 +33,8 @@ import { first, forkJoin, switchMap } from 'rxjs';
 interface GridItem {
   widgetId: string;
   widgetType: string;
+  heightInCells: number;
+  isSupported: boolean;
   templateRef?: TemplateRef<any>;
 }
 
@@ -42,7 +43,6 @@ interface GridItem {
   imports: [
     StepBasicsModule,
     GridResizerComponent,
-    GridElementTitleComponent,
     GridDragHandleComponent,
     GridBackgroundComponent,
     GridElementComponent,
@@ -135,8 +135,10 @@ export class GridLayoutComponent implements AfterViewInit {
     const gridItems = widgetPositions.map((position) => {
       const widgetId = position.id;
       const widgetType = position.widgetType;
+      const heightInCells = position.heightInCells;
+      const isSupported = !!this._gridLayoutConfig.defaultElementParamsMap[widgetType];
       const templateRef = templateDictionary[widgetType];
-      return { widgetId, widgetType, templateRef } as GridItem;
+      return { widgetId, widgetType, heightInCells, isSupported, templateRef } as GridItem;
     });
 
     return gridItems.filter((item) => !!item);

@@ -15,7 +15,7 @@ export class BookmarkService implements OnDestroy {
     switchMap(() =>
       this._bookmarksApi.getUserBookmarkTable({
         skip: 0,
-        limit: 0,
+        limit: 100,
         sort: [
           {
             field: 'label',

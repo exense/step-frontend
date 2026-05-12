@@ -48,8 +48,8 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _matDialog = inject(MatDialog);
   private _screenService = inject(ScreensService);
 
-  private apSnippetEditor = viewChild('apSnippetEditor', { read: RichEditorComponent });
-  private librarySnippetEditor = viewChild('librarySnippetEditor', { read: RichEditorComponent });
+  private readonly apSnippetEditor = viewChild('apSnippetEditor', { read: RichEditorComponent });
+  private readonly librarySnippetEditor = viewChild('librarySnippetEditor', { read: RichEditorComponent });
 
   private _dialogData = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA);
 
@@ -90,15 +90,19 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     ? 'New Automation Package'
     : `Edit Automation Package "${this.automationPackage.attributes?.['name'] ?? this.automationPackage.id}"`;
 
+  protected get isAutomationPackageResourceMissing(): boolean {
+    return !this.isNewPackage && !this.automationPackage?.automationPackageResource;
+  }
+
   protected progress$?: Observable<number>;
-  protected showAdvancedSettings = signal(this.hasPrefilledAdvancedSettings());
+  protected readonly showAdvancedSettings = signal(this.hasPrefilledAdvancedSettings());
 
   protected customPlanAttributes: Partial<Plan> = { attributes: {} };
   protected customKeywordAttributes: Partial<Keyword> = { attributes: {} };
   protected routingCriteria: KeyValue<string, string>[] = this.createTokenSelectionCriteria();
 
-  protected apType = signal(UploadType.UPLOAD);
-  protected libraryType = signal(UploadType.UPLOAD);
+  protected readonly apType = signal(UploadType.UPLOAD);
+  protected readonly libraryType = signal(UploadType.UPLOAD);
 
   protected form = this._fb.group({
     apFile: this._fb.control(this.automationPackage?.automationPackageResource ?? '', Validators.required),
@@ -117,7 +121,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       ),
     ),
   });
-  private apFileName = toSignal(this.form.controls.apFile.valueChanges, {
+  private readonly apFileName = toSignal(this.form.controls.apFile.valueChanges, {
     initialValue: this.form.controls.apFile.value,
   });
   protected readonly isApFileEmpty = computed(() => {
@@ -125,7 +129,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     return !apFileName.trim();
   });
 
-  private libraryFileName = toSignal(this.form.controls.libraryFile.valueChanges, {
+  private readonly libraryFileName = toSignal(this.form.controls.libraryFile.valueChanges, {
     initialValue: this.form.controls.libraryFile.value,
   });
   protected readonly isLibraryFileEmpty = computed(() => {

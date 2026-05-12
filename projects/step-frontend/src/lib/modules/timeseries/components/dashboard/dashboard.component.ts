@@ -49,7 +49,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
+import { forkJoin, map, merge, Observable, of, Subscription, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -101,7 +101,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
-  readonly id = input.required<string>(); // dashboard id
+  id = input.required<string>(); // dashboard id
   @Input() storageId?: string; // for persistence across views
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
@@ -130,6 +130,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected editMode = false;
   protected metricTypes?: MetricType[];
   protected hasWritePermission = false;
+  protected emptyItemIds = new Set<string>();
 
   protected mainEngine!: DashboardStateEngine;
   protected compareEngine?: DashboardStateEngine;
@@ -199,6 +200,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.contextSettingsChanged.emit(context);
           this.fullRangeSelected = context.isFullRangeSelected();
         });
+        merge(
+          context.onGroupingChange(),
+          context.onFilteringChange(),
+          context.onChartsResolutionChange(),
+          context.onTimeSelectionChange(),
+          context.onFullRangeChange(),
+        )
+          .pipe(takeUntilDestroyed(this._destroyRef))
+          .subscribe(() => this.emptyItemIds.clear());
         this.contextSettingsInit.emit(context);
         context.onTimeSelectionChange().subscribe((range) => {
           this.zoomChange.emit(range);
@@ -517,6 +527,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return indexedEntities;
       }),
     );
+  }
+
+  protected handleDashletEmptyState(id: string, isEmpty: boolean): void {
+    if (isEmpty) {
+      this.emptyItemIds.add(id);
+    } else {
+      this.emptyItemIds.delete(id);
+    }
   }
 
   protected handleChartDelete(index: number) {
