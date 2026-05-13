@@ -52,7 +52,6 @@ import { DashboardStateEngine } from './dashboard-state-engine';
 import { forkJoin, map, merge, Observable, of, Subscription, tap } from 'rxjs';
 
 //@ts-ignore
-import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
@@ -71,12 +70,12 @@ import { MatTooltip } from '@angular/material/tooltip';
   imports: [
     COMMON_IMPORTS,
     DashboardFilterBarComponent,
-    ChartDashletComponent,
     TimeRangePickerComponent,
-    TableDashletComponent,
     MatProgressSpinner,
     PerformanceViewTimeSelectionComponent,
     MatTooltip,
+    ChartDashletComponent,
+    TableDashletComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -395,8 +394,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.hiddenFilters,
     );
     let disabledFilterOptions: string[] = this.disabledFilterOptions();
-    disabledFilterOptions.forEach(disabledAttribute => {
-      visibleFilters = visibleFilters.filter(f => f.attributeName !== disabledAttribute);
+    disabledFilterOptions.forEach((disabledAttribute) => {
+      visibleFilters = visibleFilters.filter((f) => f.attributeName !== disabledAttribute);
     });
     return this.fetchFilterEntities(visibleFilters).pipe(
       map((empty) => {
