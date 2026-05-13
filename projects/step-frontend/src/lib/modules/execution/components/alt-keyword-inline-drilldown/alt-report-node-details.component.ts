@@ -63,16 +63,9 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
       if (meta?.reportDetailsComponent) {
         return of(undefined);
       }
-      return this._controllerService.getReportNodeChildren(node.id!).pipe(catchError(() => of(undefined)));
+      return this._controllerService.getReportNodesWithErrors(node.id!).pipe(catchError(() => of(undefined)));
     }),
-    map((children: ReportNode[] | undefined) => {
-      return (children ?? []).filter(
-        (child) =>
-          (child._class === 'step.artefacts.reports.AssertReportNode' ||
-            child._class === 'step.artefacts.reports.PerformanceAssertReportNode') &&
-          child.status !== 'PASSED',
-      );
-    }),
+    map((children: ReportNode[] | undefined) => children ?? []),
   );
 
   searchFor($event: string): void {

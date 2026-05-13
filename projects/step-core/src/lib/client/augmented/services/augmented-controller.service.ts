@@ -37,6 +37,14 @@ export class AugmentedControllerService extends ControllerService implements Htt
     });
   }
 
+  getReportNodesWithErrors(id: string): Observable<ReportNode[]> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/controller/reportnode/{id}/reportnodes-with-errors',
+      path: { id },
+    });
+  }
+
   getReportNodes<T extends TableParameters>(tableParameters: T): Observable<ReportNode[]> {
     return this._tableApi
       .requestTable<ReportNode>(this.REPORT_TABLE_ID, {

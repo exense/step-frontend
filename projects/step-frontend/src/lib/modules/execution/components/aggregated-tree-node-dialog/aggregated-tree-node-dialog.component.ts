@@ -16,7 +16,7 @@ import { HashContainer } from '../aggregated-tree-node-history/aggregated-tree-n
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNodeId?: string;
-  resolvedPartialPath?: string;
+  partialTreeRootNodeId?: string;
   reportNodeId?: string;
   searchStatus?: Status;
   searchStatusCount?: number;
@@ -113,7 +113,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
     return { artefactHash: aggregatedNode.artefactHash };
   });
 
-  protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
+  protected readonly partialTreeRootNodeId = this._data.partialTreeRootNodeId;
   protected readonly initialSearchStatus = this._data.searchStatus;
   protected readonly initialSearchStatusCount = this._data.searchStatusCount;
   protected readonly hasData = computed(() => {

@@ -399,7 +399,7 @@ export class AltExecutionProgressComponent
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
-        enrichCallKeywordWithAssertionErrors: true,
+        enrichWithContributingErrors: true,
       } as KeywordParameters;
     }),
     distinctUntilChanged((a, b) => a.eid === b.eid),
@@ -534,7 +534,7 @@ export class AltExecutionProgressComponent
         ),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+      .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeTabState.init(undefined);
           this._aggregatedTreeWidgetState.init(undefined);
@@ -543,8 +543,8 @@ export class AltExecutionProgressComponent
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeTabState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
         this.isTreeInitialized = true;
       });
 

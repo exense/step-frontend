@@ -135,13 +135,13 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
             map((response) => ({
               aggregatedReportView: response?.aggregatedReportView,
-              resolvedPartialPath: response?.resolvedPartialPath,
+              partialTreeRootNodeId: response?.partialTreeRootNodeId,
               reportNode,
             })),
             catchError(() =>
               of({
                 aggregatedReportView: undefined,
-                resolvedPartialPath: undefined,
+                partialTreeRootNodeId: undefined,
                 reportNode,
               }),
             ),
@@ -159,9 +159,9 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           this._treeState.init(undefined);
           return;
         }
-        const { aggregatedReportView, resolvedPartialPath, reportNode } = result;
+        const { aggregatedReportView, partialTreeRootNodeId, reportNode } = result;
 
-        this._treeState.init(aggregatedReportView, { resolvedPartialPath });
+        this._treeState.init(aggregatedReportView, { partialTreeRootNodeId });
 
         const treeNode = this.findTreeNode(reportNode);
 

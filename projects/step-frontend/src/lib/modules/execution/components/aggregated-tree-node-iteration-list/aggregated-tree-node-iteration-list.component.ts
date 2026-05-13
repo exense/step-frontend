@@ -89,7 +89,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   readonly node = input.required<AggregatedTreeNode>();
   readonly initialStatus = input<Status | undefined>(undefined);
   readonly initialStatusCount = input<number | undefined>(undefined);
-  readonly resolvedPartialPath = input<string | undefined>(undefined);
+  readonly partialTreeRootNodeId = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
   readonly openTreeView = output<ReportNode>();
@@ -102,8 +102,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
-    const resolvedPartialPath = this.resolvedPartialPath();
-    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath);
+    const partialTreeRootNodeId = this.partialTreeRootNodeId();
+    return this.getReportNodeDataSource(artefactHash, partialTreeRootNodeId);
   });
 
   private readonly dataSource$ = toObservable(this.dataSource);
@@ -114,7 +114,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
       // omit test case selection in case of tree
-      map((keywordParameters) => ({ ...keywordParameters, testcases: undefined })),
+      map((keywordParameters) => ({ ...keywordParameters, ancestorIds: undefined })),
     ),
   );
 
@@ -220,15 +220,17 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(statuses);
   }
 
-  private getReportNodeDataSource(artefactHash?: string, resolvedPartialPath?: string): TableDataSource<ReportNode> {
+  private getReportNodeDataSource(artefactHash?: string, partialTreeRootNodeId?: string): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
       filters = filters ?? {};
       filters['artefactHash'] = artefactHash;
     }
-    if (resolvedPartialPath) {
+    if (partialTreeRootNodeId) {
       filters = filters ?? {};
-      filters['path'] = { value: `^${resolvedPartialPath}`, regex: true };
+      filters['partialTreeRootNodeId'] = this._filterConditionFactory.basicFilterCondition([
+        { oql: `ancestorIds includes ${partialTreeRootNodeId}` },
+      ]);
     }
     return this._dataSourceFactory.createDataSource(
       AugmentedExecutionsService.REPORTS_TABLE_ID,

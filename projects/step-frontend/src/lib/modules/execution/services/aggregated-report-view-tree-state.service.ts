@@ -26,7 +26,7 @@ import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-vi
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions &
-  Pick<AggregatedReport, 'resolvedPartialPath'> & { resetSearch?: boolean };
+  Pick<AggregatedReport, 'partialTreeRootNodeId'> & { resetSearch?: boolean };
 
 const ERROR_STATUSES_SEARCH_VALUE = ERROR_STATUSES.join(' | ');
 
@@ -55,8 +55,8 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.hasErrorsInternal.set(!this.errorsSearchIndex.isEmpty());
   });
 
-  private resolvedPartialPathInternal = signal<string | undefined>(undefined);
-  readonly resolvedPartialPath = this.resolvedPartialPathInternal.asReadonly();
+  private partialTreeRootNodeIdInternal = signal<string | undefined>(undefined);
+  readonly partialTreeRootNodeId = this.partialTreeRootNodeIdInternal.asReadonly();
 
   private searchForErrorsOnlyInternal = signal(false);
   readonly searchForErrorsOnly = this.searchForErrorsOnlyInternal.asReadonly();
@@ -155,7 +155,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
   override init(root?: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);
-    this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
+    this.partialTreeRootNodeIdInternal.set(options?.partialTreeRootNodeId);
     this.searchForErrorsOnlyInternal.set(false);
     this.errorLeafsRootNameInternal.set(undefined);
     this.errorsLeafsSet.set(undefined);

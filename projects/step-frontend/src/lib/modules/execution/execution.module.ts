@@ -839,8 +839,8 @@ export class ExecutionModule {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
                       },
-                      resolvedPartialPath: () =>
-                        inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
+                      partialTreeRootNodeId: () =>
+                        inject(AggregatedReportViewTreeStateContextService).getState().partialTreeRootNodeId(),
                       reportNodeId: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;

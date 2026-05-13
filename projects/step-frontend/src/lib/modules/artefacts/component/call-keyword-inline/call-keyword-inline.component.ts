@@ -57,7 +57,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   });
   protected readonly hasDescription = computed(() => !!this.description());
   protected readonly routingItems = computed(() => this.getRoutingItems(this.reportNode()));
-  protected readonly assertionErrors = computed(() => this.reportNode()?.assertionReportNodesOnError ?? []);
+  protected readonly assertionErrors = computed(() => this.reportNode()?.contributingErrors ?? []);
   protected readonly hasAssertionErrors = computed(() => !!this.assertionErrors().length);
 
   private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {
