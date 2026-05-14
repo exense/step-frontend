@@ -81,6 +81,7 @@ import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-pl
 import { StepPageEvent } from '../../types/step-page-event';
 import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
 import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
+import { TableColumnsRender } from '../../services/table-columns-render';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -117,6 +118,10 @@ enum EmptyState {
     },
     {
       provide: TableReload,
+      useExisting: forwardRef(() => TableComponent),
+    },
+    {
+      provide: TableColumnsRender,
       useExisting: forwardRef(() => TableComponent),
     },
     {
@@ -165,7 +170,8 @@ export class TableComponent<T>
     HasFilter,
     TableHighlightItemContainer,
     TableColumnsDictionaryService,
-    SelectionList<unknown, T>
+    SelectionList<unknown, T>,
+    TableColumnsRender
 {
   private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
@@ -379,7 +385,7 @@ export class TableComponent<T>
     return searchColumnNames.filter((col) => configuredSearchColumnNames.has(col));
   });
 
-  protected handleColumnsChange(): void {
+  redrawColumns(): void {
     this.columnsUpdateTrigger.update((value) => (value + 1) % 10);
     setTimeout(() => {
       if (!this.isInitialized) {

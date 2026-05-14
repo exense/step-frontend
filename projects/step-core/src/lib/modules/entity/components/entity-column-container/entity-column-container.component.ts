@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, forwardRef, input, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CustomColumnsBaseComponent, BaseColumnContainerComponent, ColumnContainer } from '../../../table/table.module';
 import { EntityColumnContext } from '../entity-column/entity-column.component';
 
@@ -18,27 +18,18 @@ import { EntityColumnContext } from '../entity-column/entity-column.component';
   ],
   standalone: false,
 })
-export class EntityColumnContainerComponent extends BaseColumnContainerComponent implements OnChanges {
-  @Input() entityName!: string;
-  @Input() entityPath?: string;
+export class EntityColumnContainerComponent extends BaseColumnContainerComponent {
+  readonly entityName = input.required<string>();
+  readonly entityPath = input<string | undefined>();
+  readonly entityColumnKey = input<string>('entityColumn');
 
-  protected entityContext?: EntityColumnContext;
+  protected readonly entityContext = computed(() => {
+    const entityName = this.entityName();
+    const entityPath = this.entityPath();
 
-  ngOnChanges(changes: SimpleChanges): void {
-    let entityName: string | undefined;
-    let entityPath: string | undefined;
-
-    const cEntityName = changes['entityName'];
-    const cEntityPath = changes['entityPath'];
-
-    if (cEntityName?.previousValue !== cEntityName?.currentValue || cEntityName?.firstChange) {
-      entityName = cEntityName?.currentValue;
+    if (!!entityName && !!entityPath) {
+      return { entityName, entityPath } as EntityColumnContext;
     }
-
-    if (cEntityPath?.previousValue !== cEntityPath?.currentValue || cEntityPath?.firstChange) {
-      entityPath = cEntityPath?.currentValue;
-    }
-
-    this.entityContext = !!entityPath && !!entityName ? { entityName, entityPath } : entityName;
-  }
+    return entityName as EntityColumnContext;
+  });
 }

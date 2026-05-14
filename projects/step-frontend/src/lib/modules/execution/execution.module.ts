@@ -171,6 +171,7 @@ import { ExecutionHistorySectionComponent } from './components/execution-history
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
 
 @NgModule({
   declarations: [
@@ -276,6 +277,7 @@ import { TableCountsToggleComponent } from './components/table-counts-toggle/tab
     AggregatedTreeNodeHistoryComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
     ExecutionHistorySectionComponent,
+    DashletEmptyColumnComponent,
   ],
   imports: [
     StepCommonModule,
@@ -375,6 +377,7 @@ export class ExecutionModule {
     this._dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     this._dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
     this._dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
+    this._dashletRegistry.registerDashlet('executionEntityColumn', DashletEmptyColumnComponent);
 
     this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',

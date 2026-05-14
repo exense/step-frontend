@@ -176,6 +176,7 @@ export * from './shared/table-data-source';
 export * from './types/column-container';
 export * from './services/table-search';
 export * from './services/table-reload';
+export * from './services/table-columns-render';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
