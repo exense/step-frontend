@@ -1,257 +1,274 @@
 @if (dashboard) {
-  <mat-menu #settingsMenu="matMenu">
-    <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
-    <mat-menu #resolutionsMenu="matMenu" class="wide">
-      <div (click)="$event.stopPropagation()" class="resolution-select-container">
-        <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
-      </div>
+  <ng-container [stepEntityRef]="dashboard">
+    <mat-menu #settingsMenu="matMenu">
+      <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
+      <mat-menu #resolutionsMenu="matMenu" class="wide">
+        <div (click)="$event.stopPropagation()" class="resolution-select-container">
+          <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
+        </div>
+      </mat-menu>
+      <button mat-menu-item (click)="exportRawData()">
+        <step-icon name="download" />
+        <span>Export Raw Measurements</span>
+      </button>
+      <button mat-menu-item (click)="resetDashboard()">
+        <step-icon name="refresh-cw" />
+        <span>Reset dashboard</span>
+      </button>
     </mat-menu>
-    <button mat-menu-item (click)="exportRawData()">
-      <step-icon name="download" />
-      <span>Export Raw Measurements</span>
-    </button>
-    <button mat-menu-item (click)="resetDashboard()">
-      <step-icon name="refresh-cw" />
-      <span>Reset dashboard</span>
-    </button>
-  </mat-menu>
 
-  <div class="page-container">
-    <div>
-      @if (compareModeEnabled) {
-        <div class="settings-top-bar">
-          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-        </div>
-      }
-    </div>
-    <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
-      @if (mainEngine.state.context) {
-        <div class="full-width-grow">
-          <div class="time-section-container">
-            <div class="ranger-section" [class.compact]="compareModeEnabled">
-              <step-execution-time-selection
-                #timeSelection
-                [context]="mainEngine.state.context"
-                [showSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
-              />
-            </div>
-            @if (compareModeEnabled) {
-              <div
-                class="round-btn disabled align-with-ranger"
-                mat-icon-button
-                matTooltip="Use the main range picker to adjust"
-              >
-                <step-icon name="clock" />
-              </div>
-            } @else {
-              <div
-                (click)="emitFullRangeUpdateRequest()"
-                class="round-btn grey-border align-with-ranger"
-                [class.disabled]="fullRangeSelected"
-                mat-icon-button
-                matTooltip="Apply selection to the time range picker"
-              >
-                <step-icon name="update-time-selection" />
-              </div>
-            }
-          </div>
-          <div class="tools-bar">
-            <step-ts-dashboard-filter-bar
-              #filterBar
-              [editMode]="editMode"
-              [context]="mainEngine.state.context"
-              [compactView]="compareModeEnabled"
-              [showHiddenFilters]="compareModeEnabled"
-              (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
-              (groupingChange)="handleGroupingChange(mainEngine, $event)"
-              (filtersChange)="handleFiltersChange(mainEngine, $event)"
-            />
-            @if (!compareModeEnabled) {
-              <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-            }
-          </div>
-        </div>
+    <div class="page-container">
+      <div>
         @if (compareModeEnabled) {
-          <div class="dual-columns-container">
-            <div class="time-section-container">
-              <div class="ranger-section" [class.compact]="compareModeEnabled">
-                <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
-              </div>
-              <step-time-range-picker
-                class="align-with-ranger"
-                [compact]="true"
-                [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
-                (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
-                [activeTimeRange]="compareEngine!.state.context.timeRangeSettings.fullRange"
-                [selectOptions]="timeRangeOptions"
-              />
-            </div>
-            <step-ts-dashboard-filter-bar
-              #compareFilterBar
-              [editMode]="editMode"
-              [context]="compareEngine!.state.context"
-              [compactView]="true"
-              (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
-              (groupingChange)="handleGroupingChange(compareEngine!, $event)"
-              (filtersChange)="handleFiltersChange(compareEngine!, $event)"
-            />
+          <div class="settings-top-bar">
+            <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
           </div>
         }
-      }
-    </div>
-
-    @if (mainEngine.state) {
-      <div class="dashlet-container">
-        @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
-          @if (!dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
-            @if (dashlet.type === 'CHART') {
-              <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
-                <step-chart-dashlet
-                  #chart
-                  [editMode]="editMode"
-                  [showExecutionLinks]="showExecutionLinks"
-                  [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
-                  [item]="dashlet"
+      </div>
+      <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
+        @if (mainEngine.state.context) {
+          <div class="full-width-grow">
+            <div class="time-section-container">
+              <div class="ranger-section" [class.compact]="compareModeEnabled">
+                <step-execution-time-selection
+                  #timeSelection
                   [context]="mainEngine.state.context"
-                  [height]="DASHLET_HEIGHT"
-                  (remove)="handleChartDelete(i)"
-                  (shiftLeft)="handleChartShiftLeft(i)"
-                  (shiftRight)="handleChartShiftRight(i)"
-                  (zoomReset)="handleZoomReset()"
-                  (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
+                  [showSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                 />
               </div>
               @if (compareModeEnabled) {
-                <div class="dashlet">
-                  <div class="compare-mode-tag">Compare</div>
+                <div
+                  class="round-btn disabled align-with-ranger"
+                  mat-icon-button
+                  matTooltip="Use the main range picker to adjust"
+                >
+                  <step-icon name="clock" />
+                </div>
+              } @else {
+                <div
+                  (click)="emitFullRangeUpdateRequest()"
+                  class="round-btn grey-border align-with-ranger"
+                  [class.disabled]="fullRangeSelected"
+                  mat-icon-button
+                  matTooltip="Apply selection to the time range picker"
+                >
+                  <step-icon name="update-time-selection" />
+                </div>
+              }
+            </div>
+            <div class="tools-bar">
+              <step-ts-dashboard-filter-bar
+                #filterBar
+                [editMode]="editMode"
+                [context]="mainEngine.state.context"
+                [compactView]="compareModeEnabled"
+                [showHiddenFilters]="compareModeEnabled"
+                (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
+                (groupingChange)="handleGroupingChange(mainEngine, $event)"
+                (filtersChange)="handleFiltersChange(mainEngine, $event)"
+              />
+              @if (!compareModeEnabled) {
+                <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+              }
+            </div>
+          </div>
+          @if (compareModeEnabled) {
+            <div class="dual-columns-container">
+              <div class="time-section-container">
+                <div class="ranger-section" [class.compact]="compareModeEnabled">
+                  <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
+                </div>
+                <step-time-range-picker
+                  class="align-with-ranger"
+                  [compact]="true"
+                  [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
+                  (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
+                  [activeTimeRange]="compareEngine!.state.context.timeRangeSettings.fullRange"
+                  [selectOptions]="timeRangeOptions"
+                />
+              </div>
+              <step-ts-dashboard-filter-bar
+                #compareFilterBar
+                [editMode]="editMode"
+                [context]="compareEngine!.state.context"
+                [compactView]="true"
+                (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
+                (groupingChange)="handleGroupingChange(compareEngine!, $event)"
+                (filtersChange)="handleFiltersChange(compareEngine!, $event)"
+              />
+            </div>
+          }
+        }
+      </div>
+
+      @if (mainEngine.state) {
+        <div class="dashlet-container">
+          @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
+            @if (!dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
+              @if (dashlet.type === 'CHART') {
+                <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
                   <step-chart-dashlet
-                    #compareChart
-                    [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
+                    #chart
                     [editMode]="editMode"
+                    [showExecutionLinks]="showExecutionLinks"
+                    [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                     [item]="dashlet"
-                    [context]="compareEngine!.state.context"
+                    [context]="mainEngine.state.context"
                     [height]="DASHLET_HEIGHT"
                     (remove)="handleChartDelete(i)"
                     (shiftLeft)="handleChartShiftLeft(i)"
                     (shiftRight)="handleChartShiftRight(i)"
+                    (zoomReset)="handleZoomReset()"
+                    (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
+                  />
+                </div>
+                @if (compareModeEnabled) {
+                  <div class="dashlet">
+                    <div class="compare-mode-tag">Compare</div>
+                    <step-chart-dashlet
+                      #compareChart
+                      [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
+                      [editMode]="editMode"
+                      [item]="dashlet"
+                      [context]="compareEngine!.state.context"
+                      [height]="DASHLET_HEIGHT"
+                      (remove)="handleChartDelete(i)"
+                      (shiftLeft)="handleChartShiftLeft(i)"
+                      (shiftRight)="handleChartShiftRight(i)"
+                    />
+                  </div>
+                }
+              } @else if (dashlet.type === 'TABLE') {
+                <div class="dashlet" [class.size-full]="compareModeEnabled || dashlet.size === 2">
+                  <step-table-dashlet
+                    #chart
+                    [item]="dashlet"
+                    [showLoadingSpinnerWhileLoading]="
+                      mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
+                    "
+                    [context]="mainEngine.state.context"
+                    [editMode]="editMode"
+                    (remove)="handleChartDelete(i)"
+                    (shiftLeft)="handleChartShiftLeft(i)"
+                    (shiftRight)="handleChartShiftRight(i)"
+                    (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
                   />
                 </div>
               }
-            } @else if (dashlet.type === 'TABLE') {
-              <div class="dashlet" [class.size-full]="compareModeEnabled || dashlet.size === 2">
-                <step-table-dashlet
-                  #chart
-                  [item]="dashlet"
-                  [showLoadingSpinnerWhileLoading]="
-                    mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
-                  "
-                  [context]="mainEngine.state.context"
-                  [editMode]="editMode"
-                  (remove)="handleChartDelete(i)"
-                  (shiftLeft)="handleChartShiftLeft(i)"
-                  (shiftRight)="handleChartShiftRight(i)"
-                  (emptyStateChange)="handleDashletEmptyState(dashlet.id, $event)"
-                />
-              </div>
             }
           }
-        }
-        @if (!editMode && !dashboard.dashlets.length) {
-          <div class="no-charts-message size-full">Dashboard has no charts.</div>
-        }
-        @if (editMode && metricTypes) {
-          <div class="add-dashlet-container" [style.height.px]="DASHLET_HEIGHT">
-            <div [matMenuTriggerFor]="dashletsMenu">
-              <button mat-raised-button color="primary">
-                <step-icon name="plus" />
-                Add Dashlet
-              </button>
-              <mat-menu #dashletsMenu="matMenu">
-                <button mat-menu-item [matMenuTriggerFor]="chartMetrics">Chart</button>
-                <button mat-menu-item [matMenuTriggerFor]="tableMetrics">Table</button>
-              </mat-menu>
-              <mat-menu #chartMetrics="matMenu">
-                @for (metric of metricTypes; track metric.name) {
-                  <button mat-menu-item (click)="addChartDashlet(metric)">
-                    {{ metric.displayName }}
-                  </button>
-                }
-              </mat-menu>
-              <mat-menu #tableMetrics="matMenu">
-                @for (metric of metricTypes; track metric.name) {
-                  <button mat-menu-item (click)="addTableDashlet(metric)">
-                    {{ metric.displayName }}
-                  </button>
-                }
-              </mat-menu>
+          @if (!editMode && !dashboard.dashlets.length) {
+            <div class="no-charts-message size-full">Dashboard has no charts.</div>
+          }
+          @if (editMode && metricTypes) {
+            <div class="add-dashlet-container" [style.height.px]="DASHLET_HEIGHT">
+              <div [matMenuTriggerFor]="dashletsMenu">
+                <button mat-raised-button color="primary">
+                  <step-icon name="plus" />
+                  Add Dashlet
+                </button>
+                <mat-menu #dashletsMenu="matMenu">
+                  <button mat-menu-item [matMenuTriggerFor]="chartMetrics">Chart</button>
+                  <button mat-menu-item [matMenuTriggerFor]="tableMetrics">Table</button>
+                </mat-menu>
+                <mat-menu #chartMetrics="matMenu">
+                  @for (metric of metricTypes; track metric.name) {
+                    <button mat-menu-item (click)="addChartDashlet(metric)">
+                      {{ metric.displayName }}
+                    </button>
+                  }
+                </mat-menu>
+                <mat-menu #tableMetrics="matMenu">
+                  @for (metric of metricTypes; track metric.name) {
+                    <button mat-menu-item (click)="addTableDashlet(metric)">
+                      {{ metric.displayName }}
+                    </button>
+                  }
+                </mat-menu>
+              </div>
             </div>
-          </div>
-        }
-      </div>
-    }
-  </div>
-
-  <ng-template #settingsButtonsTemplate>
-    <div class="header-buttons-container">
-      @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
-        @if (editMode) {
-          <step-alert class="edit-alert" type="WARNING"
-            >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
-          >
-          <button
-            [disabled]="!dashboard.attributes!['name']"
-            mat-button
-            mat-flat-button
-            color="primary"
-            (click)="saveEditChanges()"
-          >
-            Save
-          </button>
-          <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-        } @else {
-          <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
-            <step-btn-group class="with-borders">
-              <button
-                type="button"
-                mat-stroked-button
-                #menuTrigger="matMenuTrigger"
-                [matMenuTriggerFor]="settingsMenu"
-                [disabled]="!hasWritePermission || compareModeEnabled"
-                (click)="enableEditMode()"
-                matTooltip="Edit"
-              >
-                <step-icon name="edit" />
-              </button>
-            </step-btn-group>
-          </div>
-        }
+          }
+        </div>
       }
-      <step-btn-group
-        class="with-borders"
-        (click)="toggleCompareMode()"
-        [class.compare-btn-active]="compareModeEnabled"
-      >
-        <button
-          type="button"
-          [matTooltip]="compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode'"
-          mat-stroked-button
-        >
-          <step-icon name="bar-chart-2" />
-        </button>
-      </step-btn-group>
-      <step-btn-group class="with-borders">
-        <button
-          type="button"
-          mat-stroked-button
-          #menuTrigger="matMenuTrigger"
-          [matMenuTriggerFor]="settingsMenu"
-          matTooltip="Settings"
-        >
-          <step-icon name="more-horizontal" />
-        </button>
-      </step-btn-group>
     </div>
-  </ng-template>
+
+    <ng-template #settingsButtonsTemplate>
+      <div class="header-buttons-container">
+        @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
+          @if (editMode) {
+            <step-alert class="edit-alert" type="WARNING"
+              >Saving will capture all the current settings, like filters, grouping, and charts settings
+            </step-alert>
+            <button
+              [disabled]="!dashboard.attributes!['name']"
+              mat-button
+              mat-flat-button
+              color="primary"
+              (click)="saveEditChanges()"
+            >
+              Save
+            </button>
+            <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
+          } @else if (dashboard | isEntityBelongsToCurrentProject) {
+            <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
+              <step-btn-group class="with-borders">
+                <button
+                  type="button"
+                  mat-stroked-button
+                  #menuTrigger="matMenuTrigger"
+                  [matMenuTriggerFor]="settingsMenu"
+                  [disabled]="!('dashboard-write' | hasRight | async) || compareModeEnabled"
+                  (click)="enableEditMode()"
+                  matTooltip="Edit"
+                >
+                  <step-icon name="edit" />
+                </button>
+              </step-btn-group>
+            </div>
+          } @else {
+            <step-popover>
+              <step-btn-group class="with-borders">
+                <button type="button" mat-stroked-button [disabled]="true">
+                  <step-icon name="edit" />
+                </button>
+              </step-btn-group>
+              <step-popover-content>
+                This dashboard doesn't belong to currently selected project.
+                @let editorUrl = '/dashboards/' + id();
+                @if (dashboard | entityEditorUrlForProject: editorUrl; as openUrl) {
+                  <a [href]="'#' + openUrl">Open in {{ (dashboard | entityProject)?.name }}</a>
+                }
+              </step-popover-content>
+            </step-popover>
+          }
+        }
+        <step-btn-group
+          class="with-borders"
+          (click)="toggleCompareMode()"
+          [class.compare-btn-active]="compareModeEnabled"
+        >
+          <button
+            type="button"
+            [matTooltip]="compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode'"
+            mat-stroked-button
+          >
+            <step-icon name="bar-chart-2" />
+          </button>
+        </step-btn-group>
+        <step-btn-group class="with-borders">
+          <button
+            type="button"
+            mat-stroked-button
+            #menuTrigger="matMenuTrigger"
+            [matMenuTriggerFor]="settingsMenu"
+            matTooltip="Settings"
+          >
+            <step-icon name="more-horizontal" />
+          </button>
+        </step-btn-group>
+      </div>
+    </ng-template>
+  </ng-container>
 } @else {
   <div class="spinner-container">
     <mat-spinner />

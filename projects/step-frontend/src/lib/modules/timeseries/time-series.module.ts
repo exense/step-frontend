@@ -91,6 +91,7 @@ export class TimeSeriesModule {
               getEditorUrl: (id) => inject(CommonEntitiesUrlsService).dashboardUrl(id),
               getListUrl: () => inject(CommonEntitiesUrlsService).dashboardListUrl(),
               isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchDashboardUrl(url),
+              disableEntityMessage: true,
             }),
             (route: ActivatedRouteSnapshot) => {
               const _dashboardService = inject(DashboardsService);
