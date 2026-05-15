@@ -4,10 +4,15 @@
   </step-alt-report-widget-title>
   @if (_reportNodeListSort.showSort()) {
     <step-alt-report-widget-sort>
-      <step-icon
-        [name]="_reportNodeListSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+      <button
+        type="button"
+        mat-icon-button
         (click)="_reportNodeListSort.toggleSort()"
-      />
+        matTooltip="Sort by execution time"
+        matTooltipPosition="below"
+      >
+        <step-icon [name]="_reportNodeListSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+      </button>
     </step-alt-report-widget-sort>
   }
   <step-alt-report-widget-filter>

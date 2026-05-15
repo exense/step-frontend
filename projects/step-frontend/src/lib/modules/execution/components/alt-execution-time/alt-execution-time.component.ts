@@ -4,6 +4,7 @@ import {
   DateRangeAdapterService,
   DateSingleAdapterService,
   DurationPipe,
+  PopoverMode,
   STEP_DATE_TIME_FORMAT_PROVIDERS,
 } from '@exense/step-core';
 import { DatePipe } from '@angular/common';
@@ -29,6 +30,7 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
+  readonly popoverMode = input(PopoverMode.BOTH);
   readonly mode = input<'chip' | 'text'>('chip');
   readonly displayFormat = input<'auto' | 'date' | 'time'>('auto');
   readonly durationVariant = input<'plain' | 'chip'>('plain');
@@ -105,4 +107,5 @@ export class AltExecutionTimeComponent {
   });
 
   protected readonly isChipMode = computed(() => this.mode() === 'chip');
+  protected readonly PopoverMode = PopoverMode;
 }

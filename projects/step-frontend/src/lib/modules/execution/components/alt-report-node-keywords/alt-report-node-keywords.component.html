@@ -23,6 +23,7 @@
                 [duration]="element.duration"
                 [isRunning]="element.status === 'RUNNING'"
                 [singleUnit]="true"
+                [popoverMode]="PopoverMode.HOVER"
               />
               <step-report-node-icon [node]="element" />
               <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />

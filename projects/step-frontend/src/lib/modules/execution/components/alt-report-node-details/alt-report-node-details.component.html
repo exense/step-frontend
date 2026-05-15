@@ -73,7 +73,13 @@
             <span>Steps</span>
             @if (stepsSort.showSort()) {
               <step-alt-report-widget-sort>
-                <button type="button" mat-icon-button (click)="stepsSort.toggleSort()">
+                <button
+                  type="button"
+                  mat-icon-button
+                  (click)="stepsSort.toggleSort()"
+                  matTooltip="Sort by execution time"
+                  matTooltipPosition="below"
+                >
                   <step-icon [name]="stepsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
                 </button>
               </step-alt-report-widget-sort>

@@ -13,6 +13,7 @@ import {
   AugmentedScreenService,
   FilterConditionFactoryService,
   HighlightedItemExtractor,
+  PopoverMode,
   ReportNode,
   STORE_ALL,
   TableIndicatorMode,
@@ -104,4 +105,6 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
       }),
     );
   }
+
+  protected readonly PopoverMode = PopoverMode;
 }

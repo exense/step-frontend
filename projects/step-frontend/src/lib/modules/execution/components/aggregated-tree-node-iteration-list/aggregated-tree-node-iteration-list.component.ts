@@ -32,6 +32,7 @@ import {
   AlertType,
   TableIndicatorMode,
   HighlightedItemExtractor,
+  PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
@@ -241,4 +242,5 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly AlertType = AlertType;
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly PopoverMode = PopoverMode;
 }
