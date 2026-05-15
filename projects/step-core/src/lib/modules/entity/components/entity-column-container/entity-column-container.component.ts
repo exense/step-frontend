@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, input, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, forwardRef, input } from '@angular/core';
 import { CustomColumnsBaseComponent, BaseColumnContainerComponent, ColumnContainer } from '../../../table/table.module';
 import { EntityColumnContext } from '../entity-column/entity-column.component';
 
