@@ -82,9 +82,6 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 import { UndraggedClickDirective } from './directives/undragged-click.directive';
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
-import { EntityEditorUrlForProjectPipe } from '../entity/pipes/entity-editor-url-for-project.pipe';
-import { EntityProjectPipe } from '../entity/pipes/entity-project.pipe';
-import { IsEntityBelongsToCurrentProjectPipe } from '../entity/pipes/is-entity-belongs-to-current-project.pipe';
 
 @NgModule({
   imports: [

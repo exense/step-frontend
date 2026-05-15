@@ -2,9 +2,9 @@ import { inject, Pipe, PipeTransform } from '@angular/core';
 import { MultipleProjectsService } from '../../basics/step-basics.module';
 
 @Pipe({
-  name: 'isEntityBelongsToCurrentProject',
+  name: 'isEntityInCurrentProject',
 })
-export class IsEntityBelongsToCurrentProjectPipe implements PipeTransform {
+export class IsEntityInCurrentProjectPipe implements PipeTransform {
   private _multipleProjectsService = inject(MultipleProjectsService);
 
   transform<T extends { attributes?: Record<string, string> }>(entity: T): boolean {

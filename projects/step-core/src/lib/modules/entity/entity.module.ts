@@ -18,7 +18,7 @@ import { EntityColumnContainerComponent } from './components/entity-column-conta
 import { EntityRefDirective } from './directives/entity-ref.directive';
 import { EntityEditorUrlForProjectPipe } from './pipes/entity-editor-url-for-project.pipe';
 import { EntityProjectPipe } from './pipes/entity-project.pipe';
-import { IsEntityBelongsToCurrentProjectPipe } from './pipes/is-entity-belongs-to-current-project.pipe';
+import { IsEntityInCurrentProjectPipe } from './pipes/is-entity-in-current-project.pipe';
 
 @NgModule({
   imports: [
@@ -33,7 +33,7 @@ import { IsEntityBelongsToCurrentProjectPipe } from './pipes/is-entity-belongs-t
     EntityRefDirective,
     EntityEditorUrlForProjectPipe,
     EntityProjectPipe,
-    IsEntityBelongsToCurrentProjectPipe,
+    IsEntityInCurrentProjectPipe,
   ],
   declarations: [
     EntityIconComponent,
@@ -59,7 +59,7 @@ import { IsEntityBelongsToCurrentProjectPipe } from './pipes/is-entity-belongs-t
     EntityRefDirective,
     EntityEditorUrlForProjectPipe,
     EntityProjectPipe,
-    IsEntityBelongsToCurrentProjectPipe,
+    IsEntityInCurrentProjectPipe,
   ],
 })
 export class EntityModule {}
@@ -84,7 +84,6 @@ export * from './types/entity-object';
 export * from './types/entity-meta';
 export * from './types/select-entity-of-type-result.interface';
 export * from './types/select-entity-context.interface';
-export * from './directives/entity-ref.directive';
 export * from './pipes/entity-editor-url-for-project.pipe';
 export * from './pipes/entity-project.pipe';
-export * from './pipes/is-entity-belongs-to-current-project.pipe';
+export * from './pipes/is-entity-in-current-project.pipe';

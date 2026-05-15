@@ -209,7 +209,7 @@
               Save
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-          } @else if (dashboard | isEntityBelongsToCurrentProject) {
+          } @else if (dashboard | isEntityInCurrentProject) {
             <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
               <step-btn-group class="with-borders">
                 <button
