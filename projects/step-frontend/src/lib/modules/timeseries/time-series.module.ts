@@ -63,7 +63,7 @@ export class TimeSeriesModule {
     _bulkOperations: DashboardBulkOperationsRegisterService,
   ) {
     _bulkOperations.register();
-    _entityRegistry.register('dashboard', 'Dashboard', { icon: 'dashboard' });
+    _entityRegistry.register('dashboard', 'Dashboard', { icon: 'bar-chart-square-01' });
     _viewRegistry.registerRoute({
       path: 'analytics',
       component: AnalyticsPageComponent,
