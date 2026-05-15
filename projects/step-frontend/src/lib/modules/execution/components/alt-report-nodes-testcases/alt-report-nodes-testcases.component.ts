@@ -88,8 +88,9 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       return;
     }
 
-    if (options && !options?.count) {
-      options!.count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+    if (!options?.count) {
+      options = options ?? {};
+      options.count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
     }
 
     this._executionDialogs.openIterations(node, {
