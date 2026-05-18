@@ -40,7 +40,7 @@ export class AugmentedControllerService extends ControllerService implements Htt
   getReportNodesWithErrors(id: string): Observable<ReportNode[]> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/controller/reportnode/{id}/reportnodes-with-errors',
+      url: '/controller/reportnode/{id}/descendants-with-errors',
       path: { id },
     });
   }
