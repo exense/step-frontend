@@ -1,7 +1,14 @@
 <section matSort [matSortDisableClear]="true" stepElementSize>
   <div>
     <div class="sort-container">
-      <button class="sort-handler" type="button" mat-icon-button (click)="toggleSort()">
+      <button
+        class="sort-handler"
+        type="button"
+        mat-icon-button
+        (click)="toggleSort()"
+        matTooltip="Sort by start time"
+        matTooltipPosition="below"
+      >
         <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
       </button>
     </div>
