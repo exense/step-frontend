@@ -89,7 +89,10 @@ export class SplitAreaComponent implements AfterViewInit, OnDestroy {
     sizeUpdateDebounce = sizeUpdateDebounce ?? untracked(() => this.sizeUpdateDebounce());
     this.sizeUpdateInternal$ = new Subject<void>();
     this.sizeUpdateInternal$.pipe(debounceTime(sizeUpdateDebounce)).subscribe(() => {
-      const size = untracked(() => this.size()) ?? 0;
+      const size = untracked(() => this.size());
+      if (size === undefined) {
+        return;
+      }
       this.sizeChange.emit(size);
     });
   }
