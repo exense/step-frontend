@@ -15,7 +15,7 @@
     [screen]="screen"
     [entitySubPath]="_tableColumns.entityScreenSubPath"
     [options]="_tableColumns.customColumnOptions"
-    (columnsChange)="handleColumnsChange()"
+    (columnsChange)="redrawColumns()"
   />
 }
 <step-columns-placeholders />
