@@ -17,10 +17,12 @@ export class ExecutionHistoryNodesComponent {
   readonly currentNodeSize = input<number>(16);
 
   protected readonly pastNodes: Signal<ExecutionNodeItem[]> = computed(() => {
-    return this.execution().historyResults?.map((item) => {
-      const color = this._statusColors[item.result!];
-      return { id: item.id, status: item.result, color: color, startTime: item.startTime };
-    });
+    return (
+      this.execution().historyResults?.map((item) => {
+        const color = this._statusColors[item.result!];
+        return { id: item.id, status: item.result, color: color, startTime: item.startTime } as ExecutionNodeItem;
+      }) || []
+    );
   });
 
   protected readonly currentNode: Signal<ExecutionNodeItem> = computed(() => {
