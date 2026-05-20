@@ -12,7 +12,9 @@ export class AltExecutionAnalyticsControlsComponent {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
-  protected readonly gridExtraItems: KeyValue<string, string>[] = [{ key: 'performance', value: 'Performance Layout' }];
+  protected readonly gridExtraItems: KeyValue<string, string>[] = [
+    { key: 'performance', value: 'Performance Dashboard' },
+  ];
 
   protected openReport(extraPresetId?: string): any {
     if (extraPresetId !== undefined) {
