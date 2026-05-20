@@ -195,12 +195,14 @@
           >
             <step-icon name="stop-circle" aria-hidden="true" />
           </button>
+          @let repositoryObject = element.executionParameters?.repositoryObject;
+          @let isNotLocal = !!repositoryObject && repositoryObject.repositoryID !== 'local';
           <a
             stepTestId="cross-execution-plan-btn"
             mat-icon-button
             matTooltip="Open plan report"
             [disabled]="!('plan-read' | hasRight | async)"
-            [routerLink]="element.executionParameters?.repositoryObject && element.executionParameters?.repositoryObject?.repositoryID !== 'local' ? (element.id | crossExecutionRepositoryUrl) : (element.planId | crossExecutionPlanUrl)"
+            [routerLink]="isNotLocal  ? (element.id | crossExecutionRepositoryUrl) : (element.planId | crossExecutionPlanUrl)"
           >
             <step-icon name="file-07" />
           </a>

@@ -500,10 +500,11 @@ export abstract class CrossExecutionDashboardState {
         entityParams = { planId: this.getEntityId() };
         break;
       case "repository":
-        if (!this.execution()) {
+        let execution = this.execution();
+        if (!execution || !execution.importResult) {
           return;
         }
-        entityParams = { canonicalPlanName: this.execution()!.importResult!.canonicalPlanName };
+        entityParams = { canonicalPlanName: execution!.importResult!.canonicalPlanName };
         break;
 
     }
