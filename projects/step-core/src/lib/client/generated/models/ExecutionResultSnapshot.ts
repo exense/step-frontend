@@ -1,7 +1,10 @@
-export interface ExecutionResultSnapshot {
-  id: string;
-  startTime: number;
-  status:
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+
+export type ExecutionResultSnapshot = {
+  id?: string;
+  status?:
     | 'INITIALIZING'
     | 'IMPORTING'
     | 'ESTIMATING'
@@ -12,7 +15,7 @@ export interface ExecutionResultSnapshot {
     | 'DEPROVISIONING'
     | 'EXPORTING'
     | 'ENDED';
-  result:
+  result?:
     | 'VETOED'
     | 'IMPORT_ERROR'
     | 'TECHNICAL_ERROR'
@@ -22,4 +25,5 @@ export interface ExecutionResultSnapshot {
     | 'SKIPPED'
     | 'NORUN'
     | 'RUNNING';
-}
+  startTime?: number;
+};

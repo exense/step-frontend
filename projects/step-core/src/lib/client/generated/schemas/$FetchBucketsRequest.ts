@@ -58,5 +58,8 @@ export const $FetchBucketsRequest = {
     includeGlobalEntities: {
       type: 'boolean',
     },
+    metricType: {
+      type: 'string',
+    },
   },
 } as const;

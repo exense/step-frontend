@@ -5,6 +5,6 @@
 export type ImportResult = {
   successful?: boolean;
   planId?: string;
-  errors?: Array<string>;
   canonicalPlanName?: string;
+  errors?: Array<string>;
 };

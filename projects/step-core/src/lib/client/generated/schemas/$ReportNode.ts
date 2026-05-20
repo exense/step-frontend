@@ -61,10 +61,10 @@ export const $ReportNode = {
     resolvedArtefact: {
       type: 'AbstractArtefact',
     },
-    orphan: {
+    contributingError: {
       type: 'boolean',
     },
-    contributingError: {
+    orphan: {
       type: 'boolean',
     },
     id: {

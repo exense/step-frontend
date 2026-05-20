@@ -326,6 +326,59 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns the last executions by canonical plan name
+   * @param name
+   * @param limit
+   * @param from
+   * @param to
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getLastExecutionsByCanonicalPlanName(
+    name: string,
+    limit?: number,
+    from?: number,
+    to?: number,
+  ): Observable<Array<Execution>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/search/last/by/canonical-plan/{name}',
+      path: {
+        name: name,
+      },
+      query: {
+        limit: limit,
+        from: from,
+        to: to,
+      },
+    });
+  }
+
+  /**
+   * Returns the last executions by planId
+   * @param id
+   * @param limit
+   * @param from
+   * @param to
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getLastExecutionsByPlan(id: string, limit?: number, from?: number, to?: number): Observable<Array<Execution>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/search/last/by/plan/{id}',
+      path: {
+        id: id,
+      },
+      query: {
+        limit: limit,
+        from: from,
+        to: to,
+      },
+    });
+  }
+
+  /**
    * Returns the last execution triggered by a specific task.
    * @param taskId
    * @param limit
@@ -456,37 +509,6 @@ export class ExecutionsService {
       url: '/executions/bulk/stop',
       body: requestBody,
       mediaType: 'application/json',
-    });
-  }
-
-  public getLastExecutionsByPlan(planId: string, limit: number, from?: number, to?: number): Observable<Execution[]> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: `/executions/search/last/by/plan/${planId}`,
-      mediaType: 'application/json',
-      query: {
-        limit,
-        from,
-        to,
-      },
-    });
-  }
-
-  public getLastExecutionsByCanonicalPlanName(
-    canonicalPlanName: string,
-    limit: number,
-    from?: number,
-    to?: number,
-  ): Observable<Execution[]> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: `/executions/search/last/by/canonical-plan/${canonicalPlanName}`,
-      mediaType: 'application/json',
-      query: {
-        limit,
-        from,
-        to,
-      },
     });
   }
 }
