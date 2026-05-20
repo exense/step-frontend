@@ -9,7 +9,7 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { TreeAction, TreeActionsService, TreeComponent, TreeNode } from '@exense/step-core';
+import { ElementSizeDirective, TreeAction, TreeActionsService, TreeComponent, TreeNode } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
@@ -35,6 +35,7 @@ enum TreeNodeAction {
       useExisting: forwardRef(() => AltExecutionTreeComponent),
     },
   ],
+  hostDirectives: [ElementSizeDirective],
   standalone: false,
 })
 export class AltExecutionTreeComponent implements TreeActionsService {
