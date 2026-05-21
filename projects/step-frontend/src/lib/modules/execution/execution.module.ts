@@ -200,6 +200,7 @@ import {
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
+import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
 
 @NgModule({
   declarations: [
@@ -311,6 +312,7 @@ import { AltExecutionAnalyticsControlsComponent } from './components/alt-executi
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
     AltExecutionAnalyticsControlsComponent,
+    DashletEmptyColumnComponent,
   ],
   imports: [
     StepCommonModule,
@@ -434,6 +436,7 @@ export class ExecutionModule {
     this._dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     this._dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
     this._dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
+    this._dashletRegistry.registerDashlet('executionEntityColumn', DashletEmptyColumnComponent);
 
     this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',

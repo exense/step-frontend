@@ -1,23 +1,25 @@
 <div class="header-container">
   <div class="dashboard-title">
     @if (dashboard(); as dashboard) {
-      <div class="name">
-        <step-editable-label
-          [ngModel]="dashboard!.attributes!['name']"
-          (ngModelChange)="onDashboardNameChange($event)"
-          [disabled]="!hasWritePermission || dashboard!.customFields?.['locked']"
-        />
-      </div>
-      <div class="description">
-        <step-editable-textarea-label
-          [(ngModel)]="dashboard!.description"
-          (ngModelChange)="handleDashboardDescriptionChange($event)"
-          [disabled]="!hasWritePermission || dashboard!.customFields?.['locked']"
-          name="description"
-        >
-          <div *stepEditableLabelTemplate>Add description</div>
-        </step-editable-textarea-label>
-      </div>
+      <ng-container [stepEntityRef]="dashboard">
+        <div class="name">
+          <step-editable-label
+            [ngModel]="dashboard!.attributes!['name']"
+            (ngModelChange)="onDashboardNameChange($event)"
+            [disabled]="!('dashboard-write' | hasRight | async) || dashboard!.customFields?.['locked']"
+          />
+        </div>
+        <div class="description">
+          <step-editable-textarea-label
+            [(ngModel)]="dashboard!.description"
+            (ngModelChange)="handleDashboardDescriptionChange($event)"
+            [disabled]="!('dashboard-write' | hasRight | async) || dashboard!.customFields?.['locked']"
+            name="description"
+          >
+            <div *stepEditableLabelTemplate>Add description</div>
+          </step-editable-textarea-label>
+        </div>
+      </ng-container>
     }
   </div>
   <div class="right-section">
