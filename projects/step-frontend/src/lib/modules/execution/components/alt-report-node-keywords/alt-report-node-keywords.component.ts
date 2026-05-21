@@ -75,10 +75,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
     this._dialogs.openIterationDetails(node);
   }
 
-  protected getDescription(node: ReportNode): string | undefined {
-    return this.showFullDescription() ? undefined : node.resolvedArtefact?.description;
-  }
-
   protected toggleCountsCalculation(): void {
     this.calculateCounts.update((value) => !value);
   }

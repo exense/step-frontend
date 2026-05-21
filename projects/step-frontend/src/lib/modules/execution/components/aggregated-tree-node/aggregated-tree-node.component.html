@@ -11,9 +11,10 @@
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
               <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
-              @if (!showFullDescription() && node?.originalArtefact?.description) {
+              @let description = node?.originalArtefact?.description;
+              @if (!showFullDescription() && !!description) {
                 <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">
-                  {{ node?.originalArtefact?.description | treeNodeDescription: false }}
+                  {{ description | treeNodeDescription: false }}
                 </span>
               }
             </div>

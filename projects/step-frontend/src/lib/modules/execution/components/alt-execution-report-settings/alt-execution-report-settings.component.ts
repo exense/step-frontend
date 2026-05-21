@@ -14,18 +14,17 @@ export class AltExecutionReportSettingsComponent {
 
   readonly widgetType = input.required<AltExecutionReportWidgetType>();
 
-  protected readonly detailOptions = this._settings.detailOptions.map((key) => ({
-    key,
-    label: this.getLabel(key),
-  }));
+  protected readonly detailOptions = computed(() => {
+    const widgetType = this.widgetType();
+    return this._settings.detailOptions.map((key) => ({
+      key,
+      label: this.getLabel(key),
+      isChecked: this._settings.isDetailEnabled(widgetType, key),
+    }));
+  });
 
-  protected readonly details = computed(() => this._settings.details(this.widgetType())());
-  protected readonly hasDetails = computed(() => this.details().length > 0);
+  protected readonly hasDetails = computed(() => this.detailOptions().some((option) => option.isChecked));
   protected readonly PopoverMode = PopoverMode;
-
-  protected isChecked(key: AltExecutionReportDetailKey): boolean {
-    return this._settings.isDetailEnabled(this.widgetType(), key);
-  }
 
   protected onToggle(key: AltExecutionReportDetailKey, checked: boolean): void {
     this._settings.updateDetail(this.widgetType(), key, checked);

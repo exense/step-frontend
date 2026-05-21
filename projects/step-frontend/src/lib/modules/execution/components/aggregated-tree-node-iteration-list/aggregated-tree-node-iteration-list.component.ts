@@ -201,10 +201,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.showDetails.emit(node);
   }
 
-  protected getDescription(node: ReportNode): string | undefined {
-    return this.showFullDescription() ? undefined : node.resolvedArtefact?.description;
-  }
-
   protected toggleSort(): void {
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }

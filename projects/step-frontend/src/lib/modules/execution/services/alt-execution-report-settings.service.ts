@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal, signal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal, untracked } from '@angular/core';
 import { GridEditableService, WidgetsPersistenceStateService } from '@exense/step-core';
 import {
   ALT_EXECUTION_REPORT_DETAIL_KEYS,
@@ -6,6 +6,11 @@ import {
   AltExecutionReportWidgetSettings,
   AltExecutionReportWidgetType,
 } from '../shared/alt-execution-report-details';
+
+interface DetailsReadOptions {
+  readonly tracked?: boolean;
+  readonly editMode?: boolean;
+}
 
 @Injectable()
 export class AltExecutionReportSettingsService {
@@ -31,7 +36,8 @@ export class AltExecutionReportSettingsService {
   }
 
   updateDetail(widgetType: AltExecutionReportWidgetType, key: AltExecutionReportDetailKey, enabled: boolean): void {
-    const current = new Set(this.getDetails(widgetType));
+    const editMode = untracked(() => this._gridEditable.editMode());
+    const current = new Set(this.getDetails(widgetType, { tracked: false, editMode }));
     if (enabled) {
       current.add(key);
     } else {
@@ -41,7 +47,7 @@ export class AltExecutionReportSettingsService {
     const details = ALT_EXECUTION_REPORT_DETAIL_KEYS.filter((detailKey) => current.has(detailKey));
     const nextSettings = details.length ? ({ details } as AltExecutionReportWidgetSettings) : undefined;
 
-    if (this._gridEditable.editMode()) {
+    if (editMode) {
       this._widgetsPersistence.updateWidgetSettings(widgetType, nextSettings);
       return;
     }
@@ -57,16 +63,24 @@ export class AltExecutionReportSettingsService {
     });
   }
 
-  private getDetails(widgetType: AltExecutionReportWidgetType): AltExecutionReportDetailKey[] {
-    const viewOverride = this.viewOverrides()[widgetType];
-    const persistedSettings = this._widgetsPersistence.getWidgetSettings(widgetType) as
-      | AltExecutionReportWidgetSettings
-      | undefined;
-    const details = this._gridEditable.editMode()
-      ? (persistedSettings?.details ?? [])
-      : (viewOverride?.details ?? persistedSettings?.details ?? []);
-    return details.filter((detail): detail is AltExecutionReportDetailKey =>
-      ALT_EXECUTION_REPORT_DETAIL_KEYS.includes(detail as AltExecutionReportDetailKey),
-    );
+  private getDetails(
+    widgetType: AltExecutionReportWidgetType,
+    { tracked = true, editMode }: DetailsReadOptions = {},
+  ): AltExecutionReportDetailKey[] {
+    const readDetails = (): AltExecutionReportDetailKey[] => {
+      const isEditMode = editMode ?? this._gridEditable.editMode();
+      const persistedSettings = this._widgetsPersistence.getWidgetSettings(widgetType) as
+        | AltExecutionReportWidgetSettings
+        | undefined;
+      const viewOverride = isEditMode ? undefined : this.viewOverrides()[widgetType];
+      const details = isEditMode
+        ? (persistedSettings?.details ?? [])
+        : (viewOverride?.details ?? persistedSettings?.details ?? []);
+      return details.filter((detail): detail is AltExecutionReportDetailKey =>
+        ALT_EXECUTION_REPORT_DETAIL_KEYS.includes(detail as AltExecutionReportDetailKey),
+      );
+    };
+
+    return tracked ? readDetails() : untracked(readDetails);
   }
 }

@@ -12,8 +12,8 @@
   <step-popover-content>
     <section class="details-settings" (click)="$event.stopPropagation()">
       <strong>Detail levels</strong>
-      @for (option of detailOptions; track option.key) {
-        <mat-checkbox color="primary" [ngModel]="isChecked(option.key)" (ngModelChange)="onToggle(option.key, $event)">
+      @for (option of detailOptions(); track option.key) {
+        <mat-checkbox color="primary" [ngModel]="option.isChecked" (ngModelChange)="onToggle(option.key, $event)">
           {{ option.label }}
         </mat-checkbox>
       }
