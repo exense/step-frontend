@@ -15,6 +15,10 @@ import { EntityMenuItemDirective } from './directives/entity-menu-item.directive
 import { TableModule } from '../table/table.module';
 import { EntityColumnComponent } from './components/entity-column/entity-column.component';
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
+import { EntityRefDirective } from './directives/entity-ref.directive';
+import { EntityEditorUrlForProjectPipe } from './pipes/entity-editor-url-for-project.pipe';
+import { EntityProjectPipe } from './pipes/entity-project.pipe';
+import { IsEntityInCurrentProjectPipe } from './pipes/is-entity-in-current-project.pipe';
 
 @NgModule({
   imports: [
@@ -26,6 +30,10 @@ import { EntityColumnContainerComponent } from './components/entity-column-conta
     EntityMenuComponent,
     EntityMenuContentDirective,
     EntityMenuItemDirective,
+    EntityRefDirective,
+    EntityEditorUrlForProjectPipe,
+    EntityProjectPipe,
+    IsEntityInCurrentProjectPipe,
   ],
   declarations: [
     EntityIconComponent,
@@ -48,6 +56,10 @@ import { EntityColumnContainerComponent } from './components/entity-column-conta
     EntityMenuButtonComponent,
     EntityColumnComponent,
     EntityColumnContainerComponent,
+    EntityRefDirective,
+    EntityEditorUrlForProjectPipe,
+    EntityProjectPipe,
+    IsEntityInCurrentProjectPipe,
   ],
 })
 export class EntityModule {}
@@ -72,3 +84,6 @@ export * from './types/entity-object';
 export * from './types/entity-meta';
 export * from './types/select-entity-of-type-result.interface';
 export * from './types/select-entity-context.interface';
+export * from './pipes/entity-editor-url-for-project.pipe';
+export * from './pipes/entity-project.pipe';
+export * from './pipes/is-entity-in-current-project.pipe';

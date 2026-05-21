@@ -63,7 +63,7 @@ export class TimeSeriesModule {
     _bulkOperations: DashboardBulkOperationsRegisterService,
   ) {
     _bulkOperations.register();
-    _entityRegistry.register('dashboard', 'Dashboard', { icon: 'dashboard' });
+    _entityRegistry.register('dashboard', 'Dashboard', { icon: 'bar-chart-square-01' });
     _viewRegistry.registerRoute({
       path: 'analytics',
       component: AnalyticsPageComponent,
@@ -91,6 +91,7 @@ export class TimeSeriesModule {
               getEditorUrl: (id) => inject(CommonEntitiesUrlsService).dashboardUrl(id),
               getListUrl: () => inject(CommonEntitiesUrlsService).dashboardListUrl(),
               isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchDashboardUrl(url),
+              disableEntityMessage: true,
             }),
             (route: ActivatedRouteSnapshot) => {
               const _dashboardService = inject(DashboardsService);
