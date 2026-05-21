@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Execution, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,16 +14,16 @@ export class ExecutionLegacySwitcherComponent {
   /** @Input() **/
   readonly execution = input<Execution | undefined>();
 
-  protected _executionViewModeService = inject(ExecutionViewModeService);
+  protected readonly _executionViewModeService = inject(ExecutionViewModeService);
 
-  protected isDisabled = computed(() => {
+  protected readonly isDisabled = computed(() => {
     const exec = this.execution();
     return !exec || !this._executionViewModeService.isNewExecutionAvailable(exec);
   });
 
-  protected toggleControl = new FormControl(false);
+  protected readonly toggleControl = new FormControl(false);
 
-  protected forceLegacyReporting = toSignal(this._executionViewModeService.checkForceLegacyReporting(), {
+  protected readonly forceLegacyReporting = toSignal(this._executionViewModeService.checkForceLegacyReporting(), {
     initialValue: false,
   });
 
@@ -35,12 +35,12 @@ export class ExecutionLegacySwitcherComponent {
     });
 
     this.toggleControl.valueChanges.subscribe((enabled) => {
-      this._executionViewModeService.setForceLegacyView(!enabled);
+      this._executionViewModeService.setForceLegacyView(!!enabled);
       window.location.reload();
     });
   }
 
-  private updateToggleState() {
+  private updateToggleState(): void {
     const exec = this.execution();
     if (!exec) {
       this.toggleControl.disable({ emitEvent: false });
@@ -55,7 +55,7 @@ export class ExecutionLegacySwitcherComponent {
 
     this._executionViewModeService
       .getExecutionMode(exec)
-      .pipe(map((mode) => mode !== ExecutionViewMode.LEGACY))
+      .pipe(map((mode) => mode === ExecutionViewMode.LEGACY))
       .subscribe((isLegacyMode) => {
         this.toggleControl.setValue(isLegacyMode, { emitEvent: false });
       });
