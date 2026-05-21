@@ -183,6 +183,7 @@ import { CalcElementWidthAggregatorDirective } from './directives/calc-element-w
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
 
 @NgModule({
   declarations: [
@@ -289,6 +290,7 @@ import { ExecutionHistoryNodeTooltipComponent } from './components/execution-his
     ExecutionHistorySectionComponent,
     ExecutionHistoryNodesComponent,
     ExecutionHistoryNodeTooltipComponent,
+    DashletEmptyColumnComponent,
   ],
   imports: [
     StepCommonModule,
@@ -404,6 +406,7 @@ export class ExecutionModule {
     this._dashletRegistry.registerDashlet('executionTree', DashletExecutionTreeComponent);
     this._dashletRegistry.registerDashlet('executionViz', DashletExecutionVizComponent);
     this._dashletRegistry.registerDashlet('executionError', DashletExecutionErrorsComponent);
+    this._dashletRegistry.registerDashlet('executionEntityColumn', DashletEmptyColumnComponent);
 
     this._viewRegistry.registerDashletAdvanced(
       'executionTabMigrated',
