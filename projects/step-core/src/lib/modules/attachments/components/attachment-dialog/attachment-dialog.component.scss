@@ -60,6 +60,18 @@ step-attachment-dialog {
     overflow: auto;
     display: flex;
     justify-content: center;
+    align-items: center;
+  }
+
+  .image-container {
+    &.zoomed {
+      align-items: flex-start;
+    }
+
+    &.can-zoom:hover .image-zoom-toggle,
+    .image-zoom-toggle:focus-visible {
+      opacity: 1;
+    }
   }
 
   video,
@@ -68,7 +80,33 @@ step-attachment-dialog {
   }
 
   img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
+
+    &.zoomed {
+      width: 100%;
+      max-height: none;
+    }
+  }
+
+  .image-zoom-toggle {
+    position: sticky;
+    top: 1rem;
+    right: 1rem;
+    align-self: flex-start;
+    margin: 1rem 1rem 0 -4.8rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    background: var.$white-transparent;
+    z-index: 1;
+
+    step-icon {
+      color: var.$gray-700;
+    }
   }
 
   video {
