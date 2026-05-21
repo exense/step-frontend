@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, untracked } from '@angular/core';
 import {
+  APP_HOST,
   AugmentedControllerService,
   BaseReportDetailsComponent,
   DateFormat,
@@ -41,6 +42,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _http = inject(HttpClient);
+  private _appHost = inject(APP_HOST);
   private _window = inject(DOCUMENT).defaultView!;
 
   private reportNodesToRender = new Set([
@@ -121,7 +123,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
       switchMap((node) =>
         node?.id
           ? this._http
-              .get<MetricSample[]>(`/rest/raw-samples/metric-samples/${node.id}/aggregated`)
+              .get<MetricSample[]>(`${this._appHost}/rest/raw-samples/metric-samples/${node.id}/aggregated`)
               .pipe(catchError(() => of<MetricSample[]>([])))
           : of<MetricSample[]>([]),
       ),
