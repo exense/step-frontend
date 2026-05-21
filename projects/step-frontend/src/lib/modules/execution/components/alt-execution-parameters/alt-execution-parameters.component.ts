@@ -43,21 +43,25 @@ export class AltExecutionParametersComponent {
     const parameters = this.executionParameters() ?? {};
     const parametersInfo = this.getVisibleExecutionParametersInfo();
 
-    const result = parametersInfo
-      .reduce(
-        (res, screenInput) => {
-          const id = screenInput.input!.id!;
-          const label = screenInput.input!.label!;
-          if (!parameters.hasOwnProperty(id)) {
-            return res.concat(undefined);
-          }
-          const key = label ?? id;
-          const value = parameters[id];
-          return res.concat({ key, value });
-        },
-        [] as (KeyValue<string, string> | undefined)[],
-      )
-      .filter((item) => !!item) as KeyValue<string, string>[];
+    const resolvedParameterIds = new Set<string>();
+    const result = parametersInfo.reduce(
+      (res, screenInput) => {
+        const id = screenInput.input?.id;
+        if (!id || !parameters.hasOwnProperty(id)) {
+          return res;
+        }
+        const label = screenInput.input?.label;
+        const key = label ?? id;
+        const value = parameters[id];
+        resolvedParameterIds.add(id);
+        return res.concat({ key, value });
+      },
+      [] as KeyValue<string, string>[],
+    );
+
+    Object.entries(parameters)
+      .filter(([id]) => !resolvedParameterIds.has(id))
+      .forEach(([key, value]) => result.push({ key, value }));
 
     return result;
   });
