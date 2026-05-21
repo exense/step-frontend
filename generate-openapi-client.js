@@ -88,8 +88,8 @@ async function main() {
 
   shell.sed('-i', '.*Service.*', '', `${GENERATED_CODE_LOCATION}/${CLIENT_MODULE_NAME}.ts`);
   shell.sed('-i', '/rest', 'rest', `${GENERATED_CODE_LOCATION}/StepGeneratedClientModule.ts`);
-  shell.exec(`npx prettier --end-of-line crlf --write ${GENERATED_CODE_LOCATION}/*`);
-  shell.exec(`npx prettier --end-of-line crlf --write ${GENERATED_CODE_LOCATION}/**/*`);
+  shell.exec(`npx prettier --write ${GENERATED_CODE_LOCATION}/*`);
+  shell.exec(`npx prettier --write ${GENERATED_CODE_LOCATION}/**/*`);
   console.log('DONE');
 }
 
