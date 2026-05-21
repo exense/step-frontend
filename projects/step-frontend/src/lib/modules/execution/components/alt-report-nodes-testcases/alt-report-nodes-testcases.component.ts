@@ -90,7 +90,7 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
 
     if (!options?.count) {
       options = options ?? {};
-      options.count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+      options.count = Object.values(item.countByStatus ?? {}).reduce((res, count) => res + count, 0);
     }
 
     this._executionDialogs.openIterations(node, {
