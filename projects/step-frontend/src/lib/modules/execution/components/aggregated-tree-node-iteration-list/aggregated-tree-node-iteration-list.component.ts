@@ -69,13 +69,13 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
 
-  readonly statuses = REPORT_NODE_STATUS;
+  protected readonly statuses = REPORT_NODE_STATUS;
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
-  private matSort = viewChild(MatSort);
+  private readonly matSort = viewChild(MatSort);
 
-  protected sort = signal<SortDirection>('desc');
+  protected readonly sort = signal<SortDirection>('desc');
 
   private effectSort = effect(() => {
     const sort = this.sort();
@@ -91,7 +91,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   readonly openTreeView = output<ReportNode>();
 
-  private artefactHash = computed(() => this.node().artefactHash);
+  private readonly artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -100,7 +100,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   });
 
   private dataSource$ = toObservable(this.dataSource);
-  private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+  private totalItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.totalFiltered$),
+    map((totalItems) => totalItems ?? 0),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
 
@@ -113,7 +116,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly searchCtrl = this._fb.control('');
 
-  private searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
+  private readonly searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
     initialValue: this.searchCtrl.value,
   });
 
@@ -133,7 +136,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  private readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;
@@ -182,10 +185,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     }
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
     return of([PAGE_SIZE]);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getDefaultPageSizeItem(): Observable<number> {
     return of(PAGE_SIZE);
   }
@@ -198,7 +203,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
-  readonly isFilteredByNonPassed = computed(() => {
+  protected readonly isFilteredByNonPassed = computed(() => {
     const statuses = new Set(this.statusCtrlValue());
     return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
   });
