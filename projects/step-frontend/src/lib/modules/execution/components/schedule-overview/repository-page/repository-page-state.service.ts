@@ -1,4 +1,7 @@
-import { CrossExecutionDashboardState, CrossExecutionViewType } from '../cross-execution-dashboard/cross-execution-dashboard-state';
+import {
+  CrossExecutionDashboardState,
+  CrossExecutionViewType,
+} from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { Execution, FilterConditionFactoryService, SearchValue, TimeRange } from '@exense/step-core';
 import { computed, inject, signal, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -33,9 +36,8 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   getDashboardFilter(): string {
-    const execution = this.getExecutionOrThrow();
     const canonicalPlanName = this.getCanonicalPlanNameOrThrow();
-    return `(attributes.planId = \"${execution.planId}\" or attributes.canonicalPlanName = \"${canonicalPlanName}\")`;
+    return `(attributes.canonicalPlanName = \"${canonicalPlanName}\")`;
   }
 
   fetchLastExecution(): Observable<Execution> {
