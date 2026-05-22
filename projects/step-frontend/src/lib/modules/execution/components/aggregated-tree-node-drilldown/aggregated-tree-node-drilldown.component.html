@@ -1,0 +1,241 @@
+<step-stack-view [withOverflow]="true" (removeItem)="removeItem($event, true)">
+  <div *stepStackViewGroupTooltip>
+    <strong>Minimized panels</strong><br />
+    <div>When opening more panels than fit the screen, previous panels will automatically be minimized</div>
+  </div>
+  <div *stepStackViewCloseAll class="close-all">
+    <button mat-icon-button matTooltip="Close drilldown view" matTooltipPosition="left" (click)="handleCloseAll()">
+      <step-icon name="x" />
+    </button>
+  </div>
+  @for (item of stackItems(); track item.id) {
+    @switch (item.type) {
+      @case (StackItemType.ROOT) {
+        @switch ($any(item).rootType) {
+          @case (DrilldownRootType.KEYWORDS) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltReportNodeListSort
+              sortByColumn="executionTime"
+              matSort
+              matSortActive="executionTime"
+              matSortDirection="desc"
+              [matSortDisableClear]="true"
+              stepAltReportNodesProvideKeywords
+              #keywordsSort="AltReportNodeListSort"
+              breadcrumbsTooltip="Click go back to Steps"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="list" />
+                <span>Steps</span>
+              </div>
+              <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
+                <div>
+                  <span>Steps</span>
+                  @if (keywordsSort.showSort()) {
+                    <step-alt-report-widget-sort>
+                      <step-icon
+                        [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+                        (click)="keywordsSort.toggleSort()"
+                      />
+                    </step-alt-report-widget-sort>
+                  }
+                </div>
+                <div>
+                  <step-alt-report-node-status-filter />
+                  <step-alt-report-node-search />
+                </div>
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-report-node-keywords
+                  [selectedReportId]="selectedRootReportNodeId()"
+                  (openDetails)="handleOpenDetails($event, item.id)"
+                />
+              </section>
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Steps"
+                matTooltipPosition="below"
+              >
+                <step-icon name="list" />
+              </button>
+            </step-stack-view-item>
+          }
+          @case (DrilldownRootType.TESTCASES) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltReportNodeListProvideTestcases
+              breadcrumbsTooltip="Click go back to Testcases"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="list" />
+                <span>Testcases</span>
+              </div>
+              <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
+                <div>Test Cases</div>
+                <div>
+                  <step-alt-report-node-status-filter />
+                  <step-alt-report-node-search />
+                </div>
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-report-node-testcases
+                  [selectedId]="selectedAggregatedNodeId()"
+                  (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+                />
+              </section>
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Steps"
+                matTooltipPosition="below"
+              >
+                <step-icon name="list" />
+              </button>
+            </step-stack-view-item>
+          }
+          @case (DrilldownRootType.TREE) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltExecutionTreeWidget
+              breadcrumbsTooltip="Click go back to Execution Tree"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="tree" />
+                <span>Execution Tree</span>
+              </div>
+              <section *stepStackViewItemTitle class="stack-view-title">
+                <div>Execution Tree</div>
+                <step-alt-execution-tree-control-panel />
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-execution-tree
+                  stepAltExecutionTreeSearchFocus
+                  stepTreeAutoChooseVirtualScroll="340px"
+                  [applyVirtualScrollFrom]="150"
+                  [showSpinnerWhileTreeInitialize]="true"
+                  (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+                />
+              </section>
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Execution Tree"
+                matTooltipPosition="below"
+              >
+                <step-icon name="tree" />
+              </button>
+            </step-stack-view-item>
+          }
+        }
+      }
+      @case (StackItemType.AGGREGATED_REPORT_NODE) {
+        <step-stack-view-item
+          [itemId]="item.id"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Iterations)'"
+        >
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="list" />
+            <span>Iterations of {{ $any(item).data.name }}</span>
+          </div>
+          <ng-container *stepStackViewItemTitle>
+            <step-alt-iteration-list-title [node]="$any(item).data" />
+          </ng-container>
+          <section *stepStackViewItemContent>
+            <step-aggregated-tree-node-iteration-list
+              [node]="$any(item).data!"
+              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [initialStatus]="$any(item).searchStatus"
+              [initialStatusCount]="$any(item).searchStatusCount"
+              (showDetails)="handleOpenDetails($event, item.id)"
+            />
+          </section>
+          <button
+            mat-stroked-button
+            class="miniature"
+            *stepStackViewItemMiniature
+            [matTooltip]="'Iterations of ' + $any(item).data.name"
+            matTooltipPosition="below"
+          >
+            <step-icon name="list" />
+          </button>
+        </step-stack-view-item>
+      }
+      @case (StackItemType.REPORT_NODE) {
+        <step-stack-view-item
+          [itemId]="item.id"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Details)'"
+        >
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="sidebar" />
+            <span>Details of {{ $any(item).data.name }}</span>
+          </div>
+          <ng-container *stepStackViewItemTitle>
+            <step-alt-report-node-header [node]="$any(item).data" />
+          </ng-container>
+          <ng-container *stepStackViewItemContent>
+            <step-alt-report-node-details
+              [node]="$any(item).data"
+              [showArtefact]="false"
+              (openDetails)="handleOpenDetails($event, item.id)"
+              (openPartialTree)="handlePartialTree($event, item.id)"
+              (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+            />
+          </ng-container>
+          <button
+            mat-stroked-button
+            class="miniature"
+            *stepStackViewItemMiniature
+            [matTooltip]="'Details of ' + $any(item).data.name"
+            matTooltipPosition="below"
+          >
+            <step-icon name="sidebar" />
+          </button>
+        </step-stack-view-item>
+      }
+      @case (StackItemType.PARTIAL_TREE) {
+        <step-stack-view-item
+          [itemId]="item.id"
+          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Drilldown Tree)'"
+          stepDrilldownPartialTreeState
+        >
+          <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+            <step-icon name="tree" />
+            <span>Drilldown tree of {{ $any(item).data.name }}</span>
+          </div>
+          <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
+            <div>
+              <step-icon name="tree" />
+              <span>{{ $any(item).data.name }}</span>
+            </div>
+            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" />
+          </section>
+          <ng-container *stepStackViewItemContent>
+            <section class="standalone-tree-container">
+              <step-alt-execution-tree-partial
+                [node]="$any(item).data"
+                [noPadding]="true"
+                [showDetailsButton]="true"
+                [autoFocusNode]="false"
+                (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
+              />
+            </section>
+          </ng-container>
+          <button
+            mat-stroked-button
+            class="miniature"
+            *stepStackViewItemMiniature
+            [matTooltip]="'Drilldown tree of ' + $any(item).data.name"
+            matTooltipPosition="below"
+          >
+            <step-icon name="tree" />
+          </button>
+        </step-stack-view-item>
+      }
+    }
+  }
+</step-stack-view>

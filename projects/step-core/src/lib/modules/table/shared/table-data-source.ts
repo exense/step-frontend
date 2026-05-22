@@ -10,7 +10,7 @@ import {
 import { StepPageEvent } from '../types/step-page-event';
 
 export interface TableFilterOptions {
-  search?: { [key: string]: SearchValue };
+  search?: Record<string, SearchValue>;
   filter?: string;
   params?: TableParameters;
 }
@@ -26,7 +26,7 @@ export interface TableGetDataOptions extends TableFilterOptions {
 export interface TableDataSource<T> extends StepDataSource<T> {
   readonly inProgress$: Observable<boolean>;
   readonly hasNext$: Observable<boolean>;
-  readonly totalFiltered$: Observable<number>;
+  readonly totalFiltered$: Observable<number | null>;
   readonly forceNavigateToFirstPage$: Observable<unknown>;
   getTableData(options?: TableGetDataOptions): void;
   getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined;

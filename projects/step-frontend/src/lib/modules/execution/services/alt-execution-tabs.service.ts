@@ -3,17 +3,15 @@ import { Tab } from '@exense/step-core';
 
 export enum STATIC_TABS {
   REPORT = 'report',
-  TREE = 'tree',
   ANALYTICS = 'analytics',
 }
 
 @Injectable()
 export class AltExecutionTabsService {
-  private addedTabs = new Set<string>([STATIC_TABS.REPORT, STATIC_TABS.TREE, STATIC_TABS.ANALYTICS]);
+  private addedTabs = new Set<string>([STATIC_TABS.REPORT, STATIC_TABS.ANALYTICS]);
 
-  private tabsInternal = signal<Tab<string>[]>([
+  private readonly tabsInternal = signal<Tab<string>[]>([
     this.createTab(STATIC_TABS.REPORT, 'Report'),
-    this.createTab(STATIC_TABS.TREE, 'Execution Tree'),
     this.createTab(STATIC_TABS.ANALYTICS, 'Performance'),
   ]);
 

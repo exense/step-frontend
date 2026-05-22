@@ -1,7 +1,6 @@
 <form [formGroup]="saveForm" (submit)="handleSubmit()">
-  <step-modal-window title="Save changes of '{{_dialogData.currentLayoutName}}'">
+  <step-modal-window title="Save changes of '{{ _dialogData.currentLayoutName }}'">
     <div step-modal-window-body>
-
       <h5>Save mode</h5>
       <mat-radio-group formControlName="saveType">
         <mat-radio-button [value]="SaveType.SAVE_AND_OVERRIDE" color="primary" [disabled]="!_dialogData.canOverride"

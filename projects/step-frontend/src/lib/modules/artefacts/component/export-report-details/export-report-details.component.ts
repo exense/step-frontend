@@ -30,16 +30,16 @@ export class ExportReportDetailsComponent extends BaseReportDetailsComponent<Rep
     }
 
     const source: ArtefactInlineItemSource = [
-      { label: 'value', value: artefact.value, itemType: ItemType.configuration },
-      { label: 'file', value: artefact.file, itemType: ItemType.configuration },
+      { label: 'value', value: artefact.value, itemType: ItemType.CONFIGURATION },
+      { label: 'file', value: artefact.file, itemType: ItemType.CONFIGURATION },
     ];
 
     if (artefact.prefix?.value || artefact.prefix?.expression) {
-      source.push({ label: 'prefix', value: artefact.prefix, itemType: ItemType.configuration });
+      source.push({ label: 'prefix', value: artefact.prefix, itemType: ItemType.CONFIGURATION });
     }
 
     if (artefact.filter?.value || artefact.filter?.expression) {
-      source.push({ label: 'filter', value: artefact.filter, itemType: ItemType.configuration });
+      source.push({ label: 'filter', value: artefact.filter, itemType: ItemType.CONFIGURATION });
     }
 
     return this._artefactInlineItems.convert(source);

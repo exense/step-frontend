@@ -1,0 +1,9 @@
+@let item = node();
+<div class="icon-container">
+  <step-icon [name]="item?.icon" [class]="item?.iconClassName" />
+</div>
+<step-aggregated-status
+  [hasDescendantInvocations]="item?.hasDescendantInvocations"
+  [countByStatus]="item?.countByStatus"
+/>
+<span class="name">Iterations of {{ item?.name }}</span>

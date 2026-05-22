@@ -8,8 +8,11 @@
       matTooltip="Switch layout"
       matTooltipPosition="below"
     >
-      @if (!presets().length) {
+      @if (!hasItems()) {
         <mat-option [value]="undefined" disabled>No Layout</mat-option>
+      }
+      @for (item of extraItems(); track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
       }
       @for (preset of presets(); track preset.key) {
         <mat-option [value]="preset.key">{{ preset.value }}</mat-option>
@@ -57,14 +60,8 @@
       </step-suffix>
     }
   } @else if (canEditGrid()) {
-    <step-suffix class="button-suffix">
-      <button
-        type="button"
-        mat-stroked-button
-        (click)="toggleEditMode()"
-        matTooltip="Edit grid"
-        matTooltipPosition="below"
-      >
+    <step-suffix class="button-suffix" [matTooltip]="hintEditGrid()" matTooltipPosition="below">
+      <button type="button" mat-stroked-button [disabled]="isExtraItemSelected()" (click)="toggleEditMode()">
         <step-icon name="settings" />
       </button>
     </step-suffix>

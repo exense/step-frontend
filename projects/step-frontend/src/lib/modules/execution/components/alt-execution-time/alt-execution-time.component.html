@@ -1,5 +1,5 @@
 @if (hasContent()) {
-  <step-popover yPosition="below">
+  <step-popover yPosition="below" [mode]="popoverMode()">
     @if (isChipMode()) {
       <section class="chip-mode">
         <ng-content select="step-alt-execution-time-prefix" />
