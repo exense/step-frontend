@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
 import { IS_SMALL_SCREEN } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +13,6 @@ export class AltExecutionReportControlsComponent {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
-  protected _printService = inject(AltExecutionReportPrintService);
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   protected readonly gridExtraItems: KeyValue<string, string>[] = [
