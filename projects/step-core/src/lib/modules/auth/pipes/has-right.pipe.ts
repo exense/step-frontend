@@ -14,7 +14,7 @@ export class HasRightPipe implements PipeTransform {
 
   private entityChange$ = !this._entityRef ? of(true) : toObservable(this._entityRef.currentEntity);
 
-  transform(right: string): Observable<boolean> {
-    return this.entityChange$.pipe(switchMap(() => this._authService.hasRight$(right, this._injector)));
+  transform(right: string, ignoreEntity?: boolean): Observable<boolean> {
+    return this.entityChange$.pipe(switchMap(() => this._authService.hasRight$(right, this._injector, ignoreEntity)));
   }
 }
