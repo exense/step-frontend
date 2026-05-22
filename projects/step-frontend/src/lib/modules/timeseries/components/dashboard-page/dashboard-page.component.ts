@@ -19,7 +19,7 @@ import { TimeRangePickerComponent } from '../../modules/_common/components/time-
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, of, pairwise, switchMap } from 'rxjs';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { AuthService, DashboardsService, DashboardView, ReloadableDirective, TimeRange } from '@exense/step-core';
+import { DashboardsService, DashboardView, ReloadableDirective, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 interface UrlParams {
@@ -41,12 +41,11 @@ export class DashboardPageComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _dashboardService = inject(DashboardsService);
-  private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activatedRoute = inject(ActivatedRoute);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
-  activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
+  readonly activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
   // Dashboard ID can be provided through route or as component input
   readonly dashboardFromInputId = input<string | null>(null, { alias: 'dashboardId' });
@@ -66,14 +65,12 @@ export class DashboardPageComponent implements OnInit {
     return this.dashboardFromInput() ?? this.dashboardFromRoute();
   });
 
-  showRefreshToggle = input<boolean>(true);
-  refreshInterval = signal<number>(0);
+  readonly showRefreshToggle = input<boolean>(true);
+  readonly refreshInterval = signal<number>(0);
 
-  hasWritePermission = this._authService.hasRight('dashboard-write');
+  readonly isLoading = signal<boolean>(false);
 
-  isLoading = signal<boolean>(false);
-
-  timeRange = computed<TimeRange | undefined>(() => {
+  readonly timeRange = computed<TimeRange | undefined>(() => {
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
       return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
@@ -82,7 +79,7 @@ export class DashboardPageComponent implements OnInit {
     }
   });
 
-  dashboardFetchEffect = effect(() => {
+  private dashboardFetchEffect = effect(() => {
     const dashboard = this.dashboard();
     const activeTimeRangeSelection = this.activeTimeRangeSelection();
     if (dashboard && activeTimeRangeSelection === undefined) {
@@ -111,8 +108,8 @@ export class DashboardPageComponent implements OnInit {
     this.subscribeToUrlNavigation();
   }
 
-  handleDashboardUpdate(dashboard: DashboardView) {
-    // this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
+  handleDashboardUpdate(dashboard: DashboardView): void {
+    // the dashboard is editable. this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
     const mergedDashboard: DashboardView = {
       ...dashboard,
       attributes: this.dashboard!()!.attributes,
@@ -121,12 +118,12 @@ export class DashboardPageComponent implements OnInit {
     this._dashboardService.saveDashboard(mergedDashboard).subscribe((response) => {});
   }
 
-  handleRefreshIntervalChange(interval: number) {
+  handleRefreshIntervalChange(interval: number): void {
     this.refreshInterval.set(interval);
     this._urlParamsService.updateRefreshInterval(interval, false);
   }
 
-  handleFullRangeChanged(range: TimeRange) {
+  handleFullRangeChanged(range: TimeRange): void {
     this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
@@ -139,11 +136,11 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
+  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection): void {
     this.activeTimeRangeSelection.set(pickerSelection);
   }
 
-  handleDashboardSettingsChange(context: TimeSeriesContext) {
+  handleDashboardSettingsChange(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
       this.activeTimeRangeSelection()!,
@@ -151,7 +148,7 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  handleDashboardSettingsInit(context: TimeSeriesContext) {
+  handleDashboardSettingsInit(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
       this.activeTimeRangeSelection()!,
@@ -160,12 +157,12 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  triggerRefresh() {
+  triggerRefresh(): void {
     let rangeSelection = this.activeTimeRangeSelection()!;
     this.activeTimeRangeSelection.set({ ...rangeSelection });
   }
 
-  private subscribeToUrlNavigation() {
+  private subscribeToUrlNavigation(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(
@@ -190,7 +187,7 @@ export class DashboardPageComponent implements OnInit {
       });
   }
 
-  onDashboardNameChange(name: string) {
+  onDashboardNameChange(name: string): void {
     const dashboard = this.dashboard()!;
     if (!name) {
       dashboard.attributes!['name'] = 'Unnamed';
@@ -200,7 +197,7 @@ export class DashboardPageComponent implements OnInit {
     this._dashboardService.saveDashboard(dashboard).subscribe();
   }
 
-  handleDashboardDescriptionChange(description: string) {
+  handleDashboardDescriptionChange(description: string): void {
     let dashboard = this.dashboard()!;
     dashboard.description = description;
     this._dashboardService.saveDashboard(dashboard).subscribe();
