@@ -78,7 +78,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _dateUtils = inject(DateUtilsService);
   private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
 
-  readonly statuses = REPORT_NODE_STATUS;
+  protected readonly statuses = REPORT_NODE_STATUS;
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
@@ -101,6 +101,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   readonly showDetails = output<ReportNode>();
 
   private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
+  readonly openTreeView = output<ReportNode>();
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -109,7 +110,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   });
 
   private dataSource$ = toObservable(this.dataSource);
-  private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+  private totalItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.totalFiltered$),
+    map((totalItems) => totalItems ?? 0),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
 
@@ -191,10 +195,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     }
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
     return of([PAGE_SIZE]);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getDefaultPageSizeItem(): Observable<number> {
     return of(PAGE_SIZE);
   }
@@ -208,7 +214,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
-  readonly isFilteredByNonPassed = computed(() => {
+  protected readonly isFilteredByNonPassed = computed(() => {
     const statuses = new Set(this.statusCtrlValue());
     return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
   });
