@@ -67,6 +67,8 @@
           class="media-container image-container"
           [class.zoomed]="isImageZoomed()"
           [class.can-zoom]="canZoomImage() || isImageZoomed()"
+          [attr.title]="canZoomImage() || isImageZoomed() ? (isImageZoomed() ? 'Fit to height' : 'Fill width') : null"
+          (click)="toggleImageZoom()"
         >
           <img
             #imageElement
@@ -74,19 +76,6 @@
             [class.zoomed]="isImageZoomed()"
             (load)="updateCanZoomImage()"
           />
-          @if (canZoomImage() || isImageZoomed()) {
-            <button
-              type="button"
-              class="image-zoom-toggle"
-              mat-icon-button
-              [attr.aria-label]="isImageZoomed() ? 'Zoom out' : 'Zoom in'"
-              [matTooltip]="isImageZoomed() ? 'Fit to height' : 'Fill width'"
-              matTooltipPosition="below"
-              (click)="toggleImageZoom($event)"
-            >
-              <step-icon [name]="isImageZoomed() ? 'zoom-out' : 'zoom-in'" />
-            </button>
-          }
         </div>
       }
       @case (AttachmentType.VIDEO) {

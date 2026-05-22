@@ -1,8 +1,22 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-attachment-dialog {
+  h1[mat-dialog-title] {
+    padding: 0.6rem 1.6rem 0.4rem !important;
+
+    .header-title {
+      margin-top: 0.6rem;
+      padding-left: 0;
+    }
+  }
+
   .dialog-content {
     padding-bottom: 0 !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    min-height: auto;
+    padding: 1.2rem !important;
   }
 
   div[step-modal-window-title] {
@@ -40,7 +54,7 @@ step-attachment-dialog {
 
   div[step-modal-window-body] {
     width: 100%;
-    height: 60vh;
+    height: 68vh;
   }
 
   &.small {
@@ -66,11 +80,11 @@ step-attachment-dialog {
   .image-container {
     &.zoomed {
       align-items: flex-start;
+      cursor: zoom-out;
     }
 
-    &.can-zoom:hover .image-zoom-toggle,
-    .image-zoom-toggle:focus-visible {
-      opacity: 1;
+    &.can-zoom:not(.zoomed) {
+      cursor: zoom-in;
     }
   }
 
@@ -90,22 +104,6 @@ step-attachment-dialog {
     &.zoomed {
       width: 100%;
       max-height: none;
-    }
-  }
-
-  .image-zoom-toggle {
-    position: sticky;
-    top: 1rem;
-    right: 1rem;
-    align-self: flex-start;
-    margin: 1rem 1rem 0 -4.8rem;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    background: var.$white-transparent;
-    z-index: 1;
-
-    step-icon {
-      color: var.$gray-700;
     }
   }
 

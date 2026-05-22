@@ -121,8 +121,10 @@ export class AttachmentDialogComponent implements OnInit {
     this.canZoomImage.set(!!container && !!image && image.clientWidth < container.clientWidth - 16);
   }
 
-  protected toggleImageZoom(event: MouseEvent): void {
-    event.stopPropagation();
+  protected toggleImageZoom(): void {
+    if (!this.canZoomImage() && !this.isImageZoomed()) {
+      return;
+    }
     this.isImageZoomed.update((isZoomed) => !isZoomed);
     setTimeout(() => this.updateCanZoomImage());
   }

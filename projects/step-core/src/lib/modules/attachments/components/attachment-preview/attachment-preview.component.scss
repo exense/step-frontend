@@ -13,8 +13,20 @@ step-attachment-preview {
   }
 
   &.large {
-    width: 45rem;
-    height: 21rem;
+    width: auto;
+    height: auto;
+    max-width: 35rem;
+    max-height: 35rem;
+    overflow: visible;
+
+    img {
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: 35rem;
+      max-height: 35rem;
+      object-fit: contain;
+    }
   }
 
   &.with-border {
@@ -47,6 +59,7 @@ step-attachment-preview {
     left: 0;
     right: 0;
     padding: 0.3rem 1rem;
+    color: var.$gray-700;
 
     &.overlay {
       background: var.$white-transparent;
