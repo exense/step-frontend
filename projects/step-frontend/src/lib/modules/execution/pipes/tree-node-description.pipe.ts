@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { BREAK_LINE, DEFAULT_DECORATION_INDEX } from '@exense/step-core';
 
+const MATCH_LINEBREAK = /<br\s*\/?>/gi;
+const MATCH_HTML = /<[^>]*>/g;
+
 @Pipe({
   name: 'treeNodeDescription',
   standalone: false,
@@ -22,6 +25,6 @@ export class TreeNodeDescriptionPipe implements PipeTransform {
   }
 
   private stripHtml(value: string): string {
-    return value.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, '');
+    return value.replace(MATCH_LINEBREAK, ' ').replace(MATCH_HTML, '');
   }
 }
