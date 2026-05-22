@@ -324,12 +324,16 @@ export class AltExecutionProgressComponent
     const repoRef = execution?.executionParameters?.repositoryObject;
     const isLocal = repoRef?.repositoryID === 'local';
 
+    if (!testCases) {
+      return undefined;
+    }
+
     const list = testCases
       .map((item) => item.singleInstanceReportNode)
       .filter((item) => !!item && item.status !== 'SKIPPED')
       .map((item) => (isLocal ? item!.artefactID : item!.name));
 
-    if (list.length === testCases.length) {
+    if (!list.length || list.length === testCases.length) {
       return undefined;
     }
 
