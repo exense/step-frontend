@@ -44,6 +44,7 @@
                 <div>
                   <step-alt-report-node-status-filter />
                   <step-alt-report-node-search />
+                  <step-alt-execution-report-settings widgetType="keywordsList" />
                 </div>
               </section>
               <section *stepStackViewItemContent class="root-content">
@@ -117,6 +118,7 @@
                   stepTreeAutoChooseVirtualScroll="340px"
                   [applyVirtualScrollFrom]="150"
                   [showSpinnerWhileTreeInitialize]="true"
+                  [details]="details()"
                   (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
                 />
               </section>
@@ -221,6 +223,7 @@
                 [noPadding]="true"
                 [showDetailsButton]="true"
                 [autoFocusNode]="false"
+                [details]="details()"
                 (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
               />
             </section>
