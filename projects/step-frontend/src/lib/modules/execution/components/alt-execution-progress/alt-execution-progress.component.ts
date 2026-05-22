@@ -1,6 +1,7 @@
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import {
   Component,
+  computed,
   DestroyRef,
   forwardRef,
   inject,
@@ -315,26 +316,28 @@ export class AltExecutionProgressComponent
     map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
   );
+  private readonly testCases = toSignal(this.testCases$, { initialValue: [] });
 
-  protected testCasesForRelaunch$ = this.testCases$.pipe(
-    map((testCases) => testCases.map((item) => item.singleInstanceReportNode).filter((item) => !!item)),
-    map((testCases) => {
-      const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
-      if (list?.length === testCases?.length) {
-        return undefined;
-      }
-      return list;
-    }),
-    map((list) => {
-      if (!list?.length) {
-        return undefined;
-      }
-      return {
-        list,
-        by: 'id',
-      } as IncludeTestcases;
-    }),
-  );
+  protected readonly testCasesForRelaunch = computed(() => {
+    const testCases = this.testCases();
+    const execution = this.execution();
+    const repoRef = execution?.executionParameters?.repositoryObject;
+    const isLocal = repoRef?.repositoryID === 'local';
+
+    const list = testCases
+      .map((item) => item.singleInstanceReportNode)
+      .filter((item) => !!item && item.status !== 'SKIPPED')
+      .map((item) => (isLocal ? item!.artefactID : item!.name));
+
+    if (list.length === testCases.length) {
+      return undefined;
+    }
+
+    return {
+      by: isLocal ? 'id' : 'name',
+      list,
+    } as IncludeTestcases;
+  });
 
   private testCasesDataSource?: TableDataSource<AggregatedReportView>;
   readonly testCasesDataSource$ = this.testCases$.pipe(
