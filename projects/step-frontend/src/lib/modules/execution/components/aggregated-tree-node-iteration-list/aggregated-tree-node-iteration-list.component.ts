@@ -12,6 +12,7 @@ import {
   untracked,
   ViewEncapsulation,
   viewChild,
+  DestroyRef,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
@@ -76,6 +77,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
+  private _destroyRef = inject(DestroyRef);
   private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
 
   protected readonly statuses = REPORT_NODE_STATUS;
@@ -130,15 +132,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     initialValue: this.searchCtrl.value,
   });
 
-  private searchSubscription = this.searchCtrl.valueChanges
-    .pipe(
-      startWith(this.searchCtrl.value),
-      debounceTime(200),
-      map((value) => this._filterConditionFactory.reportNodeFilterCondition((value ?? '').trim())),
-      takeUntilDestroyed(),
-    )
-    .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
-
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
   private effectSyncStatus = effect(() => {
@@ -150,30 +143,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;
-
-  private statusesSubscription = this.statusesCtrl.valueChanges
-    .pipe(
-      startWith(this.statusesCtrl.value),
-      map((statuses) => Array.from(statuses)),
-      takeUntilDestroyed(),
-    )
-    .subscribe((statuses) =>
-      untracked(() => this.tableSearch())?.onSearch?.(
-        'status',
-        this._filterConditionFactory.inFilterCondition(statuses),
-      ),
-    );
-
-  private timeRangeSubscription = this._executionState.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
-    const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
-    const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
-    const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
-    const isManualChange = !!timeRange?.isManualChange;
-    const isForce = isInitialTimeRangeLoad || isManualChange;
-    const hideProgress = !isForce;
-    untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
-    this.initialTimeRangeLoadPending = false;
-  });
 
   protected readonly showCountWarning = computed(() => {
     const initialStatus = this.initialStatus();
@@ -193,6 +162,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     if (treeNodeName) {
       this._renderer.addClass(treeNodeName, 'not-selectable');
     }
+    this.setupSearchSubscriptions();
   }
 
   // eslint-disable-next-line step-lint/component-public-fields
@@ -244,6 +214,41 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
       },
       filters,
     );
+  }
+
+  private setupSearchSubscriptions(): void {
+    this.searchCtrl.valueChanges
+      .pipe(
+        startWith(this.searchCtrl.value),
+        debounceTime(200),
+        map((value) => this._filterConditionFactory.reportNodeFilterCondition((value ?? '').trim())),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
+
+    this.statusesCtrl.valueChanges
+      .pipe(
+        startWith(this.statusesCtrl.value),
+        map((statuses) => Array.from(statuses)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((statuses) =>
+        untracked(() => this.tableSearch())?.onSearch?.(
+          'status',
+          this._filterConditionFactory.inFilterCondition(statuses),
+        ),
+      );
+
+    this._executionState.timeRange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
+      const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
+      const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+      const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
+      const isManualChange = !!timeRange?.isManualChange;
+      const isForce = isInitialTimeRangeLoad || isManualChange;
+      const hideProgress = !isForce;
+      untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
+      this.initialTimeRangeLoadPending = false;
+    });
   }
 
   protected readonly AlertType = AlertType;
