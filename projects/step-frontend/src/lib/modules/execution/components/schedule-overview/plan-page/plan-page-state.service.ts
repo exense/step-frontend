@@ -27,7 +27,7 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
 
   getDashboardFilter(): string {
     const planId = this._planIdFn();
-    return `(attributes.planId = \"${planId}\" or attributes.canonicalPlanName = \"${planId}\")`;
+    return `attributes.planId = \"${planId}\"`;
   }
 
   fetchLastExecution(): Observable<Execution> {
