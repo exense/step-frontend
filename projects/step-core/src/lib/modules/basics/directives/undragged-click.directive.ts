@@ -1,5 +1,6 @@
-import { DestroyRef, Directive, inject, input, output } from '@angular/core';
+import { DestroyRef, Directive, inject, input, output, untracked } from '@angular/core';
 import { ClickGuardService, ClickGuard } from '../injectables/click-guard.service';
+import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepUndraggedClick]',
@@ -12,6 +13,7 @@ import { ClickGuardService, ClickGuard } from '../injectables/click-guard.servic
 })
 export class UndraggedClickDirective {
   private _guardService = inject(ClickGuardService);
+  private _doc = inject(DOCUMENT);
   private _destroyRef = inject(DestroyRef);
 
   private static readonly DEFAULT_DRAG_THRESHOLD = 8;
@@ -24,9 +26,8 @@ export class UndraggedClickDirective {
   private removeWindowListeners?: () => void;
 
   private createGuard(): ClickGuard {
-    return this._guardService.create({
-      dragThreshold: this.dragThreshold() ?? UndraggedClickDirective.DEFAULT_DRAG_THRESHOLD,
-    });
+    const dragThreshold = untracked(() => this.dragThreshold()) ?? UndraggedClickDirective.DEFAULT_DRAG_THRESHOLD;
+    return this._guardService.create({ dragThreshold });
   }
 
   protected handlePointerDown(event: MouseEvent): void {
@@ -54,11 +55,11 @@ export class UndraggedClickDirective {
       this.removeWindowListeners = undefined;
     };
 
-    window.addEventListener('mousemove', move, true);
-    window.addEventListener('mouseup', up, true);
+    this._doc.defaultView?.addEventListener?.('mousemove', move, true);
+    this._doc.defaultView?.addEventListener?.('mouseup', up, true);
     this.removeWindowListeners = () => {
-      window.removeEventListener('mousemove', move, true);
-      window.removeEventListener('mouseup', up, true);
+      this._doc.defaultView?.removeEventListener?.('mousemove', move, true);
+      this._doc.defaultView?.removeEventListener?.('mouseup', up, true);
     };
 
     this._destroyRef.onDestroy(() => {

@@ -55,7 +55,18 @@ export class ArtefactInlineItemUtilsService {
           ? this.prepareTimeValue(config.value as DynamicValueInteger, config.timeValueUnit)
           : this.prepareDynamicValue(config.value);
 
-      const { itemType, icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip, hideColon, margin } = config;
+      const {
+        itemType,
+        icon,
+        iconTooltip,
+        isValueFirst,
+        prefix,
+        suffix,
+        labelTooltip,
+        valueTooltip,
+        hideColon,
+        margin,
+      } = config;
 
       if (label) {
         label.tooltip = labelTooltip;

@@ -1,4 +1,4 @@
-import { Directive, forwardRef, inject, Input } from '@angular/core';
+import { Directive, forwardRef, inject, input, untracked } from '@angular/core';
 import { ItemHoldReceiverService, ItemHoverReceiverService } from '../../basics/step-basics.module';
 import { TableHighlightItemContainer } from '../services/table-highlight-item-container.service';
 
@@ -17,24 +17,24 @@ import { TableHighlightItemContainer } from '../services/table-highlight-item-co
   standalone: false,
 })
 export class HighlightTableRowDirective implements ItemHoverReceiverService, ItemHoldReceiverService {
-  private _tableHighlightItemContainerInjected? = inject(TableHighlightItemContainer, { optional: true });
+  private _tableHighlightItemContainerInjected = inject(TableHighlightItemContainer, { optional: true });
 
-  @Input('stepHighlightTableRow')
-  tableHighlightItemContainerInput?: TableHighlightItemContainer | unknown;
+  readonly tableHighlightItemContainerInput = input<TableHighlightItemContainer | unknown | undefined>(undefined, {
+    alias: 'stepHighlightTableRow',
+  });
 
   private get tableHighlightItemContainer(): TableHighlightItemContainer | undefined {
-    return this._tableHighlightItemContainerInjected ?? this.tableHighlightItemContainerInput ?? undefined;
+    const tableHighlightItemContainerInput = untracked(() =>
+      this.tableHighlightItemContainerInput(),
+    ) as TableHighlightItemContainer;
+    return this._tableHighlightItemContainerInjected ?? tableHighlightItemContainerInput ?? undefined;
   }
 
   receiveHoveredItem(item: unknown): void {
-    if (this.tableHighlightItemContainer) {
-      this.tableHighlightItemContainer.highlightedItem = item;
-    }
+    this.tableHighlightItemContainer?.setHighlightedItem?.(item);
   }
 
   receiveHoldItem(item: unknown): void {
-    if (this.tableHighlightItemContainer) {
-      this.tableHighlightItemContainer.highlightedItem = item;
-    }
+    this.tableHighlightItemContainer?.setHighlightedItem?.(item);
   }
 }

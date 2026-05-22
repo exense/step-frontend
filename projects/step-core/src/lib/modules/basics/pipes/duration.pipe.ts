@@ -81,8 +81,8 @@ export class DurationPipe implements PipeTransform {
     }
 
     return partsToDisplay
-      .filter((item) => !!item)
-      .map((item) => item.displayValue)
+      .map((item) => item?.displayValue)
+      .filter((part) => !!part)
       .join(' ');
   }
 

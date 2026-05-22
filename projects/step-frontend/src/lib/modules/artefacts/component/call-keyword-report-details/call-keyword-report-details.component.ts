@@ -152,7 +152,10 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   private effectRefreshMeasurements = effect(() => {
     const node = this.node();
     const measuresDataSource = untracked(() => this.measuresDataSource());
-    measuresDataSource?.reload?.();
+    // Reload make sense to running status only
+    if (node?.status === 'RUNNING') {
+      measuresDataSource?.reload?.();
+    }
   });
 
   protected copyInput(): void {

@@ -7,6 +7,7 @@ import {
   input,
   OnDestroy,
   OnInit,
+  output,
   signal,
   untracked,
   viewChild,
@@ -20,18 +21,16 @@ import { AggregatedReportViewTreeStateService } from '../../services/aggregated-
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
-import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
-import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { Router } from '@angular/router';
 import { Status } from '../../../_common/shared/status.enum';
+import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
   templateUrl: './alt-execution-tree-partial.component.html',
   styleUrl: './alt-execution-tree-partial.component.scss',
   encapsulation: ViewEncapsulation.None,
-  providers: [AggregatedReportViewTreeSearchFacadeService],
   host: {
     '[class.no-padding]': 'noPadding()',
   },
@@ -43,10 +42,10 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _executionsApi = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
-  private _executionDialogs = inject(AltExecutionDialogsService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
-  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
   private _router = inject(Router);
+
+  readonly openIterations = output<OpenIterationsEvent>();
 
   private readonly isRunningExecution = toSignal(
     this._executionState.execution$.pipe(map((execution) => execution.status === 'RUNNING')),
@@ -98,16 +97,8 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }
 
-  protected openDetails(treeNode: AggregatedTreeNode): void {
-    this._executionDialogs.openIterations(treeNode, {});
-  }
-
-  protected toggleErrorSearch(): void {
-    this._treeState.toggleErrorSearch();
-  }
-
-  protected exitRootCauseSearch(): void {
-    this._treeState.clearErrorLeafs();
+  protected openDetails(node: AggregatedTreeNode): void {
+    this.openIterations.emit({ node, restParams: {} });
   }
 
   private setupTree(): void {

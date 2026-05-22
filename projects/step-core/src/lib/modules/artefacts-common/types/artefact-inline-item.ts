@@ -1,6 +1,6 @@
 export enum ItemType {
-  configuration = 'configuration',
-  result = 'result',
+  CONFIGURATION = 'configuration',
+  RESULT = 'result',
 }
 
 export interface ArtefactInlineItemsResolvableField {

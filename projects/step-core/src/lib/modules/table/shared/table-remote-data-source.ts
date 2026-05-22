@@ -2,6 +2,7 @@ import { CollectionViewer } from '@angular/cdk/collections';
 import {
   BehaviorSubject,
   catchError,
+  concat,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -128,7 +129,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private currentRequestTerminator$?: Subject<void>;
   private requestRef$?: Observable<TableResponseGeneric<T> | null>;
   private _request$ = new BehaviorSubject<RequestContainer<TableRequestData> | undefined>(undefined);
-  private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
+  private _response$: Observable<TableResponseGeneric<T> | null | undefined> = this._request$.pipe(
     tap((x) => {
       this.isSkipOngoingRequest = false;
     }),
@@ -172,16 +173,16 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         shareReplay(1),
       );
 
-      return this.requestRef$;
+      return isProgressTriggered ? concat(of(undefined), this.requestRef$) : this.requestRef$;
     }),
-    startWith(null),
+    startWith(undefined),
     shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
     takeUntil(this._terminator$),
   );
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
-  readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
+  readonly totalFiltered$ = this._response$.pipe(map((r) => (r === undefined ? null : r?.recordsFiltered || 0)));
   readonly hasNext$ = this._response$.pipe(map((r) => r?.hasNext || false));
   readonly forceNavigateToFirstPage$ = this._response$.pipe(
     map((r) => {

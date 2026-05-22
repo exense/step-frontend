@@ -29,27 +29,27 @@ export class RetryIfFailsReportDetailsComponent extends BaseReportDetailsCompone
     const artefact = node?.resolvedArtefact;
     if (artefact) {
       source.push(
-        { label: 'max tries', value: artefact.maxRetries, itemType: ItemType.configuration },
+        { label: 'max tries', value: artefact.maxRetries, itemType: ItemType.CONFIGURATION },
         {
           label: 'grace period',
           value: artefact.gracePeriod,
           timeValueUnit: 'ms',
-          itemType: ItemType.configuration,
+          itemType: ItemType.CONFIGURATION,
         },
         {
           label: 'timeout',
           value: artefact.timeout,
           timeValueUnit: 'ms',
-          itemType: ItemType.configuration,
+          itemType: ItemType.CONFIGURATION,
         },
-        { label: 'release token', value: artefact.releaseTokens, itemType: ItemType.configuration },
-        { label: 'report last try', value: artefact.reportLastTryOnly, itemType: ItemType.configuration },
+        { label: 'release token', value: artefact.releaseTokens, itemType: ItemType.CONFIGURATION },
+        { label: 'report last try', value: artefact.reportLastTryOnly, itemType: ItemType.CONFIGURATION },
       );
     }
     source.push(
-      { label: 'tries', value: node.tries, itemType: ItemType.result },
-      { label: 'skipped', value: node.skipped, itemType: ItemType.result },
-      { label: 'release token', value: node.releasedToken, itemType: ItemType.result },
+      { label: 'tries', value: node.tries, itemType: ItemType.RESULT },
+      { label: 'skipped', value: node.skipped, itemType: ItemType.RESULT },
+      { label: 'release token', value: node.releasedToken, itemType: ItemType.RESULT },
     );
     return this._artefactInlineUtils.convert(source);
   });

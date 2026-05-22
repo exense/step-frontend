@@ -29,8 +29,8 @@ export class SynchronizedReportDetailsComponent extends BaseReportDetailsCompone
       return undefined;
     }
     return this._artefactInlineUtils.convert([
-      { label: 'lock name', value: artefact.lockName, itemType: ItemType.configuration },
-      { label: 'global lock', value: artefact.globalLock, itemType: ItemType.configuration },
+      { label: 'lock name', value: artefact.lockName, itemType: ItemType.CONFIGURATION },
+      { label: 'global lock', value: artefact.globalLock, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }
