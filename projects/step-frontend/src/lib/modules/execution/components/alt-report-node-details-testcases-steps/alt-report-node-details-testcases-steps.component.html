@@ -1,0 +1,10 @@
+<section>
+  <div>
+    <ng-content />
+  </div>
+  <div>
+    <step-alt-report-node-status-filter />
+    <step-alt-report-node-search />
+  </div>
+</section>
+<step-alt-report-node-keywords [selectedReportId]="selectedReportNodeId()" (openDetails)="handleOpenDetails($event)" />

@@ -32,7 +32,13 @@ export class DataSetReportDetailsComponent extends BaseReportDetailsComponent<Re
         return of(undefined);
       }
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource, true).pipe(
-        map((items) => [...items, { label: 'for write', value: artefact?.dataSource?.forWrite, itemType: ItemType.configuration }] as ArtefactInlineItemSource),
+        map(
+          (items) =>
+            [
+              ...items,
+              { label: 'for write', value: artefact?.dataSource?.forWrite, itemType: ItemType.CONFIGURATION },
+            ] as ArtefactInlineItemSource,
+        ),
         map((items) => this._artefactInlineUtils.convert(items)),
       );
     }),

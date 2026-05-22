@@ -47,16 +47,4 @@ step-alt-execution-tree-partial {
       display: inline-flex !important;
     }
   }
-
-  .controls-container {
-    position: absolute;
-    right: 2rem;
-    z-index: 3;
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      background: var.$white;
-    }
-  }
 }

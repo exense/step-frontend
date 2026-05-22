@@ -21,7 +21,7 @@ import { SleepArtefact } from '../../types/sleep.artefact';
 export class SleepReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SleepArtefact>> {
   private _artefactInlineService = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
@@ -30,8 +30,13 @@ export class SleepReportDetailsComponent extends BaseReportDetailsComponent<Repo
     const { duration, unit, releaseTokens } = artefact;
 
     return this._artefactInlineService.convert([
-      { label: 'sleep', value: duration, timeValueUnit: unit.value as TimeUnitDictKey, itemType: ItemType.configuration },
-      { label: 'releaseToken', value: releaseTokens, itemType: ItemType.configuration },
+      {
+        label: 'sleep',
+        value: duration,
+        timeValueUnit: unit.value as TimeUnitDictKey,
+        itemType: ItemType.CONFIGURATION,
+      },
+      { label: 'releaseToken', value: releaseTokens, itemType: ItemType.CONFIGURATION },
     ]);
   });
 }

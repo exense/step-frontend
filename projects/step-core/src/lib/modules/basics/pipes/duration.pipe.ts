@@ -80,7 +80,10 @@ export class DurationPipe implements PipeTransform {
       }
     }
 
-    return partsToDisplay.map((item) => item.displayValue).join(' ');
+    return partsToDisplay
+      .map((item) => item?.displayValue)
+      .filter((part) => !!part)
+      .join(' ');
   }
 
   private createDatePart(duration: Duration, unit: UsedDurationUnit): DatePart {

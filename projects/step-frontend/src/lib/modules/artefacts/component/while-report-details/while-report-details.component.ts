@@ -28,17 +28,17 @@ export class WhileReportDetailsComponent extends BaseReportDetailsComponent<Whil
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        { label: 'condition', value: node.resolvedArtefact.condition, itemType: ItemType.configuration },
-        { label: 'post condition', value: node.resolvedArtefact.postCondition, itemType: ItemType.configuration },
-        { label: 'pacing', value: node.resolvedArtefact.pacing, itemType: ItemType.configuration },
-        { label: 'timeout', value: node.resolvedArtefact.timeout, itemType: ItemType.configuration },
-        { label: 'max iterations', value: node.resolvedArtefact.maxIterations, itemType: ItemType.configuration },
+        { label: 'condition', value: node.resolvedArtefact.condition, itemType: ItemType.CONFIGURATION },
+        { label: 'post condition', value: node.resolvedArtefact.postCondition, itemType: ItemType.CONFIGURATION },
+        { label: 'pacing', value: node.resolvedArtefact.pacing, itemType: ItemType.CONFIGURATION },
+        { label: 'timeout', value: node.resolvedArtefact.timeout, itemType: ItemType.CONFIGURATION },
+        { label: 'max iterations', value: node.resolvedArtefact.maxIterations, itemType: ItemType.CONFIGURATION },
       );
     }
 
     source.push(
-      { label: 'count', value: node.count, itemType: ItemType.result },
-      { label: 'error count', value: node.errorCount, itemType: ItemType.result },
+      { label: 'count', value: node.count, itemType: ItemType.RESULT },
+      { label: 'error count', value: node.errorCount, itemType: ItemType.RESULT },
     );
 
     return this._artefactInlineUtils.convert(source);

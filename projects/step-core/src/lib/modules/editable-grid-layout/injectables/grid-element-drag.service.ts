@@ -4,7 +4,7 @@ import { WidgetsPositionsStateService } from './widgets-positions-state.service'
 import { GridDimensionsService } from './grid-dimensions.service';
 import { gridElementId } from '../types/grid-element-id';
 import { PositionToApply } from '../types/position-to-apply';
-import {GridPoint} from '../types/widget-position';
+import { GridPoint } from '../types/widget-position';
 
 @Injectable()
 export class GridElementDragService implements OnDestroy {
@@ -138,7 +138,7 @@ export class GridElementDragService implements OnDestroy {
 
     const dragPoint: GridPoint = {
       column: this._gridDimensions.determineCellColumn(mouseX - gridRect.x),
-      row
+      row,
     };
 
     const position = originalPosition.clone();

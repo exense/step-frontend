@@ -1,8 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, map, of, switchMap } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, from, map, of, switchMap } from 'rxjs';
 import { CommonEntitiesUrlsService, ControllerService, DialogsService, ReportNode } from '@exense/step-core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+
+export interface PlanNodeDetailsDialogComponentData {
+  reportNode: ReportNode;
+}
 
 @Component({
   selector: 'step-plan-node-details-dialog',
@@ -15,24 +19,20 @@ export class PlanNodeDetailsDialogComponent {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _router = inject(Router);
   private _dialogs = inject(DialogsService);
+  private _dialogRef = inject(MatDialogRef);
+
+  private _dialogData = inject<PlanNodeDetailsDialogComponentData>(MAT_DIALOG_DATA);
+  protected readonly reportNode = this._dialogData.reportNode;
+  protected readonly artefact = this.reportNode.resolvedArtefact;
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
-  private reportNode$ = this._activatedRoute.parent!.data.pipe(
-    map((data) => data['reportNode'] as ReportNode),
-    switchMap((node) => {
-      if (!!node) {
-        return of(node);
-      }
-      const nodeId = this._activatedRoute.snapshot.queryParams['reportNodeId'];
-      return this._api.getReportNode(nodeId).pipe(catchError(() => of(undefined)));
-    }),
-  );
 
-  protected readonly reportNode = toSignal(this.reportNode$);
-  protected readonly artefact = computed(() => this.reportNode()?.resolvedArtefact);
+  protected closeDialog(): void {
+    this._dialogRef.close();
+  }
 
   protected openPlan(): void {
-    const node = this.reportNode();
+    const node = this.reportNode;
     if (!node) {
       return;
     }
@@ -47,7 +47,7 @@ export class PlanNodeDetailsDialogComponent {
           url = `${url}?artefactId=${node.artefactID!}`;
           return url;
         }),
-        switchMap((url) => this._router.navigateByUrl(url)),
+        switchMap((url) => from(this._router.navigateByUrl(url))),
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);
@@ -56,6 +56,10 @@ export class PlanNodeDetailsDialogComponent {
           return of(false);
         }),
       )
-      .subscribe();
+      .subscribe((isSuccess) => {
+        if (isSuccess) {
+          this.closeDialog();
+        }
+      });
   }
 }

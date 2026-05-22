@@ -1,0 +1,31 @@
+<section>
+  <div class="panel-header">
+    @if (viewGroupTooltip(); as viewGroupTooltipTemplate) {
+      <step-popover>
+        <div class="title">
+          <step-icon name="layers" />
+        </div>
+        <step-popover-content>
+          <ng-container *ngTemplateOutlet="viewGroupTooltipTemplate" />
+        </step-popover-content>
+      </step-popover>
+    } @else {
+      <div class="title">
+        <step-icon name="layers" />
+      </div>
+    }
+  </div>
+  <div class="content">
+    @for (item of items(); track item.id) {
+      <div (click)="openView.emit(item.id)">
+        @if (item.miniatureTemplateRef; as miniatureTemplateRef) {
+          <ng-container *ngTemplateOutlet="miniatureTemplateRef" />
+        } @else {
+          <button type="button" mat-stroked-button>
+            {{ item | viewItemDefaultName }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</section>

@@ -14,7 +14,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   AugmentedExecutionsService,
   DateUtilsService,
@@ -32,12 +31,15 @@ import {
   TableDataSource,
   AlertType,
   TableIndicatorMode,
+  HighlightedItemExtractor,
+  PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
+import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
 
 const PAGE_SIZE = 25;
 
@@ -59,6 +61,12 @@ const PAGE_SIZE = 25;
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  hostDirectives: [
+    {
+      directive: AltAggregatedNodeDetailsDirective,
+      inputs: ['node'],
+    },
+  ],
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
   private _fb = inject(FormBuilder).nonNullable;
@@ -68,6 +76,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
+  private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
 
   protected readonly statuses = REPORT_NODE_STATUS;
 
@@ -83,15 +92,16 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
 
-  readonly node = input.required<AggregatedTreeNode>();
+  protected readonly selectedReportNode = signal<ReportNode | undefined>(undefined);
+
+  protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
   readonly initialStatusCount = input<number | undefined>(undefined);
   readonly resolvedPartialPath = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
+  private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
   readonly openTreeView = output<ReportNode>();
-
-  private readonly artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -196,6 +206,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   }
 
   protected openNodeDetails(node: ReportNode): void {
+    this.selectedReportNode.set(node);
     this.showDetails.emit(node);
   }
 
@@ -237,4 +248,5 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly AlertType = AlertType;
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly PopoverMode = PopoverMode;
 }
