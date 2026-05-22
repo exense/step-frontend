@@ -14,12 +14,17 @@ export class AltExecutionReportSettingsComponent {
 
   readonly widgetType = input.required<AltExecutionReportWidgetType>();
 
-  protected readonly detailOptions = computed(() => {
+  private readonly details = computed(() => {
     const widgetType = this.widgetType();
+    return this._settings.details(widgetType)();
+  });
+
+  protected readonly detailOptions = computed(() => {
+    const details = this.details();
     return this._settings.detailOptions.map((key) => ({
       key,
       label: this.getLabel(key),
-      isChecked: this._settings.isDetailEnabled(widgetType, key),
+      isChecked: details.includes(key),
     }));
   });
 
