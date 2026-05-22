@@ -6,5 +6,5 @@ import type { AggregatedReportView } from './AggregatedReportView';
 
 export type AggregatedReport = {
   aggregatedReportView?: AggregatedReportView;
-  partialTreeRootNodeId?: string;
+  resolvedPartialPath?: string;
 };

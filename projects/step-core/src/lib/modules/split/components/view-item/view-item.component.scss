@@ -1,0 +1,40 @@
+step-view-item {
+  height: 100%;
+
+  & > section {
+    height: calc(100% - 1rem);
+    margin: 0.5rem;
+    padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+
+    .item-header {
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: space-between;
+      display: flex;
+      margin-bottom: 1rem;
+
+      & > div:first-child {
+        flex: 1;
+      }
+
+      .item-title {
+        white-space: nowrap;
+        font-size: 1.7rem;
+        font-weight: 500;
+      }
+    }
+
+    .item-content {
+      flex: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+
+  &.is-last > section {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+}

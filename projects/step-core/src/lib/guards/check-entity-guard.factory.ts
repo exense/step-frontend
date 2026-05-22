@@ -13,6 +13,7 @@ export interface CheckProjectGuardConfig {
   isMatchEditorUrl?: (url: string) => boolean;
   getEditorUrl: (id: string, route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => EntityEditLink;
   getEntity: (id: string) => Observable<unknown>;
+  disableEntityMessage?: boolean;
 }
 
 export const checkEntityGuardFactory =
@@ -75,7 +76,7 @@ export const checkEntityGuardFactory =
           return true;
         }
 
-        if (_multipleProjects.isEntityBelongsToCurrentProject(entity)) {
+        if (_multipleProjects.isEntityBelongsToCurrentProject(entity) || config.disableEntityMessage) {
           return true;
         }
 

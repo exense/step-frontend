@@ -28,15 +28,15 @@ export class AssertReportDetailsComponent extends BaseReportDetailsComponent<Ass
     const source: ArtefactInlineItemSource = [];
     if (node.resolvedArtefact) {
       source.push(
-        { label: 'negated', value: node.resolvedArtefact.doNegate, itemType: ItemType.configuration },
-        { label: 'actual', value: node.resolvedArtefact.actual, itemType: ItemType.configuration },
-        { label: 'operator', value: node.resolvedArtefact.operator, itemType: ItemType.configuration },
-        { label: 'expected', value: node.resolvedArtefact.expected, itemType: ItemType.configuration },
+        { label: 'negated', value: node.resolvedArtefact.doNegate, itemType: ItemType.CONFIGURATION },
+        { label: 'actual', value: node.resolvedArtefact.actual, itemType: ItemType.CONFIGURATION },
+        { label: 'operator', value: node.resolvedArtefact.operator, itemType: ItemType.CONFIGURATION },
+        { label: 'expected', value: node.resolvedArtefact.expected, itemType: ItemType.CONFIGURATION },
       );
     }
 
     if (!node.error) {
-      source.push({ label: 'message', value: node.message, itemType: ItemType.result });
+      source.push({ label: 'message', value: node.message, itemType: ItemType.RESULT });
     }
 
     if (!source.length) {

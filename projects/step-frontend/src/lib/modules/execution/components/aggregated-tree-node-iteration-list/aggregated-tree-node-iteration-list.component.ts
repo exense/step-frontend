@@ -14,7 +14,6 @@ import {
   viewChild,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   AugmentedExecutionsService,
   DateUtilsService,
@@ -32,6 +31,7 @@ import {
   TableDataSource,
   AlertType,
   TableIndicatorMode,
+  PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
@@ -40,6 +40,7 @@ import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
+import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
 
 const PAGE_SIZE = 25;
 
@@ -61,6 +62,12 @@ const PAGE_SIZE = 25;
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  hostDirectives: [
+    {
+      directive: AltAggregatedNodeDetailsDirective,
+      inputs: ['node'],
+    },
+  ],
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
   private _fb = inject(FormBuilder).nonNullable;
@@ -71,8 +78,9 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
+  private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
 
-  readonly statuses = REPORT_NODE_STATUS;
+  protected readonly statuses = REPORT_NODE_STATUS;
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
@@ -86,35 +94,39 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
 
-  readonly node = input.required<AggregatedTreeNode>();
+  protected readonly selectedReportNode = signal<ReportNode | undefined>(undefined);
+
+  protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
   readonly initialStatusCount = input<number | undefined>(undefined);
-  readonly partialTreeRootNodeId = input<string | undefined>(undefined);
+  readonly resolvedPartialPath = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
+  private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
   readonly openTreeView = output<ReportNode>();
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly showFullDescription = computed(() =>
     hasAltExecutionReportDetail(this.details(), 'fullDescription'),
   );
 
-  private readonly artefactHash = computed(() => this.node().artefactHash);
-
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
-    const partialTreeRootNodeId = this.partialTreeRootNodeId();
-    return this.getReportNodeDataSource(artefactHash, partialTreeRootNodeId);
+    const resolvedPartialPath = this.resolvedPartialPath();
+    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath);
   });
 
-  private readonly dataSource$ = toObservable(this.dataSource);
-  private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+  private dataSource$ = toObservable(this.dataSource);
+  private totalItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.totalFiltered$),
+    map((totalItems) => totalItems ?? 0),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
 
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
       // omit test case selection in case of tree
-      map((keywordParameters) => ({ ...keywordParameters, ancestorIds: undefined })),
+      map((keywordParameters) => ({ ...keywordParameters, testcases: undefined })),
     ),
   );
 
@@ -189,15 +201,18 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     }
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
     return of([PAGE_SIZE]);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getDefaultPageSizeItem(): Observable<number> {
     return of(PAGE_SIZE);
   }
 
   protected openNodeDetails(node: ReportNode): void {
+    this.selectedReportNode.set(node);
     this.showDetails.emit(node);
   }
 
@@ -205,7 +220,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
-  readonly isFilteredByNonPassed = computed(() => {
+  protected readonly isFilteredByNonPassed = computed(() => {
     const statuses = new Set(this.statusCtrlValue());
     return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
   });
@@ -216,17 +231,15 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(statuses);
   }
 
-  private getReportNodeDataSource(artefactHash?: string, partialTreeRootNodeId?: string): TableDataSource<ReportNode> {
+  private getReportNodeDataSource(artefactHash?: string, resolvedPartialPath?: string): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
       filters = filters ?? {};
       filters['artefactHash'] = artefactHash;
     }
-    if (partialTreeRootNodeId) {
+    if (resolvedPartialPath) {
       filters = filters ?? {};
-      filters['partialTreeRootNodeId'] = this._filterConditionFactory.basicFilterCondition([
-        { oql: `ancestorIds includes ${partialTreeRootNodeId}` },
-      ]);
+      filters['path'] = { value: `^${resolvedPartialPath}`, regex: true };
     }
     return this._dataSourceFactory.createDataSource(
       AugmentedExecutionsService.REPORTS_TABLE_ID,
@@ -241,4 +254,5 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly AlertType = AlertType;
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly PopoverMode = PopoverMode;
 }

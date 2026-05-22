@@ -76,7 +76,6 @@
             data-step-testid="view-dashboard-btn"
             mat-icon-button
             matTooltip="View dashboard"
-            [disabled]="!('dashboard-write' | hasRight | async)"
             [routerLink]="['/', 'dashboards', element.id]"
           >
             <step-icon name="eye" />

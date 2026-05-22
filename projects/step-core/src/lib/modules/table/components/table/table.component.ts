@@ -9,6 +9,7 @@ import {
   forwardRef,
   inject,
   input,
+  linkedSignal,
   signal,
   TemplateRef,
   TrackByFunction,
@@ -25,7 +26,10 @@ import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { SearchColumn } from '../../shared/search-column.interface';
-import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
+import {
+  HighlightedItemExtractor,
+  TableHighlightItemContainer,
+} from '../../services/table-highlight-item-container.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
 import { CustomColumnsComponent } from '../custom-columns/custom-columns.component';
@@ -36,8 +40,6 @@ import { ColumnInfo } from '../../types/column-info';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
 import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
-import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
-import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
 import { TablePartPaginationDirective } from '../../directives/table-part-pagination.directive';
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { TablePartSearchDirective } from '../../directives/table-part-search.directive';
@@ -50,6 +52,7 @@ import { TablePartReloadDirective } from '../../directives/table-part-reload.dir
 import { TableReload } from '../../services/table-reload';
 import { EmptyState } from '../../shared/empty-state.enum';
 import { TablePartIndicatorDirective } from '../../directives/table-part-indicator.directive';
+import { TableColumnsRender } from '../../services/table-columns-render';
 
 @Component({
   selector: 'step-table',
@@ -87,6 +90,10 @@ import { TablePartIndicatorDirective } from '../../directives/table-part-indicat
   ],
   providers: [
     {
+      provide: TableColumnsRender,
+      useExisting: forwardRef(() => TableComponent),
+    },
+    {
       provide: TableHighlightItemContainer,
       useExisting: forwardRef(() => TableComponent),
     },
@@ -101,7 +108,13 @@ import { TablePartIndicatorDirective } from '../../directives/table-part-indicat
   standalone: false,
 })
 export class TableComponent<T>
-  implements AfterViewInit, TableSearch, TableReload, TableHighlightItemContainer, TableColumnsDictionaryService
+  implements
+    AfterViewInit,
+    TableSearch,
+    TableReload,
+    TableHighlightItemContainer,
+    TableColumnsDictionaryService,
+    TableColumnsRender
 {
   private _destroyRef = inject(DestroyRef);
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
@@ -260,7 +273,7 @@ export class TableComponent<T>
     return searchColumnNames.filter((col) => configuredSearchColumnNames.has(col));
   });
 
-  protected handleColumnsChange(): void {
+  redrawColumns(): void {
     this.columnsUpdateTrigger.update((value) => (value + 1) % 10);
     setTimeout(() => {
       if (!this.isInitialized) {
@@ -272,7 +285,14 @@ export class TableComponent<T>
     });
   }
 
-  highlightedItem?: unknown;
+  readonly highlightedItemExtractor = input<HighlightedItemExtractor | undefined>(undefined);
+  readonly highlightedItemInput = input<unknown>(undefined, { alias: 'highlightedItem' });
+
+  protected readonly highlightedItem = linkedSignal(() => this.highlightedItemInput());
+
+  setHighlightedItem(highlightedItem: unknown): void {
+    this.highlightedItem.set(highlightedItem);
+  }
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {
     const dataSource = untracked(() => this._tableDataSource.dataSource());

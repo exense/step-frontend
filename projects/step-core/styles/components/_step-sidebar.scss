@@ -91,7 +91,7 @@ $menu-sub-item-height: 3.2rem;
     position: fixed;
     top: 6.2rem;
     left: 5.6rem;
-    z-index: 3;
+    z-index: 14;
     max-width: 15rem;
     min-width: 15rem;
   }
@@ -109,7 +109,7 @@ $menu-sub-item-height: 3.2rem;
       height: 100%;
       width: 0;
       position: fixed;
-      z-index: 2;
+      z-index: 13;
       top: 0;
       left: 0;
       background-color: map.get($config, background-color);
