@@ -6,6 +6,11 @@
   gap: var(--inline-secondary-icon-gap, 0.5rem);
 }
 
+:host > *:not(:first-child) {
+  margin-left: 2rem;
+  max-width: calc(100% - 2rem);
+}
+
 :host ::ng-deep step-artefact-inline-field-list.detailed-mode {
   width: 100%;
 

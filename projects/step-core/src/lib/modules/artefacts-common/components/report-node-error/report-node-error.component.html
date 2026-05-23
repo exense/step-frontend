@@ -1,6 +1,6 @@
 @if (node(); as node) {
   <step-report-node-icon [node]="node" />
-  <span class="m-left">{{ node?.name }}: </span>
+  <span>{{ node?.name }}: </span>
   @if (node.error; as error) {
     <span class="report-node-text m-left">{{ error.msg }}</span>
   } @else if (node.message) {

@@ -1,8 +1,8 @@
 export const ALT_EXECUTION_REPORT_DETAIL_KEYS = [
-  'attachmentPreview',
-  'agentRouting',
-  'fullInputsOutputs',
   'fullDescription',
+  'fullInputsOutputs',
+  'agentRouting',
+  'attachmentPreview',
 ] as const;
 
 export type AltExecutionReportDetailKey = (typeof ALT_EXECUTION_REPORT_DETAIL_KEYS)[number];

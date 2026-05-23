@@ -37,14 +37,14 @@ export class AltExecutionReportSettingsComponent {
 
   private getLabel(key: AltExecutionReportDetailKey): string {
     switch (key) {
-      case 'attachmentPreview':
-        return 'Attachment preview';
-      case 'agentRouting':
-        return 'Agent routing';
-      case 'fullInputsOutputs':
-        return 'Full Inputs / Outputs';
       case 'fullDescription':
-        return 'Full Description';
+        return 'Description';
+      case 'fullInputsOutputs':
+        return 'Full input / outputs';
+      case 'agentRouting':
+        return 'Routing';
+      case 'attachmentPreview':
+        return 'Attachment previews';
     }
   }
 }
