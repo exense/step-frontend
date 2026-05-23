@@ -82,6 +82,27 @@ step-attachment-dialog {
     width: 100%;
   }
 
+  .text-attachment-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    &.loading {
+      step-rich-editor {
+        visibility: hidden;
+      }
+    }
+  }
+
+  .text-attachment-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var.$gray-100;
+  }
+
   .max-width-600 {
     max-width: 600px;
   }

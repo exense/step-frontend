@@ -5,6 +5,7 @@ import {
   inject,
   model,
   OnInit,
+  signal,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -18,7 +19,7 @@ import { DOCUMENT, NgOptimizedImage } from '@angular/common';
 import { RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { from, map } from 'rxjs';
+import { finalize, from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
@@ -93,6 +94,7 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly scrollDownOnRefresh = model(true);
 
   protected readonly contentCtrl = this._fb.control('');
+  protected readonly isTextContentLoading = signal(false);
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
   protected readonly AttachmentType = AttachmentType;
 
@@ -117,10 +119,14 @@ export class AttachmentDialogComponent implements OnInit {
     if (this.attachmentType !== AttachmentType.TEXT) {
       return;
     }
-    this._resourceService.getResourceContentAsText(this._data.id!).subscribe((content) => {
-      this.contentCtrl.setValue(content);
-      this.richEditor()?.clearSelection?.();
-    });
+    this.isTextContentLoading.set(true);
+    this._resourceService
+      .getResourceContentAsText(this._data.id!)
+      .pipe(finalize(() => this.isTextContentLoading.set(false)))
+      .subscribe((content) => {
+        this.contentCtrl.setValue(content);
+        this.richEditor()?.clearSelection?.();
+      });
   }
 
   protected copyTextContentToClipboard(): void {

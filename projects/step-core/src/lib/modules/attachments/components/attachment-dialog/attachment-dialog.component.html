@@ -74,7 +74,14 @@
         </div>
       }
       @case (AttachmentType.TEXT) {
-        <step-rich-editor #richEditor [formControl]="contentCtrl" />
+        <div class="text-attachment-container" [class.loading]="isTextContentLoading()">
+          <step-rich-editor #richEditor [formControl]="contentCtrl" [printMargin]="false" />
+          @if (isTextContentLoading()) {
+            <div class="text-attachment-loading">
+              <mat-spinner [diameter]="40" />
+            </div>
+          }
+        </div>
       }
       @case (AttachmentType.STREAMING_TEXT) {
         @if (streamingAttachmentLineChunkSize(); as lineChunkSize) {
