@@ -11,6 +11,8 @@ step-attachment-dialog {
   }
 
   .dialog-content {
+    max-height: none;
+    overflow: visible;
     padding-bottom: 0 !important;
   }
 
@@ -81,6 +83,7 @@ step-attachment-dialog {
     &.zoomed {
       align-items: flex-start;
       cursor: zoom-out;
+      overflow: auto;
     }
 
     &.can-zoom:not(.zoomed) {
