@@ -27,6 +27,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
+const IMAGE_ZOOM_PADDING_PX = 16;
 
 @Component({
   selector: 'step-attachment-dialog',
@@ -118,7 +119,12 @@ export class AttachmentDialogComponent implements OnInit {
     }
     const container = this.imageContainer()?.nativeElement;
     const image = this.imageElement()?.nativeElement;
-    this.canZoomImage.set(!!container && !!image && image.clientWidth < container.clientWidth - 16);
+    const containerWidth = container?.clientWidth ?? 0;
+    const imageWidth = image?.clientWidth ?? 0;
+    if (!containerWidth || !imageWidth) {
+      return;
+    }
+    this.canZoomImage.set(imageWidth < containerWidth - IMAGE_ZOOM_PADDING_PX);
   }
 
   protected toggleImageZoom(): void {
