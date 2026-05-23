@@ -22,19 +22,20 @@ export class FileTypeUtilsService {
     if (!type.extension) {
       return res;
     }
-    res.set(type.extension, type);
+    res.set(type.extension.toLowerCase(), type);
     return res;
   }, new Map<string, TypeInfo>());
 
   findByExtension(extension?: string): TypeInfo | undefined {
-    const result = this.extensionsDictionary.get(extension ?? '');
+    const result = this.extensionsDictionary.get(extension?.toLowerCase() ?? '');
     return result?.isCustom ? undefined : result;
   }
 
   findByMimeTypeAndExtension(mimeType?: string, extension?: string): TypeInfo[] {
     let types = this.mimeTypesDictionary.get(mimeType ?? '') ?? [];
     if (extension) {
-      types = types.filter((type) => type.extension === extension);
+      const normalizedExtension = extension.toLowerCase();
+      types = types.filter((type) => type.extension?.toLowerCase() === normalizedExtension);
     }
     return types;
   }
