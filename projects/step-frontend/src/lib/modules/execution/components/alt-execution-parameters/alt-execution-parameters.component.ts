@@ -80,10 +80,6 @@ export class AltExecutionParametersComponent {
       projects.filter((project) => project.global && !!project.projectId).map((project) => project.projectId!),
     );
 
-    if (!globalProjectIds.size) {
-      return this.deduplicateByInputId(parametersInfo, executionProjectId);
-    }
-
     const visibleProjectIds = new Set([executionProjectId, ...globalProjectIds]);
     const visibleParametersInfo = parametersInfo.filter((screenInput) => {
       const screenInputProjectId = screenInput.attributes?.['project'];
