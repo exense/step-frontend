@@ -218,4 +218,14 @@ step-alt-execution-progress {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  max-width: calc(100vw - 4rem);
+  max-height: calc(100vh - 19rem);
+  overflow: hidden;
+
+  step-alt-execution-resolved-parameters,
+  step-execution-agents-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
 }

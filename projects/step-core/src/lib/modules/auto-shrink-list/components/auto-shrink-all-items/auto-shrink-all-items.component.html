@@ -1,4 +1,4 @@
-<step-table [dataSource]="dataSource()">
+<step-table class="compact-rows" [dataSource]="dataSource()">
   <ng-container matColumnDef="key" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Label</th>
     <td mat-cell *matCellDef="let element" class="item-cell">{{ element.key }}</td>

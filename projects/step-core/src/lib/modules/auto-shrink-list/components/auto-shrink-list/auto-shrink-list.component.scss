@@ -58,4 +58,13 @@ step-auto-shrink-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  max-width: calc(100vw - 4rem);
+  max-height: calc(100vh - 19rem);
+  overflow: hidden;
+
+  step-auto-shrink-all-items {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
 }
