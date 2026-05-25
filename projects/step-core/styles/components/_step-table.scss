@@ -141,6 +141,28 @@ step-table {
     @include paddingless-top-bottom-edges;
   }
 
+  &.compact-rows {
+    --mat-table-row-item-container-height: 4rem;
+    --mat-table-header-container-height: 4rem;
+
+    tr.mat-mdc-header-row {
+      height: 4rem;
+    }
+
+    th.mat-mdc-header-cell,
+    td.mat-mdc-cell,
+    td.mat-mdc-footer-cell {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+    }
+
+    thead tr.mat-mdc-header-row {
+      th.mat-mdc-header-cell {
+        border-bottom: none;
+      }
+    }
+  }
+
   &.no-border {
     td,
     th {
