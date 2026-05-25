@@ -5,7 +5,6 @@
 export type FetchBucketsRequest = {
   start?: number;
   end?: number;
-  metricType?: string;
   oqlFilter?: string;
   params?: Record<string, any>;
   groupDimensions?: Array<string>;
@@ -16,4 +15,5 @@ export type FetchBucketsRequest = {
   collectAttributesValuesLimit?: number;
   maxNumberOfSeries?: number;
   includeGlobalEntities?: boolean;
+  metricType?: string;
 };

@@ -4,10 +4,10 @@
 
 import type { Error } from './Error';
 import type { ExecutionParameters } from './ExecutionParameters';
+import type { ExecutionResultSnapshot } from './ExecutionResultSnapshot';
 import type { ExecutiontTaskParameters } from './ExecutiontTaskParameters';
 import type { ImportResult } from './ImportResult';
 import type { ReportExport } from './ReportExport';
-import { ExecutionResultSnapshot } from './ExecutionResultSnapshot';
 import type { Version } from './Version';
 
 export type Execution = {
@@ -49,6 +49,6 @@ export type Execution = {
   resolvedPlanRootNodeId?: string;
   agentsInvolved?: string;
   stepVersion?: Version;
+  historyResults?: Array<ExecutionResultSnapshot>;
   id?: string;
-  historyResults: ExecutionResultSnapshot[];
 };

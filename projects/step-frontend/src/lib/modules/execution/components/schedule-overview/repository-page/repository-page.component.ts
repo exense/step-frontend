@@ -1,22 +1,22 @@
-import { Component, DestroyRef, effect, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PlanPageStateService } from './plan-page-state.service';
 import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
-import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '@exense/step-core';
-import { PLAN_ID } from '../../../services/plan-id.token';
+import { AugmentedPlansService, AugmentedSchedulerService, ExecutionsService, PlansService } from '@exense/step-core';
+import { RepositoryPageStateService } from './repository-page-state.service';
+import { EXECUTION_ID } from '../../../services/execution-id.token';
+import { switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'step-scheduler-page',
-  templateUrl: './plan-page.component.html',
-  styleUrls: ['./plan-page.component.scss'],
+  templateUrl: './repository-page.component.html',
+  styleUrls: ['./repository-page.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
     DashboardUrlParamsService,
     {
-      provide: PLAN_ID,
+      provide: EXECUTION_ID,
       useFactory: () => {
         const _activatedRoute = inject(ActivatedRoute);
         return () => _activatedRoute.snapshot.params?.['id'] ?? '';
@@ -31,19 +31,25 @@ import { PLAN_ID } from '../../../services/plan-id.token';
     },
     {
       provide: CrossExecutionDashboardState,
-      useClass: PlanPageStateService,
+      useClass: RepositoryPageStateService,
     },
   ],
   standalone: false,
 })
-export class PlanPageComponent implements OnInit {
+export class RepositoryPageComponent implements OnInit {
   _state = inject(CrossExecutionDashboardState);
-  readonly _planIdFn = inject(PLAN_ID);
+  readonly _executionIdFn = inject(EXECUTION_ID);
+  private _executionsService = inject(ExecutionsService);
   private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {
-    this._planService.getPlanById(this._planIdFn()).subscribe((plan) => {
-      this._state.plan.set(plan ? plan : null);
-    });
+    this._executionsService
+      .getExecutionById(this._executionIdFn())
+      .pipe(
+        tap((execution) => this._state.execution.set(execution)),
+        switchMap((execution) => this._planService.getPlanById(execution!.planId!)),
+        tap((plan) => this._state.plan.set(plan)),
+      )
+      .subscribe();
   }
 }

@@ -2,19 +2,21 @@ import { Component, computed, effect, inject, OnDestroy, signal, viewChild, View
 import {
   AugmentedExecutionsService,
   BulkSelectionType,
-  DateFormat,
+  DateFormat, DialogsService,
   EntitySelectionState,
   entitySelectionStateProvider,
+  Execution,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   MultiLevelArrayFilterComponent,
+  Plan,
   REQUEST_FILTERS_INTERCEPTORS,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ERROR_STATUSES, EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, exhaustMap, of, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, exhaustMap, map, of, pipe, startWith, switchMap, tap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -44,16 +46,17 @@ import { FormControl } from '@angular/forms';
 })
 export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
-  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
-  readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
+  protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  protected readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
-  readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
-  readonly DateFormat = DateFormat;
-  readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
-  readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
+  protected readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
+  protected readonly DateFormat = DateFormat;
+  protected readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
+  protected readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
+  readonly _dialogs = inject(DialogsService);
 
   autoRefreshDisabled: boolean = false;
 
@@ -89,6 +92,65 @@ export class ExecutionListComponent implements OnDestroy {
   });
 
   protected readonly calculateCounts = signal(false);
+
+  protected restartExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showWarning(`Are you sure you want to restart Execution ${name}?`)
+      .pipe(
+        switchMap((confirmed) =>
+          confirmed
+            ? this._augmentedExecutionsService.restartExecutions({
+                ids: [execution.id!],
+                targetType: 'LIST',
+                preview: false,
+              })
+            : of(false),
+        ),
+      )
+      .subscribe();
+  }
+
+  protected stopExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showWarning(`Are you sure you want to stop Execution ${name}?`)
+      .pipe(
+        switchMap((confirmed) =>
+          confirmed
+            ? this._augmentedExecutionsService.stopExecutions({
+                ids: [execution.id!],
+                targetType: 'LIST',
+                preview: false,
+              })
+            : of(false),
+        ),
+      )
+      .subscribe();
+  }
+
+  protected deleteExecution(execution: Execution): void {
+    const name = execution.description;
+    this._dialogs
+      .showDeleteWarning(1, `Execution "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed
+            ? this._augmentedExecutionsService.deleteExecution(execution.id!).pipe(map(() => true))
+            : of(false),
+        ),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
+  }
+
+  private updateDataSourceAfterChange = pipe(
+    tap((changeResult?: Plan | boolean | string[]) => {
+      if (changeResult) {
+        this.dataSource.reload();
+      }
+    }),
+  );
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();

@@ -88,7 +88,7 @@ export class TimeSeriesContext {
     ) as Observable<void>;
   }
 
-  getTimeRangeSettings() {
+  getTimeRangeSettings(): DashboardTimeRangeSettings {
     return this.timeRangeSettings;
   }
 
@@ -96,7 +96,7 @@ export class TimeSeriesContext {
     return this.indexedMetrics[key];
   }
 
-  updateTimeRangeSettings(settings: DashboardTimeRangeSettings) {
+  updateTimeRangeSettings(settings: DashboardTimeRangeSettings): void {
     settings.fullRange = TimeSeriesUtils.removeFloatingDigits(settings.fullRange);
     settings.selectedRange = TimeSeriesUtils.removeFloatingDigits(settings.selectedRange);
     this.timeRangeSettings = settings;
@@ -109,7 +109,7 @@ export class TimeSeriesContext {
    * If there is a selection before changing the full range, and it fits inside it, the selection will not be reset. Otherwise it does.
    * @param range
    */
-  updateFullTimeRange(range: TimeRange, resetSelection?: boolean) {
+  updateFullTimeRange(range: TimeRange, resetSelection?: boolean): void {
     range = TimeSeriesUtils.removeFloatingDigits(range);
     const isFullRangeSelected = this.isFullRangeSelected() || resetSelection;
     const previousSelection = this.timeRangeSettings.selectedRange;
@@ -161,7 +161,7 @@ export class TimeSeriesContext {
     return syncGroup;
   }
 
-  updateEditMode(enabled: boolean) {
+  updateEditMode(enabled: boolean): void {
     this.editMode$.next(enabled);
   }
 
@@ -199,11 +199,11 @@ export class TimeSeriesContext {
     return Object.values(this.dashboardAttributes$.getValue());
   }
 
-  enableCompareMode(context: TimeSeriesContext) {
+  enableCompareMode(context: TimeSeriesContext): void {
     this.compareModeChange$.next({ enabled: true, context: context });
   }
 
-  disableCompareMode() {
+  disableCompareMode(): void {
     this.compareModeChange$.getValue()?.context?.destroy();
     this.compareModeChange$.next({ enabled: false });
   }
@@ -224,11 +224,11 @@ export class TimeSeriesContext {
     return this.chartsResolution$.getValue();
   }
 
-  setInProgress(inProgress: boolean) {
+  setInProgress(inProgress: boolean): void {
     this.inProgress$.next(inProgress);
   }
 
-  inProgressChange() {
+  inProgressChange(): Observable<boolean> {
     return this.inProgress$.asObservable();
   }
 
@@ -240,7 +240,7 @@ export class TimeSeriesContext {
     this.chartsLockedState$.next(state);
   }
 
-  updateFullRangeAndSelection(range: TimeRange, emitEvent = true) {
+  updateFullRangeAndSelection(range: TimeRange, emitEvent = true): void {
     this.timeRangeSettings.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: range };
     this.timeRangeSettings.fullRange = range;
     this.timeRangeSettings.selectedRange = range;
@@ -251,7 +251,7 @@ export class TimeSeriesContext {
     }
   }
 
-  updateSelectedRange(range: TimeRange, emitEvent = true) {
+  updateSelectedRange(range: TimeRange, emitEvent = true): void {
     range = TimeSeriesUtils.removeFloatingDigits(range);
     this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
@@ -269,7 +269,7 @@ export class TimeSeriesContext {
     return this.selectedTimeRangeChange$.asObservable();
   }
 
-  isFullRangeSelected() {
+  isFullRangeSelected(): boolean {
     return (
       this.timeRangeSettings.fullRange.from === this.timeRangeSettings.selectedRange.from &&
       this.timeRangeSettings.fullRange.to === this.timeRangeSettings.selectedRange.to
@@ -306,13 +306,13 @@ export class TimeSeriesContext {
           );
     const selectedTimeRange = this.getSelectedTimeRange();
     return new OQLBuilder()
-      .open('and')
+      .append(this.getFilteringSettings().hiddenFiltersOql)
       .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)
       .append(filtersOql)
       .build();
   }
 
-  resetZoom() {
+  resetZoom(): void {
     this.timeRangeSettings.selectedRange = this.timeRangeSettings.fullRange;
     this.selectedTimeRangeChange$.next(this.timeRangeSettings.selectedRange);
   }
@@ -325,7 +325,7 @@ export class TimeSeriesContext {
     return this.filterSettings$.asObservable().pipe(skip(1));
   }
 
-  updateGrouping(grouping: string[]) {
+  updateGrouping(grouping: string[]): void {
     this.activeGroupings$.next(grouping);
   }
 

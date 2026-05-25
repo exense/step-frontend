@@ -120,7 +120,7 @@ export class ExecutionsChartTooltipComponent {
     const oql = new OQLBuilder()
       .open('and')
       .append('attributes.metricType = "executions/duration"')
-      .append(FilterUtils.filtersToOQL([this._state.getDashboardFilter()], 'attributes'))
+      .append(this._state.getDashboardFilter())
       .append(`attributes.result = ${item.label}`)
       .build();
 

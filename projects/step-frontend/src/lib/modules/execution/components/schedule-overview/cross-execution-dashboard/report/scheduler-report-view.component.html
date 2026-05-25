@@ -127,7 +127,7 @@
           <step-cross-execution-executions-table
             [defaultDateRange]="dateRange!"
             #executionList
-            [hiddenFilters]="_state.executionsTableFilter"
+            [hiddenFilters]="_state.executionsTableFilters()"
           />
         }
       </step-alt-report-widget-content>

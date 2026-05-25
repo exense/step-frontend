@@ -20,6 +20,10 @@ export const $MetricType = {
     description: {
       type: 'string',
     },
+    instrumentType: {
+      type: 'string',
+      isRequired: true,
+    },
     attributes: {
       type: 'array',
       contains: {

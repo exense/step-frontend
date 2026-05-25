@@ -77,6 +77,12 @@ export const $Execution = {
     stepVersion: {
       type: 'Version',
     },
+    historyResults: {
+      type: 'array',
+      contains: {
+        type: 'ExecutionResultSnapshot',
+      },
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

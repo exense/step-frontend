@@ -24,5 +24,11 @@ export const $OutputJsonObject = {
         type: 'Measure',
       },
     },
+    metrics: {
+      type: 'array',
+      contains: {
+        type: 'MetricSample',
+      },
+    },
   },
 } as const;

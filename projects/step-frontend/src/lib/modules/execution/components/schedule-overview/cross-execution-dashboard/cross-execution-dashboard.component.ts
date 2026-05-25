@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
+import { ExecutionNamePipe, IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Subject } from 'rxjs';
 import {
@@ -24,19 +24,41 @@ export class CrossExecutionDashboardComponent implements OnInit {
 
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
-  viewTitle = computed(() => {
-    const isTask = this._state.viewType() === 'task';
-    let entity = isTask ? this._state.task() : this._state.plan();
-    if (entity === undefined) {
-      return 'Loading...';
-    } else if (entity === null) {
-      return isTask ? 'Deleted task' : 'Deleted plan';
-    } else {
-      return entity?.attributes?.['name'];
+  protected readonly viewTitle = computed(() => {
+    const loadingLabel = 'Loading...';
+    switch (this._state.viewType()) {
+      case 'task':
+        let task = this._state.task();
+        if (task === undefined) {
+          return loadingLabel;
+        }
+        if (task == null) {
+          return 'Deleted task';
+        }
+        return task.attributes?.['name']
+      case 'plan':
+        const plan = this._state.plan();
+        if (plan === undefined) {
+          return loadingLabel;
+        }
+        if (plan === null) {
+          return 'Deleted plan';
+        }
+        return plan.attributes?.['name'];
+      case 'repository':
+        const execution = this._state.execution();
+        if (execution === undefined) {
+          return loadingLabel;
+        }
+        if (execution === null) {
+          // TODO handle
+        }
+        return ExecutionNamePipe.transform(execution!);
+
     }
   });
 
-  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+  protected readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.WEEK } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.WEEK * 2 } },
@@ -52,9 +74,18 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.updateTimeAndRefresh(urlParams);
   }
 
-  handleRefreshIntervalChange(interval: number) {
+  handleRefreshIntervalChange(interval: number): void {
     this._state.lastRefreshTrigger.set('auto');
     this._state.refreshInterval.set(interval);
+  }
+
+  handleTimeRangeChange(selection: TimeRangePickerSelection): void {
+    this._state.activeTimeRangeSelection.set(selection);
+  }
+
+  triggerRefresh(): void {
+    this._state.activeTimeRangeSelection.set({ ...this._state.activeTimeRangeSelection()! });
+    this.fetchLastExecutionTrigger$.next();
   }
 
   private updateTimeAndRefresh(urlParams: DashboardUrlParams) {

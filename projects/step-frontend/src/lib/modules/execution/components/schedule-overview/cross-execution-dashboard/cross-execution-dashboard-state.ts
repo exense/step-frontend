@@ -14,6 +14,7 @@ import {
 } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
+  AugmentedExecutionsService,
   AugmentedTimeSeriesService,
   BucketResponse,
   Execution,
@@ -52,18 +53,19 @@ interface EntityWithKeywordsStats {
 
 type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: Execution[] };
 
-export type CrossExecutionViewType = 'task' | 'plan';
+export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 
 export abstract class CrossExecutionDashboardState {
   public LAST_EXECUTIONS_TO_DISPLAY = 30;
 
-  protected _executionService = inject(ExecutionsService);
+  protected _executionService = inject(AugmentedExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
-  readonly plan = signal<Plan | null | undefined>(undefined);
+  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined); // set directly from the main component
+  readonly plan = signal<Plan | null | undefined>(undefined); // set directly from the main component
+  readonly execution = signal<Execution | null | undefined>(undefined); // used for repostiories. set directly from the main component
   readonly lastRefreshTrigger = signal<'manual' | 'auto'>('manual');
   readonly onRefreshTriggered = new Subject<TimeRange>();
   readonly onTimeSelectionChanged = new Subject<TimeRange>();
@@ -74,10 +76,12 @@ export abstract class CrossExecutionDashboardState {
 
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
-  abstract getDashboardFilter(): FilterBarItem;
+  abstract getDashboardFilter(): string;
   abstract readonly viewType: Signal<CrossExecutionViewType>;
-  abstract readonly executionsTableFilter: Record<string, SearchValue>;
+  abstract readonly executionsTableFilters: Signal<Record<string, SearchValue>>;
   abstract getViewType(): CrossExecutionViewType;
+  abstract getEntityId(): string;
+  abstract dashboardDisabledFilters: string[];
 
   readonly executionsChartLoading = signal<boolean>(false);
   readonly summaryWidgetLoading = signal<boolean>(false);
@@ -138,8 +142,6 @@ export abstract class CrossExecutionDashboardState {
     }
   }
 
-  // charts
-
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
       this.summaryWidgetLoading.set(true);
@@ -149,7 +151,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .append(this.getDashboardFilter())
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -183,7 +185,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .append(this.getDashboardFilter())
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -489,13 +491,24 @@ export abstract class CrossExecutionDashboardState {
   readonly errorsDataSource = this._timeSeriesService.createErrorsFetchDataSource();
 
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
-    let filterItem = this.getDashboardFilter();
-    // this is working only with searchEntities for now. extend it if needed
-    const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    this.errorsDataSource.reload({
-      request: { timeRange: timeRange, ...filter },
-      hideProgress: this.lastRefreshTrigger() === 'auto',
-    });
+    let entityParams = undefined;
+    switch (this.getViewType()) {
+      case "task":
+        entityParams = { taskId: this.getEntityId() };
+        break;
+      case "plan":
+        entityParams = { planId: this.getEntityId() };
+        break;
+      case "repository":
+        let execution = this.execution();
+        if (!execution || !execution.importResult) {
+          return;
+        }
+        entityParams = { canonicalPlanName: execution!.importResult!.canonicalPlanName };
+        break;
+
+    }
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {
@@ -582,7 +595,6 @@ export abstract class CrossExecutionDashboardState {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
         values: (u, vals) => vals,
-        incrs: [1],
       },
     ];
 

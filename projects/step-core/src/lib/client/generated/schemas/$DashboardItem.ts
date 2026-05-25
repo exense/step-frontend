@@ -84,5 +84,8 @@ export const $DashboardItem = {
       isRequired: true,
       format: 'int32',
     },
+    omitWhenEmpty: {
+      type: 'boolean',
+    },
   },
 } as const;

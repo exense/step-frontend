@@ -63,12 +63,13 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   standalone: true,
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
-  context = input.required<TimeSeriesContext>();
-  showHiddenFilters = input<boolean>(false);
+  readonly context = input.required<TimeSeriesContext>();
+  readonly showHiddenFilters = input<boolean>(false);
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
   @Input() editMode = false;
+  readonly disabledFilterOptions = input<string[]>([]);
 
   /**
    * Output used to notify when the full time range of the dashboard should be changed. This is currently triggered only via "use selected execution's time range" filters.
@@ -147,7 +148,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
           customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
         }
         this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
-        this.filterOptions = this.collectUnusedAttributes();
+        this.filterOptions = this.collectFilterOptions();
       });
 
     this.emitFilterChange$
@@ -162,7 +163,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       });
   }
 
-  public addUniqueFilterItems(items: FilterBarItem[]) {
+  public addUniqueFilterItems(items: FilterBarItem[]): void {
     const existingFilterAttributes: Record<string, boolean> = {};
     this._internalFilters.forEach((item) => (existingFilterAttributes[item.attributeName] = true));
     this._internalFilters = this._internalFilters.concat(
@@ -170,26 +171,37 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  private collectUnusedAttributes(): MetricAttribute[] {
+  private collectFilterOptions(): MetricAttribute[] {
     const hiddenFilters = this.context().getFilteringSettings().hiddenFilters || [];
+    const disabledFilterOptionsMap = this.disabledFilterOptions().reduce(
+      (acc: Record<string, boolean>, filterOption: string) => {
+        acc[filterOption] = true;
+        acc[ATTRIBUTES_REMOVAL_FUNCTION(filterOption)] = true;
+        return acc;
+      },
+      {},
+    );
+
     return this.context()
       .getAllAttributes()
       .filter(
         (attr) =>
           !this._internalFilters.find((item) => attr.name === item.attributeName) &&
-          !hiddenFilters.find((item) => attr.name === item.attributeName),
+          !hiddenFilters.find((item) => attr.name === item.attributeName) &&
+          !disabledFilterOptionsMap[attr.name] &&
+          !disabledFilterOptionsMap[ATTRIBUTES_REMOVAL_FUNCTION(attr.name)],
       );
   }
 
-  getValidFilters(): FilterBarItem[] {
+  protected getValidFilters(): FilterBarItem[] {
     return this._internalFilters.filter(FilterUtils.filterItemIsValid);
   }
 
-  handleOqlChange(event: any) {
+  protected handleOqlChange(event: any): void {
     this.invalidOql = false;
   }
 
-  toggleOQLMode(mode: number) {
+  protected toggleOQLMode(mode: number): void {
     this.activeMode = mode as TsFilteringMode;
     if (this.activeMode === TsFilteringMode.OQL) {
       this.oqlValue = FilterUtils.filtersToOQL(
@@ -201,11 +213,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  disableOqlMode() {
+  protected disableOqlMode(): void {
     this.activeMode = TsFilteringMode.STANDARD;
   }
 
-  composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
+  protected composeAndVerifyFullOql(groupDimensions: string[]): Observable<OQLVerifyResponse> {
     // we fake group dimensions as being filters, to verify altogether
     const filtersOql =
       this.activeMode === TsFilteringMode.OQL
@@ -223,11 +235,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       searchEntities: [],
     }));
     const groupingOql = FilterUtils.filtersToOQL(groupingItems, TimeSeriesConfig.ATTRIBUTES_PREFIX);
-    const finalOql = `${groupingOql} and (${filtersOql})`;
-    return this._timeSeriesService.verifyOql(finalOql);
+    let finalOQL = new OQLBuilder().append(filtersOql).append(groupingOql).build();
+    return this._timeSeriesService.verifyOql(finalOQL);
   }
 
-  handleGroupingChange(dimensions: string[]) {
+  protected handleGroupingChange(dimensions: string[]): void {
     this.activeGrouping = dimensions;
     this.composeAndVerifyFullOql(dimensions).subscribe((response) => {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
@@ -241,17 +253,19 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  emitFiltersChange() {
+  protected emitFiltersChange(): void {
+    const filteringSettings = this.context().getFilteringSettings();
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
       filterItems: JSON.parse(JSON.stringify(this._internalFilters)),
-      hiddenFilters: this.context().getFilteringSettings().hiddenFilters,
+      hiddenFilters: filteringSettings.hiddenFilters,
+      hiddenFiltersOql: filteringSettings.hiddenFiltersOql,
       oql: this.oqlValue,
     };
     this.filtersChange.emit(settings);
   }
 
-  manuallyApplyFilters() {
+  protected manuallyApplyFilters(): void {
     if (this.haveNewGrouping()) {
       this.groupingChange.emit(this.activeGrouping);
       // this.context().updateGrouping(this.activeGrouping);
@@ -274,7 +288,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleFilterChange(index: number, item: FilterBarItem) {
+  protected handleFilterChange(index: number, item: FilterBarItem): void {
     this._internalFilters[index] = item;
     if (!item.attributeName) {
       this.removeFilterItem(index);
@@ -325,7 +339,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(metricAttribute: MetricAttribute) {
+  addFilterItem(metricAttribute: MetricAttribute): void {
     const filterIndex = this._internalFilters.findIndex(
       (filterItem) => filterItem.attributeName === metricAttribute.name,
     );
@@ -334,7 +348,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  addCustomFilter(type: FilterBarItemType) {
+  addCustomFilter(type: FilterBarItemType): void {
     this.addFilter({
       attributeName: '',
       type: type,
@@ -344,12 +358,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  removeFilterItem(index: number) {
+  removeFilterItem(index: number): void {
     const itemToDelete = this._internalFilters[index];
 
     this._internalFilters.splice(index, 1);
     this._internalFilters = [...this._internalFilters];
-    this.filterOptions = this.collectUnusedAttributes();
+    this.filterOptions = this.collectFilterOptions();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
@@ -357,7 +371,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   private addFilter(item: FilterBarItem): void {
     this._internalFilters = [...this._internalFilters, item];
-    this.filterOptions = this.collectUnusedAttributes();
+    this.filterOptions = this.collectFilterOptions();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
   }
@@ -376,12 +390,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  openDiscovery() {
+  openDiscovery(): void {
     const data: DiscoverDialogData = { oqlFilter: this.createRawMeasurementsFilter() };
     this._matDialog.open(DiscoverComponent, { data: data });
   }
 
-  private createRawMeasurementsFilter() {
+  private createRawMeasurementsFilter(): string {
     const filteringSettings = this.context().getFilteringSettings();
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
@@ -389,7 +403,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
     const selectedTimeRange = this.context().getSelectedTimeRange();
     return new OQLBuilder()
-      .open('and')
+      .append(filteringSettings.hiddenFiltersOql)
       .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)
       .append(filtersOql)
       .build();

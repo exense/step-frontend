@@ -11,11 +11,11 @@ export type MetricType = {
   name: string;
   displayName: string;
   description?: string;
+  instrumentType: string;
   attributes: Array<MetricAttribute>;
   unit?: string;
   defaultAggregation: MetricAggregation;
   defaultGroupingAttributes: Array<string>;
   renderingSettings: MetricRenderingSettings;
-  instrumentType?: 'gauge' | 'counter' | 'histogram';
   id?: string;
 };

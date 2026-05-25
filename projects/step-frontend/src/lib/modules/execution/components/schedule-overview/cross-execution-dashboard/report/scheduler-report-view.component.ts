@@ -19,14 +19,14 @@ export type ReportNodesChartType = 'keywords' | 'testcases';
   standalone: false,
 })
 export class SchedulerReportViewComponent implements OnInit {
-  readonly _state = inject(CrossExecutionDashboardState);
+  protected readonly _state = inject(CrossExecutionDashboardState);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
 
-  readonly reportNodesChartType = signal<ReportNodesChartType | undefined>(undefined);
+  protected readonly reportNodesChartType = signal<ReportNodesChartType | undefined>(undefined);
 
-  readonly primaryChartTypes: Tab<ReportNodesChartType>[] = [
+  protected readonly primaryChartTypes: Tab<ReportNodesChartType>[] = [
     {
       id: 'testcases',
       label: 'Test Cases',
@@ -41,7 +41,7 @@ export class SchedulerReportViewComponent implements OnInit {
 
   @ViewChild('executionList') executionList!: ExecutionListComponent;
 
-  luxonDateRange = toSignal(
+  protected readonly luxonDateRange = toSignal(
     this._state.timeRange$.pipe(
       map(
         ({ from, to }) =>
@@ -53,7 +53,11 @@ export class SchedulerReportViewComponent implements OnInit {
     ),
   );
 
-  switchReportNodesChart(type: ReportNodesChartType) {
+  protected switchReportNodesChart(type: ReportNodesChartType): void {
+    if (this.reportNodesChartType() === type) {
+      // nothing happened
+      return;
+    }
     this._state.lastRefreshTrigger.set('manual');
     if (type === 'keywords') {
       this._state.keywordsCountChartLoading.set(true);
@@ -63,7 +67,7 @@ export class SchedulerReportViewComponent implements OnInit {
     this.reportNodesChartType.set(type);
   }
 
-  readonly countChartTitle = computed(() => {
+  protected readonly countChartTitle = computed(() => {
     const label = this.reportNodesChartType() === 'keywords' ? 'Keyword calls count' : 'Test cases count';
     return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
   });
@@ -106,11 +110,11 @@ export class SchedulerReportViewComponent implements OnInit {
     });
   }
 
-  jumpToExecution(eId: string) {
+  protected jumpToExecution(eId: string): void {
     window.open(`#/executions/${eId!}/report`);
   }
 
-  handleMainChartZoom(timeRange: TimeRange) {
+  protected handleMainChartZoom(timeRange: TimeRange): void {
     this._state.lastRefreshTrigger.set('manual');
     this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
       const base = chartSettings.xAxesSettings.values[0];
@@ -130,7 +134,7 @@ export class SchedulerReportViewComponent implements OnInit {
     { initialValue: [] },
   );
 
-  private subscribeToBackEvents() {
+  private subscribeToBackEvents(): void {
     // subscribe to back and forward events
     this._router.events
       .pipe(

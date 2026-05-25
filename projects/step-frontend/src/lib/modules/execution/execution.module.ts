@@ -39,6 +39,7 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -191,6 +192,7 @@ import { AltIterationListTitleComponent } from './components/alt-iteration-list-
 import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
 import {
   DRILL_DOWN_ROOT_ID,
   DrillDownStackItemConfig,
@@ -297,6 +299,7 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     SchedulerReportViewComponent,
     CrossExecutionDashboardComponent,
     SchedulerPageComponent,
+    RepositoryPageComponent,
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
@@ -354,6 +357,11 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltReportNodeListProvideKeywordsDirective,
     AltReportNodeListProvideTestcasesDirective,
     DrilldownPartialTreeStateDirective,
+    AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryNodesComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    EntityRefDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -552,6 +560,24 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'plans/:id/report',
       component: PlanPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
+      ],
+    });
+    this._viewRegistry.registerRoute({
+      path: 'repository/:id/report',
+      component: RepositoryPageComponent,
       children: [
         {
           path: '',

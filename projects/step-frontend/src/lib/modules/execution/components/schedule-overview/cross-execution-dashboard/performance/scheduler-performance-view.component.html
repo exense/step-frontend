@@ -5,6 +5,8 @@
       [id]="dashboardId!"
       [initialTimeRange]="(_state.timeRange$ | async)!"
       [hiddenFilters]="dashboardFilters"
+      [hiddenFiltersOQL]="_state.getDashboardFilter()"
+      [disabledFilterOptions]="_state.dashboardDisabledFilters"
       [showExecutionLinks]="true"
       (contextSettingsChanged)="handleDashboardSettingsChange($event)"
       (contextSettingsInit)="handleDashboardSettingsInit($event)"
