@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   model,
   OnInit,
@@ -21,7 +22,7 @@ import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { finalize, from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
@@ -45,6 +46,7 @@ const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
   },
 })
 export class AttachmentDialogComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _resourceService = inject(AugmentedResourcesService);
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _userService = inject(UserService);
@@ -122,7 +124,10 @@ export class AttachmentDialogComponent implements OnInit {
     this.isTextContentLoading.set(true);
     this._resourceService
       .getResourceContentAsText(this._data.id!)
-      .pipe(finalize(() => this.isTextContentLoading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => this.isTextContentLoading.set(false)),
+      )
       .subscribe((content) => {
         this.contentCtrl.setValue(content);
         this.richEditor()?.clearSelection?.();
