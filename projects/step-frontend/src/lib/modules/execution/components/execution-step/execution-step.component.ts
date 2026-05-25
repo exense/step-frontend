@@ -121,11 +121,19 @@ export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestr
     this.selectionTerminator$ = new Subject<void>();
 
     this.keywordParameters$ = this.selected$.pipe(
-      map((testcases) => ({
-        type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
-        eid: executionId,
-        testcases: this.panelService.isPanelEnabled(Panels.TEST_CASES) ? testcases : undefined,
-      })),
+      map((selectedArtefactIds) => {
+        const ancestorIds =
+          this.panelService.isPanelEnabled(Panels.TEST_CASES) && selectedArtefactIds.length
+            ? (this._state.testCases ?? [])
+                .filter((tc) => selectedArtefactIds.includes(tc.artefactID!))
+                .map((tc) => tc.id!)
+            : undefined;
+        return {
+          type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
+          eid: executionId,
+          ancestorIds,
+        };
+      }),
       takeUntil(this.selectionTerminator$),
     );
   }

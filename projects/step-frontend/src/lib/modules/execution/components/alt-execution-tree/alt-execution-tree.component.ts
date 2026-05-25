@@ -44,6 +44,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   private readonly tree = viewChild('tree', { read: TreeComponent });
   readonly showSpinnerWhileTreeInitialize = input(false);
+  readonly details = input<readonly string[] | undefined>(undefined);
   readonly openIterations = output<OpenIterationsEvent>();
 
   protected readonly showSpinner = computed(() => {

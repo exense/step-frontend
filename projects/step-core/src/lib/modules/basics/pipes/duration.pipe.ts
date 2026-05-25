@@ -61,9 +61,10 @@ export class DurationPipe implements PipeTransform {
     if (!shortenMs) {
       partsToDisplay.push(parts.milliseconds);
     }
+
     partsToDisplay = partsToDisplay.filter((item) => !!item.value);
-    if (partsToDisplay.length === 0 && parts.milliseconds.value > 0) {
-      return '< 1s';
+    if (partsToDisplay.length === 0) {
+      return '< 1 ms';
     }
 
     if (displaySingle) {

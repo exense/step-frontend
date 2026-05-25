@@ -20,6 +20,9 @@ export class WidgetsPersistenceStateService {
 
   private readonly ALL_WIDGET_TYPE_IDS = Object.keys(this._gridConfig.defaultElementParamsMap);
   private readonly lastSavedPositions = signal<Record<string, WidgetPosition> | undefined>(undefined);
+  private readonly lastSavedWidgetSettings = signal<Record<string, Record<string, any> | undefined> | undefined>(
+    undefined,
+  );
 
   private readonly isInitializedInternal = signal(false);
   readonly isInitialized = this.isInitializedInternal.asReadonly();
@@ -30,10 +33,15 @@ export class WidgetsPersistenceStateService {
   private readonly selectedPresetInternal = signal<WidgetStatePreset | undefined>(undefined);
   readonly selectedPreset = this.selectedPresetInternal.asReadonly();
 
+  private readonly widgetSettingsInternal = signal<Record<string, Record<string, any> | undefined>>({});
+  readonly widgetSettings = this.widgetSettingsInternal.asReadonly();
+
   readonly hasChanges = computed(() => {
     const positions = this._widgetsPositions.positionsState();
     const lastSavedPositions = this.lastSavedPositions();
-    return positions !== lastSavedPositions;
+    const widgetSettings = this.widgetSettings();
+    const lastSavedWidgetSettings = this.lastSavedWidgetSettings();
+    return positions !== lastSavedPositions || widgetSettings !== lastSavedWidgetSettings;
   });
 
   private effectPresetSelection = effect(() => {
@@ -42,9 +50,12 @@ export class WidgetsPersistenceStateService {
       return;
     }
     this.initializePositions(selectedPreset);
+    this.initializeWidgetSettings(selectedPreset);
     queueMicrotask(() => {
       const positions = untracked(() => this._widgetsPositions.positionsState());
+      const widgetSettings = untracked(() => this.widgetSettings());
       this.lastSavedPositions.set(positions);
+      this.lastSavedWidgetSettings.set(widgetSettings);
     });
   });
 
@@ -148,11 +159,31 @@ export class WidgetsPersistenceStateService {
 
   resetState(): void {
     const lastSavedPositions = untracked(() => this.lastSavedPositions());
+    const lastSavedWidgetSettings = untracked(() => this.lastSavedWidgetSettings());
     const positions = Object.values(lastSavedPositions ?? {});
     this._widgetsPositions.initializePositions(positions, []);
+    this.widgetSettingsInternal.set(lastSavedWidgetSettings ?? {});
     queueMicrotask(() => {
       const positions = untracked(() => this._widgetsPositions.positionsState());
+      const widgetSettings = untracked(() => this.widgetSettings());
       this.lastSavedPositions.set(positions);
+      this.lastSavedWidgetSettings.set(widgetSettings);
+    });
+  }
+
+  getWidgetSettings(widgetType: string): Record<string, any> | undefined {
+    return this.widgetSettings()[widgetType];
+  }
+
+  updateWidgetSettings(widgetType: string, settings?: Record<string, any>): void {
+    this.widgetSettingsInternal.update((current) => {
+      const next = { ...current };
+      if (!settings || Object.keys(settings).length === 0) {
+        delete next[widgetType];
+      } else {
+        next[widgetType] = settings;
+      }
+      return next;
     });
   }
 
@@ -250,6 +281,19 @@ export class WidgetsPersistenceStateService {
     this._widgetsPositions.initializePositions(positions, typesToAllocate);
   }
 
+  private initializeWidgetSettings(preset?: WidgetStatePreset): void {
+    const widgetSettings = (preset?.layout?.widgets ?? []).reduce(
+      (res, widgetState) => {
+        if (widgetState.settings && Object.keys(widgetState.settings).length > 0) {
+          res[widgetState.widgetType] = widgetState.settings;
+        }
+        return res;
+      },
+      {} as Record<string, Record<string, any> | undefined>,
+    );
+    this.widgetSettingsInternal.set(widgetSettings);
+  }
+
   private getWidgetsStates(): WidgetState[] {
     const positions = untracked(() => this._widgetsPositions.positionsState());
     const result = Object.values(positions).map((position) => {
@@ -260,6 +304,7 @@ export class WidgetsPersistenceStateService {
 
   private convertToWidgetState(widgetType: string, position: WidgetPositionParams): WidgetState {
     const { row, column, widthInCells, heightInCells } = position;
+    const settings = untracked(() => this.widgetSettings())[widgetType];
     return {
       widgetType,
       position: {
@@ -268,6 +313,7 @@ export class WidgetsPersistenceStateService {
         widthInCells,
         heightInCells,
       },
+      settings,
     };
   }
 }

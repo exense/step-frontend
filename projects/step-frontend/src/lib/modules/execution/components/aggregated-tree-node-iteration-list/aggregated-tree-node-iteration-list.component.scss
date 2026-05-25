@@ -67,12 +67,23 @@ step-aggregated-tree-node-iteration-list {
 
       step-alt-execution-time {
         display: flex;
+        flex: 0 0 11.5rem;
         width: 11.5rem;
         overflow: hidden;
       }
 
       .name {
         font-weight: 500;
+        white-space: nowrap;
+        line-height: 1.5;
+        align-self: baseline;
+      }
+
+      .description {
+        min-width: 0;
+        overflow: hidden;
+        color: var.$gray-500;
+        text-overflow: ellipsis;
         white-space: nowrap;
         line-height: 1.5;
         align-self: baseline;
@@ -85,6 +96,10 @@ step-aggregated-tree-node-iteration-list {
     gap: 1rem;
     padding-right: 2rem;
     align-items: center;
+
+    & > step-alt-execution-report-settings {
+      margin-left: auto;
+    }
 
     .sort-container {
       flex: 1;

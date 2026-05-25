@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   inject,
   input,
   output,
@@ -31,6 +32,8 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -54,6 +57,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
   readonly _state = inject(AltReportNodesStateService);
   private _screenApiService = inject(AugmentedScreenService);
   private _listSearch = inject(AltReportNodeListSearchDirective, { self: true });
+  private _reportSettings = inject(AltExecutionReportSettingsService);
 
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
@@ -69,6 +73,10 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
   protected readonly extractReportId: HighlightedItemExtractor<ReportNode, string> = (node?: ReportNode) => node?.id;
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
+  protected readonly details = this._reportSettings.details('keywordsList');
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 

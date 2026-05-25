@@ -32,7 +32,6 @@ import {
   TableDataSource,
   AlertType,
   TableIndicatorMode,
-  HighlightedItemExtractor,
   PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -40,6 +39,8 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
 
 const PAGE_SIZE = 25;
@@ -74,6 +75,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
@@ -88,7 +90,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly sort = signal<SortDirection>('desc');
 
-  private effectSort = effect(() => {
+  private readonly effectSort = effect(() => {
     const sort = this.sort();
     const mastSort = this.matSort();
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
@@ -104,6 +106,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
   readonly openTreeView = output<ReportNode>();
+  protected readonly details = this._reportSettings.details('executionTree');
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -134,7 +140,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
-  private effectSyncStatus = effect(() => {
+  private readonly effectSyncStatus = effect(() => {
     const initialStatus = this.initialStatus();
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });

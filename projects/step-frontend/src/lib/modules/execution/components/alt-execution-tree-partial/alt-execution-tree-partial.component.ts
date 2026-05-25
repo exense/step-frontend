@@ -58,6 +58,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly noPadding = input(false);
   readonly autoFocusNode = input(true);
   readonly showDetailsButton = input(false);
+  readonly details = input<readonly string[] | undefined>(undefined);
 
   private readonly isFirstLoad = signal(true);
   private lastLoadedReportNodeId?: string;

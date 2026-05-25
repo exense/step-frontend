@@ -52,6 +52,24 @@ step-alt-report-node-keywords {
     gap: 0.5rem;
     flex-direction: column;
 
+    .step-row-content {
+      display: grid;
+      grid-template-columns: 12rem minmax(0, 1fr);
+      column-gap: 0.5rem;
+      align-items: start;
+      width: 100%;
+    }
+
+    .step-time {
+      display: flex;
+      overflow: hidden;
+    }
+
+    .step-entity {
+      min-width: 0;
+      width: 100%;
+    }
+
     .artefact-header {
       display: flex;
       align-items: center;
@@ -59,14 +77,23 @@ step-alt-report-node-keywords {
       height: 2rem;
       margin: 0 0.5rem 0.2rem 0;
 
-      step-alt-execution-time {
-        display: flex;
-        width: 12rem;
-        overflow: hidden;
+      &.has-description {
+        align-items: flex-start;
+        height: auto;
       }
 
       .name {
         font-weight: 500;
+        white-space: nowrap;
+        line-height: 1.5;
+        align-self: baseline;
+      }
+
+      .description {
+        min-width: 0;
+        overflow: hidden;
+        color: var.$gray-500;
+        text-overflow: ellipsis;
         white-space: nowrap;
         line-height: 1.5;
         align-self: baseline;

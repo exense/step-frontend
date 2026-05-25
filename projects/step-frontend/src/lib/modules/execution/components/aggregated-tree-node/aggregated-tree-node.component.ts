@@ -1,11 +1,12 @@
 import { Component, computed, forwardRef, inject, input, output, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
-import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
+import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 import { ElementSizeService, TreeNodeData } from '@exense/step-core';
 import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -21,7 +22,6 @@ import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-
 })
 export class AggregatedTreeNodeComponent implements ElementSizeService {
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  // private _executionDialogs = inject(AltExecutionDialogsService);
   private _parentElementSize = inject(ElementSizeService, { skipSelf: true, optional: true });
   private _treeNodeData = inject(TreeNodeData);
   protected readonly _useLargeView = inject(AGGREGATED_TREE_NODE_LARGE_VIEW);
@@ -31,6 +31,7 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
 
   readonly nodeId = input.required<string>();
   readonly addonTemplate = input<TemplateRef<unknown> | undefined>(undefined);
+  readonly details = input<readonly string[] | undefined>(undefined);
 
   readonly height = computed(() => this._parentElementSize?.height?.() ?? 0);
 
@@ -52,6 +53,10 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     const selectedNodes = this._treeState.selectedNodeIds();
     return selectedNodes.includes(nodeId);
   });
+
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   protected readonly detailsTooltip = 'Open execution details';
 

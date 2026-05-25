@@ -82,6 +82,8 @@ import { ExecutionDetailsComponent } from './components/execution-details/execut
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
+import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
+import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
@@ -242,6 +244,8 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportControlsComponent,
+    AltExecutionReportSettingsComponent,
+    AltExecutionReportGridSettingsActionComponent,
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
     AltReportNodeListWidgetComponent,

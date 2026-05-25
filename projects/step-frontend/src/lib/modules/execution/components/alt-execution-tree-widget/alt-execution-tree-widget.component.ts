@@ -6,6 +6,7 @@ import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggr
 import { AltExecutionTreeWidgetDirective } from '../../directives/alt-execution-tree-widget.directive';
 import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 import { DrilldownRootType } from '../../shared/drilldown-root-type';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -18,6 +19,9 @@ export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
+
+  protected readonly details = this._reportSettings.details('executionTree');
 
   private readonly tree = viewChild('tree', { read: AltExecutionTreeComponent });
 

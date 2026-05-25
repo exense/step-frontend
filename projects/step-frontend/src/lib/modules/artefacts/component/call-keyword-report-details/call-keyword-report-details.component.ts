@@ -15,7 +15,6 @@ import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
-import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 
 interface MetricSample {
@@ -45,16 +44,11 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   private _appHost = inject(APP_HOST);
   private _window = inject(DOCUMENT).defaultView!;
 
-  private reportNodesToRender = new Set([
-    ReportNodeType.ASSERT_REPORT_NODE,
-    ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE,
-    ReportNodeType.CHECK_REPORT_NODE,
-    ReportNodeType.SET_REPORT_NODE,
-  ]);
-
   protected readonly execution = toSignal(this._altExecutionState?.execution$ ?? of(undefined), {
     initialValue: undefined,
   });
+
+  protected readonly description = computed(() => this.node()?.resolvedArtefact?.description);
 
   protected readonly keywordInputs = computed(() => {
     const context = this.node();
@@ -91,13 +85,9 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
       if (!node || node.status !== 'FAILED') {
         return of(undefined);
       }
-      return this._controllerService.getReportNodeChildren(node.id!).pipe(catchError(() => of(undefined)));
+      return this._controllerService.getReportNodesWithErrors(node.id!).pipe(catchError(() => of(undefined)));
     }),
-    map((children: ReportNode[] | undefined) => {
-      return (children ?? []).filter(
-        (child) => this.reportNodesToRender.has(child._class as ReportNodeType) && child.status !== 'PASSED',
-      );
-    }),
+    map((children: ReportNode[] | undefined) => children ?? []),
   );
 
   protected readonly failedChildren = toSignal(this.failedChildren$, { initialValue: [] });

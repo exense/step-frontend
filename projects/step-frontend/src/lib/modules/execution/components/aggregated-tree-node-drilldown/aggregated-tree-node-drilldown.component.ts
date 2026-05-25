@@ -36,6 +36,7 @@ import {
 import { v4 } from 'uuid';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -72,8 +73,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService);
   private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
   private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
 
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
+  protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
 
   protected readonly selectedRootReportNodeId = computed(() => {

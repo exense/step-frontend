@@ -3,6 +3,7 @@
 :host {
   font-size: 1.4rem;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 4rem;
   height: 100%;
   align-content: start;
@@ -57,7 +58,15 @@ step-alt-execution-tree-partial {
 
 .grid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2rem;
+  min-width: 0;
+  max-width: 100%;
+
+  & > * {
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 :host ::ng-deep step-alt-execution-tree-partial step-alt-execution-tree step-tree {

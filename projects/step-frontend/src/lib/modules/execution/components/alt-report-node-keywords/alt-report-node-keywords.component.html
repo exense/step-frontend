@@ -12,9 +12,15 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
       <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
-        <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view">
+        <step-artefact-inline-details
+          parentElementSize
+          [reportInfo]="element"
+          [details]="details()"
+          class="smaller-view indent-call-keyword-inline"
+        >
           <ng-container *stepArtefactInlineDetailsHeader>
-            <div class="larger-view artefact-header">
+            @let description = element.resolvedArtefact?.description;
+            <div class="larger-view artefact-header" [class.has-description]="!showFullDescription() && !!description">
               <step-alt-execution-time
                 mode="text"
                 displayFormat="time"
@@ -28,6 +34,9 @@
               <step-report-node-icon [node]="element" />
               <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
               <span class="name">{{ element.name }}</span>
+              @if (!showFullDescription() && !!description) {
+                <span class="description">{{ description | treeNodeDescription: false }}</span>
+              }
             </div>
           </ng-container>
         </step-artefact-inline-details>

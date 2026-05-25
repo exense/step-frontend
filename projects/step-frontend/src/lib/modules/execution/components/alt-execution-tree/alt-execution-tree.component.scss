@@ -74,6 +74,13 @@ step-alt-execution-tree {
 
   .tree-node {
     flex: 1;
+    align-items: flex-start !important;
+
+    > .no-toggle,
+    > .mat-mdc-icon-button {
+      margin-top: 0.8rem;
+    }
+
     .node-content {
       align-items: flex-start !important;
       margin-bottom: 0 !important;

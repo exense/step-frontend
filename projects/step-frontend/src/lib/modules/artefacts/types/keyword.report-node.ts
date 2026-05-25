@@ -9,5 +9,6 @@ export interface KeywordReportNode extends ReportNode {
   input: string;
   output: string;
   measures?: Measure[];
+  contributingErrors?: ReportNode[];
   resolvedArtefact?: KeywordArtefact;
 }

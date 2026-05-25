@@ -33,6 +33,7 @@
       </step-prefix>
       <input type="text" class="search-input" [formControl]="searchCtrl" placeholder="Search" />
     </step-form-field>
+    <step-alt-execution-report-settings widgetType="executionTree" />
   </div>
   <step-table
     #table
@@ -50,9 +51,11 @@
             parentElementSize
             [offset]="100"
             [reportInfo]="element"
-            class="shift-rows smaller-view"
+            [details]="details()"
+            class="shift-rows smaller-view indent-call-keyword-inline"
           >
             <ng-container *stepArtefactInlineDetailsHeader>
+              @let description = element.resolvedArtefact?.description;
               <div class="larger-view artefact-header">
                 <step-alt-execution-time
                   mode="text"
@@ -67,6 +70,9 @@
                 <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span class="name">{{ element.name }}</span>
+                @if (!showFullDescription() && !!description) {
+                  <span class="description">{{ description | treeNodeDescription: false }}</span>
+                }
               </div>
             </ng-container>
           </step-artefact-inline-details>

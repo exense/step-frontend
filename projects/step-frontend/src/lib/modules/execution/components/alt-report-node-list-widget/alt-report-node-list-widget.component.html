@@ -16,7 +16,6 @@
     </step-alt-report-widget-sort>
   }
   <step-alt-report-widget-filter>
-    <ng-content select="step-alt-report-widget-filter" />
     @if (mode() === ViewMode.VIEW) {
       <step-alt-report-node-status-filter />
       <step-alt-report-node-search />
@@ -24,6 +23,7 @@
       <div>{{ statusText }}</div>
       <div>{{ searchText }}</div>
     }
+    <ng-content select="step-alt-report-widget-filter" />
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <ng-content />

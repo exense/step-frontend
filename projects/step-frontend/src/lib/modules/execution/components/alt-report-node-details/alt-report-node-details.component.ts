@@ -58,16 +58,14 @@ export class AltReportNodeDetailsComponent {
       if (node.status !== 'FAILED') {
         return of(undefined);
       }
-      return this._controllerService.getReportNodeChildren(node.id!).pipe(catchError(() => of(undefined)));
+      const artefactClass = node.resolvedArtefact?._class;
+      const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
+      if (meta?.reportDetailsComponent) {
+        return of(undefined);
+      }
+      return this._controllerService.getReportNodesWithErrors(node.id!).pipe(catchError(() => of(undefined)));
     }),
-    map((children: ReportNode[] | undefined) => {
-      return (children ?? []).filter(
-        (child) =>
-          (child._class === 'step.artefacts.reports.AssertReportNode' ||
-            child._class === 'step.artefacts.reports.PerformanceAssertReportNode') &&
-          child.status !== 'PASSED',
-      );
-    }),
+    map((children: ReportNode[] | undefined) => children ?? []),
   );
 
   protected searchFor($event: string): void {

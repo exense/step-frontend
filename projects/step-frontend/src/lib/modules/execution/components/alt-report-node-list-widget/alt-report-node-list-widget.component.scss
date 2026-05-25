@@ -12,6 +12,10 @@ step-alt-report-node-list-widget {
       flex: 1;
     }
 
+    & > step-alt-execution-report-settings {
+      margin-left: auto;
+    }
+
     .search-input {
       border-left: none;
       padding-left: 0;

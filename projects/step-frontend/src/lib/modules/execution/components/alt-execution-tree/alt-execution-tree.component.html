@@ -21,6 +21,7 @@
     <step-aggregated-tree-node
       [nodeId]="node.id"
       [addonTemplate]="treeNodeAddon()?.templateRef"
+      [details]="details()"
       (openIterations)="handleOpenIterations($event)"
     />
   </div>
