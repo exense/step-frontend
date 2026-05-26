@@ -2,9 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
+  HostListener,
   inject,
   model,
   OnInit,
+  signal,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -14,7 +17,7 @@ import { AttachmentType } from '../../types/attachment-type.enum';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { AttachmentMeta, AugmentedResourcesService, UserService } from '../../../../client/step-client-module';
-import { DOCUMENT, NgOptimizedImage } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -24,17 +27,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
+const IMAGE_ZOOM_PADDING_PX = 16;
 
 @Component({
   selector: 'step-attachment-dialog',
-  imports: [
-    StepBasicsModule,
-    AttachmentUrlPipe,
-    NgOptimizedImage,
-    RichEditorComponent,
-    StreamingTextComponent,
-    TraceViewerComponent,
-  ],
+  imports: [StepBasicsModule, AttachmentUrlPipe, RichEditorComponent, StreamingTextComponent, TraceViewerComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +52,8 @@ export class AttachmentDialogComponent implements OnInit {
   private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
   private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
+  private imageContainer = viewChild<ElementRef<HTMLElement>>('imageContainer');
+  private imageElement = viewChild<ElementRef<HTMLImageElement>>('imageElement');
   private streamingAttachmentLineChunkSize$ = this._userService.getPreferences().pipe(
     map((preferences) => preferences?.preferences?.['attachment_line_chunk_size'] ?? ''),
     map((lineChunkSize) => parseInt(lineChunkSize)),
@@ -91,6 +90,8 @@ export class AttachmentDialogComponent implements OnInit {
   });
 
   protected readonly scrollDownOnRefresh = model(true);
+  protected readonly canZoomImage = signal(false);
+  protected readonly isImageZoomed = signal(false);
 
   protected readonly contentCtrl = this._fb.control('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
@@ -110,6 +111,34 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected openTraceViewerInSeparateTab(): void {
     this.traceViewer()?.openInSeparateTab?.();
+  }
+
+  protected updateCanZoomImage(): void {
+    if (this.isImageZoomed()) {
+      return;
+    }
+    const container = this.imageContainer()?.nativeElement;
+    const image = this.imageElement()?.nativeElement;
+    const containerWidth = container?.clientWidth ?? 0;
+    const imageWidth = image?.clientWidth ?? 0;
+    if (!containerWidth || !imageWidth) {
+      return;
+    }
+    this.canZoomImage.set(imageWidth < containerWidth - IMAGE_ZOOM_PADDING_PX);
+  }
+
+  protected toggleImageZoom(): void {
+    if (!this.canZoomImage() && !this.isImageZoomed()) {
+      return;
+    }
+    this.isImageZoomed.update((isZoomed) => !isZoomed);
+    setTimeout(() => this.updateCanZoomImage());
+  }
+
+  @HostListener('window:resize')
+  protected handleWindowResize(): void {
+    this.isImageZoomed.set(false);
+    setTimeout(() => this.updateCanZoomImage());
   }
 
   private initializeContent(): void {

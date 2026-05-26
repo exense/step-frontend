@@ -1,7 +1,7 @@
 @if (attachmentType(); as attachmentType) {
   @switch (attachmentType) {
     @case (AttachmentType.IMG) {
-      <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
+      <img [src]="(attachment() | attachmentUrl)!" />
     }
     @case (AttachmentType.STREAMING_TEXT) {
       @if (canUseStreamPreview()) {
@@ -27,7 +27,7 @@
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT
+    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT,
   }"
 >
   <step-long-inline-text [text]="attachment()?.name" />
