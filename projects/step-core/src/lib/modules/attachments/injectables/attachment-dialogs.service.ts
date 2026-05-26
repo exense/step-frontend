@@ -17,8 +17,8 @@ export class AttachmentDialogsService {
     const isTrace = type === AttachmentType.TRACE;
     this._matDialog.open(AttachmentDialogComponent, {
       data,
-      width: isTrace ? '95vw' : '80vw',
-      maxWidth: isTrace ? '95vw' : '80vw',
+      width: isTrace ? '95vw' : '88vw',
+      maxWidth: isTrace ? '95vw' : '88vw',
       height: isTrace ? '90vh' : 'auto',
       maxHeight: isTrace ? '90vh' : 'auto',
       panelClass: isTrace ? 'trace' : undefined,

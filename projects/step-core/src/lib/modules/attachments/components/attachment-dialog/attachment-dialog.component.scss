@@ -1,8 +1,24 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-attachment-dialog {
+  h1[mat-dialog-title] {
+    padding: 0.6rem 1.6rem 0.4rem !important;
+
+    .header-title {
+      margin-top: 0.6rem;
+      padding-left: 0;
+    }
+  }
+
   .dialog-content {
+    max-height: none;
+    overflow: visible;
     padding-bottom: 0 !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    min-height: auto;
+    padding: 1.2rem !important;
   }
 
   div[step-modal-window-title] {
@@ -55,7 +71,7 @@ step-attachment-dialog {
 
   div[step-modal-window-body] {
     width: 100%;
-    height: 60vh;
+    height: 68vh;
   }
 
   &.small {
@@ -75,6 +91,19 @@ step-attachment-dialog {
     overflow: auto;
     display: flex;
     justify-content: center;
+    align-items: center;
+  }
+
+  .image-container {
+    &.zoomed {
+      align-items: flex-start;
+      cursor: zoom-out;
+      overflow: auto;
+    }
+
+    &.can-zoom:not(.zoomed) {
+      cursor: zoom-in;
+    }
   }
 
   video,
@@ -83,7 +112,17 @@ step-attachment-dialog {
   }
 
   img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
+
+    &.zoomed {
+      width: 100%;
+      max-height: none;
+    }
   }
 
   video {
