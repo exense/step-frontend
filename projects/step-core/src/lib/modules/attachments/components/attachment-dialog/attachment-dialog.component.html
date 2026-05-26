@@ -63,8 +63,20 @@
   <div step-modal-window-body>
     @switch (attachmentType) {
       @case (AttachmentType.IMG) {
-        <div class="media-container">
-          <img [ngSrc]="(_data | attachmentUrl)!" fill />
+        <div
+          #imageContainer
+          class="media-container image-container"
+          [class.zoomed]="isImageZoomed()"
+          [class.can-zoom]="canZoomImage() || isImageZoomed()"
+          [attr.title]="canZoomImage() || isImageZoomed() ? (isImageZoomed() ? 'Fit to height' : 'Fill width') : null"
+          (click)="toggleImageZoom()"
+        >
+          <img
+            #imageElement
+            [src]="(_data | attachmentUrl)!"
+            [class.zoomed]="isImageZoomed()"
+            (load)="updateCanZoomImage()"
+          />
         </div>
       }
       @case (AttachmentType.VIDEO) {

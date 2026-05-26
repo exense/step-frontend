@@ -5,7 +5,6 @@ import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { SkippedAttachmentMeta } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
-import { NgOptimizedImage } from '@angular/common';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
 import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
@@ -16,7 +15,7 @@ import { AuthService } from '../../../auth';
 
 @Component({
   selector: 'step-attachment-preview',
-  imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage, AttachmentTypeIconPipe, StreamingTextComponent],
+  imports: [AttachmentUrlPipe, StepBasicsModule, AttachmentTypeIconPipe, StreamingTextComponent],
   templateUrl: './attachment-preview.component.html',
   styleUrl: './attachment-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
