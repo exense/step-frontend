@@ -13,17 +13,18 @@ import {
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentType } from '../../types/attachment-type.enum';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { FILE_TYPES, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { AttachmentMeta, AugmentedResourcesService, UserService } from '../../../../client/step-client-module';
 import { DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { RichEditorComponent } from '../../../rich-editor';
+import { AceMode, RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { finalize, from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
 
@@ -52,7 +53,9 @@ export class AttachmentDialogComponent implements OnInit {
   private _userService = inject(UserService);
   private _fb = inject(FormBuilder).nonNullable;
   private _snackBar = inject(MatSnackBar);
-  private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
+  private _sanitizer = inject(DomSanitizer);
+  private _doc = inject(DOCUMENT);
+  private _clipboard = this._doc.defaultView!.navigator.clipboard;
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
   private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
@@ -97,7 +100,17 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected readonly contentCtrl = this._fb.control('');
   protected readonly isTextContentLoading = signal(false);
+  protected readonly isTextContentLoaded = signal(false);
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
+  protected readonly isXmlAttachment = this.matchesAttachmentType(FILE_TYPES.XML, FILE_TYPES.XML_TEXT);
+  protected readonly isPdfAttachment = this.matchesAttachmentType(FILE_TYPES.PDF);
+  protected readonly canRenderAttachment = this.determineCanRenderAttachment();
+  protected readonly isSourceView = signal(!this.canRenderAttachment);
+  protected readonly renderedAttachmentUrl = computed<SafeResourceUrl | undefined>(() => {
+    const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    return this._sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+  protected readonly textAttachmentSyntaxMode = this.isXmlAttachment ? AceMode.XML : AceMode.TEXT;
   protected readonly AttachmentType = AttachmentType;
 
   ngOnInit(): void {
@@ -116,9 +129,31 @@ export class AttachmentDialogComponent implements OnInit {
     this.traceViewer()?.openInSeparateTab?.();
   }
 
+  protected toggleSourceView(): void {
+    const showSource = !this.isSourceView();
+    this.isSourceView.set(showSource);
+    if (showSource) {
+      this.loadTextContent();
+    }
+  }
+
+  protected openRenderedAttachmentInSeparateTab(): void {
+    const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    this._doc.defaultView!.open(url, '_blank');
+  }
+
   private initializeContent(): void {
     this.contentCtrl.disable();
     if (this.attachmentType !== AttachmentType.TEXT) {
+      return;
+    }
+    if (this.isSourceView() || this.isXmlAttachment) {
+      this.loadTextContent();
+    }
+  }
+
+  private loadTextContent(): void {
+    if (this.isTextContentLoading() || this.isTextContentLoaded()) {
       return;
     }
     this.isTextContentLoading.set(true);
@@ -130,6 +165,7 @@ export class AttachmentDialogComponent implements OnInit {
       )
       .subscribe((content) => {
         this.contentCtrl.setValue(content);
+        this.isTextContentLoaded.set(true);
         this.richEditor()?.clearSelection?.();
       });
   }
@@ -142,5 +178,18 @@ export class AttachmentDialogComponent implements OnInit {
     from(this._clipboard.writeText(content)).subscribe(() => {
       this._snackBar.open(`Text copied to clipboard.`, 'dismiss');
     });
+  }
+
+  private determineCanRenderAttachment(): boolean {
+    return this.matchesAttachmentType(FILE_TYPES.HTML, FILE_TYPES.HTM);
+  }
+
+  private matchesAttachmentType(...types: Array<{ readonly extension?: string; readonly mimeType?: string }>): boolean {
+    const mimeType = this._data.mimeType?.toLowerCase();
+    if (mimeType && types.some((type) => type.mimeType?.toLowerCase() === mimeType)) {
+      return true;
+    }
+    const extension = this._data.name?.split('.').pop()?.toLowerCase();
+    return !!extension && types.some((type) => type.extension?.toLowerCase() === extension);
   }
 }

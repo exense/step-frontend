@@ -72,5 +72,6 @@ export const FILE_TYPES = {
   OGV: createTypeInfo(TypeInfoCategory.VIDEO, 'ogv', 'video/ogg'),
 
   // Other types
+  PDF: createTypeInfo(TypeInfoCategory.OTHER, 'pdf', 'application/pdf'),
   PLAYWRIGHT_TRACE: createTypeInfo(TypeInfoCategory.OTHER, 'zip', 'application/vnd.step.playwright-trace+zip', true),
 };
