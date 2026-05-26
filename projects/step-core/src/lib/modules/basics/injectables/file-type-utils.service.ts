@@ -32,7 +32,7 @@ export class FileTypeUtilsService {
   }
 
   findByMimeTypeAndExtension(mimeType?: string, extension?: string): TypeInfo[] {
-    let types = this.mimeTypesDictionary.get(mimeType ?? '') ?? [];
+    let types = this.mimeTypesDictionary.get(mimeType?.toLowerCase() ?? '') ?? [];
     if (extension) {
       const normalizedExtension = extension.toLowerCase();
       types = types.filter((type) => type.extension?.toLowerCase() === normalizedExtension);

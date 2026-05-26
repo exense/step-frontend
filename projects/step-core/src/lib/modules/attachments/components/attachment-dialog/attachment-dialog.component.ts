@@ -105,6 +105,8 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly isXmlAttachment = this.matchesAttachmentType(FILE_TYPES.XML, FILE_TYPES.XML_TEXT);
   protected readonly isPdfAttachment = this.matchesAttachmentType(FILE_TYPES.PDF);
   protected readonly canRenderAttachment = this.determineCanRenderAttachment();
+  protected readonly canOpenRenderedAttachmentInSeparateTab =
+    this.canRenderAttachment || this.isXmlAttachment || this.isPdfAttachment;
   protected readonly isSourceView = signal(!this.canRenderAttachment);
   protected readonly renderedAttachmentUrl = computed<SafeResourceUrl | undefined>(() => {
     const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);

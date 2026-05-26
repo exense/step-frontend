@@ -26,30 +26,8 @@
         >
           <step-icon name="code" />
         </button>
-        <button
-          type="button"
-          tabindex="-1"
-          mat-icon-button
-          matTooltip="Open in separate tab"
-          matTooltipPosition="below"
-          (click)="openRenderedAttachmentInSeparateTab()"
-        >
-          <step-icon name="external-link" />
-        </button>
       }
-      @if (attachmentType === AttachmentType.TEXT && isXmlAttachment) {
-        <button
-          type="button"
-          tabindex="-1"
-          mat-icon-button
-          matTooltip="Open in separate tab"
-          matTooltipPosition="below"
-          (click)="openRenderedAttachmentInSeparateTab()"
-        >
-          <step-icon name="external-link" />
-        </button>
-      }
-      @if (attachmentType === AttachmentType.DEFAULT && isPdfAttachment) {
+      @if (canOpenRenderedAttachmentInSeparateTab) {
         <button
           type="button"
           tabindex="-1"

@@ -21,4 +21,9 @@ describe('FileTypeUtilsService', () => {
     expect(service.checkTypeCategory('application/xml')).toBe(TypeInfoCategory.TEXT);
     expect(service.checkTypeCategory('text/xml')).toBe(TypeInfoCategory.TEXT);
   });
+
+  it('matches mime type and extension case-insensitively', () => {
+    const [html] = service.findByMimeTypeAndExtension('TEXT/HTML', 'HTML');
+    expect(html?.category).toBe(TypeInfoCategory.TEXT);
+  });
 });
