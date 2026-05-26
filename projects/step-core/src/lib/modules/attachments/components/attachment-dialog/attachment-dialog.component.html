@@ -103,7 +103,7 @@
       @case (AttachmentType.DEFAULT) {
         @if (isPdfAttachment) {
           @if (renderedAttachmentUrl(); as url) {
-            <iframe class="rendered-attachment-frame" [src]="url" title="Rendered attachment"></iframe>
+            <iframe class="rendered-attachment-frame" sandbox [src]="url" title="Rendered attachment"></iframe>
           } @else {
             <div class="rendered-attachment-loading">
               <mat-spinner [diameter]="40" />
@@ -128,7 +128,7 @@
           </div>
         } @else {
           @if (renderedAttachmentUrl(); as url) {
-            <iframe class="rendered-attachment-frame" [src]="url" title="Rendered attachment"></iframe>
+            <iframe class="rendered-attachment-frame" sandbox [src]="url" title="Rendered attachment"></iframe>
           } @else {
             <div class="rendered-attachment-loading">
               <mat-spinner [diameter]="40" />
