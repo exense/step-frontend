@@ -19,6 +19,7 @@ export interface CheckLoadErrorsConfig {
 
 export interface MultipleProjectsStrategy {
   currentProject(): Project | undefined;
+  getProjects(): Project[];
   getUrlForProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): string;
   getProject(projectId: string): Project | undefined;
   getProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;

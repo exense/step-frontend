@@ -1,4 +1,4 @@
-<step-table [dataSource]="parametersDataSource()" matSort [matSortDisableClear]="true">
+<step-table class="compact-rows" [dataSource]="parametersDataSource()" matSort [matSortDisableClear]="true">
   <ng-container matColumnDef="key" stepSearchCol>
     <step-input-filter *stepSearchCellDef stepFilterConnect />
     <th mat-header-cell mat-sort-header *matHeaderCellDef>Key</th>

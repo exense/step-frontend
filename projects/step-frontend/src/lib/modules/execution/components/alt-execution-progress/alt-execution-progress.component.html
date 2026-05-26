@@ -81,7 +81,10 @@
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
       @if (execution?.executionParameters?.customParameters; as executionParameters) {
-        <step-alt-execution-parameters [executionParameters]="executionParameters" />
+        <step-alt-execution-parameters
+          [executionParameters]="executionParameters"
+          [executionProjectId]="execution?.executionParameters?.attributes?.['project']"
+        />
       }
     </div>
     <div class="controls">
