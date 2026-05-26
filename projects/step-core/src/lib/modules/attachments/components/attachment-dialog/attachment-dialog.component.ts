@@ -43,7 +43,8 @@ const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.small]': 'attachmentType === AttachmentType.DEFAULT || attachmentType === AttachmentType.SKIPPED',
+    '[class.small]':
+      '(attachmentType === AttachmentType.DEFAULT && !isPdfAttachment) || attachmentType === AttachmentType.SKIPPED',
   },
 })
 export class AttachmentDialogComponent implements OnInit {
