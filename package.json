@@ -37,8 +37,9 @@
     "deploy:core": "npm run deploy:core:copy && npm run deploy:core:publish --tag latest",
     "deploy:step-frontend:copy": "copyfiles .npmrc dist/step-frontend",
     "deploy:step-frontend:publish": "cd dist/step-frontend && npm publish --tag latest",
-    "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish --tag latest"
-   },
+    "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish --tag latest",
+    "deploy": "npm run deploy:core && npm run deploy:step-frontend"
+  },
   "private": false,
   "dependencies": {
     "@angular-architects/module-federation": "19.0.3",
