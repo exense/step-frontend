@@ -8,7 +8,7 @@
     "build": "npm run build:assets && npm run build:schematics",
     "postbuild": "node copy-schematic-files.js",
     "pack": "",
-    "push": "npm publish ../../dist/step-core/*.tgz"
+    "push": "npm publish ../../dist/step-core/*.tgz --tag latest"
   },
   "exports": {
     "./styles/core-mixins": {
