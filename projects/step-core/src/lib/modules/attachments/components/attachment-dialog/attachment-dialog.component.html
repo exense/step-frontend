@@ -106,10 +106,15 @@
         </div>
       }
       @case (AttachmentType.VIDEO) {
-        <div class="media-container">
-          <video controls>
-            <source [src]="_data | attachmentUrl" />
-          </video>
+        <div class="media-container video-container">
+          @if (videoAttachmentUrl(); as url) {
+            <video controls [src]="url"></video>
+          }
+          @if (isVideoContentLoading()) {
+            <div class="rendered-attachment-loading">
+              <mat-spinner [diameter]="40" />
+            </div>
+          }
         </div>
       }
       @case (AttachmentType.DEFAULT) {

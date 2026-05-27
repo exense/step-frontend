@@ -12,6 +12,7 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentType } from '../../types/attachment-type.enum';
@@ -48,6 +49,7 @@ export class AttachmentDialogComponent implements OnInit {
   private _resourceService = inject(AugmentedResourcesService);
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _userService = inject(UserService);
+  private _httpClient = inject(HttpClient);
   private _fb = inject(FormBuilder).nonNullable;
   private _snackBar = inject(MatSnackBar);
   private _sanitizer = inject(DomSanitizer);
@@ -98,6 +100,8 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly scrollDownOnRefresh = model(true);
   protected readonly canZoomImage = signal(false);
   protected readonly isImageZoomed = signal(false);
+  protected readonly videoAttachmentUrl = signal<string | undefined>(undefined);
+  protected readonly isVideoContentLoading = signal(false);
 
   protected readonly contentCtrl = this._fb.control('');
   protected readonly isTextContentLoading = signal(false);
@@ -115,6 +119,10 @@ export class AttachmentDialogComponent implements OnInit {
   });
   protected readonly textAttachmentSyntaxMode = this.isXmlAttachment ? AceMode.XML : AceMode.TEXT;
   protected readonly AttachmentType = AttachmentType;
+
+  constructor() {
+    this._destroyRef.onDestroy(() => this.revokeVideoObjectUrl());
+  }
 
   ngOnInit(): void {
     this.initializeContent();
@@ -175,6 +183,10 @@ export class AttachmentDialogComponent implements OnInit {
 
   private initializeContent(): void {
     this.contentCtrl.disable();
+    if (this.attachmentType === AttachmentType.VIDEO) {
+      this.loadVideoContent();
+      return;
+    }
     if (this.attachmentType !== AttachmentType.TEXT) {
       return;
     }
@@ -199,6 +211,37 @@ export class AttachmentDialogComponent implements OnInit {
         this.isTextContentLoaded.set(true);
         this.richEditor()?.clearSelection?.();
       });
+  }
+
+  private loadVideoContent(): void {
+    if (this.isVideoContentLoading() || this.videoAttachmentUrl()) {
+      return;
+    }
+    const fallbackUrl = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    this.isVideoContentLoading.set(true);
+    this._httpClient
+      .get(fallbackUrl, { responseType: 'blob' })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => this.isVideoContentLoading.set(false)),
+      )
+      .subscribe({
+        next: (content) => {
+          this.revokeVideoObjectUrl();
+          const objectUrl = this._doc.defaultView!.URL.createObjectURL(content);
+          this.videoAttachmentUrl.set(objectUrl);
+        },
+        error: () => this.videoAttachmentUrl.set(fallbackUrl),
+      });
+  }
+
+  private revokeVideoObjectUrl(): void {
+    const url = this.videoAttachmentUrl();
+    if (!url?.startsWith('blob:')) {
+      return;
+    }
+    this._doc.defaultView!.URL.revokeObjectURL(url);
+    this.videoAttachmentUrl.set(undefined);
   }
 
   protected copyTextContentToClipboard(): void {
