@@ -1,1 +1,1 @@
-export type AdditionalRightRule = (right: string) => boolean;
+export type AdditionalRightRule = (right: string, ignoreEntity?: boolean) => boolean;
