@@ -3,7 +3,8 @@
   "version": "0.2.0",
   "scripts": {
     "copyimages": "copyfiles images/*.* ../../dist/step-frontend",
-    "pack": ""
+    "pack": "",
+    "deploy": "npm publish"
   },
   "exports": {
     "./styles/common-mixins": {
