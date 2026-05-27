@@ -12,19 +12,19 @@ export class AdditionalRightRuleService {
     this._rules.push(...rules);
   }
 
-  checkRight(right: string, injector?: Injector): boolean {
+  checkRight(right: string, injector?: Injector, ignoreEntity?: boolean): boolean {
     if (this._rules.length === 0) {
       return true;
     }
 
     return this._rules.reduce(
-      (res: boolean, rule: AdditionalRightRule) => res && this.checkRule(rule, right, injector),
+      (res: boolean, rule: AdditionalRightRule) => res && this.checkRule(rule, right, ignoreEntity, injector),
       true,
     );
   }
 
-  private checkRule(rule: AdditionalRightRule, right: string, injector?: Injector): boolean {
+  private checkRule(rule: AdditionalRightRule, right: string, ignoreEntity?: boolean, injector?: Injector): boolean {
     injector = injector ?? this._rootInjector;
-    return runInInjectionContext(injector, () => rule(right));
+    return runInInjectionContext(injector, () => rule(right, ignoreEntity));
   }
 }
