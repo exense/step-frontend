@@ -138,17 +138,17 @@ export class AuthService implements OnDestroy, Reloadable {
     return !!this._serviceContext?.conf?.noLoginMask;
   }
 
-  hasRight$(right: string, injector?: Injector): Observable<boolean> {
-    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right, injector)));
+  hasRight$(right: string, injector?: Injector, ignoreEntity?: boolean): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right, injector, ignoreEntity)));
   }
 
-  hasRight(right: string, injector?: Injector): boolean {
+  hasRight(right: string, injector?: Injector, ignoreEntity?: boolean): boolean {
     const conf = this.getConf();
     if (!!conf && !conf.authentication) {
       return true;
     }
 
-    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right, injector);
+    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right, injector, ignoreEntity);
     if (!additionalRulesCheckResult) {
       return false;
     }

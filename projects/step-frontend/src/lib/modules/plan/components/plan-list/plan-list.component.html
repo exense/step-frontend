@@ -137,11 +137,12 @@
 </step-drag-drop-container>
 <step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <a mat-menu-item [disabled]="!('plan-write' | hasRight | async)" [routerLink]="element | planUrl">
+    <!--Plan read is used, because this item just opens the plan editor-->
+    <a mat-menu-item [disabled]="!('plan-read' | hasRight | async)" [routerLink]="element | planUrl">
       <step-icon name="edit-2" aria-hidden="true" />
       Edit plan
     </a>
-    <button mat-menu-item (click)="scheduleCommands.schedule()" [disabled]="!('task-write' | hasRight | async)">
+    <button mat-menu-item (click)="scheduleCommands.schedule()" [disabled]="!('task-write' | hasRight: true | async)">
       <ng-container
         stepExecutionCommands
         #scheduleCommands="StepExecutionCommands"

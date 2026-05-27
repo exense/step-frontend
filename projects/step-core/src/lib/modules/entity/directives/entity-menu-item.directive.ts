@@ -115,7 +115,6 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
     let isDisabled$ = operationController?.isDisabled && entity ? operationController.isDisabled(entity) : undefined;
 
     if (!isDisabled$ && !!this.entityMenuItem?.permission) {
-      console.log('BASIC CHECK FROM PARENT', this._parentInjector.get(this.EntityRefService));
       isDisabled$ = this._auth
         .hasRight$(this.entityMenuItem.permission, this._parentInjector)
         .pipe(map((hasRight) => !hasRight));

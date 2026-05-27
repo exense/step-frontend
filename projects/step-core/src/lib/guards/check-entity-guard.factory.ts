@@ -13,6 +13,7 @@ export interface CheckProjectGuardConfig {
   isMatchEditorUrl?: (url: string) => boolean;
   getEditorUrl: (id: string, route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => EntityEditLink;
   getEntity: (id: string) => Observable<unknown>;
+  disableEntityMessage?: boolean;
 }
 
 export const checkEntityGuardFactory =
@@ -75,7 +76,7 @@ export const checkEntityGuardFactory =
           return true;
         }
 
-        if (_multipleProjects.isEntityBelongsToCurrentProject(entity)) {
+        if (_multipleProjects.isEntityBelongsToCurrentProject(entity) || config.disableEntityMessage) {
           return true;
         }
 
@@ -105,7 +106,9 @@ export const checkEntityGuardFactory =
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];
-        if (!result && emptyUrls.includes(_router.url)) {
+        const previousUrl = _router.getCurrentNavigation()?.previousNavigation?.finalUrl?.toString().split('?')[0];
+        const currentUrl = _router.url.split('?')[0];
+        if (!result && emptyUrls.includes(previousUrl ?? currentUrl)) {
           return _router.parseUrl(_defaultPage());
         }
         return result;
