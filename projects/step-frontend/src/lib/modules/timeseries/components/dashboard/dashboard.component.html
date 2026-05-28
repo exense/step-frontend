@@ -104,7 +104,7 @@
 
       @if (mainEngine.state) {
         <div class="dashlet-container">
-          @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
+          @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.id) {
             @if (editMode || !dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
               @if (dashlet.type === 'CHART') {
                 <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
