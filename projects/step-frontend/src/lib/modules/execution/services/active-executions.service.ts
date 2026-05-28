@@ -117,6 +117,12 @@ class ActiveExecutionImpl implements ActiveExecution {
           break;
         }
 
+        // If auto-refresh has been disabled, don't set new interval
+        // Otherwise it may restart the timer
+        if (this.autoRefreshModel.disabled) {
+          return;
+        }
+
         this.autoRefreshModel.setInterval(result);
         this.autoRefreshModel.setAutoIncreaseTo(result);
         break;
