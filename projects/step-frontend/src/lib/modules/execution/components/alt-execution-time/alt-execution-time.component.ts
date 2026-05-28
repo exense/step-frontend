@@ -44,6 +44,7 @@ export class AltExecutionTimeComponent {
   readonly isRunning = input(false);
   readonly timeOnly = input(false);
   readonly status = input<string>();
+  readonly refreshTrigger = input<unknown>();
 
   protected readonly displayDate = computed(() => {
     const startTime = this.startTimeInput();
@@ -75,12 +76,13 @@ export class AltExecutionTimeComponent {
       return endTime;
     }
 
-    if (startTime !== undefined && duration !== undefined && duration !== null) {
-      return startTime + duration;
+    if (this.isRunning() && startTime !== undefined) {
+      this.refreshTrigger();
+      return Date.now();
     }
 
-    if (this.isRunning() && startTime !== undefined) {
-      return new Date().getTime();
+    if (startTime !== undefined && duration !== undefined && duration !== null) {
+      return startTime + duration;
     }
 
     return undefined;
