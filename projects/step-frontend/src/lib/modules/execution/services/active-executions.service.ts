@@ -94,6 +94,13 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   adjustAutoRefresh(requestDuration: number): void {
+
+    // If auto-refresh has been disabled, don't set new interval
+    // Otherwise it may restart the timer
+    if (this.autoRefreshModel.disabled) {
+      return;
+    }
+
     const durationAndIntervals = [
       2500,
       5_000,
