@@ -68,6 +68,9 @@ export class AltExecutionTimeComponent {
     let endTime = this.endTimeInput();
     const duration = this.durationInput();
 
+    /* workaround to trigger endTime compute on execution refresh */
+    const triggerCompute = this.refreshTrigger();
+
     if (endTime === null) {
       endTime = undefined;
     }
@@ -77,7 +80,6 @@ export class AltExecutionTimeComponent {
     }
 
     if (this.isRunning() && startTime !== undefined) {
-      this.refreshTrigger();
       return Date.now();
     }
 
