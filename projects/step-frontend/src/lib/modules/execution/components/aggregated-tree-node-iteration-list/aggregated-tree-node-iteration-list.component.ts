@@ -43,7 +43,8 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 100;
+const PAGE_SIZE_OPTIONS = [25, 50, PAGE_SIZE, 250];
 
 @Component({
   selector: 'step-aggregated-tree-node-iteration-list',
@@ -173,7 +174,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
-    return of([PAGE_SIZE]);
+    return of(PAGE_SIZE_OPTIONS);
   }
 
   // eslint-disable-next-line step-lint/component-public-fields

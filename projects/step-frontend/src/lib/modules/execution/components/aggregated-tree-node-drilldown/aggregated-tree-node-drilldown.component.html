@@ -32,7 +32,7 @@
               [matSortDisableClear]="true"
               stepAltReportNodesProvideKeywords
               #keywordsSort="AltReportNodeListSort"
-              breadcrumbsTooltip="Click go back to Steps"
+              breadcrumbsTooltip="Click to go back to Steps"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="list" />
@@ -77,7 +77,7 @@
             <step-stack-view-item
               [itemId]="item.id"
               stepAltReportNodeListProvideTestcases
-              breadcrumbsTooltip="Click go back to Testcases"
+              breadcrumbsTooltip="Click to go back to Testcases"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="list" />
@@ -111,7 +111,7 @@
             <step-stack-view-item
               [itemId]="item.id"
               stepAltExecutionTreeWidget
-              breadcrumbsTooltip="Click go back to Execution Tree"
+              breadcrumbsTooltip="Click to go back to Execution Tree"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="tree" />
@@ -147,7 +147,7 @@
       @case (StackItemType.AGGREGATED_REPORT_NODE) {
         <step-stack-view-item
           [itemId]="item.id"
-          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Iterations)'"
+          [breadcrumbsTooltip]="'Click to go back to ' + $any(item).data.name + ' (Iterations)'"
         >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
             <step-icon name="list" />
@@ -179,7 +179,7 @@
       @case (StackItemType.REPORT_NODE) {
         <step-stack-view-item
           [itemId]="item.id"
-          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Details)'"
+          [breadcrumbsTooltip]="'Click to go back to ' + $any(item).data.name + ' (Details)'"
         >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
             <step-icon name="sidebar" />
@@ -211,7 +211,7 @@
       @case (StackItemType.PARTIAL_TREE) {
         <step-stack-view-item
           [itemId]="item.id"
-          [breadcrumbsTooltip]="'Click go back to ' + $any(item).data.name + ' (Drilldown Tree)'"
+          [breadcrumbsTooltip]="'Click to go back to ' + $any(item).data.name + ' (Drilldown Tree)'"
           stepDrilldownPartialTreeState
         >
           <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
