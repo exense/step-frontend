@@ -4,9 +4,18 @@
     <div>When opening more panels than fit the screen, previous panels will automatically be minimized</div>
   </div>
   <div *stepStackViewCloseAll class="close-all">
-    <button mat-icon-button matTooltip="Close drilldown view" matTooltipPosition="left" (click)="handleCloseAll()">
-      <step-icon name="x" />
-    </button>
+    <step-time-range-picker
+      [activeSelection]="(_executionState.timeRangeSelection$ | async)!"
+      [activeTimeRange]="(_executionState.timeRange$ | async)!"
+      [selectOptions]="_executionState.timeRangeOptions"
+      (selectionChange)="handleTimeRangeChange($event)"
+      [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+    />
+    <step-btn-group class="with-borders shrink">
+      <button mat-icon-button matTooltip="Close drilldown view" matTooltipPosition="left" (click)="handleCloseAll()">
+        <step-icon name="x" />
+      </button>
+    </step-btn-group>
   </div>
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {

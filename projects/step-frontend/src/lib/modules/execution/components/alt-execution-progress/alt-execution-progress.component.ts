@@ -594,6 +594,17 @@ export class AltExecutionProgressComponent
             .join(' ')
             .toLowerCase(),
         )
+        .addCustomSearchPredicate('executionTime', (item, searchValue) => {
+          const reportNode = item.singleInstanceReportNode;
+          if (!reportNode?.executionTime) {
+            return true;
+          }
+          const [from, to] = searchValue.split('|').map((value) => Number(value));
+          if (Number.isNaN(from) || Number.isNaN(to)) {
+            return true;
+          }
+          return reportNode.executionTime >= from && reportNode.executionTime <= to;
+        })
         .build(),
     );
   }

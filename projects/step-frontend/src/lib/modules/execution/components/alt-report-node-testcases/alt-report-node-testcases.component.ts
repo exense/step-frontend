@@ -63,6 +63,13 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
     this._listSearch.searchReportNodeClass$.subscribe((reportNodeClass) =>
       this.tableSearchUntracked?.onSearch?.('_class', reportNodeClass),
     );
+    this._listSearch.searchDateRange$.subscribe(({ searchValue, params }) => {
+      if (typeof searchValue === 'string') {
+        this.tableSearchUntracked?.onSearch?.('executionTime', searchValue, true, params);
+      } else {
+        this.tableSearchUntracked?.onSearch?.('executionTime', searchValue, params);
+      }
+    });
   }
 
   onSearchFor(item: AggregatedReportView, message: string): void {
