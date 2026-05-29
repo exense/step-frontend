@@ -183,6 +183,7 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
   }
 
   ngOnDestroy(): void {
+    this._globalReload.unRegister(this);
     this.autoCloseExecutionInternal$.complete();
     this.cleanup();
   }
