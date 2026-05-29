@@ -48,10 +48,10 @@ export class AttachmentInlinePreviewComponent {
     initialValue: this._auth.hasRight('resource-read'),
   });
 
-  readonly availableWidth = computed(() => {
+  protected readonly availableWidth = computed<number | undefined>(() => {
     const attachment = this.attachment();
     const maxWidth = this.maxWidth();
-    return maxWidth ?? attachment?.explicitWidth ?? 0;
+    return maxWidth ?? attachment?.explicitWidth;
   });
 
   getAttachmentData(): AttachmentMetaWithExplicitWidth {

@@ -1,4 +1,9 @@
 step-attachment-inline-preview-list {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
   .invisible-items {
     visibility: hidden;
     height: 0;
@@ -9,5 +14,15 @@ step-attachment-inline-preview-list {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+
+    &.invisible-items {
+      width: 0;
+      max-width: unset;
+      overflow: visible;
+    }
   }
 }
