@@ -5,7 +5,7 @@ import {
   AutoRefreshModel,
   AutoRefreshModelFactoryService,
   Execution,
-  durationSwitchMap,
+  durationSwitchMap, Reloadable, GlobalReloadService,
 } from '@exense/step-core';
 import { BehaviorSubject, concatMap, filter, Observable, of, startWith, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -141,13 +141,18 @@ class ActiveExecutionImpl implements ActiveExecution {
 }
 
 @Injectable()
-export class ActiveExecutionsService implements OnDestroy {
+export class ActiveExecutionsService implements OnDestroy, Reloadable {
   private _executionService = inject(AugmentedExecutionsService);
   private _autoRefreshFactory = inject(AutoRefreshModelFactoryService);
+  private _globalReload = inject(GlobalReloadService);
 
   private executions = new Map<string, ActiveExecution>();
   private autoCloseExecutionInternal$ = new Subject<string>();
   readonly autoCloseExecution$ = this.autoCloseExecutionInternal$.asObservable();
+
+  constructor() {
+    this._globalReload.register(this);
+  }
 
   getActiveExecution(executionId: string): ActiveExecution {
     if (!this.executions.has(executionId)) {
@@ -186,6 +191,13 @@ export class ActiveExecutionsService implements OnDestroy {
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
     return true;
+  }
+
+  reload(isCausedByProjectChange?: boolean) {
+    if (!isCausedByProjectChange) {
+      return;
+    }
+    this.cleanup();
   }
 
   private createActiveExecution(executionId: string): ActiveExecution {
