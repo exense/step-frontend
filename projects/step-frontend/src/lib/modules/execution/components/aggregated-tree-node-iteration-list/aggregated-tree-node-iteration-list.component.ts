@@ -124,8 +124,13 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     switchMap((dataSource) => dataSource.totalFiltered$),
     map((totalItems) => totalItems ?? 0),
   );
+  private displayedItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.connect(undefined)),
+    map((items) => items.length),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
+  private readonly displayedItems = toSignal(this.displayedItems$, { initialValue: 0 });
 
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
@@ -168,10 +173,14 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   protected readonly showCountWarning = computed(() => {
     const search = this.searchCtrlValue();
     const totalItems = this.totalItems();
+    const displayedItems = this.displayedItems();
     const expectedCount = this.expectedCount();
 
     if (!!search || (expectedCount === 0 && totalItems === 0)) {
       return false;
+    }
+    if (expectedCount <= PAGE_SIZE_OPTIONS[0] && expectedCount !== displayedItems) {
+      return true;
     }
     return expectedCount !== totalItems;
   });
