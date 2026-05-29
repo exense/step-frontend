@@ -462,7 +462,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   protected openSettings(): void {
     this._matDialog
-      .open(TableDashletSettingsComponent, { data: { item: this.item(), context: this.context } })
+      .open(TableDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
       .afterClosed()
       // eslint-disable-next-line step-lint/rx-nested-subscription
       .subscribe((updatedItem: DashboardItem) => {

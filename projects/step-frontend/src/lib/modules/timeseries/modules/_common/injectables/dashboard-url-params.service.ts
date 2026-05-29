@@ -242,6 +242,7 @@ export class DashboardUrlParamsService {
         relativeTo: this._activatedRoute,
         queryParams: updatedParams,
         queryParamsHandling: 'merge',
+        state: { skipScrollReset: true },
       });
     });
   }
