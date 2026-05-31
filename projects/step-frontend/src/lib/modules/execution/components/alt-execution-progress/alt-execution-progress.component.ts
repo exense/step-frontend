@@ -596,7 +596,7 @@ export class AltExecutionProgressComponent
         )
         .addCustomSearchPredicate('executionTime', (item, searchValue) => {
           const reportNode = item.singleInstanceReportNode;
-          if (!reportNode?.executionTime) {
+          if (reportNode?.executionTime == null) {
             return true;
           }
           const [from, to] = searchValue.split('|').map((value) => Number(value));
