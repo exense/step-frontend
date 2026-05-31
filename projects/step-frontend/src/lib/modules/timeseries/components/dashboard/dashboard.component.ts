@@ -77,8 +77,8 @@ import { MatTooltip } from '@angular/material/tooltip';
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
-  protected readonly dashlets = viewChildren('chart', { read: ChartDashlet });
-  protected readonly compareDashlets = viewChildren('compareChart', { read: ChartDashlet });
+  protected readonly dashlets = viewChildren<ChartDashlet>('chart');
+  protected readonly compareDashlets = viewChildren<ChartDashlet>('compareChart');
   protected readonly filterBar = viewChild('filterBar', { read: DashboardFilterBarComponent });
   protected readonly timeRanger = viewChild('timeSelection', { read: PerformanceViewTimeSelectionComponent });
   protected readonly compareTimeRanger = viewChild('compareTimeSelection', {
@@ -136,6 +136,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
   ): void {
+    console.log('UPDATING time range', timeRange);
     this.mainEngine.state.lastChangeType = opts.actionType;
     this.mainEngine?.state.context.updateFullTimeRange(timeRange, opts.resetSelection);
   }
