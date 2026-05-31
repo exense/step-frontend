@@ -13,12 +13,12 @@ import { ElementSizeDirective, ReportNode } from '@exense/step-core';
 export class AltReportNodeDetailsTestcasesStepsComponent {
   protected readonly _state = inject(AltTestCasesDetailsNodesStateService);
 
-  readonly testCaseId = input<string>();
+  readonly testCaseReportNodeId = input<string>();
   protected readonly selectedReportNodeId = signal<string | undefined>(undefined);
 
-  private effectTestCaseIdChange = effect(() => {
-    const testCaseId = this.testCaseId();
-    this._state.setTestCaseId(testCaseId);
+  private effectTestCaseReportNodeIdChange = effect(() => {
+    const testCaseReportNodeId = this.testCaseReportNodeId();
+    this._state.setTestCaseReportNodeId(testCaseReportNodeId);
   });
 
   readonly openDetails = output<ReportNode>();

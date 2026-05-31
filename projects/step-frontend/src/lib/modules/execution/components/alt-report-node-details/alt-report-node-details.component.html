@@ -54,10 +54,10 @@
     </div>
   }
   @if (isTestCase()) {
-    @if (node?.artefactID; as artefactID) {
+    @if (node?.id; as reportNodeId) {
       <step-alt-report-node-details-testcases-steps
         class="execution-report-node-details"
-        [testCaseId]="artefactID"
+        [testCaseReportNodeId]="reportNodeId"
         (openDetails)="openDetails.emit($event)"
         stepAltReportNodeListSort
         sortByColumn="executionTime"
