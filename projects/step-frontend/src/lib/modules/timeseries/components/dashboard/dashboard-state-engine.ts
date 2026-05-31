@@ -1,4 +1,16 @@
-import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  defaultIfEmpty,
+  finalize,
+  forkJoin,
+  merge,
+  Observable,
+  of,
+  skip,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
@@ -14,7 +26,7 @@ export class DashboardStateEngine {
     this.state = state;
   }
 
-  destroy() {
+  destroy(): void {
     this.terminator$.next();
     this.terminator$.complete();
   }
@@ -34,7 +46,7 @@ export class DashboardStateEngine {
       });
   }
 
-  handleTimeRangePickerChange(selection: TimeRangePickerSelection) {
+  handleTimeRangePickerChange(selection: TimeRangePickerSelection): void {
     let timeRange: TimeRange;
     switch (selection.type) {
       case 'ABSOLUTE':
@@ -56,7 +68,7 @@ export class DashboardStateEngine {
     this.state.context.updateTimeRangeSettings(timeRangeSettings);
   }
 
-  triggerRefresh(force: boolean = false) {
+  triggerRefresh(force: boolean = false): void {
     const state = this.state;
     if (state.context.compareModeChange$.getValue().enabled) {
       // refresh is not enabled on compare mode
@@ -83,13 +95,14 @@ export class DashboardStateEngine {
         tap(() => (state.refreshInProgress = true)),
         switchMap(() => {
           const dashlets$ = state.getDashlets().map((dashlet) => dashlet.refresh());
+          // eslint-disable-next-line step-lint/redundant-if
           if (refreshRanger) {
             dashlets$.push(this.refreshRanger());
           }
           return forkJoin(dashlets$).pipe(defaultIfEmpty([]));
         }),
-        tap(() => (state.refreshInProgress = false)),
         takeUntil(this.terminator$),
+        finalize(() => (state.refreshInProgress = false)),
       )
       .subscribe();
   }

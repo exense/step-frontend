@@ -9,7 +9,7 @@ import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '
 import { PLAN_ID } from '../../../services/plan-id.token';
 
 @Component({
-  selector: 'step-scheduler-page',
+  selector: 'step-cross-exec-plan-page',
   templateUrl: './plan-page.component.html',
   styleUrls: ['./plan-page.component.scss'],
   encapsulation: ViewEncapsulation.None,

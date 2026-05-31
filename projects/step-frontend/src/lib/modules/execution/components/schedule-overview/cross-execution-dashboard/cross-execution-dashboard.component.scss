@@ -2,7 +2,9 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
-step-scheduler-page {
+step-cross-exec-scheduler-page,
+step-cross-exec-plan-page,
+step-cross-exec-scheduler-page {
   display: flex;
   flex-direction: column;
   gap: 2rem;

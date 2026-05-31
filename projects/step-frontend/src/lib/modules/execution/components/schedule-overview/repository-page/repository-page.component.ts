@@ -9,7 +9,7 @@ import { EXECUTION_ID } from '../../../services/execution-id.token';
 import { switchMap, tap } from 'rxjs';
 
 @Component({
-  selector: 'step-scheduler-page',
+  selector: 'step-cross-exec-repository-page',
   templateUrl: './repository-page.component.html',
   styleUrls: ['./repository-page.component.scss'],
   encapsulation: ViewEncapsulation.None,

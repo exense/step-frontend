@@ -16,7 +16,7 @@ interface EntityWithKeywordsStats {
 }
 
 @Component({
-  selector: 'step-scheduler-page',
+  selector: 'step-cross-exec-scheduler-page',
   templateUrl: './scheduler-page.component.html',
   styleUrls: ['./scheduler-page.component.scss'],
   encapsulation: ViewEncapsulation.None,

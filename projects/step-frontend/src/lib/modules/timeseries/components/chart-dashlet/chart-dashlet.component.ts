@@ -1,10 +1,12 @@
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   inject,
   input,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   output,
   signal,
@@ -82,7 +84,7 @@ const resolutionLabels: Record<string, string> = {
   ],
   standalone: true,
 })
-export class ChartDashletComponent extends ChartDashlet implements OnInit {
+export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDestroy {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
@@ -101,6 +103,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
   protected _cd = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
 
   readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
   readonly chart = viewChild<TimeSeriesChartComponent>('chart');
@@ -144,7 +147,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         this.prepareState(item);
         return this.refresh(true);
       }),
-      takeUntilDestroyed(),
+      takeUntilDestroyed(this._destroyRef),
     )
     .subscribe(() => this._cd.markForCheck());
 
@@ -218,12 +221,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return this.fetchDataAndCreateChartSettings().pipe(tap((settings) => this._internalSettings.set(settings)));
   }
 
-  handleZoomReset(): void {
+  protected handleZoomReset(): void {
+    console.log('zoom reset from chart');
     this.context().setChartsLockedState(false);
     this.zoomReset.emit();
   }
 
-  switchAggregate(aggregate: ChartAggregation, params?: AggregateParams): void {
+  protected switchAggregate(aggregate: ChartAggregation, params?: AggregateParams): void {
     this.selectedAggregate = aggregate;
     this.item().chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe(() => {
@@ -231,7 +235,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     });
   }
 
-  switchRateUnit(unit: RateUnit): void {
+  protected switchRateUnit(unit: RateUnit): void {
     const primaryAggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
     const secondaryAggregation: MetricAggregation | undefined = this.item().chartSettings!.secondaryAxes?.aggregation;
     if (primaryAggregation.type === ChartAggregation.RATE) {
@@ -250,21 +254,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
-  toggleGroupingAttribute(attribute: MetricAttributeSelection): void {
+  protected toggleGroupingAttribute(attribute: MetricAttributeSelection): void {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe(() => {
       this._cd.markForCheck();
     });
   }
 
-  handleLockStateChange(locked: boolean): void {
+  protected handleLockStateChange(locked: boolean): void {
     this.context().setChartsLockedState(locked);
   }
 
-  openChartSettings(): void {
+  protected openChartSettings(): void {
     this._matDialog
       .open(ChartDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
       .afterClosed()
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((updatedItem) => {
         this.handleChartUpdate(updatedItem);
       });
@@ -714,6 +719,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         this.emptyStateChange.emit(response.matrix.length === 0);
       }),
       switchMap((response) => this.createChartSettings(response, request)),
+      takeUntilDestroyed(this._destroyRef),
     );
   }
 
@@ -905,6 +911,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
     }
     return bands;
+  }
+
+  ngOnDestroy(): void {
+    this.syncGroupSubscription?.unsubscribe();
   }
 
   getType(): 'TABLE' | 'CHART' {
