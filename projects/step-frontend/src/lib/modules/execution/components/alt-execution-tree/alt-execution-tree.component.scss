@@ -2,9 +2,6 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 @mixin highlight-node($color) {
-  // The control icon now lives inside `step-tree-node-name` (rendered by `step-aggregated-tree-node`),
-  // so a single rounded background on the name element is enough to highlight the whole row,
-  // icon included. No more separate icon cap + connector + bar construction.
   step-tree-node-name {
     background: $color !important;
   }
@@ -66,12 +63,6 @@ step-alt-execution-tree {
       max-width: 100%;
       min-width: 50rem;
       overflow: hidden;
-      // The control icon is rendered by `step-aggregated-tree-node` inside the clickable name
-      // element (so it can host a tooltip and share the row click handler). Suppress the icon the
-      // framework would otherwise render here as a separate sibling.
-      > .node-icon {
-        display: none;
-      }
     }
 
     &.tree-node-selected {
@@ -96,12 +87,11 @@ step-alt-execution-tree {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     z-index: 2;
-    // The control icon used to be rendered outside the name element, which then overlapped it via a
-    // negative margin (core `tree-node-name` styles) to make the selection highlight wrap the icon.
-    // Now the icon is rendered inside the name element, so the overlap is no longer needed - reset it
-    // and inset the rounded highlight slightly instead.
-    margin-left: 0;
+
     padding-left: 1rem;
+    > .node-icon {
+      display: none;
+    }
     &.not-selectable {
       background: none !important;
     }
@@ -110,7 +100,7 @@ step-alt-execution-tree {
   .control-icon {
     flex: none;
     align-self: flex-start;
-    margin-top: 0.2rem;
+    margin-right: 0.5rem;
     @include core.step-icon-size(1.6rem);
   }
 
@@ -118,7 +108,6 @@ step-alt-execution-tree {
     display: flex;
     flex-wrap: nowrap;
     gap: 1rem;
-    // align-items: center;
     width: 100%;
   }
 

@@ -48,13 +48,14 @@ export class TreeFlattenerService {
   }
 
   private convertNode(node: TreeNode, parentPath: string[]): TreeFlatNode {
-    const { id, name, icon, iconClassName, expandable, isSkipped, isVisuallySkipped } = node;
+    const { id, name, icon, iconClassName, iconTooltip, expandable, isSkipped, isVisuallySkipped } = node;
 
     return {
       id,
       name,
       icon,
       iconClassName,
+      iconTooltip,
       expandable,
       isSkipped,
       isVisuallySkipped,

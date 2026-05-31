@@ -49,12 +49,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     return node;
   });
 
-  /**
-   * The control icon is rendered inside this component (within the clickable `.aggregated-info`)
-   * rather than by the framework `step-tree-node`, so that it shares the row's click handler and
-   * can carry its own tooltip. The icon name and status class are reused from the tree node, which
-   * the utils service already computes.
-   */
   protected readonly iconClass = computed(() => {
     const node = this.node();
     return ['control-icon', node?.iconClassName].filter((cssClass) => !!cssClass).join(' ');

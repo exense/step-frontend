@@ -1,12 +1,27 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
 step-tree-node-name {
   min-height: 2.4rem;
   display: flex;
   align-items: center;
-  margin-left: -3.3rem;
-  padding-left: 3.3rem;
+  gap: 8px;
   padding-right: 1rem;
   border-radius: 2rem;
   white-space: nowrap;
+
+  > .node-icon {
+    flex: none;
+    background: var.$gray-100;
+    border-radius: 50%;
+    padding: 5px;
+    border: 1px solid transparent;
+
+    > step-icon {
+      @include core.step-icon-size(12px);
+      display: flex;
+    }
+  }
 
   .hidden {
     display: none;
@@ -14,5 +29,13 @@ step-tree-node-name {
 
   button {
     max-height: 2rem !important;
+  }
+}
+
+.step-tree-node-container .tree-node.root-node step-tree-node-name > .node-icon {
+  padding: 4px;
+
+  > step-icon {
+    @include core.step-icon-size(14px);
   }
 }

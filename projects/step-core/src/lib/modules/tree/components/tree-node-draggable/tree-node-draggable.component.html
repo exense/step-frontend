@@ -24,11 +24,6 @@
       (dropItem)="dropNode.emit($event)"
       [dropDisabled]="dropDisabled()"
     >
-      @if (n.icon) {
-        <div class="node-icon">
-          <step-icon [name]="n.icon" [class]="n.iconClassName" />
-        </div>
-      }
       <step-tree-node-name [node]="n" />
     </div>
   }
