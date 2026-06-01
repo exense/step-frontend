@@ -29,6 +29,7 @@
         [startTime]="execution.startTime"
         [endTime]="execution.endTime"
         [isRunning]="execution.status === 'RUNNING'"
+        [refreshTrigger]="execution"
       />
       <div class="user" matTooltip="User that triggered the execution">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {

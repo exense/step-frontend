@@ -42,8 +42,10 @@ import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum'
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
+import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 100;
+const PAGE_SIZE_OPTIONS = [25, 50, PAGE_SIZE, 250];
 
 @Component({
   selector: 'step-aggregated-tree-node-iteration-list',
@@ -81,6 +83,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _dateUtils = inject(DateUtilsService);
   private _destroyRef = inject(DestroyRef);
   private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
+  private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
 
   protected readonly statuses = REPORT_NODE_STATUS;
 
@@ -100,7 +103,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
-  readonly initialStatusCount = input<number | undefined>(undefined);
   readonly resolvedPartialPath = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
@@ -122,8 +124,13 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     switchMap((dataSource) => dataSource.totalFiltered$),
     map((totalItems) => totalItems ?? 0),
   );
+  private displayedItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.connect(undefined)),
+    map((items) => items.length),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
+  private readonly displayedItems = toSignal(this.displayedItems$, { initialValue: 0 });
 
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
@@ -150,17 +157,32 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   });
   private initialTimeRangeLoadPending = true;
 
-  protected readonly showCountWarning = computed(() => {
-    const initialStatus = this.initialStatus();
-    const initialCount = this.initialStatusCount();
-    const search = this.searchCtrlValue();
-    const status = this.statusCtrlValue();
-    const totalItems = this.totalItems();
+  private readonly currentAggregatedNode = computed(() => {
+    const node = this.aggregatedNode();
+    const treeState = this._treeStateContext.getState();
+    return treeState.findNodeById(node.id) ?? node;
+  });
 
-    if (!!search || (!!initialStatus && (status?.length !== 1 || status[0] !== initialStatus)) || totalItems === 0) {
+  private readonly expectedCount = computed(() => {
+    const countByStatus = this.currentAggregatedNode().countByStatus ?? {};
+    const selectedStatuses = this.statusCtrlValue() ?? [];
+    const statusesToCount = selectedStatuses.length ? selectedStatuses : Object.keys(countByStatus);
+    return statusesToCount.reduce((sum, status) => sum + (countByStatus[status] ?? 0), 0);
+  });
+
+  protected readonly showCountWarning = computed(() => {
+    const search = this.searchCtrlValue();
+    const totalItems = this.totalItems();
+    const displayedItems = this.displayedItems();
+    const expectedCount = this.expectedCount();
+
+    if (!!search || (expectedCount === 0 && totalItems === 0)) {
       return false;
     }
-    return initialCount !== totalItems;
+    if (expectedCount <= PAGE_SIZE_OPTIONS[0] && expectedCount !== displayedItems) {
+      return true;
+    }
+    return expectedCount !== totalItems;
   });
 
   ngAfterViewInit(): void {
@@ -173,7 +195,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
-    return of([PAGE_SIZE]);
+    return of(PAGE_SIZE_OPTIONS);
   }
 
   // eslint-disable-next-line step-lint/component-public-fields

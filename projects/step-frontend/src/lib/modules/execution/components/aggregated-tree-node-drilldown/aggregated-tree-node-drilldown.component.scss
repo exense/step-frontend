@@ -40,6 +40,14 @@ step-aggregated-tree-node-drilldown {
   }
 
   .close-all {
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  step-btn-group.shrink button.mat-mdc-icon-button.mat-mdc-button-base {
+    height: 3.4rem;
+    width: 3.6rem;
   }
 }
