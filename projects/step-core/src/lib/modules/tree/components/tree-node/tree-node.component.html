@@ -15,11 +15,6 @@
   }
   @if (_treeNode.node(); as n) {
     <div class="node-content" (contextmenu)="_treeNode.openContextMenu($event)">
-      @if (n.icon) {
-        <div class="node-icon">
-          <step-icon [name]="n.icon" [class]="n.iconClassName" />
-        </div>
-      }
       <step-tree-node-name [node]="n" />
     </div>
   }
