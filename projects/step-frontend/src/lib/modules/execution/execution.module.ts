@@ -650,23 +650,6 @@ export class ExecutionModule {
         },
         {
           path: ':id',
-          canActivate: [
-            sequenceCanActivateGuards([
-              checkEntityGuardFactory({
-                entityType: 'execution',
-                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
-                getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
-                isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
-                getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
-              }),
-              altExecutionGuard,
-            ]),
-            (route: ActivatedRouteSnapshot) => {
-              const id = route.params['id'];
-              inject(ActiveExecutionContextService).setupExecutionId(id);
-              return true;
-            },
-          ],
           component: AltExecutionProgressComponent,
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
@@ -686,6 +669,25 @@ export class ExecutionModule {
             ActiveExecutionContextService,
             AggregatedReportViewTreeStateContextService,
           ],
+          canActivate: [
+            sequenceCanActivateGuards([
+              checkEntityGuardFactory({
+                entityType: 'execution',
+                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
+                isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
+                getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
+              }),
+              altExecutionGuard,
+            ]),
+          ],
+          resolve: {
+            setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            }
+          },
           canDeactivate: [
             () => {
               inject(AugmentedExecutionsService).cleanupCache();
