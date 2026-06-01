@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import {
   AugmentedScreenService,
+  ElementSizeDirective,
   FilterConditionFactoryService,
   HighlightedItemExtractor,
   PopoverMode,
@@ -47,7 +48,7 @@ import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-d
     TablePersistenceStateService,
     tablePersistenceConfigProvider('keywords', { ...STORE_ALL, storeSort: false }),
   ],
-  hostDirectives: [AltReportNodeListSearchDirective, AltReportNodeListItemsPerPageDirective],
+  hostDirectives: [AltReportNodeListSearchDirective, AltReportNodeListItemsPerPageDirective, ElementSizeDirective],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
