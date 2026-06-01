@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   HostListener,
   inject,
@@ -11,20 +12,22 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentType } from '../../types/attachment-type.enum';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { FILE_TYPES, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { AttachmentMeta, AugmentedResourcesService, UserService } from '../../../../client/step-client-module';
 import { DOCUMENT } from '@angular/common';
-import { RichEditorComponent } from '../../../rich-editor';
+import { AceMode, RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { from, map } from 'rxjs';
+import { finalize, from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
 const IMAGE_ZOOM_PADDING_PX = 16;
@@ -37,16 +40,21 @@ const IMAGE_ZOOM_PADDING_PX = 16;
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.small]': 'attachmentType === AttachmentType.DEFAULT || attachmentType === AttachmentType.SKIPPED',
+    '[class.small]':
+      '(attachmentType === AttachmentType.DEFAULT && !isPdfAttachment) || attachmentType === AttachmentType.SKIPPED',
   },
 })
 export class AttachmentDialogComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _resourceService = inject(AugmentedResourcesService);
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _userService = inject(UserService);
+  private _httpClient = inject(HttpClient);
   private _fb = inject(FormBuilder).nonNullable;
   private _snackBar = inject(MatSnackBar);
-  private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
+  private _sanitizer = inject(DomSanitizer);
+  private _doc = inject(DOCUMENT);
+  private _clipboard = this._doc.defaultView!.navigator.clipboard;
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
   private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
@@ -92,10 +100,29 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly scrollDownOnRefresh = model(true);
   protected readonly canZoomImage = signal(false);
   protected readonly isImageZoomed = signal(false);
+  protected readonly videoAttachmentUrl = signal<string | undefined>(undefined);
+  protected readonly isVideoContentLoading = signal(false);
 
   protected readonly contentCtrl = this._fb.control('');
+  protected readonly isTextContentLoading = signal(false);
+  protected readonly isTextContentLoaded = signal(false);
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
+  protected readonly isXmlAttachment = this.matchesAttachmentType(FILE_TYPES.XML, FILE_TYPES.XML_TEXT);
+  protected readonly isPdfAttachment = this.matchesAttachmentType(FILE_TYPES.PDF);
+  protected readonly canRenderAttachment = this.determineCanRenderAttachment();
+  protected readonly canOpenRenderedAttachmentInSeparateTab =
+    this.canRenderAttachment || this.isXmlAttachment || this.isPdfAttachment;
+  protected readonly isSourceView = signal(!this.canRenderAttachment);
+  protected readonly renderedAttachmentUrl = computed<SafeResourceUrl | undefined>(() => {
+    const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    return this._sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+  protected readonly textAttachmentSyntaxMode = this.isXmlAttachment ? AceMode.XML : AceMode.TEXT;
   protected readonly AttachmentType = AttachmentType;
+
+  constructor() {
+    this._destroyRef.onDestroy(() => this.revokeVideoObjectUrl());
+  }
 
   ngOnInit(): void {
     this.initializeContent();
@@ -111,6 +138,19 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected openTraceViewerInSeparateTab(): void {
     this.traceViewer()?.openInSeparateTab?.();
+  }
+
+  protected toggleSourceView(): void {
+    const showSource = !this.isSourceView();
+    this.isSourceView.set(showSource);
+    if (showSource) {
+      this.loadTextContent();
+    }
+  }
+
+  protected openRenderedAttachmentInSeparateTab(): void {
+    const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    this._doc.defaultView!.open(url, '_blank');
   }
 
   protected updateCanZoomImage(): void {
@@ -143,13 +183,65 @@ export class AttachmentDialogComponent implements OnInit {
 
   private initializeContent(): void {
     this.contentCtrl.disable();
+    if (this.attachmentType === AttachmentType.VIDEO) {
+      this.loadVideoContent();
+      return;
+    }
     if (this.attachmentType !== AttachmentType.TEXT) {
       return;
     }
-    this._resourceService.getResourceContentAsText(this._data.id!).subscribe((content) => {
-      this.contentCtrl.setValue(content);
-      this.richEditor()?.clearSelection?.();
-    });
+    if (this.isSourceView() || this.isXmlAttachment) {
+      this.loadTextContent();
+    }
+  }
+
+  private loadTextContent(): void {
+    if (this.isTextContentLoading() || this.isTextContentLoaded()) {
+      return;
+    }
+    this.isTextContentLoading.set(true);
+    this._resourceService
+      .getResourceContentAsText(this._data.id!)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => this.isTextContentLoading.set(false)),
+      )
+      .subscribe((content) => {
+        this.contentCtrl.setValue(content);
+        this.isTextContentLoaded.set(true);
+        this.richEditor()?.clearSelection?.();
+      });
+  }
+
+  private loadVideoContent(): void {
+    if (this.isVideoContentLoading() || this.videoAttachmentUrl()) {
+      return;
+    }
+    const fallbackUrl = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
+    this.isVideoContentLoading.set(true);
+    this._httpClient
+      .get(fallbackUrl, { responseType: 'blob' })
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => this.isVideoContentLoading.set(false)),
+      )
+      .subscribe({
+        next: (content) => {
+          this.revokeVideoObjectUrl();
+          const objectUrl = this._doc.defaultView!.URL.createObjectURL(content);
+          this.videoAttachmentUrl.set(objectUrl);
+        },
+        error: () => this.videoAttachmentUrl.set(fallbackUrl),
+      });
+  }
+
+  private revokeVideoObjectUrl(): void {
+    const url = this.videoAttachmentUrl();
+    if (!url?.startsWith('blob:')) {
+      return;
+    }
+    this._doc.defaultView!.URL.revokeObjectURL(url);
+    this.videoAttachmentUrl.set(undefined);
   }
 
   protected copyTextContentToClipboard(): void {
@@ -160,5 +252,18 @@ export class AttachmentDialogComponent implements OnInit {
     from(this._clipboard.writeText(content)).subscribe(() => {
       this._snackBar.open(`Text copied to clipboard.`, 'dismiss');
     });
+  }
+
+  private determineCanRenderAttachment(): boolean {
+    return this.matchesAttachmentType(FILE_TYPES.HTML, FILE_TYPES.HTM);
+  }
+
+  private matchesAttachmentType(...types: Array<{ readonly extension?: string; readonly mimeType?: string }>): boolean {
+    const mimeType = this._data.mimeType?.toLowerCase();
+    if (mimeType && types.some((type) => type.mimeType?.toLowerCase() === mimeType)) {
+      return true;
+    }
+    const extension = this._data.name?.split('.').pop()?.toLowerCase();
+    return !!extension && types.some((type) => type.extension?.toLowerCase() === extension);
   }
 }
