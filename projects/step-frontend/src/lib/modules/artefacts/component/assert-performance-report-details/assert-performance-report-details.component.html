@@ -2,10 +2,20 @@
   <step-report-details-sections [items]="items" />
 }
 @if (node()?.error) {
-  <step-report-details-error [node]="node()" />
+  <section class="data-container">
+    <div class="container-title">Errors</div>
+    <div>
+      <step-report-details-error [node]="node()" />
+    </div>
+  </section>
 }
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
-    <step-report-details-attachments [attachments]="attachments" />
+    <section class="data-container">
+      <div class="container-title">Attachments</div>
+      <div>
+        <step-report-details-attachments [attachments]="attachments" />
+      </div>
+    </section>
   }
 }
