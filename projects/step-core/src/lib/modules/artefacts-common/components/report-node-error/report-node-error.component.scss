@@ -2,7 +2,6 @@
 
 :host {
   display: flex;
-  align-items: center;
 }
 
 @include mixins.reportNodeText();
