@@ -20,7 +20,10 @@ export const FILE_TYPES = {
   MD: createTypeInfo(TypeInfoCategory.TEXT, 'md', 'text/plain'),
   CSV: createTypeInfo(TypeInfoCategory.TEXT, 'csv', 'text/csv'),
   JSON: createTypeInfo(TypeInfoCategory.TEXT, 'json', 'application/json'),
-  XML: createTypeInfo(TypeInfoCategory.TEXT, 'XML', 'application/xml'),
+  HTML: createTypeInfo(TypeInfoCategory.TEXT, 'html', 'text/html'),
+  HTM: createTypeInfo(TypeInfoCategory.TEXT, 'htm', 'text/html'),
+  XML: createTypeInfo(TypeInfoCategory.TEXT, 'xml', 'application/xml'),
+  XML_TEXT: createTypeInfo(TypeInfoCategory.TEXT, 'xml', 'text/xml'),
   YAML: createTypeInfo(TypeInfoCategory.TEXT, 'yaml', 'application/yaml'),
   YML: createTypeInfo(TypeInfoCategory.TEXT, 'yml', 'application/yaml'),
   INI: createTypeInfo(TypeInfoCategory.TEXT, 'ini', 'text/plain'),
@@ -69,5 +72,6 @@ export const FILE_TYPES = {
   OGV: createTypeInfo(TypeInfoCategory.VIDEO, 'ogv', 'video/ogg'),
 
   // Other types
+  PDF: createTypeInfo(TypeInfoCategory.OTHER, 'pdf', 'application/pdf'),
   PLAYWRIGHT_TRACE: createTypeInfo(TypeInfoCategory.OTHER, 'zip', 'application/vnd.step.playwright-trace+zip', true),
 };
