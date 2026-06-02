@@ -93,6 +93,14 @@
   }
 }
 
+step-alt-report-node-keywords {
+  .execution-report-node-inline-details {
+    step-artefact-inline-additional-info {
+      margin-left: 2rem;
+    }
+  }
+}
+
 @mixin execution-report-node-details {
   .tree-collapse-container {
     background: var.$gray-25;

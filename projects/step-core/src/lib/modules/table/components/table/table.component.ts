@@ -253,12 +253,16 @@ export class TableComponent<T>
   readonly displayColumns = computed(() => {
     const isColumnsInitialized = this._tableColumns.isInitialized();
     const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
-    const isTableReady = this.isTableReadyToRenderColumns();
+    const isTableReadyToRenderColumns = this.isTableReadyToRenderColumns();
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
     const visibleColumnsByInput = this.visibleColumns();
 
     if (!isColumnsInitialized) {
-      return isTableReady ? columnPlaceholderIds : [];
+      return isTableReadyToRenderColumns ? columnPlaceholderIds : [];
+    }
+
+    if (!isTableReadyToRenderColumns) {
+      return columnPlaceholderIds;
     }
 
     if (!visibleColumnsByInput) {
@@ -268,19 +272,23 @@ export class TableComponent<T>
   });
 
   readonly displaySearchColumns = computed(() => {
+    const isTableReadyToRenderColumns = this.isTableReadyToRenderColumns();
     const searchColumnNames = this.displayColumns().map((col) => `search-${col}`);
+    if (!isTableReadyToRenderColumns) {
+      return [];
+    }
     const configuredSearchColumnNames = new Set(this.searchColumns.map((col) => col.colName));
     return searchColumnNames.filter((col) => configuredSearchColumnNames.has(col));
   });
 
   redrawColumns(): void {
+    this.isTableReadyToRenderColumns.set(false);
     this.columnsUpdateTrigger.update((value) => (value + 1) % 10);
     setTimeout(() => {
       if (!this.isInitialized) {
         return;
       }
       this.configureColumns();
-      this.configureSearchColumns();
       this.addCustomColumnsDefinitionsToRemoteDatasource();
     });
   }
@@ -314,7 +322,6 @@ export class TableComponent<T>
   ngAfterViewInit(): void {
     const setup = (): void => {
       this.configureColumns();
-      this.configureSearchColumns();
       this._columnsDefinitions.setup(this.contentColumns, this.customRemoteColumns);
       this._tableColumns.initialize();
 
@@ -336,6 +343,12 @@ export class TableComponent<T>
   }
 
   private configureColumns(): void {
+    this.configureViewColumns();
+    this.configureSearchColumns();
+    this.isTableReadyToRenderColumns.set(true);
+  }
+
+  private configureViewColumns(): void {
     const table = this.table();
     if (!table) {
       return;
@@ -355,7 +368,6 @@ export class TableComponent<T>
         table.addColumnDef(col);
       }
     });
-    this.isTableReadyToRenderColumns.set(true);
   }
 
   private configureSearchColumns(): void {

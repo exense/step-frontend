@@ -4,6 +4,7 @@ export interface TreeNode {
   parentId?: string;
   icon: string;
   iconClassName?: string;
+  iconTooltip?: string;
   expandable: boolean;
   isSkipped: boolean;
   isVisuallySkipped?: boolean;

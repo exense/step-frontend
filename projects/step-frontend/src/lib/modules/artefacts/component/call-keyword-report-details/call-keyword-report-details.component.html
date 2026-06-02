@@ -32,6 +32,7 @@
 @if (failedChildren(); as failedChildren) {
   @if (failedChildren.length) {
     <section class="data-container">
+      <div class="container-title">Errors</div>
       <div>
         @for (child of failedChildren; track child.id) {
           <step-report-node-error [node]="child" />
@@ -40,12 +41,22 @@
     </section>
   }
   @if (!failedChildren.length && node()?.error) {
-    <step-report-details-error [node]="node()" />
+    <section class="data-container">
+      <div class="container-title">Errors</div>
+      <div>
+        <step-report-details-error [node]="node()" />
+      </div>
+    </section>
   }
 }
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
-    <step-report-details-attachments [attachments]="attachments" />
+    <section class="data-container">
+      <div class="container-title">Attachments</div>
+      <div>
+        <step-report-details-attachments [attachments]="attachments" />
+      </div>
+    </section>
   }
 }
 @if (measuresDataSource(); as measuresDataSource) {

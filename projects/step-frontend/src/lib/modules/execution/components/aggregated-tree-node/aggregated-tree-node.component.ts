@@ -4,7 +4,7 @@ import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
-import { ElementSizeService, TreeNodeData } from '@exense/step-core';
+import { ArtefactService, ElementSizeService, TreeNodeData } from '@exense/step-core';
 import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 
@@ -24,6 +24,7 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _parentElementSize = inject(ElementSizeService, { skipSelf: true, optional: true });
   private _treeNodeData = inject(TreeNodeData);
+  private _artefactTypes = inject(ArtefactService);
   protected readonly _useLargeView = inject(AGGREGATED_TREE_NODE_LARGE_VIEW);
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
@@ -46,6 +47,16 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   protected readonly node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
+  });
+
+  protected readonly iconClass = computed(() => {
+    const node = this.node();
+    return ['control-icon', node?.iconClassName].filter((cssClass) => !!cssClass).join(' ');
+  });
+
+  protected readonly iconTooltip = computed(() => {
+    const artefactClass = this.node()?.originalArtefact?._class;
+    return this._artefactTypes.getArtefactType(artefactClass)?.label ?? artefactClass ?? '';
   });
 
   protected readonly isSelected = computed(() => {

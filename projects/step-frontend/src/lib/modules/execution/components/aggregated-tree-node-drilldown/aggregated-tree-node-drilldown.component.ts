@@ -37,6 +37,9 @@ import { v4 } from 'uuid';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -74,10 +77,15 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
   private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
   private _reportSettings = inject(AltExecutionReportSettingsService);
+  protected readonly _executionState = inject(AltExecutionStateService);
 
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
+  protected readonly fullTimeRangeLabel = this._executionState.timeRange$.pipe(
+    filter((range) => range !== undefined),
+    map((range) => TimeSeriesUtils.formatRange(range)),
+  );
 
   protected readonly selectedRootReportNodeId = computed(() => {
     const stackItems = this.stackItems();
@@ -162,6 +170,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   protected handleCloseAll(): void {
     const items = this.stackItemsUntracked;
     this.removeItem(items[0].id);
+  }
+
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
+    this._executionState.updateTimeRangeSelection(selection);
   }
 
   protected removeItem(id: string, withLocationUpdate?: boolean): void {
