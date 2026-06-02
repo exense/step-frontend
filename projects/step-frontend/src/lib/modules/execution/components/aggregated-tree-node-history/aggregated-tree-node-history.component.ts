@@ -8,7 +8,7 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { combineLatestWith, map, Observable, of, switchMap, take } from 'rxjs';
+import { combineLatestWith, map, Observable, switchMap, take } from 'rxjs';
 import { TreeNodePieChartSlice } from './execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { Status } from '../../../_common/shared/status.enum';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -46,31 +46,12 @@ export class AggregatedTreeNodeHistoryComponent {
 
   private previousExecutions$ = this._executionState.execution$.pipe(
     take(1),
-    switchMap((ex: Execution) => {
-      let lastExecutions: Observable<Execution[]>;
-      if (ex.executionTaskID) {
-        lastExecutions = this.fetchLastExecutionsByTask(ex.startTime! - 1, ex.executionTaskID);
-      } else {
-        const repositoryObject = ex.executionParameters?.repositoryObject;
-        const isNotLocal = !!repositoryObject && repositoryObject.repositoryID !== 'local';
-        if (isNotLocal) {
-          let canonicalPlanName = ex.importResult?.canonicalPlanName;
-          if (!canonicalPlanName) {
-            return of([]);
-          } else {
-            return this._executionService.getLastExecutionsByCanonicalPlanName(
-              canonicalPlanName,
-              this.previousExecutionsCount(),
-              0,
-              ex.startTime! - 1,
-            );
-          }
-        } else {
-          lastExecutions = this.fetchLastExecutionsByPlan(ex.startTime! - 1, ex.planId!);
-        }
-      }
-      return lastExecutions.pipe(map((lastExecutions) => [ex, ...lastExecutions].reverse()));
-    }),
+    switchMap((ex) =>
+      (ex.executionTaskID
+        ? this.fetchLastExecutionsByTask(ex.startTime! - 1, ex.executionTaskID)
+        : this.fetchLastExecutionsByPlan(ex.startTime! - 1, ex.planId!)
+      ).pipe(map((lastExecutions) => [ex, ...lastExecutions].reverse())),
+    ),
   );
 
   private artefactHashWithPreviousExecutions$ = toObservable(this.artefactHashContainer).pipe(
