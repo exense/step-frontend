@@ -111,6 +111,10 @@ export class TimeSeriesContext {
    */
   updateFullTimeRange(range: TimeRange, resetSelection?: boolean): void {
     range = TimeSeriesUtils.removeFloatingDigits(range);
+    const current = this.timeRangeSettings.fullRange;
+    if (!resetSelection && current?.from === range.from && current?.to === range.to) {
+      return;
+    }
     const isFullRangeSelected = this.isFullRangeSelected() || resetSelection;
     const previousSelection = this.timeRangeSettings.selectedRange;
     if (isFullRangeSelected || !TimeSeriesUtils.intervalIsInside(range, previousSelection)) {
