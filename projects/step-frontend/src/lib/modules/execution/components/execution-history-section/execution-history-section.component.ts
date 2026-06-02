@@ -19,4 +19,13 @@ export class ExecutionHistorySectionComponent {
   protected readonly isScheduledExecution = toSignal(
     this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)),
   );
+
+  protected readonly isExternalPlanExecution = toSignal(
+    this._executionState.execution$.pipe(
+      map((ex) => {
+        const repositoryObject = ex.executionParameters?.repositoryObject;
+        return repositoryObject && repositoryObject?.repositoryID !== 'local';
+      }),
+    ),
+  );
 }
