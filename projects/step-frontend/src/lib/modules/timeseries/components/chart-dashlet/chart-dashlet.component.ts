@@ -34,7 +34,19 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, finalize, forkJoin, map, Observable, of, skip, Subscription, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  defaultIfEmpty,
+  finalize,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  skip,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis, Band, Hooks } from 'uplot';
@@ -145,7 +157,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       skip(1),
       switchMap((item) => {
         this.prepareState(item);
-        return this.refresh(true);
+        return this.refresh(true).pipe(catchError(() => of(undefined)));
       }),
       takeUntilDestroyed(this._destroyRef),
     )
@@ -222,7 +234,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   protected handleZoomReset(): void {
-    console.log('zoom reset from chart');
     this.context().setChartsLockedState(false);
     this.zoomReset.emit();
   }

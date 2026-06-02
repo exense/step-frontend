@@ -45,7 +45,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, merge, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { catchError, forkJoin, map, merge, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 //@ts-ignore
 import { DashboardState } from './dashboard-state';
@@ -136,7 +136,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
   ): void {
-    console.log('UPDATING time range', timeRange);
     this.mainEngine.state.lastChangeType = opts.actionType;
     this.mainEngine?.state.context.updateFullTimeRange(timeRange, opts.resetSelection);
   }
@@ -658,7 +657,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const tableRefreshes$ = this.dashlets()
             .filter((d) => d.getType() === 'TABLE')
             .map((d) => (d as TableDashletComponent).refreshCompareData());
-          return tableRefreshes$.length ? forkJoin(tableRefreshes$) : of([]);
+          return (tableRefreshes$.length ? forkJoin(tableRefreshes$) : of([])).pipe(catchError(() => of([])));
         }),
       )
       .subscribe();
