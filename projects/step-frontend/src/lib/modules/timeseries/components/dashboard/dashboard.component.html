@@ -104,14 +104,14 @@
 
       @if (mainEngine.state) {
         <div class="dashlet-container">
-          @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.id) {
+          @for (dashlet of dashboard.dashlets; let i = $index; track dashlet) {
             @if (editMode || !dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
               @if (dashlet.type === 'CHART') {
                 <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
                   <step-chart-dashlet
                     #chart
                     [editMode]="editMode"
-                    [showExecutionLinks]="showExecutionLinks"
+                    [showExecutionLinks]="showExecutionLinks()"
                     [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                     [item]="dashlet"
                     [context]="mainEngine.state.context"
@@ -195,7 +195,7 @@
 
     <ng-template #settingsButtonsTemplate>
       <div class="header-buttons-container">
-        @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
+        @if (hasWritePermission && editable() && !dashboard.customFields?.['locked']) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
               >Saving will capture all the current settings, like filters, grouping, and charts settings

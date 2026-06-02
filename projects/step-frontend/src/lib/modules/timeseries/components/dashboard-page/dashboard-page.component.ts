@@ -110,7 +110,7 @@ export class DashboardPageComponent implements OnInit {
     this.subscribeToUrlNavigation();
   }
 
-  handleDashboardUpdate(dashboard: DashboardView): void {
+  protected handleDashboardUpdate(dashboard: DashboardView): void {
     // the dashboard is editable. this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
     const mergedDashboard: DashboardView = {
       ...dashboard,
@@ -120,13 +120,14 @@ export class DashboardPageComponent implements OnInit {
     this._dashboardService.saveDashboard(mergedDashboard).subscribe((response) => {});
   }
 
-  handleRefreshIntervalChange(interval: number): void {
+  protected handleRefreshIntervalChange(interval: number): void {
     this.refreshInterval.set(interval);
     this._urlParamsService.updateRefreshInterval(interval, false);
   }
 
-  handleFullRangeChanged(range: TimeRange): void {
+  protected handleFullRangeChanged(range: TimeRange): void {
     this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
+    this.dashboardComponent()?.updateFullTimeRange(range, { actionType: 'manual' });
   }
 
   private findRelativeTimeOption(relativeMs: number): TimeRangePickerSelection {
@@ -138,7 +139,7 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  handleDashboardSettingsChange(context: TimeSeriesContext): void {
+  protected handleDashboardSettingsChange(context: TimeSeriesContext): void {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
       this.activeTimeRangeSelection()!,

@@ -2,16 +2,13 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  effect,
   inject,
   input,
-  Input,
   OnDestroy,
   OnInit,
   output,
-  QueryList,
-  ViewChild,
-  ViewChildren,
+  viewChild,
+  viewChildren,
 } from '@angular/core';
 import {
   AugmentedTimeSeriesService,
@@ -41,7 +38,6 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent, PerformanceViewTimeSelectionComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
-import { MatMenuTrigger } from '@angular/material/menu';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -49,7 +45,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, merge, Observable, of, Subscription, tap } from 'rxjs';
+import { catchError, forkJoin, map, merge, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 //@ts-ignore
 import { DashboardState } from './dashboard-state';
@@ -81,13 +77,14 @@ import { MatTooltip } from '@angular/material/tooltip';
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
-  @ViewChildren('chart') dashlets!: QueryList<ChartDashlet>;
-  @ViewChildren('compareChart') compareDashlets!: QueryList<ChartDashlet>;
-  @ViewChild('filterBar') filterBar?: DashboardFilterBarComponent;
-  @ViewChild('timeSelection') timeRanger?: PerformanceViewTimeSelectionComponent;
-  @ViewChild('compareTimeSelection') compareTimeRanger?: PerformanceViewTimeSelectionComponent;
-  @ViewChild('compareFilterBar') compareFilterBar?: DashboardFilterBarComponent;
-  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
+  protected readonly dashlets = viewChildren<ChartDashlet>('chart');
+  protected readonly compareDashlets = viewChildren<ChartDashlet>('compareChart');
+  protected readonly filterBar = viewChild('filterBar', { read: DashboardFilterBarComponent });
+  protected readonly timeRanger = viewChild('timeSelection', { read: PerformanceViewTimeSelectionComponent });
+  protected readonly compareTimeRanger = viewChild('compareTimeSelection', {
+    read: PerformanceViewTimeSelectionComponent,
+  });
+  protected readonly compareFilterBar = viewChild('compareFilterBar', { read: DashboardFilterBarComponent });
 
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
@@ -100,13 +97,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
-  id = input.required<string>(); // dashboard id
-  @Input() storageId?: string; // for persistence across views
-  @Input() editable: boolean = true;
-  @Input() hiddenFilters: FilterBarItem[] = [];
+  readonly id = input.required<string>(); // dashboard id
+  readonly storageId = input<string>(); // for persistence across views
+  readonly editable = input(true);
+  readonly hiddenFilters = input<FilterBarItem[]>([]);
   readonly hiddenFiltersOQL = input<string>();
   readonly disabledFilterOptions = input<string[]>([]);
-  @Input() showExecutionLinks = true;
+  readonly showExecutionLinks = input(true);
   readonly initialTimeRange = input.required<TimeRange>();
 
   protected timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
@@ -155,10 +152,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     const metrics$ = this._timeSeriesService.getMetricTypes();
     const dashboard$ = this._dashboardService.getDashboardById(dashboardId);
-    forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
-      this.metricTypes = metrics;
-      this.initState(urlParams, dashboard).subscribe((context) => this.contextSettingsInit.emit(context));
-    });
+    forkJoin([metrics$, dashboard$])
+      .pipe(
+        switchMap(([metrics, dashboard]) => {
+          this.metricTypes = metrics;
+          return this.initState(urlParams, dashboard);
+        }),
+      )
+      .subscribe((context) => this.contextSettingsInit.emit(context));
   }
 
   /**
@@ -188,7 +189,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   private initState(urlParams: DashboardUrlParams, dashboard: DashboardView): Observable<TimeSeriesContext> {
     this.dashboard = dashboard;
-    const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
+    const storageId = this.storageId();
+    const existingContext = storageId ? this._timeSeriesContextFactory.getContext(storageId) : undefined;
     const context$: Observable<TimeSeriesContext> = existingContext
       ? of(existingContext)
       : this.createContext(this.dashboard, urlParams, existingContext);
@@ -235,16 +237,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.resolution = context.getChartsResolution();
     const state: DashboardState = {
       context: context,
-      getFilterBar: () => this.filterBar!,
-      getDashlets: () => this.dashlets,
-      getRanger: () => this.timeRanger!,
+      getFilterBar: () => this.filterBar()!,
+      getDashlets: () => Array.from(this.dashlets()),
+      getRanger: () => this.timeRanger()!,
       refreshInProgress: false,
       lastChangeType: 'manual', // to trigger loading
     };
     this.mainEngine = new DashboardStateEngine(state);
     this.mainEngine.subscribeForContextChange();
 
-    if (editMode && this.hasWritePermission && this.editable) {
+    if (editMode && this.hasWritePermission && this.editable()) {
       this.enableEditMode();
     }
   }
@@ -277,7 +279,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.dashboard.grouping = this.mainEngine.state.context.getGroupDimensions();
     this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
-      this.filterBar?._internalFilters.map((item) => {
+      this.filterBar()?._internalFilters.map((item) => {
         const apiFilter = FilterUtils.convertToApiFilterItem(item);
         apiFilter.removable = false; // make all the fields not removable once saved
         return apiFilter;
@@ -304,7 +306,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       specificFiltersToInherit: [],
       tableSettings: { columns: this.getInitialTableColumns() },
     };
-    this.filterBar!.addUniqueFilterItems(
+    this.filterBar()!.addUniqueFilterItems(
       tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
     );
     this.dashboard.dashlets.push(tableItem);
@@ -326,7 +328,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
   }
 
-  protected addChartDashlet(metric: MetricType) {
+  protected addChartDashlet(metric: MetricType): void {
     const newDashlet: DashboardItem = {
       id: 'chart-' + new Date().getTime(),
       name: metric.displayName,
@@ -352,14 +354,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         },
       },
     };
-    this.filterBar!.addUniqueFilterItems(
+    this.filterBar()!.addUniqueFilterItems(
       newDashlet.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
     );
     this.dashboard.dashlets.push(newDashlet);
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
   }
 
-  private computeTimeRangeSettings(
+  private computeInitialTimeRangeSettings(
     existingSettings: DashboardTimeRangeSettings | undefined,
     urlParams: DashboardUrlParams,
   ): DashboardTimeRangeSettings {
@@ -379,7 +381,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     urlParams: DashboardUrlParams,
     existingContext?: TimeSeriesContext,
   ): Observable<TimeSeriesContext> {
-    const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
+    const timeRangeSettings: DashboardTimeRangeSettings = this.computeInitialTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
       urlParams,
     );
@@ -391,7 +393,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     let visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
       dashboard.filters,
-      this.hiddenFilters,
+      this.hiddenFilters(),
     );
     let disabledFilterOptions: string[] = this.disabledFilterOptions();
     disabledFilterOptions.forEach((disabledAttribute) => {
@@ -410,7 +412,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             filteringSettings: {
               mode: TsFilteringMode.STANDARD,
               filterItems: visibleFilters,
-              hiddenFilters: this.hiddenFilters,
+              hiddenFilters: this.hiddenFilters(),
               hiddenFiltersOql: this.hiddenFiltersOQL(),
             },
             resolution: this.resolution,
@@ -418,7 +420,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             refreshInterval:
               urlParams.refreshInterval !== undefined ? urlParams.refreshInterval : this.dashboard.refreshInterval,
           },
-          this.storageId,
+          this.storageId(),
         );
       }),
     );
@@ -536,7 +538,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected handleChartDelete(index: number) {
+  protected handleChartDelete(index: number): void {
     const itemToDelete = this.dashboard.dashlets[index];
     this.dashboard.dashlets.splice(index, 1);
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
@@ -548,7 +550,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
 
-  protected handleChartShiftLeft(index: number) {
+  protected handleChartShiftLeft(index: number): void {
     const listLength = this.dashboard.dashlets.length;
     let swapIndex = index - 1;
     if (index === 0) {
@@ -561,7 +563,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
   }
 
-  protected handleChartShiftRight(index: number) {
+  protected handleChartShiftRight(index: number): void {
     const listLength = this.dashboard.dashlets.length;
     let swapIndex = index + 1;
     if (index === listLength - 1) {
@@ -574,7 +576,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
   }
 
-  protected toggleCompareMode() {
+  protected toggleCompareMode(): void {
     this.compareModeEnabled = !this.compareModeEnabled;
     if (this.compareModeEnabled) {
       this.enableCompareMode();
@@ -583,13 +585,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private disableCompareMode() {
+  private disableCompareMode(): void {
     if (this.compareModeChangesSubscription) {
       this.compareModeChangesSubscription.unsubscribe();
       this.compareModeChangesSubscription = undefined;
     }
     this.mainEngine.state.context.disableCompareMode();
-    this.dashlets.forEach((d) => {
+    this.dashlets().forEach((d) => {
       if (d.getType() === 'TABLE') {
         (d as TableDashletComponent).disableCompareMode();
       }
@@ -642,25 +644,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     const state: DashboardState = {
       context: compareModeContext,
-      getDashlets: () => this.compareDashlets,
-      getFilterBar: () => this.compareFilterBar!,
-      getRanger: () => this.compareTimeRanger!,
+      getDashlets: () => Array.from(this.compareDashlets()),
+      getFilterBar: () => this.compareFilterBar()!,
+      getRanger: () => this.compareTimeRanger()!,
       refreshInProgress: false,
       lastChangeType: 'auto',
     };
 
-    this.compareModeChangesSubscription = compareModeContext.settingsChange$.subscribe((x) => {
-      this.dashlets.forEach((d) => {
-        if (d.getType() === 'TABLE') {
-          (d as TableDashletComponent).refreshCompareData().subscribe();
-        }
-      });
-    });
+    this.compareModeChangesSubscription = compareModeContext.settingsChange$
+      .pipe(
+        switchMap(() => {
+          const tableRefreshes$ = this.dashlets()
+            .filter((d) => d.getType() === 'TABLE')
+            .map((d) => (d as TableDashletComponent).refreshCompareData());
+          return (tableRefreshes$.length ? forkJoin(tableRefreshes$) : of([])).pipe(catchError(() => of([])));
+        }),
+      )
+      .subscribe();
 
     this.compareEngine = new DashboardStateEngine(state);
     this.compareEngine.subscribeForContextChange();
     mainState.context.enableCompareMode(compareModeContext);
-    this.dashlets.forEach((d) => {
+    this.dashlets().forEach((d) => {
       if (d.getType() === 'TABLE') {
         (d as TableDashletComponent).enableCompareMode(compareModeContext);
       }
@@ -684,7 +689,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   protected resetDashboard(): void {
-    this._timeSeriesContextFactory.destroyContext(this.storageId);
+    this._timeSeriesContextFactory.destroyContext(this.storageId());
     this.dashboard = undefined as any;
     this.dashboardBackup = undefined as any;
     this.compareModeEnabled = false;
@@ -694,9 +699,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this._changeDetectorRef.detectChanges();
 
-    this._dashboardService.getDashboardById(this.id()).subscribe((dashboard) => {
-      this.initState({ filters: [] }, dashboard).subscribe((context) => this.contextSettingsChanged.emit(context));
-    });
+    this._dashboardService
+      .getDashboardById(this.id())
+      .pipe(switchMap((dashboard) => this.initState({ filters: [] }, dashboard)))
+      .subscribe((context) => this.contextSettingsChanged.emit(context));
   }
 
   protected exportRawData(): void {
@@ -714,7 +720,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
     this.compareModeChangesSubscription?.unsubscribe();
-    if (!this.storageId) {
+    if (!this.storageId()) {
       this.mainEngine?.state?.context?.destroy?.();
       this.compareEngine?.state?.context?.destroy?.();
     }
