@@ -16,8 +16,12 @@
       />
     }
   </div>
-  <step-aggregated-tree-node-history
-    [artefactHashContainer]="artefactHashContainer()"
-    [previousExecutionsCount]="previousExecutionsCount()"
-  />
+  @if (!isExternalPlanExecution()) {
+    <step-aggregated-tree-node-history
+      [artefactHashContainer]="artefactHashContainer()"
+      [previousExecutionsCount]="previousExecutionsCount()"
+    />
+  } @else {
+    <span class="external-plan-warning">Execution history is not available for external plan repositories.</span>
+  }
 </section>
