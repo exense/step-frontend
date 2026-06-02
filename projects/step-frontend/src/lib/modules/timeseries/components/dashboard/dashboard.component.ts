@@ -592,6 +592,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.compareModeChangesSubscription.unsubscribe();
       this.compareModeChangesSubscription = undefined;
     }
+    this.compareEngine?.destroy();
+    this.compareEngine = undefined;
     this.mainEngine.state.context.disableCompareMode();
     this.dashlets().forEach((d) => {
       if (d.getType() === 'TABLE') {
@@ -697,6 +699,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.compareModeEnabled = false;
     this.resolution = undefined;
     this.mainEngine = undefined as any;
+    this.compareEngine?.destroy();
     this.compareEngine = undefined;
 
     this._changeDetectorRef.detectChanges();
