@@ -78,6 +78,10 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
       .subscribe();
   }
 
+  resizeRanger(): void {
+    this.rangerComponent()?.resizeChart();
+  }
+
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
     return this.createRanger(this.context());
   }

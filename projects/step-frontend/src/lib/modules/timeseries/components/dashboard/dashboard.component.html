@@ -88,15 +88,17 @@
                   [selectOptions]="timeRangeOptions"
                 />
               </div>
-              <step-ts-dashboard-filter-bar
-                #compareFilterBar
-                [editMode]="editMode"
-                [context]="compareEngine!.state.context"
-                [compactView]="true"
-                (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
-                (groupingChange)="handleGroupingChange(compareEngine!, $event)"
-                (filtersChange)="handleFiltersChange(compareEngine!, $event)"
-              />
+              <div class="tools-bar">
+                <step-ts-dashboard-filter-bar
+                  #compareFilterBar
+                  [editMode]="editMode"
+                  [context]="compareEngine!.state.context"
+                  [compactView]="true"
+                  (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
+                  (groupingChange)="handleGroupingChange(compareEngine!, $event)"
+                  (filtersChange)="handleFiltersChange(compareEngine!, $event)"
+                />
+              </div>
             </div>
           }
         }
