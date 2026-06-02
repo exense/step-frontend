@@ -19,8 +19,7 @@
           class="smaller-view indent-call-keyword-inline"
         >
           <ng-container *stepArtefactInlineDetailsHeader>
-            @let description = element.resolvedArtefact?.description;
-            <div class="larger-view artefact-header" [class.has-description]="!showFullDescription() && !!description">
+            <div class="larger-view artefact-header" [class.has-description]="!showFullDescription()">
               <step-alt-execution-time
                 mode="text"
                 displayFormat="time"
@@ -34,9 +33,6 @@
               <step-report-node-icon [node]="element" />
               <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
               <span class="name">{{ element.name }}</span>
-              @if (!showFullDescription() && !!description) {
-                <span class="description">{{ description | treeNodeDescription: false }}</span>
-              }
             </div>
           </ng-container>
         </step-artefact-inline-details>

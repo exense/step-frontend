@@ -1,25 +1,19 @@
 @if (!showFullInputsOutputs()) {
-  @if (hasDescription()) {
-    <step-artefact-inline-details-header [template]="headerTemplate()" />
-    <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
-  }
   @if (inputItems(); as inputItems) {
     <step-artefact-inline-field-list
       class="bold-labels"
       [items]="inputItems"
       hiddenItemsTooltipSuffix="additional input(s)"
     >
-      @if (!hasDescription()) {
-        <step-artefact-inline-field-list-prefix>
-          <step-artefact-inline-details-header [template]="headerTemplate()" />
-        </step-artefact-inline-field-list-prefix>
-      } @else {
-        <step-artefact-inline-field-list-prefix>
-          <step-icon name="log-in" matTooltip="Inputs" />
-        </step-artefact-inline-field-list-prefix>
-      }
+      <step-artefact-inline-field-list-prefix>
+        <step-artefact-inline-details-header [template]="headerTemplate()" />
+      </step-artefact-inline-field-list-prefix>
     </step-artefact-inline-field-list>
   }
+  @if (!inputItems()?.length && !outputItems()?.length) {
+    <step-artefact-inline-details-header [template]="headerTemplate()" />
+  }
+  <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
   @if (outputItems(); as outputItems) {
     <step-artefact-inline-field-list
       class="bold-labels"
@@ -27,17 +21,12 @@
       hiddenItemsTooltipSuffix="additional output(s)"
     >
       <step-artefact-inline-field-list-prefix>
-        @if (!hasDescription() && !inputItems()?.length) {
+        @if (!inputItems()?.length) {
           <step-artefact-inline-details-header [template]="headerTemplate()" />
         }
         <step-icon name="log-out" matTooltip="Outputs" />
       </step-artefact-inline-field-list-prefix>
     </step-artefact-inline-field-list>
-  }
-  @if (!inputItems()?.length && !outputItems()?.length) {
-    @if (!hasDescription()) {
-      <step-artefact-inline-details-header [template]="headerTemplate()" />
-    }
   }
 } @else {
   <step-artefact-inline-details-header [template]="headerTemplate()" />
