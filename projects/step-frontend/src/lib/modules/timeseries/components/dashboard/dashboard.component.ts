@@ -583,6 +583,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } else {
       this.disableCompareMode();
     }
+    // Resize after Angular updates the DOM, since the layout shifts between 100% and 50% column width
+    setTimeout(() => this.timeRanger()?.resizeRanger());
   }
 
   private disableCompareMode(): void {
