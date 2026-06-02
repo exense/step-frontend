@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .container {
   font-weight: bold;
   margin-top: 2rem;
@@ -7,5 +9,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 2rem;
+  }
+
+  .external-plan-warning {
+    color: var.$orange;
+    margin-left: 1rem;
+    font-weight: normal;
   }
 }
