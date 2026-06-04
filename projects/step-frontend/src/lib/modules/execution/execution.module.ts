@@ -39,7 +39,7 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  EntityRefDirective,
+  EntityRefDirective, PLAN_EXECUTION_REPORT_GRID, SCHEDULER_EXECUTION_REPORT_GRID, REPOSITORY_REPORT_GRID,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -120,7 +120,7 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
@@ -161,7 +161,6 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
 import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
 import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
 import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
-import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
 import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
@@ -205,6 +204,15 @@ import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
+import {
+  SummaryCardComponent
+} from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
+import {
+  CrossExecutionCallCountsComponent
+} from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
+import {
+  CrossExecutionStatusComponent
+} from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
 
 @NgModule({
   declarations: [
@@ -300,7 +308,9 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     IsEmptyStatusPipe,
     IsCurrentReportDetailsOpenedPipe,
     SchedulerPerformanceViewComponent,
+    SummaryCardComponent,
     SchedulerReportViewComponent,
+    CrossExecutionCallCountsComponent,
     CrossExecutionDashboardComponent,
     SchedulerPageComponent,
     RepositoryPageComponent,
@@ -308,7 +318,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
     AltExecutionErrorsWidgetComponent,
-    ReportViewHeaderComponent,
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
     HeatmapComponent,
@@ -320,6 +329,7 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AggregatedTreeNodeDrilldownComponent,
     AltExecutionAnalyticsControlsComponent,
     DashletEmptyColumnComponent,
+    CrossExecutionStatusComponent
   ],
   imports: [
     StepCommonModule,
@@ -343,8 +353,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
     TableCountsToggleComponent,
-    ChartSkeletonComponent,
-    ChartSkeletonComponent,
     AggregatedReportViewCountErrorsPipe,
     CalcElementWidthDirective,
     CalcElementWidthItemDirective,
@@ -943,6 +951,13 @@ export class ExecutionModule {
   private registerInfoBanners(): void {}
 
   private registerGridLayout(): void {
+    this.registerExecutionGridLayout();
+    this.registerReportGridLayout(PLAN_EXECUTION_REPORT_GRID);
+    this.registerReportGridLayout(SCHEDULER_EXECUTION_REPORT_GRID);
+    this.registerReportGridLayout(REPOSITORY_REPORT_GRID);
+  }
+
+  private registerExecutionGridLayout(): void {
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'errorsWidget',
       title: 'Error Summary',
@@ -1028,6 +1043,11 @@ export class ExecutionModule {
       weight: 99,
     });
   }
+
+  private registerReportGridLayout(gridId: string): void {
+
+  }
+
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';

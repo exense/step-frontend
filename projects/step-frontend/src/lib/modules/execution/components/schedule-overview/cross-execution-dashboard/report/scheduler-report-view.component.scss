@@ -53,7 +53,12 @@
 .piechart-container {
   width: 44rem;
   min-width: 44rem;
-  position: relative;
+}
+
+.header-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
 .row {
