@@ -5,7 +5,13 @@ import { DashboardUrlParamsService } from '../../../../timeseries/modules/_commo
 import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
-import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '@exense/step-core';
+import {
+  AugmentedPlansService,
+  AugmentedSchedulerService,
+  PLAN_EXECUTION_REPORT_GRID,
+  PlansService,
+  provideGridLayoutConfig,
+} from '@exense/step-core';
 import { PLAN_ID } from '../../../services/plan-id.token';
 
 @Component({
@@ -33,6 +39,7 @@ import { PLAN_ID } from '../../../services/plan-id.token';
       provide: CrossExecutionDashboardState,
       useClass: PlanPageStateService,
     },
+    ...provideGridLayoutConfig(PLAN_EXECUTION_REPORT_GRID),
   ],
   standalone: false,
 })

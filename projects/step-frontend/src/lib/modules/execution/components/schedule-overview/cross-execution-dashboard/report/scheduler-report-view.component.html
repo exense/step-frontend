@@ -1,59 +1,57 @@
-<section>
-  <div class="header-row">
-    <step-summary-card
-        cardTitle="Success Rate"
-        [value]="_state.successRateValue$ | async"
-        [inProgress]="_state.successRateValueInProgress()"
-    />
-    <step-summary-card
-        cardTitle="Average execution duration"
-        [value]="_state.averageExecutionDurationLabel$ | async"
-        [inProgress]="_state.averageDurationValueInProgress()"
-    />
-    <step-summary-card
-        cardTitle="Total executions"
-        [value]="_state.totalExecutionsCount$ | async"
-        [inProgress]="_state.totalExecutionsValueInProgress()"
-    />
+@if (hasNoLayout()) {
+  <div class="no-layout-message">
+    <h3>Configure a layout to see the Cross Execution Report</h3>
   </div>
-  <div class="row">
-    <step-alt-report-node-summary
-        class="piechart-container"
-        title="Summary: Executions"
-        [summary]="(_state.summaryData$ | async)"
-        [disableChartItemClick]="true"
-        [inProgress]="_state.summaryInProgress()"
-    />
-    <step-cross-execution-status class="flex-grow-1"/>
-  </div>
-  <div class="row">
-     <step-cross-execution-heatmap [defaultDateRange]="luxonDateRange()" class="flex-grow-1"/>
-  </div>
-  <div class="row">
-    <step-cross-execution-call-counts class="flex-grow-1"/>
-  </div>
-  <div class="row">
-    <step-alt-report-widget class="flex-grow-1" title="Errors">
-      <step-alt-report-widget-content class="widget-content">
-        <step-alt-execution-errors
-            [dataSource]="_state.errorsDataSource"
-            [statusFilterItems]="availableErrorTypes()"
-            [showActions]="false"
-            [indicatorMode]="TableIndicatorMode.SKELETON"
+}
+<step-grid-layout [class.hidden]="hasNoLayout()">
+  <step-summary-card
+    *stepGridItem="'successRate'; autoHeightOnFirstRow: true"
+    [value]="_state.successRateValue$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-summary-card
+    *stepGridItem="'averageExecutionDuration'; autoHeightOnFirstRow: true"
+    [value]="_state.averageExecutionDurationLabel$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-summary-card
+    *stepGridItem="'totalExecutions'; autoHeightOnFirstRow: true"
+    [value]="_state.totalExecutionsCount$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-alt-report-node-summary
+    *stepGridItem="'summaryExecutions'"
+    [summary]="_state.summaryData$ | async"
+    [disableChartItemClick]="true"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-cross-execution-status *stepGridItem="'crossExecutionStatus'" />
+  <step-cross-execution-heatmap *stepGridItem="'heatMap'" [defaultDateRange]="luxonDateRange()" />
+  <step-cross-execution-call-counts *stepGridItem="'callsCount'" />
+  <step-alt-report-widget *stepGridItem="'errors'" class="full-height">
+    <step-alt-report-widget-title>
+      <step-grid-element-title />
+    </step-alt-report-widget-title>
+    <step-alt-report-widget-content class="widget-content">
+      <step-alt-execution-errors
+        [dataSource]="_state.errorsDataSource"
+        [statusFilterItems]="availableErrorTypes()"
+        [showActions]="false"
+        [indicatorMode]="TableIndicatorMode.SKELETON"
+      />
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
+  <step-alt-report-widget *stepGridItem="'executions'" class="full-height">
+    <step-alt-report-widget-title>
+      <step-grid-element-title />
+    </step-alt-report-widget-title>
+    <step-alt-report-widget-content class="widget-content">
+      @if (luxonDateRange(); as dateRange) {
+        <step-cross-execution-executions-table
+          [defaultDateRange]="dateRange!"
+          [hiddenFilters]="_state.executionsTableFilters()"
         />
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-  <div class="row">
-    <step-alt-report-widget class="flex-grow-1" title="Executions">
-      <step-alt-report-widget-content class="widget-content">
-        @if (luxonDateRange(); as dateRange) {
-          <step-cross-execution-executions-table
-              [defaultDateRange]="dateRange!"
-              [hiddenFilters]="_state.executionsTableFilters()"
-          />
-        }
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-</section>
+      }
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
+</step-grid-layout>

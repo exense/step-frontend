@@ -1,11 +1,11 @@
-<step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
+<step-alt-report-widget [title]="dashletTitle()">
   <step-alt-report-widget-filter>
     <div>
       <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
     </div>
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content class="widget-content">
-    @let heatMapData = (heatMapData$ | async);
+    @let heatMapData = heatMapData$ | async;
     @let inProgress = !heatMapData || (isLoading() && _state.lastRefreshTrigger() !== 'auto');
     @if (heatMapData) {
       @if (inProgress) {

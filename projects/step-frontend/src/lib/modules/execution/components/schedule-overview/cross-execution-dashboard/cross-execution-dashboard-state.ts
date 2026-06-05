@@ -1,18 +1,5 @@
-import {
-  filter,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  startWith,
-  Subject,
-  switchMap,
-  take,
-  tap,
-} from 'rxjs';
-import {
-  TimeRangePickerSelection
-} from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
+import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
   AugmentedExecutionsService,
   AugmentedTimeSeriesService,
@@ -25,21 +12,17 @@ import {
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
-import {computed, inject, signal, Signal} from '@angular/core';
-import {ReportNodeSummary} from '../../../shared/report-node-summary';
-import {TSChartSeries, TSChartSettings} from '../../../../timeseries/modules/chart';
-import {
-  OQLBuilder,
-  TimeSeriesConfig,
-  TimeSeriesUtils,
-} from '../../../../timeseries/modules/_common';
-import {toObservable} from '@angular/core/rxjs-interop';
-import {Status} from '../../../../_common/shared/status.enum';
-import {Axis, Band} from 'uplot';
+import { computed, inject, signal, Signal } from '@angular/core';
+import { ReportNodeSummary } from '../../../shared/report-node-summary';
+import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
+import { OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../../timeseries/modules/_common';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { Status } from '../../../../_common/shared/status.enum';
+import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({size: [0.85, Infinity], align: 1, radius: 0.1});
+const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.85, Infinity], align: 1, radius: 0.1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -91,36 +74,15 @@ export abstract class CrossExecutionDashboardState {
 
   readonly executionsChartLoading = signal<boolean>(false);
 
-  private readonly summaryWidgetLoading = signal<boolean>(false);
-  readonly summaryInProgress = computed(() => {
-    const  summaryWidgetLoading = this.summaryWidgetLoading();
+  private readonly timeSeriesLoading = signal<boolean>(false);
+  readonly timeSeriesInProgress = computed(() => {
+    const timeSeriesLoading = this.timeSeriesLoading();
     const isLastRefreshManual = this.isLastRefreshManual();
-    return summaryWidgetLoading && isLastRefreshManual;
-  }) ;
+    return timeSeriesLoading && isLastRefreshManual;
+  });
 
   readonly testCasesCountChartLoading = signal<boolean>(false);
   readonly keywordsCountChartLoading = signal<boolean>(false);
-
-  private readonly successRateValueLoading = signal<boolean>(false);
-  readonly successRateValueInProgress = computed(() => {
-    const successRateValueLoading = this.successRateValueLoading();
-    const isLastRefreshManual = this.isLastRefreshManual();
-    return successRateValueLoading && isLastRefreshManual;
-  });
-
-  private readonly averageDurationValueLoading = signal<boolean>(false);
-  readonly averageDurationValueInProgress = computed(() => {
-    const averageDurationValueLoading = this.averageDurationValueLoading();
-    const isLastRefreshManual = this.isLastRefreshManual();
-    return averageDurationValueLoading && isLastRefreshManual;
-  });
-
-  private readonly totalExecutionsValueLoading = signal<boolean>(false);
-  readonly totalExecutionsValueInProgress = computed(() => {
-    const totalExecutionsValueLoading = this.totalExecutionsValueLoading();
-    const isLastRefreshManual = this.isLastRefreshManual();
-    return totalExecutionsValueLoading &&  isLastRefreshManual;
-  });
 
   public updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
     this.lastRefreshTrigger.set('manual');
@@ -138,7 +100,7 @@ export abstract class CrossExecutionDashboardState {
 
   public triggerRefresh(): void {
     this.lastRefreshTrigger.set('auto');
-    this.activeTimeRangeSelection.set({...this.activeTimeRangeSelection()!});
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
     this.fetchLastExecutionTrigger$.next();
     let timeRangeSelection = this.activeTimeRangeSelection();
     if (!timeRangeSelection) {
@@ -157,7 +119,7 @@ export abstract class CrossExecutionDashboardState {
   readonly lastExecution$: Observable<{ execution: Execution | null }> = this.fetchLastExecutionTrigger$.pipe(
     startWith(undefined),
     switchMap(() => this.fetchLastExecution()),
-    map((ex) => ({execution: ex})),
+    map((ex) => ({ execution: ex })),
     shareReplay(1),
   );
 
@@ -169,16 +131,13 @@ export abstract class CrossExecutionDashboardState {
         return rangeSelection.absoluteSelection!;
       case 'RELATIVE':
         const endTime = new Date().getTime();
-        return {from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime};
+        return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
     }
   }
 
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
-      this.summaryWidgetLoading.set(true);
-      this.successRateValueLoading.set(true);
-      this.totalExecutionsValueLoading.set(true);
-      this.averageDurationValueLoading.set(true);
+      this.timeSeriesLoading.set(true);
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
@@ -191,8 +150,14 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: ['result'],
       };
-      return this._timeSeriesService.fetchBuckets(request);
+      return this._timeSeriesService.fetchBuckets(request).pipe(
+        tap(() => {
+          this.timeSeriesLoading.set(false);
+        }),
+      );
     }),
+    shareReplay(1),
+    takeUntilDestroyed(),
   );
 
   readonly totalExecutionsCount$ = this.executionsDurationTimeSeriesData.pipe(
@@ -204,10 +169,6 @@ export abstract class CrossExecutionDashboardState {
       });
       return totalCount;
     }),
-    tap(() => {
-      this.totalExecutionsValueLoading.set(false);
-    }),
-    shareReplay(1),
   );
 
   readonly averageExecutionDurationLabel$ = this.executionsDurationTimeSeriesData.pipe(
@@ -226,10 +187,6 @@ export abstract class CrossExecutionDashboardState {
         return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(totalDuration / totalCount);
       }
     }),
-    tap(() => {
-      this.averageDurationValueLoading.set(false);
-    }),
-    shareReplay(1),
   );
 
   readonly summaryData$ = this.executionsDurationTimeSeriesData.pipe(
@@ -241,8 +198,7 @@ export abstract class CrossExecutionDashboardState {
         items[keyAttributes['result'] as string] = bucket.count;
         total += bucket.count;
       });
-      this.summaryWidgetLoading.set(false);
-      return {items: items, total: total};
+      return { items: items, total: total };
     }),
   );
 
@@ -254,10 +210,6 @@ export abstract class CrossExecutionDashboardState {
       }
       return ((passed / summaryData.total) * 100).toFixed(2) + '%';
     }),
-    tap(() => {
-      this.successRateValueLoading.set(false);
-    }),
-    shareReplay(1),
   );
 
   executionsChartSettings$ = this.timeRange$.pipe(
@@ -308,7 +260,7 @@ export abstract class CrossExecutionDashboardState {
               stroke: fill,
               fill: fill,
               paths: uplotBarsFn,
-              points: {show: false},
+              points: { show: false },
               show: true,
             };
             return s;
@@ -323,7 +275,7 @@ export abstract class CrossExecutionDashboardState {
             stroke: '#0976b5',
             width: 2,
             paths: uPlot.paths.spline(),
-            points: {show: false},
+            points: { show: false },
           };
 
           const axes: Axis[] = [
@@ -332,7 +284,7 @@ export abstract class CrossExecutionDashboardState {
               values: (u, vals) => {
                 return vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v));
               },
-              grid: {show: false},
+              grid: { show: false },
               size: 65,
             },
             {
@@ -464,7 +416,7 @@ export abstract class CrossExecutionDashboardState {
                     stroke: color,
                     fill: fill,
                     paths: uplotBarsFn,
-                    points: {show: false},
+                    points: { show: false },
                     show: true,
                   };
                   return s;
@@ -477,7 +429,7 @@ export abstract class CrossExecutionDashboardState {
             );
           }
         }),
-        map((chartSettings) => ({chartSettings: chartSettings, lastExecutions: executions})),
+        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
       );
     }),
   );
@@ -490,7 +442,7 @@ export abstract class CrossExecutionDashboardState {
           switchMap((timeRange) => {
             if (executions.length === 0) {
               this.testCasesCountChartLoading.set(false);
-              return of({chart: this.createTestCasesChart([], []), hasData: false, lastExecutions: []});
+              return of({ chart: this.createTestCasesChart([], []), hasData: false, lastExecutions: [] });
             } else {
               const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
               let oqlFilter = 'attributes.type = TestCase';
@@ -550,7 +502,7 @@ export abstract class CrossExecutionDashboardState {
                       stroke: color,
                       fill: fill,
                       paths: uplotBarsFn,
-                      points: {show: false},
+                      points: { show: false },
                       show: true,
                     };
                     return s;
@@ -575,28 +527,27 @@ export abstract class CrossExecutionDashboardState {
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
     let entityParams = undefined;
     switch (this.getViewType()) {
-      case "task":
-        entityParams = {taskId: this.getEntityId()};
+      case 'task':
+        entityParams = { taskId: this.getEntityId() };
         break;
-      case "plan":
-        entityParams = {planId: this.getEntityId()};
+      case 'plan':
+        entityParams = { planId: this.getEntityId() };
         break;
-      case "repository":
+      case 'repository':
         let execution = this.execution();
         if (!execution || !execution.importResult) {
           return;
         }
-        entityParams = {canonicalPlanName: execution!.importResult!.canonicalPlanName};
+        entityParams = { canonicalPlanName: execution!.importResult!.canonicalPlanName };
         break;
-
     }
-    this.errorsDataSource.reload({request: {timeRange: timeRange, ...entityParams}});
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {
     const bands: Band[] = [];
     for (let i = count; i > 1; i--) {
-      bands.push({series: [i + skipSeries, i - 1 + skipSeries]});
+      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
     }
     return bands;
   }

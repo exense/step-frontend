@@ -1,8 +1,8 @@
-import { Component, DestroyRef, inject, OnInit} from '@angular/core';
-import { DateRange, TableIndicatorMode} from '@exense/step-core';
+import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { DateRange, GridEditableService, TableIndicatorMode, WidgetsPersistenceStateService } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, pairwise, scan} from 'rxjs';
+import { filter, map, pairwise, scan } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
@@ -20,6 +20,16 @@ export class SchedulerReportViewComponent implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
+
+  private _widgetsPersistence = inject(WidgetsPersistenceStateService);
+  private _gridEditable = inject(GridEditableService);
+
+  protected readonly hasNoLayout = computed(
+    () =>
+      this._widgetsPersistence.isInitialized() &&
+      !this._widgetsPersistence.gridPresets().length &&
+      !this._gridEditable.editMode(),
+  );
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
 

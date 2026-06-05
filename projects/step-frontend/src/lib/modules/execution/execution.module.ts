@@ -39,7 +39,10 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  EntityRefDirective, PLAN_EXECUTION_REPORT_GRID, SCHEDULER_EXECUTION_REPORT_GRID, REPOSITORY_REPORT_GRID,
+  EntityRefDirective,
+  PLAN_EXECUTION_REPORT_GRID,
+  SCHEDULER_EXECUTION_REPORT_GRID,
+  REPOSITORY_REPORT_GRID,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -102,7 +105,7 @@ import { AltExecutionParametersComponent } from './components/alt-execution-para
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, Routes } from '@angular/router';
 import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
@@ -204,15 +207,11 @@ import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
-import {
-  SummaryCardComponent
-} from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
-import {
-  CrossExecutionCallCountsComponent
-} from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
-import {
-  CrossExecutionStatusComponent
-} from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
+import { SummaryCardComponent } from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
+import { CrossExecutionCallCountsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
+import { CrossExecutionStatusComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
+import { CrossExecutionReportControlsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-report-controls/cross-execution-report-controls.component';
+import { CrossExecutionPerformanceControlsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-performance-controls/cross-execution-performance-controls.component';
 
 @NgModule({
   declarations: [
@@ -329,7 +328,9 @@ import {
     AggregatedTreeNodeDrilldownComponent,
     AltExecutionAnalyticsControlsComponent,
     DashletEmptyColumnComponent,
-    CrossExecutionStatusComponent
+    CrossExecutionStatusComponent,
+    CrossExecutionReportControlsComponent,
+    CrossExecutionPerformanceControlsComponent,
   ],
   imports: [
     StepCommonModule,
@@ -572,55 +573,18 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'plans/:id/report',
       component: PlanPageComponent,
-      children: [
-        {
-          path: '',
-          redirectTo: 'report',
-        },
-        {
-          path: 'report',
-          component: SchedulerReportViewComponent,
-        },
-        {
-          path: 'performance',
-          component: SchedulerPerformanceViewComponent,
-        },
-      ],
+      children: this.crossExecutionReportRoutes(),
     });
     this._viewRegistry.registerRoute({
       path: 'repository/:id/report',
       component: RepositoryPageComponent,
-      children: [
-        {
-          path: '',
-          redirectTo: 'report',
-        },
-        {
-          path: 'report',
-          component: SchedulerReportViewComponent,
-        },
-        {
-          path: 'performance',
-          component: SchedulerPerformanceViewComponent,
-        },
-      ],
+      children: this.crossExecutionReportRoutes(),
     });
     this._viewRegistry.registerRoute({
       path: 'scheduler/:id',
       component: SchedulerPageComponent,
       children: [
-        {
-          path: '',
-          redirectTo: 'report',
-        },
-        {
-          path: 'report',
-          component: SchedulerReportViewComponent,
-        },
-        {
-          path: 'performance',
-          component: SchedulerPerformanceViewComponent,
-        },
+        ...this.crossExecutionReportRoutes(),
         editScheduledTaskRoute({
           path: 'configure',
           outlet: 'modal',
@@ -694,7 +658,7 @@ export class ExecutionModule {
               const id = route.params['id'];
               inject(ActiveExecutionContextService).setupExecutionId(id);
               return true;
-            }
+            },
           },
           canDeactivate: [
             () => {
@@ -948,6 +912,43 @@ export class ExecutionModule {
     });
   }
 
+  private crossExecutionReportRoutes(): Routes {
+    return [
+      {
+        path: '',
+        redirectTo: 'report',
+      },
+      {
+        path: 'report',
+        children: [
+          {
+            path: '',
+            component: SchedulerReportViewComponent,
+          },
+          {
+            path: '',
+            component: CrossExecutionReportControlsComponent,
+            outlet: 'controls',
+          },
+        ],
+      },
+      {
+        path: 'performance',
+        children: [
+          {
+            path: '',
+            component: SchedulerPerformanceViewComponent,
+          },
+          {
+            path: '',
+            component: CrossExecutionPerformanceControlsComponent,
+            outlet: 'controls',
+          },
+        ],
+      },
+    ];
+  }
+
   private registerInfoBanners(): void {}
 
   private registerGridLayout(): void {
@@ -1045,9 +1046,80 @@ export class ExecutionModule {
   }
 
   private registerReportGridLayout(gridId: string): void {
-
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'successRate',
+      title: 'Success Rate',
+      widthInCells: 2,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'averageExecutionDuration',
+      title: 'Average execution duration',
+      widthInCells: 3,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'totalExecutions',
+      title: 'Total executions',
+      widthInCells: 3,
+      heightInCells: 1,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'summaryExecutions',
+      title: 'Summary: Executions',
+      widthInCells: 2,
+      heightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'crossExecutionStatus',
+      title: 'Executions statuses over time',
+      widthInCells: 6,
+      heightInCells: 3,
+      weight: 1,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'heatMap',
+      title: 'HeatMap',
+      widthInCells: 8,
+      heightInCells: 4,
+      weight: 1,
+      minWidthInCells: 3,
+      minHeightInCells: 4,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'callsCount',
+      title: 'Calls Count',
+      widthInCells: 8,
+      heightInCells: 3,
+      weight: 1,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'errors',
+      title: 'Errors',
+      widthInCells: 8,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'executions',
+      title: 'Executions',
+      widthInCells: 8,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+    });
   }
-
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';
