@@ -52,9 +52,12 @@ export class TablePartPaginationDirective implements OnDestroy {
       initialPage$ = of(statePage);
     } else {
       this.page?.firstPage?.();
-      initialPage$ = this._itemsPerPageService
-        .getDefaultPageSizeItem()
-        .pipe(map((pageSize) => this.createPageInitialValue(pageSize)));
+      initialPage$ = this._itemsPerPageService.getDefaultPageSizeItem().pipe(
+        map((pageSize) => {
+          this.page?.pageSize?.set?.(pageSize);
+          return this.createPageInitialValue(pageSize);
+        }),
+      );
     }
 
     if (!this.page) {

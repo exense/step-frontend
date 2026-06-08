@@ -18,9 +18,9 @@ import {
   PopoverMode,
   ReportNode,
   STORE_ALL,
+  TablePersistenceConfig,
   TableIndicatorMode,
   TableMemoryStorageService,
-  tablePersistenceConfigProvider,
   TablePersistenceStateService,
   TableSearch,
   TableStorageService,
@@ -35,6 +35,9 @@ import { map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
+import { ALT_REPORT_NODE_KEYWORDS_TABLE_ID } from '../../shared/alt-report-node-keywords-list-config.tokens';
+
+const DRILLDOWN_KEYWORDS_TABLE_ID = 'keywordsDrilldown';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -46,7 +49,15 @@ import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-d
       useClass: TableMemoryStorageService,
     },
     TablePersistenceStateService,
-    tablePersistenceConfigProvider('keywords', { ...STORE_ALL, storeSort: false }),
+    {
+      provide: TablePersistenceConfig,
+      useFactory: () =>
+        ({
+          tableId: inject(ALT_REPORT_NODE_KEYWORDS_TABLE_ID, { optional: true }) ?? DRILLDOWN_KEYWORDS_TABLE_ID,
+          ...STORE_ALL,
+          storeSort: false,
+        }) as TablePersistenceConfig,
+    },
   ],
   hostDirectives: [AltReportNodeListSearchDirective, AltReportNodeListItemsPerPageDirective, ElementSizeDirective],
   encapsulation: ViewEncapsulation.None,
@@ -55,7 +66,7 @@ import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-d
 export class AltReportNodeKeywordsComponent implements AfterViewInit {
   protected readonly TableIndicatorMode = TableIndicatorMode;
   private _filterConditionFactory = inject(FilterConditionFactoryService);
-  readonly _state = inject(AltReportNodesStateService);
+  protected readonly _state = inject(AltReportNodesStateService);
   private _screenApiService = inject(AugmentedScreenService);
   private _listSearch = inject(AltReportNodeListSearchDirective, { self: true });
   private _reportSettings = inject(AltExecutionReportSettingsService);
