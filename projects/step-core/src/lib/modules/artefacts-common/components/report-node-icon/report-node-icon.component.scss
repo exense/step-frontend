@@ -2,7 +2,9 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
-  display: inline-block;
+  @include core.step-icon-size(2rem);
+  display: inline-flex;
+
   &.round-box {
     background: var.$gray-100;
     border-radius: 50%;
@@ -20,5 +22,6 @@
 
 step-icon {
   background: none !important;
-  margin-right: 0.5rem;
+  display: flex;
+  margin-right: 0;
 }
