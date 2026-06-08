@@ -129,7 +129,7 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Status</step-drag-column-caption>
       </th>
-      <td mat-cell *matCellDef="let element">
+      <td mat-cell *matCellDef="let element" [stepEntityRef]="element">
         <button
           data-step-testid="switch-active-btn"
           [ngClass]="{
