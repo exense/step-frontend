@@ -4,6 +4,7 @@
 :host {
   @include core.step-icon-size(2rem);
   display: inline-flex;
+  vertical-align: middle;
 
   &.round-box {
     background: var.$gray-100;
