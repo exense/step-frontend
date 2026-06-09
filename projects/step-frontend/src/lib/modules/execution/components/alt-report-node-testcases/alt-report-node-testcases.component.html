@@ -16,6 +16,8 @@
       <div
         class="details-trigger"
         (click)="showIterations(element)"
+        [matTooltip]="detailsTooltip"
+        matTooltipPosition="below"
         stepCalcElementWidth="style__name-width"
         [additionalSize]="15"
       >

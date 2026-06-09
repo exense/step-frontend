@@ -7,6 +7,7 @@ import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 import { ArtefactService, ElementSizeService, TreeNodeData } from '@exense/step-core';
 import { AGGREGATED_TREE_NODE_LARGE_VIEW } from '../../services/aggregated-tree-node-large-view.token';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
+import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -69,7 +70,7 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     hasAltExecutionReportDetail(this.details(), 'fullDescription'),
   );
 
-  protected readonly detailsTooltip = 'Open execution details';
+  protected readonly detailsTooltip = OPEN_EXECUTION_DETAILS_TOOLTIP;
 
   protected showDetails(status?: Status, count?: number, event?: MouseEvent): void {
     event?.stopPropagation?.();
