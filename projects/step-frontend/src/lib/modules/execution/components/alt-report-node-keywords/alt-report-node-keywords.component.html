@@ -11,14 +11,7 @@
   <ng-container matColumnDef="executionTime">
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
-      <div
-        class="details-trigger"
-        stepUndraggedClick
-        (undraggedClick)="openDetails.emit(element)"
-        [matTooltip]="detailsTooltip"
-        matTooltipPosition="below"
-        title=""
-      >
+      <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
         <step-artefact-inline-details
           parentElementSize
           [reportInfo]="element"
@@ -39,7 +32,9 @@
               />
               <step-report-node-icon [node]="element" />
               <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-              <span class="name">{{ element.name }}</span>
+              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                element.name
+              }}</span>
             </div>
           </ng-container>
         </step-artefact-inline-details>
