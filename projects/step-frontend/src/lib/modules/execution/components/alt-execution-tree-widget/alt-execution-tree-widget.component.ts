@@ -29,6 +29,10 @@ export class AltExecutionTreeWidgetComponent {
     this._executionDialogs.openIterations(DrilldownRootType.TREE, event.node, event.restParams);
   }
 
+  openMaximised(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.TREE);
+  }
+
   focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }

@@ -3,7 +3,19 @@
     <step-grid-element-title />
   </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
-    <step-alt-execution-tree-control-panel />
+    <step-alt-execution-tree-control-panel>
+      <step-btn-group class="with-borders maximize-button">
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Maximize"
+          matTooltipPosition="below"
+          (click)="openMaximised()"
+        >
+          <step-icon name="maximize" />
+        </button>
+      </step-btn-group>
+    </step-alt-execution-tree-control-panel>
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <step-alt-execution-tree

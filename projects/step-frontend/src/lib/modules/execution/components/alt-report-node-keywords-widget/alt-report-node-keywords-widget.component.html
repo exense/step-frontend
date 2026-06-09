@@ -8,6 +8,17 @@
   stepElementSize
 >
   <step-alt-report-widget-filter>
+    <step-btn-group class="with-borders maximize-button">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Maximize"
+        matTooltipPosition="below"
+        (click)="openMaximised()"
+      >
+        <step-icon name="maximize" />
+      </button>
+    </step-btn-group>
     <step-alt-execution-report-settings widgetType="keywordsList" />
   </step-alt-report-widget-filter>
   <step-alt-report-node-keywords (openDetails)="openDetails($event)" />

@@ -96,6 +96,10 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this.navigateToIterationDetails(drilldownRootType, reportNode.id!, undefined, openPartialTree);
   }
 
+  openDrilldownRoot(drilldownRootType: DrilldownRootType): void {
+    this._drilldownNavigationUtils.openDrilldownRoot(drilldownRootType);
+  }
+
   openScheduler(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], {
