@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { PopoverMode } from '@exense/step-core';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionReportDetailKey, AltExecutionReportWidgetType } from '../../shared/alt-execution-report-details';
@@ -11,8 +11,10 @@ import { AltExecutionReportDetailKey, AltExecutionReportWidgetType } from '../..
 })
 export class AltExecutionReportSettingsComponent {
   private _settings = inject(AltExecutionReportSettingsService);
+  private toggleVersions = new Map<AltExecutionReportDetailKey, number>();
 
   readonly widgetType = input.required<AltExecutionReportWidgetType>();
+  protected readonly pendingDetailOptions = signal<Partial<Record<AltExecutionReportDetailKey, boolean>>>({});
 
   private readonly details = computed(() => {
     const widgetType = this.widgetType();
@@ -21,10 +23,11 @@ export class AltExecutionReportSettingsComponent {
 
   protected readonly detailOptions = computed(() => {
     const details = this.details();
+    const pendingDetailOptions = this.pendingDetailOptions();
     return this._settings.detailOptions.map((key) => ({
       key,
       label: this.getLabel(key),
-      isChecked: details.includes(key),
+      isChecked: pendingDetailOptions[key] ?? details.includes(key),
     }));
   });
 
@@ -32,7 +35,22 @@ export class AltExecutionReportSettingsComponent {
   protected readonly PopoverMode = PopoverMode;
 
   protected onToggle(key: AltExecutionReportDetailKey, checked: boolean): void {
-    this._settings.updateDetail(this.widgetType(), key, checked);
+    const version = (this.toggleVersions.get(key) ?? 0) + 1;
+    this.toggleVersions.set(key, version);
+    this.pendingDetailOptions.update((pending) => ({ ...pending, [key]: checked }));
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (this.toggleVersions.get(key) !== version) {
+          return;
+        }
+        this._settings.updateDetail(this.widgetType(), key, checked);
+        this.pendingDetailOptions.update((pending) => {
+          const { [key]: _, ...rest } = pending;
+          return rest;
+        });
+      });
+    });
   }
 
   private getLabel(key: AltExecutionReportDetailKey): string {
