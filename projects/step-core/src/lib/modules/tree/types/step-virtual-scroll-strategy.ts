@@ -35,21 +35,27 @@ export class ItemSizeCalculator {
 
   readonly totalContentSize = computed(() => {
     const itemsCache = this.itemCache();
-    return itemsCache[itemsCache.length - 1].totalHeight;
+    return itemsCache[itemsCache.length - 1]?.totalHeight ?? 0;
   });
 
   getIndexByOffset(offset: number): number {
     const itemsCache = this.itemCache();
+    if (itemsCache.length === 0) {
+      return 0;
+    }
     for (let i = 0; i < itemsCache.length; i++) {
       if (itemsCache[i].totalHeight > offset) {
         return i;
       }
     }
-    return Math.max(itemsCache.length - 1, 0);
+    return itemsCache.length - 1;
   }
 
   getItemOffset(itemIndex: number): number {
     const itemsCache = this.itemCache();
+    if (itemsCache.length === 0) {
+      return 0;
+    }
     itemIndex = Math.min(itemIndex, itemsCache.length - 1);
     itemIndex = Math.max(itemIndex, 0);
     return itemsCache[itemIndex].offset;

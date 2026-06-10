@@ -38,19 +38,22 @@ export class AltExecutionReportSettingsComponent {
     const version = (this.toggleVersions.get(key) ?? 0) + 1;
     this.toggleVersions.set(key, version);
     this.pendingDetailOptions.update((pending) => ({ ...pending, [key]: checked }));
+    this.scheduleAfterNextPaint(() => this.applyToggle(key, checked, version));
+  }
 
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        if (this.toggleVersions.get(key) !== version) {
-          return;
-        }
-        this._settings.updateDetail(this.widgetType(), key, checked);
-        this.pendingDetailOptions.update((pending) => {
-          const { [key]: _, ...rest } = pending;
-          return rest;
-        });
-      });
+  private applyToggle(key: AltExecutionReportDetailKey, checked: boolean, version: number): void {
+    if (this.toggleVersions.get(key) !== version) {
+      return;
+    }
+    this._settings.updateDetail(this.widgetType(), key, checked);
+    this.pendingDetailOptions.update((pending) => {
+      const { [key]: _, ...rest } = pending;
+      return rest;
     });
+  }
+
+  private scheduleAfterNextPaint(callback: () => void): void {
+    requestAnimationFrame(() => requestAnimationFrame(callback));
   }
 
   private getLabel(key: AltExecutionReportDetailKey): string {

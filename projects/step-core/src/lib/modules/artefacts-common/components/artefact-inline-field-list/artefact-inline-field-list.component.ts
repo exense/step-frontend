@@ -40,7 +40,7 @@ export class ArtefactInlineFieldListComponent implements OnDestroy {
 
   private readonly renderedElements = viewChildren('items', { read: ArtefactInlineFieldComponent });
   private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
-  private readonly verticalRenderedItemLimit = signal<number | undefined>(undefined);
+  private readonly verticalRenderState = signal<{ target: number; limit: number } | undefined>(undefined);
   private verticalRenderFrame?: number;
   private verticalRenderChunkSize = MIN_VERTICAL_RENDER_CHUNK;
 
@@ -94,27 +94,32 @@ export class ArtefactInlineFieldListComponent implements OnDestroy {
 
   protected readonly renderedDisplayItems = computed(() => {
     const displayItems = this.displayItems();
-    const verticalRenderedItemLimit = this.verticalRenderedItemLimit();
-    if (verticalRenderedItemLimit === undefined) {
+    const verticalRenderTarget = this.verticalRenderTarget();
+    if (verticalRenderTarget === undefined) {
       return displayItems;
     }
-    return displayItems.slice(0, verticalRenderedItemLimit);
+    const verticalRenderState = this.verticalRenderState();
+    const limit = verticalRenderState?.target === verticalRenderTarget ? verticalRenderState.limit : undefined;
+    return displayItems.slice(0, limit ?? INITIAL_VERTICAL_RENDERED_ITEMS);
+  });
+
+  private readonly verticalRenderTarget = computed(() => {
+    const displayItemsLength = this.displayItems().length;
+    const isVertical = this.isVertical();
+    return isVertical && displayItemsLength > INITIAL_VERTICAL_RENDERED_ITEMS ? displayItemsLength : undefined;
   });
 
   private readonly progressiveVerticalRenderEffect = effect(() => {
-    const displayItemsLength = this.displayItems().length;
-    const isVertical = this.isVertical();
+    const verticalRenderTarget = this.verticalRenderTarget();
 
     this.cancelProgressiveVerticalRender();
     this.verticalRenderChunkSize = MIN_VERTICAL_RENDER_CHUNK;
 
-    if (!isVertical || displayItemsLength <= INITIAL_VERTICAL_RENDERED_ITEMS) {
-      this.verticalRenderedItemLimit.set(undefined);
+    if (verticalRenderTarget === undefined) {
       return;
     }
 
-    this.verticalRenderedItemLimit.set(INITIAL_VERTICAL_RENDERED_ITEMS);
-    this.scheduleProgressiveVerticalRender(displayItemsLength);
+    this.scheduleProgressiveVerticalRender(verticalRenderTarget);
   });
 
   ngOnDestroy(): void {
@@ -123,13 +128,14 @@ export class ArtefactInlineFieldListComponent implements OnDestroy {
 
   private scheduleProgressiveVerticalRender(totalItems: number): void {
     this.verticalRenderFrame = requestAnimationFrame(() => {
-      const currentLimit = this.verticalRenderedItemLimit() ?? totalItems;
+      const currentState = this.verticalRenderState();
+      const currentLimit = currentState?.target === totalItems ? currentState.limit : INITIAL_VERTICAL_RENDERED_ITEMS;
       if (currentLimit >= totalItems) {
         return;
       }
 
       const nextLimit = Math.min(totalItems, currentLimit + this.verticalRenderChunkSize);
-      this.verticalRenderedItemLimit.set(nextLimit);
+      this.verticalRenderState.set({ target: totalItems, limit: nextLimit });
       this.verticalRenderChunkSize = Math.min(this.verticalRenderChunkSize * 2, MAX_VERTICAL_RENDER_CHUNK);
       this.scheduleProgressiveVerticalRender(totalItems);
     });
