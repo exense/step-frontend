@@ -3,14 +3,13 @@
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info" stepUndraggedClick (undraggedClick)="showDetails(undefined, undefined, $event)">
         @if (node.icon) {
-          <step-icon
-            [name]="node.icon"
-            [class]="iconClass()"
-            [matTooltip]="iconTooltip()"
-            matTooltipPosition="below"
-          />
+          <step-icon [name]="node.icon" [class]="iconClass()" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
         }
-        <step-artefact-inline-details class="smaller-view" [aggregatedInfo]="node" [details]="details()">
+        <step-artefact-inline-details
+          class="smaller-view execution-tree-inline-details"
+          [aggregatedInfo]="node"
+          [details]="details()"
+        >
           <ng-container *stepArtefactInlineDetailsHeader>
             <div class="node-header" [class.larger-view]="_useLargeView">
               <step-aggregated-status
