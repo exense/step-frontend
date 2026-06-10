@@ -2,8 +2,8 @@ import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/sc
 import { distinctUntilChanged, Subject } from 'rxjs';
 import { computed, signal, WritableSignal } from '@angular/core';
 
-const MIN_BUFFER_ITEMS = 5;
-const MAX_BUFFER_ITEMS = 10;
+const MIN_BUFFER_ITEMS = 10;
+const MAX_BUFFER_ITEMS = 15;
 
 export class ItemSizeCalculator {
   constructor(

@@ -51,6 +51,8 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })
 export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService, OnDestroy {
+  private static readonly SCROLL_TO_NODE_MAX_ATTEMPTS = 5;
+
   private _treeActions = inject(TreeActionsService, { optional: true });
   private _treeFocusState = inject(TreeFocusStateService, { optional: true });
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -66,6 +68,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   protected readonly virtualScrollSkeletonRows = [0, 1, 2, 3, 4, 5, 6, 7];
   protected readonly showVirtualScrollSkeletons = signal(false);
   private virtualScrollSkeletonTimeout?: ReturnType<typeof setTimeout>;
+  private scrollToNodeCorrectionFrame?: number;
 
   private readonly applyVirtualScrollFrom =
     this._strepTreeAutoChooseVirtualScroll?.applyVirtualScrollFrom ?? signal(undefined);
@@ -171,11 +174,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     }
 
     this.handleVirtualScrollActivity();
-    this.virtualScrollViewport()?.scrollToIndex?.(index, 'smooth');
-    this.nativeScroll(nodeId);
-    // sometimes scroll to element doesn't performed correctly after virtual scroll
-    // invoke another autoscroll to correct the position (but without scrolling effect)
-    setTimeout(() => this.nativeScroll(nodeId, 'instant'), 300);
+    this.scrollToNodeWhenRendered(nodeId, index, 'smooth');
   }
 
   private nativeScroll(nodeId: string, behavior: ScrollBehavior = 'smooth'): void {
@@ -183,8 +182,38 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     nodeElement?.scrollIntoView?.({ behavior, block: 'nearest' });
   }
 
+  private scrollToNodeWhenRendered(nodeId: string, index: number, behavior: ScrollBehavior, attempt = 0): void {
+    const viewport = this.virtualScrollViewport();
+    if (!viewport) {
+      return;
+    }
+
+    this.cancelScrollToNodeCorrection();
+    viewport.scrollToIndex(index, attempt === 0 ? behavior : 'instant');
+
+    this.scrollToNodeCorrectionFrame = requestAnimationFrame(() => {
+      const range = viewport.getRenderedRange();
+      const isRendered = index >= range.start && index < range.end;
+      if (!isRendered && attempt < TreeComponent.SCROLL_TO_NODE_MAX_ATTEMPTS) {
+        this.scrollToNodeWhenRendered(nodeId, index, 'instant', attempt + 1);
+        return;
+      }
+
+      this.nativeScroll(nodeId, isRendered ? behavior : 'instant');
+    });
+  }
+
   ngOnDestroy(): void {
     clearTimeout(this.virtualScrollSkeletonTimeout);
+    this.cancelScrollToNodeCorrection();
+  }
+
+  private cancelScrollToNodeCorrection(): void {
+    if (this.scrollToNodeCorrectionFrame === undefined) {
+      return;
+    }
+    cancelAnimationFrame(this.scrollToNodeCorrectionFrame);
+    this.scrollToNodeCorrectionFrame = undefined;
   }
 
   private setFocus(isInFocus: boolean): void {
