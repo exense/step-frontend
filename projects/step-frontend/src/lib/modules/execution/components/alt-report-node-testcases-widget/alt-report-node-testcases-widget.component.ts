@@ -20,7 +20,7 @@ export class AltReportNodeTestcasesWidgetComponent {
     this._executionDialogs.openIterations(DrilldownRootType.TESTCASES, node, restParams);
   }
 
-  protected openMaximised(): void {
+  protected openMaximized(): void {
     this._executionDialogs.openDrilldownRoot(DrilldownRootType.TESTCASES);
   }
 }

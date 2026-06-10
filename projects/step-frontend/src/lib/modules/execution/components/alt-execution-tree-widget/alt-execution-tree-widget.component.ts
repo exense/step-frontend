@@ -29,7 +29,7 @@ export class AltExecutionTreeWidgetComponent {
     this._executionDialogs.openIterations(DrilldownRootType.TREE, event.node, event.restParams);
   }
 
-  openMaximised(): void {
+  openMaximized(): void {
     this._executionDialogs.openDrilldownRoot(DrilldownRootType.TREE);
   }
 

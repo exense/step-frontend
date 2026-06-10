@@ -22,7 +22,7 @@ export class AltReportNodeKeywordsWidgetComponent {
     this._dialogs.openIterationDetails(DrilldownRootType.KEYWORDS, node);
   }
 
-  protected openMaximised(): void {
+  protected openMaximized(): void {
     this._dialogs.openDrilldownRoot(DrilldownRootType.KEYWORDS);
   }
 }
