@@ -65,7 +65,13 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell mat-sort-header *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element">
-      <a href="#" (click)="onFindInTree(element.errorMessage); (false)">Find error</a>
+      <div class="error-actions">
+        @if(hasTestCases()) {
+          <a href="#" (click)="$event.preventDefault(); findInTestCases(element.errorMessage);">Find error in test cases</a>
+        }
+        <a href="#" (click)="$event.preventDefault(); findInTree(element.errorMessage);">Find error in tree</a>
+        <a href="#" (click)="$event.preventDefault(); findInKeywords(element.errorMessage);">Find error in keywords</a>
+      </div>
     </td>
   </ng-container>
 </step-table>
