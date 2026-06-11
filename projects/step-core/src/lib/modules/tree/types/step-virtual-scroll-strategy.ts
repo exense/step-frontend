@@ -3,7 +3,7 @@ import { distinctUntilChanged, Subject } from 'rxjs';
 import { computed, signal, WritableSignal } from '@angular/core';
 
 const MIN_BUFFER_ITEMS = 10;
-const MAX_BUFFER_ITEMS = 15;
+const MAX_BUFFER_ITEMS = 20;
 
 export class ItemSizeCalculator {
   constructor(
