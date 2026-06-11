@@ -39,7 +39,7 @@ export class AltReportNodeListSearchDirective {
     map((dataSource) => dataSource instanceof TableRemoteDataSource),
   );
 
-  readonly searchName$ = this._state.search$.pipe(takeUntilDestroyed());
+  readonly searchNameOrErrors$ = this._state.search$.pipe(takeUntilDestroyed());
 
   readonly searchStatuses$ = this._state.selectedStatuses$.pipe(
     map((statuses) => Array.from(statuses)),

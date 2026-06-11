@@ -1,5 +1,12 @@
 import { FilterCondition } from './filter-condition';
-import { TableRequestFilter, Regex } from '../../../client/step-client-module';
+import {
+  TableRequestFilter,
+  Regex,
+  Equals,
+  FulltextFilter,
+  FieldFilter,
+  Fulltext
+} from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/types/compare-condition.enum';
 import { FilterConditionType } from './filter-condition-type.enum';
 
@@ -39,7 +46,7 @@ export class ReportNodeFilterCondition extends FilterCondition<{ searchValue?: s
 
   private createPredicate(field: string): Regex {
     const type = CompareCondition.REGEX;
-    const expression = this.sourceObject?.searchValue;
+    const expression = (this.sourceObject?.searchValue ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const caseSensitive = false;
     return { type, field, expression, caseSensitive };
   }
