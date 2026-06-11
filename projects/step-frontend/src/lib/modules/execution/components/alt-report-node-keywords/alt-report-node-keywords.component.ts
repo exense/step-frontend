@@ -35,6 +35,7 @@ import { map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
+import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -65,6 +66,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
 
   readonly selectedReportId = input<string | undefined>(undefined);
   readonly openDetails = output<ReportNode>();
+  protected readonly detailsTooltip = OPEN_EXECUTION_DETAILS_TOOLTIP;
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
   private get tableSearchUntracked(): TableSearch | undefined {
