@@ -36,6 +36,7 @@ import { catchError } from 'rxjs/operators';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { ALT_REPORT_NODE_KEYWORDS_TABLE_ID } from '../../shared/alt-report-node-keywords-list-config.tokens';
+import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
 
 const DRILLDOWN_KEYWORDS_TABLE_ID = 'keywordsDrilldown';
 
@@ -76,6 +77,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
 
   readonly selectedReportId = input<string | undefined>(undefined);
   readonly openDetails = output<ReportNode>();
+  protected readonly detailsTooltip = OPEN_EXECUTION_DETAILS_TOOLTIP;
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
   private get tableSearchUntracked(): TableSearch | undefined {

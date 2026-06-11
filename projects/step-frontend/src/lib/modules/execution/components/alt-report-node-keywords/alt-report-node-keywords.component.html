@@ -32,7 +32,9 @@
               />
               <step-report-node-icon [node]="element" />
               <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-              <span class="name">{{ element.name }}</span>
+              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                element.name
+              }}</span>
             </div>
           </ng-container>
         </step-artefact-inline-details>

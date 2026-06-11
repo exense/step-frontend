@@ -17,7 +17,9 @@
                 [countByStatus]="node?.countByStatus"
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
-              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
+              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                node?.name
+              }}</span>
             </div>
           </ng-container>
         </step-artefact-inline-details>
