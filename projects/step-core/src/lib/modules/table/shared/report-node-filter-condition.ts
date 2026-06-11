@@ -2,10 +2,6 @@ import { FilterCondition } from './filter-condition';
 import {
   TableRequestFilter,
   Regex,
-  Equals,
-  FulltextFilter,
-  FieldFilter,
-  Fulltext
 } from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/types/compare-condition.enum';
 import { FilterConditionType } from './filter-condition-type.enum';
