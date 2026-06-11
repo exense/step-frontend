@@ -67,10 +67,10 @@
     <td mat-cell *matCellDef="let element">
       <div class="error-actions">
         @if(hasTestCases()) {
-          <a href="#" (click)="findInTestCases(element.errorMessage); (false)">Find error in test cases</a>
+          <a href="#" (click)="$event.preventDefault(); findInTestCases(element.errorMessage);">Find error in test cases</a>
         }
-        <a href="#" (click)="findInTree(element.errorMessage); (false)">Find error in tree</a>
-        <a href="#" (click)="findInKeywords(element.errorMessage); (false)">Find error in keywords</a>
+        <a href="#" (click)="$event.preventDefault(); findInTree(element.errorMessage);">Find error in tree</a>
+        <a href="#" (click)="$event.preventDefault(); findInKeywords(element.errorMessage);">Find error in keywords</a>
       </div>
     </td>
   </ng-container>
