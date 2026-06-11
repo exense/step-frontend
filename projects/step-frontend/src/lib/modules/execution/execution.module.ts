@@ -1094,10 +1094,10 @@ export class ExecutionModule {
       widgetType: 'heatMap',
       title: 'HeatMap',
       widthInCells: 8,
-      heightInCells: 4,
+      heightInCells: 3,
       weight: 1,
       minWidthInCells: 5,
-      minHeightInCells: 4,
+      minHeightInCells: 3,
     });
     this._gridSettingsRegistry.register(gridId, {
       widgetType: 'callsCount',
