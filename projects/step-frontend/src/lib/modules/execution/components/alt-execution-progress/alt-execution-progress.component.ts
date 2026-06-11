@@ -595,9 +595,9 @@ export class AltExecutionProgressComponent
           const errorMessages = Object.keys(item.countByErrorMessage ?? {});
           const childErrorMessages = Object.keys(item.countByChildrenErrorMessage ?? {});
 
-          const anyErrorMatched = [...errorMessages, ...childErrorMessages]
-            .map((item) => item.toLowerCase().trim())
-            .some((item) => item === search);
+          const anyErrorMatched =
+            errorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search) ||
+            childErrorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search);
 
           if (anyErrorMatched) {
             return true;
