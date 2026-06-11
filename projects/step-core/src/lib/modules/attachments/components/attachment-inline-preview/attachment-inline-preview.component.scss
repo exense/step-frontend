@@ -12,6 +12,10 @@ step-attachment-inline-preview {
       max-width: var(--style__value-max-width, unset);
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &.highlight-inline-item {
+        padding-right: 0.2rem;
+      }
     }
   }
 
