@@ -36,6 +36,7 @@ interface GridItem {
   heightInCells: number;
   isSupported: boolean;
   templateRef?: TemplateRef<any>;
+  canResize: boolean;
 }
 
 @Component({
@@ -110,12 +111,12 @@ export class GridLayoutComponent implements AfterViewInit {
 
   protected readonly applyAutoHeight = computed(() => {
     const autoHeightWidgetTypes = this.autoHeightWidgetTypes();
-    const autoHeightItems = Object.values(this._widgetPositions.positions()).filter(
-      (position) =>
-        position.row === 1 && position.heightInCells === 1 && autoHeightWidgetTypes.has(position.widgetType),
+    const itemsAtFirstRow = Object.values(this._widgetPositions.positions()).filter((position) => position.row === 1);
+
+    // Apply auto-height if all items at first row, belong to autoheight and have single cell in height
+    return itemsAtFirstRow.every(
+      (position) => autoHeightWidgetTypes.has(position.widgetType) && position.heightInCells === 1,
     );
-    const totalWidth = autoHeightItems.reduce((res, item) => res + item.widthInCells, 0);
-    return totalWidth === this._colCount;
   });
 
   protected readonly gridItems = computed(() => {
@@ -132,10 +133,12 @@ export class GridLayoutComponent implements AfterViewInit {
     const gridItems = widgetPositions.map((position) => {
       const widgetId = position.id;
       const widgetType = position.widgetType;
+      const defaultParams = this._gridLayoutConfig.defaultElementParamsMap[widgetType];
       const heightInCells = position.heightInCells;
-      const isSupported = !!this._gridLayoutConfig.defaultElementParamsMap[widgetType];
+      const isSupported = !!defaultParams;
+      const canResize = isSupported ? defaultParams.canResize : false;
       const templateRef = templateDictionary[widgetType];
-      return { widgetId, widgetType, heightInCells, isSupported, templateRef } as GridItem;
+      return { widgetId, widgetType, heightInCells, isSupported, templateRef, canResize } as GridItem;
     });
 
     return gridItems.filter((item) => !!item);

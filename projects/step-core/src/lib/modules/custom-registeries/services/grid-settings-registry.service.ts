@@ -9,6 +9,7 @@ export interface GridElementInfo {
   minWidthInCells?: number;
   minHeightInCells?: number;
   defaultVisibility?: boolean;
+  canResize?: boolean;
   denyDuplicates?: boolean;
 }
 
@@ -21,6 +22,9 @@ export class GridSettingsRegistryService {
   register(gridId: string, gridElement: GridElementInfo): void {
     if (gridElement.defaultVisibility === undefined) {
       gridElement.defaultVisibility = true;
+    }
+    if (gridElement.canResize === undefined) {
+      gridElement.canResize = true;
     }
     if (!this.girdSettings.has(gridId)) {
       this.girdSettings.set(gridId, []);

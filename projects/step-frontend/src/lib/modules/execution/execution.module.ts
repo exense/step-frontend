@@ -1051,21 +1051,28 @@ export class ExecutionModule {
       title: 'Success Rate',
       widthInCells: 2,
       heightInCells: 1,
+      minWidthInCells: 2,
+      minHeightInCells: 1,
       weight: 1,
+      canResize: false,
     });
     this._gridSettingsRegistry.register(gridId, {
       widgetType: 'averageExecutionDuration',
       title: 'Average execution duration',
-      widthInCells: 3,
+      widthInCells: 2,
       heightInCells: 1,
       weight: 1,
+      canResize: false,
     });
     this._gridSettingsRegistry.register(gridId, {
       widgetType: 'totalExecutions',
       title: 'Total executions',
-      widthInCells: 3,
+      widthInCells: 2,
       heightInCells: 1,
+      minWidthInCells: 2,
+      minHeightInCells: 1,
       weight: 1,
+      canResize: false,
     });
     this._gridSettingsRegistry.register(gridId, {
       widgetType: 'summaryExecutions',
@@ -1089,7 +1096,7 @@ export class ExecutionModule {
       widthInCells: 8,
       heightInCells: 4,
       weight: 1,
-      minWidthInCells: 3,
+      minWidthInCells: 5,
       minHeightInCells: 4,
     });
     this._gridSettingsRegistry.register(gridId, {

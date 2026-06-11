@@ -13,6 +13,13 @@ step-timeseries-chart {
     height: 400px;
   }
 
+  &.auto-height {
+    height: 100%;
+    .chart-wrapper {
+      height: 100%;
+    }
+  }
+
   .u-hz {
     width: 100%;
   }

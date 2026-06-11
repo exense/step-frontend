@@ -10,11 +10,12 @@
       @if (executionsChartInProgress) {
         <ng-container *ngTemplateOutlet="skeleton" />
       }
-      <div [class.hidden]="executionsChartInProgress">
+      <div class="chart-container" [class.hidden]="executionsChartInProgress">
         <step-timeseries-chart
+          class="auto-height"
           [settings]="executionsChartSettings"
           (zoomChange)="handleMainChartZoom($event)"
-          [height]="340"
+          [height]="0"
         >
           <ng-template tooltipContent let-data let-reposition="reposition">
             <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />

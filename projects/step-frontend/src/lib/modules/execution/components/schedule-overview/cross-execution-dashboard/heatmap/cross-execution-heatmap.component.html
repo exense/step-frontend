@@ -11,7 +11,7 @@
       @if (inProgress) {
         <ng-container *ngTemplateOutlet="skeleton" />
       }
-      <div [class.hidden]="inProgress">
+      <div class="heatmap-container" [class.hidden]="inProgress">
         @if (heatMapData.truncated) {
           <div class="trimmed-heatmap-placeholder">
             <span>Results were trimmed (too much data). Refine filters to see the heatmap.</span>

@@ -2,6 +2,7 @@
 
 .summary-card {
   min-height: unset;
+  height: 100%;
 }
 
 .card-value {
@@ -9,12 +10,13 @@
   align-items: center;
   font-weight: bold;
   font-size: 2rem;
-  height: 3.6rem;
+  min-height: 3.6rem;
+  height: 100%;
 }
 
 .line-skeleton {
   @include m.skeleton-background;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   height: 2.2rem;
   width: 60%;
   min-width: 10rem;

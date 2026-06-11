@@ -1,6 +1,11 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-heatmap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   .heatmap-table {
     font-size: 1.2rem;
     border-collapse: collapse;

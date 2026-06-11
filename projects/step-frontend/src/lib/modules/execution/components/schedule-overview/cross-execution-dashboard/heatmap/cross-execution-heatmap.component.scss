@@ -4,6 +4,16 @@
   height: 100%;
   gap: 2rem;
 
+  step-alt-report-widget {
+    height: 100%;
+  }
+
+  .heatmap-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .table-container {
     margin: 1rem 0;
   }
