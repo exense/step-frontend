@@ -28,7 +28,9 @@
           />
         </div>
         <span class="test-case-name-real-size" stepCalcElementWidthItem>{{ elementName }}</span>
-        <span class="test-case-name">{{ elementName }}</span>
+        <span class="test-case-name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">
+          {{ elementName }}
+        </span>
         @if (duration) {
           <step-execution-duration-simple
             stepCalcElementWidthItem
