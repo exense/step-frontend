@@ -132,13 +132,13 @@ export class DialogsService {
     return dialogRef.afterClosed().pipe(map((result) => !!result)) as Observable<boolean>;
   }
 
-  showMsg(messageHTML: string): Observable<boolean> {
+  showMsg(messageHTML: string, hideOkButton: boolean = true): Observable<boolean> {
     const dialogRef = this._matDialog.open<MessageDialogComponent, MessageDialogData, MessageDialogResult>(
       MessageDialogComponent,
       {
         data: {
           messageHTML,
-          hideOkButton: true,
+          hideOkButton: hideOkButton,
           alertType: AlertType.MINIMALIST,
         },
       },

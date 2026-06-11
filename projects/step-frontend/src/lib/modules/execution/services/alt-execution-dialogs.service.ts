@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   AbstractArtefact,
   ExecutiontTaskParameters,
@@ -10,11 +10,11 @@ import {
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
-import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './report-node-details-query-params.token';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
-import { MatDialog } from '@angular/material/dialog';
-import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
-import { NODE_DETAILS_RELATIVE_PARENT } from './node-details-relative-parent.token';
+import { AltExecutionNodesHelperService } from './alt-execution-nodes-helper.service';
+import { DrilldownRootType } from '../shared/drilldown-root-type';
+import { AltExecutionDrilldownNavigationUtilsService } from './alt-execution-drilldown-navigation-utils.service';
+import { DrillDownStackItemType } from '../shared/drilldown-stack-item';
 
 export interface OpenIterationsParams {
   aggregatedNodeId: string;
@@ -24,12 +24,18 @@ export interface OpenIterationsParams {
   reportNodeId?: string;
   nodeStatusCount?: number;
   searchFor?: string;
+  openPartialTree?: boolean;
 }
 
 export type PartialOpenIterationsParams = Pick<
   OpenIterationsParams,
-  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
+  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor' | 'openPartialTree'
 >;
+
+export interface OpenIterationsEvent {
+  node: AggregatedTreeNode;
+  restParams: PartialOpenIterationsParams;
+}
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -37,50 +43,57 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService, { optional: true });
-  private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-  private _matDialog = inject(MatDialog);
-  private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
+  private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService, { optional: true });
+  private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
 
-  openIterations(params: OpenIterationsParams): void;
-  openIterations(node: AggregatedTreeNode, restParams: PartialOpenIterationsParams): void;
+  openIterations(drilldownRootType: DrilldownRootType, params: OpenIterationsParams): void;
   openIterations(
+    drilldownRootType: DrilldownRootType,
+    node: AggregatedTreeNode,
+    restParams: PartialOpenIterationsParams,
+  ): void;
+  openIterations(
+    drilldownRootType: DrilldownRootType,
     nodeOrParams: AggregatedTreeNode | OpenIterationsParams,
     restParams?: PartialOpenIterationsParams,
   ): void {
-    if (arguments.length === 2) {
+    if (arguments.length === 3) {
       const node = nodeOrParams as AggregatedTreeNode;
       restParams = restParams ?? {};
       const { id: aggregatedNodeId, countByStatus, singleInstanceReportNode } = node;
-      this.openIterations({ aggregatedNodeId, countByStatus, singleInstanceReportNode, ...restParams });
+      this.openIterations(drilldownRootType, {
+        aggregatedNodeId,
+        countByStatus,
+        singleInstanceReportNode,
+        ...restParams,
+      });
       return;
     }
 
-    const {
-      aggregatedNodeId,
-      countByStatus,
-      reportNodeId,
-      nodeStatus,
-      nodeStatusCount,
-      singleInstanceReportNode,
-      searchFor,
-    } = nodeOrParams as OpenIterationsParams;
+    const { aggregatedNodeId, reportNodeId, nodeStatus, nodeStatusCount, searchFor, openPartialTree } =
+      nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
-      this.navigateToIterationDetails(reportNodeId);
+      this.navigateToIterationDetails(drilldownRootType, reportNodeId, undefined, openPartialTree);
       return;
     }
-    const itemsCounts = Object.values(countByStatus ?? {});
-    if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
-      const reportNode = singleInstanceReportNode!;
+    const reportNode = this._drilldownNavigationUtils.getSingleReportNode(nodeOrParams);
+    if (!!reportNode) {
       this._reportNodeDetails?.setReportNode?.(reportNode);
-      this.navigateToIterationDetails(reportNode.id!, {}, searchFor);
+      this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
+      this.navigateToIterationDetails(drilldownRootType, reportNode.id!, searchFor, openPartialTree);
       return;
     }
-    this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);
+    this.navigateToIterationList(drilldownRootType, aggregatedNodeId, nodeStatus, nodeStatusCount);
   }
 
-  openIterationDetails<T extends ReportNode>(reportNode: T): void {
+  openIterationDetails<T extends ReportNode>(
+    drilldownRootType: DrilldownRootType,
+    reportNode: T,
+    openPartialTree?: boolean,
+  ): void {
     this._reportNodeDetails?.setReportNode?.(reportNode);
-    this.navigateToIterationDetails(reportNode.id!);
+    this._altExecutionNodesHelper?.cacheReportNode?.(reportNode);
+    this.navigateToIterationDetails(drilldownRootType, reportNode.id!, undefined, openPartialTree);
   }
 
   openScheduler(task: ExecutiontTaskParameters): void {
@@ -90,27 +103,45 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     });
   }
 
-  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
-    const queryParams: Params = {};
-    queryParams[this._queryParamsNames.searchStatus] = searchStatus;
-    queryParams[this._queryParamsNames.searchStatusCount] = searchStatusCount;
-    this.openNodeDetails(`agid_${aggregatedNodeId}`, queryParams);
+  private navigateToIterationList(
+    drilldownRootType: DrilldownRootType,
+    aggregatedNodeId: string,
+    searchStatus?: Status,
+    searchStatusCount?: number,
+  ): void {
+    this._drilldownNavigationUtils.openDrilldown(
+      drilldownRootType,
+      DrillDownStackItemType.AGGREGATED_REPORT_NODE,
+      aggregatedNodeId,
+      {
+        searchStatus,
+        statusCount: searchStatusCount,
+      },
+    );
   }
 
-  private navigateToIterationDetails(reportNodeId: string, queryParams: Params = {}, searchFor?: string): void {
-    this.openNodeDetails(`rnid_${reportNodeId}`, queryParams, searchFor);
-  }
-
-  private openNodeDetails(detailsId: string, queryParams: Params, searchFor?: string): void {
-    const mergedParams = { ...queryParams };
-    if (searchFor) {
-      mergedParams['searchFor'] = searchFor;
+  private navigateToIterationDetails(
+    drilldownRootType: DrilldownRootType,
+    reportNodeId: string,
+    searchFor?: string,
+    openPartialTree?: boolean,
+  ): void {
+    if (openPartialTree) {
+      this._drilldownNavigationUtils.openDrilldown(
+        drilldownRootType,
+        DrillDownStackItemType.PARTIAL_TREE,
+        reportNodeId,
+        undefined,
+        searchFor,
+      );
+    } else {
+      this._drilldownNavigationUtils.openDrilldown(
+        drilldownRootType,
+        DrillDownStackItemType.REPORT_NODE,
+        reportNodeId,
+        undefined,
+        searchFor,
+      );
     }
-
-    this._router.navigate([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
-      relativeTo: this._nodeDetailsRelativeParent,
-      queryParams: mergedParams,
-      queryParamsHandling: 'merge',
-    });
   }
 }

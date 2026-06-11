@@ -1,3 +1,8 @@
+@if (node()?.icon; as icon) {
+  <div class="node-icon">
+    <step-icon [name]="icon" [class]="node()?.iconClassName" [matTooltip]="node()?.iconTooltip ?? ''" />
+  </div>
+}
 @if (!isEditMode()) {
   @if (templateContainer.treeNodeNameTemplate()?.templateRef; as templateRef) {
     <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: node() }; injector: _injector" />

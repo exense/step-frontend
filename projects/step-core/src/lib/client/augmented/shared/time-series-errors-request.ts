@@ -5,4 +5,5 @@ export interface TimeSeriesErrorsRequest {
   taskId?: string;
   executionId?: string;
   planId?: string;
+  canonicalPlanName?: string;
 }

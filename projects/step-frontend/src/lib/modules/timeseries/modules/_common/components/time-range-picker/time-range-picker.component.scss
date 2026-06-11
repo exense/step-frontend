@@ -27,7 +27,7 @@
   font-weight: 500;
   color: var.$blue-600;
   background: var.$gray-100;
-  border-radius: 2rem;
+  border-radius: var(--form-field-border-radius, 0.8rem);
 }
 
 .time-selector-container {
@@ -115,7 +115,7 @@
 
 .range-btn {
   display: flex;
-  min-width: 26rem;
+  min-width: 25rem;
   align-items: center;
   cursor: pointer;
   white-space: nowrap;
@@ -135,10 +135,11 @@
   }
 
   @include core.button-round;
+  border-radius: var(--form-field-border-radius, 0.8rem);
 
   .text {
     flex: 1;
-    margin-left: 8px;
+    margin-left: 0.5rem;
   }
 
   .suffix-icon {

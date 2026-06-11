@@ -9,6 +9,9 @@ export const $ImportResult = {
     planId: {
       type: 'string',
     },
+    canonicalPlanName: {
+      type: 'string',
+    },
     errors: {
       type: 'array',
       contains: {

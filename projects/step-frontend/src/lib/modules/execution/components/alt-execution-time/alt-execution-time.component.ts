@@ -4,6 +4,7 @@ import {
   DateRangeAdapterService,
   DateSingleAdapterService,
   DurationPipe,
+  PopoverMode,
   STEP_DATE_TIME_FORMAT_PROVIDERS,
 } from '@exense/step-core';
 import { DatePipe } from '@angular/common';
@@ -29,6 +30,7 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
+  readonly popoverMode = input(PopoverMode.BOTH);
   readonly mode = input<'chip' | 'text'>('chip');
   readonly displayFormat = input<'auto' | 'date' | 'time'>('auto');
   readonly durationVariant = input<'plain' | 'chip'>('plain');
@@ -42,6 +44,7 @@ export class AltExecutionTimeComponent {
   readonly isRunning = input(false);
   readonly timeOnly = input(false);
   readonly status = input<string>();
+  readonly refreshTrigger = input<unknown>();
 
   protected readonly displayDate = computed(() => {
     const startTime = this.startTimeInput();
@@ -65,6 +68,9 @@ export class AltExecutionTimeComponent {
     let endTime = this.endTimeInput();
     const duration = this.durationInput();
 
+    /* workaround to trigger endTime compute on execution refresh */
+    const triggerCompute = this.refreshTrigger();
+
     if (endTime === null) {
       endTime = undefined;
     }
@@ -73,12 +79,12 @@ export class AltExecutionTimeComponent {
       return endTime;
     }
 
-    if (startTime !== undefined && duration !== undefined && duration !== null) {
-      return startTime + duration;
+    if (this.isRunning() && startTime !== undefined) {
+      return Date.now();
     }
 
-    if (this.isRunning() && startTime !== undefined) {
-      return new Date().getTime();
+    if (startTime !== undefined && duration !== undefined && duration !== null) {
+      return startTime + duration;
     }
 
     return undefined;
@@ -98,11 +104,12 @@ export class AltExecutionTimeComponent {
     });
   });
 
-  protected hasContent = computed(() => {
+  protected readonly hasContent = computed(() => {
     const displayDate = this.displayDate();
     const duration = this.duration();
     return !!displayDate || !!duration;
   });
 
   protected readonly isChipMode = computed(() => this.mode() === 'chip');
+  protected readonly PopoverMode = PopoverMode;
 }

@@ -51,6 +51,7 @@ step-btn-group {
   display: inline-flex;
 
   &.without-borders,
+  &.with-form-field-borders,
   &.with-round-borders,
   &.with-round-corners,
   &.with-borders {
@@ -82,10 +83,20 @@ step-btn-group {
       border-radius: 2.8rem;
       width: 3.6rem;
     }
+
+    &.with-form-field-corners {
+      .mat-mdc-button-base,
+      .mat-mdc-outlined-button {
+        border-radius: var(--form-field-border-radius, 0.8rem);
+      }
+    }
   }
 
   &.with-borders {
     @include round-borders(0.8rem);
+  }
+  &.with-form-field-borders {
+    @include round-borders(var(--form-field-border-radius, 0.8rem));
   }
   &.with-round-borders {
     @include round-borders(1.6rem);

@@ -1,8 +1,9 @@
+@if (description(); as description) {
+  <section class="data-container keyword-description" [innerHTML]="description"></section>
+}
 @if (keywordInputs(); as inputs) {
   <section class="json-container">
-    <div class="container-title">
-      Inputs
-    </div>
+    <div class="container-title">Inputs</div>
     <step-json-view-expanded
       [data]="inputs"
       [limit]="7"
@@ -16,9 +17,7 @@
 }
 @if (keywordOutputs(); as outputs) {
   <section class="json-container">
-    <div class="container-title">
-      Outputs
-    </div>
+    <div class="container-title">Outputs</div>
     <step-json-view-expanded
       [data]="outputs"
       [limit]="7"
@@ -30,30 +29,39 @@
     </button>
   </section>
 }
-@if (failedChildren(); as children) {
-  @if (children.length) {
+@if (failedChildren(); as failedChildren) {
+  @if (failedChildren.length) {
     <section class="data-container">
+      <div class="container-title">Errors</div>
       <div>
-        @for (child of children; track child.id) {
+        @for (child of failedChildren; track child.id) {
           <step-report-node-error [node]="child" />
         }
       </div>
     </section>
   }
-}
-@if (node()?.error) {
-  <step-report-details-error [node]="node()" />
+  @if (!failedChildren.length && node()?.error) {
+    <section class="data-container">
+      <div class="container-title">Errors</div>
+      <div>
+        <step-report-details-error [node]="node()" />
+      </div>
+    </section>
+  }
 }
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
-    <step-report-details-attachments [attachments]="attachments" />
+    <section class="data-container">
+      <div class="container-title">Attachments</div>
+      <div>
+        <step-report-details-attachments [attachments]="attachments" />
+      </div>
+    </section>
   }
 }
 @if (measuresDataSource(); as measuresDataSource) {
   <section class="data-container">
-    <div class="container-title">
-      Measurements
-    </div>
+    <div class="container-title">Measurements</div>
     <div>
       <step-table [dataSource]="measuresDataSource" matSort>
         <ng-container matColumnDef="begin">
@@ -75,7 +83,9 @@
         <ng-container matColumnDef="data">
           <th mat-header-cell *matHeaderCellDef>Custom data</th>
           <td mat-cell *matCellDef="let measure">
-            <span *ngFor="let item of measure.data | keyvalue"> {{ item.key }}={{ item.value }} </span>
+            @for (item of measure.data | keyvalue; track item.key) {
+              <span> {{ item.key }}={{ item.value }} </span>
+            }
           </td>
         </ng-container>
         <ng-container matColumnDef="actions">
@@ -90,12 +100,58 @@
     </div>
   </section>
 }
+@if (hasMetricSamples() && metricSamplesDataSource(); as metricSamplesDataSource) {
+  <section class="data-container">
+    <div class="container-title">
+      <span>Metrics</span>
+      <step-icon
+        class="help-icon"
+        matTooltip="Aggregated metrics collected during this keyword call, grouped by name and labels. Displays observation counts alongside gauge and histogram averages, or counter running totals."
+        name="help-circle"
+      />
+    </div>
+    <div>
+      <step-table [dataSource]="metricSamplesDataSource" matSort>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let item">{{ item.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let item">{{ item.type | titlecase }}</td>
+        </ng-container>
+        <ng-container matColumnDef="count">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Count</th>
+          <td mat-cell *matCellDef="let item">{{ item.count }}</td>
+        </ng-container>
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let item">
+            @if (item.type === 'COUNTER') {
+              {{ item.max }}
+              <span class="metric-value-label">running total</span>
+            } @else {
+              {{ (item.count ? item.sum / item.count : 0) | number: '1.0-3' }}
+              <span class="metric-value-label">avg</span>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="labels">
+          <th mat-header-cell *matHeaderCellDef>Labels</th>
+          <td mat-cell *matCellDef="let item">
+            @for (label of item.labels | keyvalue; track label.key) {
+              <span> {{ label.key }}={{ label.value }} </span>
+            }
+          </td>
+        </ng-container>
+      </step-table>
+    </div>
+  </section>
+}
 @if (node(); as node) {
   @if (node.tokenId || node.agentUrl) {
     <section class="data-container tech-details">
-      <div class="container-title">
-        Routing
-      </div>
+      <div class="container-title">Routing</div>
       <div class="tech-details-content">
         @if (node.agentUrl) {
           <span>Agent:</span>

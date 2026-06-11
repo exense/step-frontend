@@ -18,7 +18,7 @@
 step-alt-execution-report {
   position: relative;
 
-  step-alt-report-node-list {
+  step-alt-report-node-list-widget {
     height: 100%;
   }
 
@@ -26,6 +26,23 @@ step-alt-execution-report {
     height: 100%;
     width: 100%;
     min-height: unset;
+  }
+
+  .errors-widget {
+    mat-card,
+    mat-card-content,
+    step-alt-report-widget-content,
+    step-alt-execution-errors,
+    step-table {
+      min-height: 0;
+    }
+
+    step-alt-report-widget-content,
+    step-alt-execution-errors {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
   }
 
   & > step-grid-layout {

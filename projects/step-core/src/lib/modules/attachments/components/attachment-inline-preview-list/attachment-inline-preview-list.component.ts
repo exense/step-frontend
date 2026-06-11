@@ -12,7 +12,12 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { AttachmentMeta } from '../../../../client/step-client-module';
-import { ElementSizeService, FareShareCalculator, StepBasicsModule } from '../../../basics/step-basics.module';
+import {
+  ElementSizeDirective,
+  ElementSizeService,
+  FareShareCalculator,
+  StepBasicsModule,
+} from '../../../basics/step-basics.module';
 import { AttachmentInlinePreviewComponent } from '../attachment-inline-preview/attachment-inline-preview.component';
 import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
 
@@ -27,10 +32,12 @@ const OFFSET = 15;
   imports: [StepBasicsModule, AttachmentInlinePreviewComponent],
   templateUrl: './attachment-inline-preview-list.component.html',
   styleUrl: './attachment-inline-preview-list.component.scss',
+  hostDirectives: [ElementSizeDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
 export class AttachmentInlinePreviewListComponent implements AfterViewInit {
+  private _hostSize = inject(ElementSizeDirective, { self: true });
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
 
   private readonly renderedElements = viewChildren('items', { read: AttachmentInlinePreviewComponent });
@@ -41,7 +48,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       if (!value?.length) {
         return undefined;
       }
-      return value.map((item) => ({ ...item, explicitWidth: MIN_WIDTH }));
+      return value;
     },
   });
 
@@ -50,11 +57,11 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   protected readonly displayItems = computed(() => {
     const items = this.attachments() ?? [];
     const renderedElements = this.renderedElements() ?? [];
-    let availableWidth = this._parentContainerSizes?.width?.();
+    let availableWidth = this._parentContainerSizes?.width?.() || this._hostSize.width();
     const listPrefixWidth = this.listPrefix()?.nativeElement?.offsetWidth ?? 0;
 
     if (!availableWidth || !renderedElements?.length) {
-      return items;
+      return this.applyInitialWidths(items);
     }
 
     availableWidth = availableWidth - listPrefixWidth - OFFSET;
@@ -108,13 +115,17 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
         totalWidth += GAP;
       }
       totalWidth += width + PADDINGS;
-      if (totalWidth >= availableWidth) {
+      if (totalWidth > availableWidth) {
         break;
       }
       result.push(element);
     }
 
     return result;
+  }
+
+  private applyInitialWidths(items: AttachmentMetaWithExplicitWidth[]): AttachmentMetaWithExplicitWidth[] {
+    return items.map((item) => ({ ...item, explicitWidth: MIN_WIDTH }));
   }
 
   private determineElementsWithWidths(
@@ -139,7 +150,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   ): AttachmentMetaWithExplicitWidth[] {
     return elements.map((element) => {
       const item = element.getAttachmentData();
-      let explicitWidth = element.getWidth(MIN_WIDTH);
+      let explicitWidth = element.getWidth();
       context.openContainer();
       explicitWidth = context.applyFairShare(explicitWidth);
       return {

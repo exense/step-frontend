@@ -9,7 +9,7 @@ import {
   TrackByFunction,
   ViewEncapsulation,
 } from '@angular/core';
-import { ArtefactService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
+import { ArtefactService, AugmentedControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
 import { map, Observable, of } from 'rxjs';
 
@@ -39,7 +39,7 @@ type FieldsAccessor = Mutable<Pick<ReportNodeShortComponent, 'headerText' | 'rep
 export class ReportNodeShortComponent implements OnChanges {
   private _artefactTypes = inject(ArtefactService);
   private _reportNodeCommons = inject(ReportNodeCommonsService);
-  private _controllerService = inject(ControllerService);
+  private _controllerService = inject(AugmentedControllerService);
 
   @Input() node?: ReportNode & ReportNodeAddon;
   @Input() includeStatus: boolean = false;
@@ -103,13 +103,8 @@ export class ReportNodeShortComponent implements OnChanges {
       return;
     }
 
-    this._controllerService.getReportNodeChildren(node!.id!).subscribe((children) => {
-      (this as FieldsAccessor).children = children.filter(
-        (child) =>
-          (child._class === 'step.artefacts.reports.AssertReportNode' ||
-            child._class === 'step.artefacts.reports.PerformanceAssertReportNode') &&
-          child.status !== 'PASSED',
-      );
+    this._controllerService.getReportNodesWithErrors(node!.id!).subscribe((children) => {
+      (this as FieldsAccessor).children = children;
     });
   }
 

@@ -1,6 +1,7 @@
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import {
   Component,
+  computed,
   DestroyRef,
   forwardRef,
   inject,
@@ -40,6 +41,7 @@ import {
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   GridPersistenceStateService,
+  GRID_ELEMENT_HEADER_ACTIONS,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
@@ -58,10 +60,7 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import {
-  AGGREGATED_TREE_TAB_STATE,
-  AGGREGATED_TREE_WIDGET_STATE,
-} from '../../services/aggregated-report-view-tree-state.service';
+import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -84,7 +83,10 @@ import { ToggleRequestWarningDirective } from '../../directives/toggle-request-w
 import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 import { TimeRangeExt } from '../../shared/time-range-ext';
 import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { AltExecutionReportGridSettingsActionComponent } from '../alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
+import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -141,6 +143,7 @@ interface RefreshParams {
       },
     },
     AltExecutionReportPrintService,
+    AltExecutionDrilldownNavigationUtilsService,
     AltExecutionDialogsService,
     {
       provide: SchedulerInvokerService,
@@ -159,6 +162,15 @@ interface RefreshParams {
       provide: GridPersistenceStateService,
       useClass: ExecutionReportGridPersistenceStateService,
     },
+    {
+      provide: GRID_ELEMENT_HEADER_ACTIONS,
+      useValue: {
+        component: AltExecutionReportGridSettingsActionComponent,
+        widgetTypes: ['executionTree', 'keywordsList'],
+      },
+      multi: true,
+    },
+    AltExecutionReportSettingsService,
     ...provideGridLayoutConfig(EXECUTION_REPORT_GRID),
   ],
   standalone: false,
@@ -176,7 +188,6 @@ export class AltExecutionProgressComponent
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _tableRemoteDataSourceFactory = inject(TableRemoteDataSourceFactoryService);
-  private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
@@ -327,29 +338,35 @@ export class AltExecutionProgressComponent
     map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
   );
+  private readonly testCases = toSignal(this.testCases$, { initialValue: [] });
 
   private readonly testCasesDisplayMode = signal(TestCasesDisplayMode.AGGREGATED);
   readonly testCasesDisplayMode$ = toObservable(this.testCasesDisplayMode);
 
-  protected testCasesForRelaunch$ = this.testCases$.pipe(
-    map((testCases) => testCases.map((item) => item.singleInstanceReportNode).filter((item) => !!item)),
-    map((testCases) => {
-      const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
-      if (list?.length === testCases?.length) {
-        return undefined;
-      }
-      return list;
-    }),
-    map((list) => {
-      if (!list?.length) {
-        return undefined;
-      }
-      return {
-        list,
-        by: 'id',
-      } as IncludeTestcases;
-    }),
-  );
+  protected readonly testCasesForRelaunch = computed(() => {
+    const testCases = this.testCases();
+    const execution = this.execution();
+    const repoRef = execution?.executionParameters?.repositoryObject;
+    const isLocal = repoRef?.repositoryID === 'local';
+
+    if (!testCases) {
+      return undefined;
+    }
+
+    const list = testCases
+      .map((item) => item.singleInstanceReportNode)
+      .filter((item) => !!item && item.status !== 'SKIPPED')
+      .map((item) => (isLocal ? item!.artefactID : item!.name));
+
+    if (!list.length || list.length === testCases.length) {
+      return undefined;
+    }
+
+    return {
+      by: isLocal ? 'id' : 'name',
+      list,
+    } as IncludeTestcases;
+  });
 
   readonly testCasesTableParameters$ = this.execution$.pipe(
     map((execution) => {
@@ -387,6 +404,7 @@ export class AltExecutionProgressComponent
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
+        enrichWithContributingErrors: true,
       } as KeywordParameters;
     }),
     distinctUntilChanged((a, b) => a.eid === b.eid),
@@ -523,14 +541,12 @@ export class AltExecutionProgressComponent
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
         if (!aggregatedReportView) {
-          this._aggregatedTreeTabState.init(undefined);
           this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
           return;
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
@@ -542,7 +558,6 @@ export class AltExecutionProgressComponent
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => {
-        this._aggregatedTreeTabState.searchCtrl.setValue('');
         this._aggregatedTreeWidgetState.searchCtrl.setValue('');
       });
   }
@@ -579,6 +594,17 @@ export class AltExecutionProgressComponent
             .join(' ')
             .toLowerCase(),
         )
+        .addCustomSearchPredicate('executionTime', (item, searchValue) => {
+          const reportNode = item.singleInstanceReportNode;
+          if (reportNode?.executionTime == null) {
+            return true;
+          }
+          const [from, to] = searchValue.split('|').map((value) => Number(value));
+          if (Number.isNaN(from) || Number.isNaN(to)) {
+            return true;
+          }
+          return reportNode.executionTime >= from && reportNode.executionTime <= to;
+        })
         .build(),
     );
   }

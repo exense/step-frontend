@@ -12,9 +12,9 @@ import {
   untracked,
   ViewEncapsulation,
   viewChild,
+  DestroyRef,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   AugmentedExecutionsService,
   DateUtilsService,
@@ -32,14 +32,20 @@ import {
   TableDataSource,
   AlertType,
   TableIndicatorMode,
+  PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
+import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
+import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
+import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 100;
+const PAGE_SIZE_OPTIONS = [25, 50, PAGE_SIZE, 250];
 
 @Component({
   selector: 'step-aggregated-tree-node-iteration-list',
@@ -59,39 +65,53 @@ const PAGE_SIZE = 25;
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  hostDirectives: [
+    {
+      directive: AltAggregatedNodeDetailsDirective,
+      inputs: ['node'],
+    },
+  ],
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
   private _fb = inject(FormBuilder).nonNullable;
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
+  private _reportSettings = inject(AltExecutionReportSettingsService);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _dateUtils = inject(DateUtilsService);
+  private _destroyRef = inject(DestroyRef);
+  private _nodeDetailsDirective = inject(AltAggregatedNodeDetailsDirective);
+  private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
 
-  readonly statuses = REPORT_NODE_STATUS;
+  protected readonly statuses = REPORT_NODE_STATUS;
 
-  protected tableSearch = viewChild('table', { read: TableSearch });
+  protected readonly tableSearch = viewChild('table', { read: TableSearch });
 
-  private matSort = viewChild(MatSort);
+  private readonly matSort = viewChild(MatSort);
 
-  protected sort = signal<SortDirection>('desc');
+  protected readonly sort = signal<SortDirection>('desc');
 
-  private effectSort = effect(() => {
+  private readonly effectSort = effect(() => {
     const sort = this.sort();
     const mastSort = this.matSort();
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
 
-  readonly node = input.required<AggregatedTreeNode>();
+  protected readonly selectedReportNode = signal<ReportNode | undefined>(undefined);
+
+  protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
-  readonly initialStatusCount = input<number | undefined>(undefined);
   readonly resolvedPartialPath = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
+  private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
   readonly openTreeView = output<ReportNode>();
-
-  private artefactHash = computed(() => this.node().artefactHash);
+  protected readonly details = this._reportSettings.details('executionTree');
+  protected readonly showFullDescription = computed(() =>
+    hasAltExecutionReportDetail(this.details(), 'fullDescription'),
+  );
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
@@ -100,9 +120,17 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   });
 
   private dataSource$ = toObservable(this.dataSource);
-  private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+  private totalItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.totalFiltered$),
+    map((totalItems) => totalItems ?? 0),
+  );
+  private displayedItems$ = this.dataSource$.pipe(
+    switchMap((dataSource) => dataSource.connect(undefined)),
+    map((items) => items.length),
+  );
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
+  private readonly displayedItems = toSignal(this.displayedItems$, { initialValue: 0 });
 
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
@@ -113,66 +141,48 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly searchCtrl = this._fb.control('');
 
-  private searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
+  private readonly searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
     initialValue: this.searchCtrl.value,
   });
 
-  private searchSubscription = this.searchCtrl.valueChanges
-    .pipe(
-      startWith(this.searchCtrl.value),
-      debounceTime(200),
-      map((value) => this._filterConditionFactory.reportNodeFilterCondition((value ?? '').trim())),
-      takeUntilDestroyed(),
-    )
-    .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
-
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
-  private effectSyncStatus = effect(() => {
+  private readonly effectSyncStatus = effect(() => {
     const initialStatus = this.initialStatus();
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  private readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;
 
-  private statusesSubscription = this.statusesCtrl.valueChanges
-    .pipe(
-      startWith(this.statusesCtrl.value),
-      map((statuses) => Array.from(statuses)),
-      takeUntilDestroyed(),
-    )
-    .subscribe((statuses) =>
-      untracked(() => this.tableSearch())?.onSearch?.(
-        'status',
-        this._filterConditionFactory.inFilterCondition(statuses),
-      ),
-    );
+  private readonly currentAggregatedNode = computed(() => {
+    const node = this.aggregatedNode();
+    const treeState = this._treeStateContext.getState();
+    return treeState.findNodeById(node.id) ?? node;
+  });
 
-  private timeRangeSubscription = this._executionState.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
-    const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
-    const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
-    const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
-    const isManualChange = !!timeRange?.isManualChange;
-    const isForce = isInitialTimeRangeLoad || isManualChange;
-    const hideProgress = !isForce;
-    untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
-    this.initialTimeRangeLoadPending = false;
+  private readonly expectedCount = computed(() => {
+    const countByStatus = this.currentAggregatedNode().countByStatus ?? {};
+    const selectedStatuses = this.statusCtrlValue() ?? [];
+    const statusesToCount = selectedStatuses.length ? selectedStatuses : Object.keys(countByStatus);
+    return statusesToCount.reduce((sum, status) => sum + (countByStatus[status] ?? 0), 0);
   });
 
   protected readonly showCountWarning = computed(() => {
-    const initialStatus = this.initialStatus();
-    const initialCount = this.initialStatusCount();
     const search = this.searchCtrlValue();
-    const status = this.statusCtrlValue();
     const totalItems = this.totalItems();
+    const displayedItems = this.displayedItems();
+    const expectedCount = this.expectedCount();
 
-    if (!!search || (!!initialStatus && (status?.length !== 1 || status[0] !== initialStatus)) || totalItems === 0) {
+    if (!!search || (expectedCount === 0 && totalItems === 0)) {
       return false;
     }
-    return initialCount !== totalItems;
+    if (expectedCount <= PAGE_SIZE_OPTIONS[0] && expectedCount !== displayedItems) {
+      return true;
+    }
+    return expectedCount !== totalItems;
   });
 
   ngAfterViewInit(): void {
@@ -180,17 +190,21 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     if (treeNodeName) {
       this._renderer.addClass(treeNodeName, 'not-selectable');
     }
+    this.setupSearchSubscriptions();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getItemsPerPage(): Observable<number[]> {
-    return of([PAGE_SIZE]);
+    return of(PAGE_SIZE_OPTIONS);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields
   getDefaultPageSizeItem(): Observable<number> {
     return of(PAGE_SIZE);
   }
 
   protected openNodeDetails(node: ReportNode): void {
+    this.selectedReportNode.set(node);
     this.showDetails.emit(node);
   }
 
@@ -198,7 +212,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
-  readonly isFilteredByNonPassed = computed(() => {
+  protected readonly isFilteredByNonPassed = computed(() => {
     const statuses = new Set(this.statusCtrlValue());
     return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
   });
@@ -230,6 +244,42 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     );
   }
 
+  private setupSearchSubscriptions(): void {
+    this.searchCtrl.valueChanges
+      .pipe(
+        startWith(this.searchCtrl.value),
+        debounceTime(200),
+        map((value) => this._filterConditionFactory.reportNodeFilterCondition((value ?? '').trim())),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
+
+    this.statusesCtrl.valueChanges
+      .pipe(
+        startWith(this.statusesCtrl.value),
+        map((statuses) => Array.from(statuses)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((statuses) =>
+        untracked(() => this.tableSearch())?.onSearch?.(
+          'status',
+          this._filterConditionFactory.inFilterCondition(statuses),
+        ),
+      );
+
+    this._executionState.timeRange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
+      const dateRange = this._dateUtils.timeRange2DateRange(timeRange);
+      const filterCondition = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+      const isInitialTimeRangeLoad = this.initialTimeRangeLoadPending;
+      const isManualChange = !!timeRange?.isManualChange;
+      const isForce = isInitialTimeRangeLoad || isManualChange;
+      const hideProgress = !isForce;
+      untracked(() => this.tableSearch())?.onSearch?.('executionTime', filterCondition, { isForce, hideProgress });
+      this.initialTimeRangeLoadPending = false;
+    });
+  }
+
   protected readonly AlertType = AlertType;
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly PopoverMode = PopoverMode;
 }

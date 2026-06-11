@@ -36,9 +36,9 @@ export class TablePartReloadDirective implements TableReload, OnDestroy {
 
   reload(isCausedByProjectChange?: boolean): void {
     this.reloadData.emit();
-    untracked(() => this._tableDataSource.tableDataSource())?.reload();
     if (isCausedByProjectChange) {
       this._tablePagination.resetToFirstPage();
     }
+    untracked(() => this._tableDataSource.tableDataSource())?.reload({ isForce: isCausedByProjectChange });
   }
 }

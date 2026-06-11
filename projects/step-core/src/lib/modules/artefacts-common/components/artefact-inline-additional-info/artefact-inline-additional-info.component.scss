@@ -1,0 +1,33 @@
+.etc-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--inline-secondary-icon-gap, 0.5rem);
+}
+
+.description-container,
+.error-container {
+  display: grid;
+  grid-template-columns: var(--inline-secondary-icon-width, 1.6rem) minmax(0, 1fr);
+  column-gap: var(--inline-secondary-icon-gap, 0.5rem);
+  align-items: start;
+  justify-items: start;
+  justify-content: start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.description-container > step-icon,
+.error-container > step-icon {
+  grid-column: 1;
+  width: var(--inline-secondary-icon-width, 1.6rem);
+  min-width: var(--inline-secondary-icon-width, 1.6rem);
+  justify-self: start;
+  align-self: start;
+}
+
+.description-text,
+.error-text {
+  grid-column: 2;
+  white-space: pre-wrap;
+  min-width: 0;
+}

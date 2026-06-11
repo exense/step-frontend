@@ -51,6 +51,7 @@ import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/
 import { TablePaginatorContentDirective } from './directives/table-paginator-content.directive';
 import { DatasourceListComponent } from './components/datasource-list/datasource-list.component';
 import { DatasourceListItemDirective } from './directives/datasource-list-item.directive';
+import { ExtractHighlightedItemPipe } from './pipe/extract-highlighted-item.pipe';
 
 @NgModule({
   imports: [
@@ -70,6 +71,7 @@ import { DatasourceListItemDirective } from './directives/datasource-list-item.d
     PaginatorComponent,
     DatasourceListComponent,
     DatasourceListItemDirective,
+    ExtractHighlightedItemPipe,
   ],
   declarations: [
     TableComponent,
@@ -182,6 +184,7 @@ export * from './shared/table-data-source';
 export * from './types/column-container';
 export * from './services/table-search';
 export * from './services/table-reload';
+export * from './services/table-columns-render';
 export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';

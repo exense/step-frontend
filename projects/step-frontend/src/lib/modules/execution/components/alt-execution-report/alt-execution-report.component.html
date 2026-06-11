@@ -18,41 +18,32 @@
   }
   @if (hasTestCases$ | async) {
     @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases
-        *stepGridItem="'testCases'"
-        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
-      />
+      <step-alt-report-node-testcases-widget *stepGridItem="'testCases'" />
     }
-    @if (_testCasesState.summary$ | async; as testCasesSummary) {
-      <step-alt-report-node-summary
-        *stepGridItem="'testCasesSummary'"
-        totalTooltip="Total number of test cases"
-        totalForecastTooltip="Forecast number of test cases"
-        [summary]="testCasesSummary"
-        [statusFilter]="_testCasesState.statusCtrlValue()"
-        (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
-      />
-    }
-  }
-  @if (_keywordsState.summary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary
-      *stepGridItem="'keywordsSummary'"
-      totalTooltip="Total number of keyword calls"
-      totalForecastTooltip="Forecast number of keyword calls"
-      [summary]="keywordsSummary"
-      [statusFilter]="_keywordsState.statusCtrlValue()"
-      (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
+      *stepGridItem="'testCasesSummary'; let rowHeightInCells = heightInCells"
+      [heightInCells]="rowHeightInCells"
+      totalTooltip="Total number of test cases"
+      totalForecastTooltip="Forecast number of test cases"
+      [summary]="(_testCasesState.summary$ | async) ?? emptyReportNodeSummary"
+      [statusFilter]="_testCasesState.statusCtrlValue()"
+      (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
     />
   }
+  <step-alt-report-node-summary
+    *stepGridItem="'keywordsSummary'; let rowHeightInCells = heightInCells"
+    [heightInCells]="rowHeightInCells"
+    totalTooltip="Total number of keyword calls"
+    totalForecastTooltip="Forecast number of keyword calls"
+    [summary]="(_keywordsState.summary$ | async) ?? emptyReportNodeSummary"
+    [statusFilter]="_keywordsState.statusCtrlValue()"
+    (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
+  />
   @if (_mode === ViewMode.VIEW) {
     <step-alt-execution-tree-widget *stepGridItem="'executionTree'" #treeWidget class="widget" />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords
-      *stepGridItem="'keywordsList'"
-      class="keywords"
-      (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
-    />
+    <step-alt-report-node-keywords-widget *stepGridItem="'keywordsList'" class="keywords" />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
@@ -63,7 +54,7 @@
       (fullRange)="_state.selectFullRange()"
     />
   }
-  <step-alt-report-widget *stepGridItem="'errors'" #errors>
+  <step-alt-report-widget *stepGridItem="'errors'" #errors class="errors-widget">
     <step-alt-report-widget-title>
       <step-grid-element-title />
     </step-alt-report-widget-title>

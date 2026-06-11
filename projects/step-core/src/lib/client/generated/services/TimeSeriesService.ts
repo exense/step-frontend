@@ -50,10 +50,24 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getMeasurements(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public fetchBuckets(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/time-series/measurements',
+      url: '/time-series/buckets',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns TimeSeriesAPIResponse default response
+   * @throws ApiError
+   */
+  public fetchBucketsWithFallback(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/time-series/buckets/with-fallback',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -117,20 +131,6 @@ export class TimeSeriesService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/time-series/report-nodes',
-      body: requestBody,
-      mediaType: 'application/json',
-    });
-  }
-
-  /**
-   * @param requestBody
-   * @returns TimeSeriesAPIResponse default response
-   * @throws ApiError
-   */
-  public getTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/time-series',
       body: requestBody,
       mediaType: 'application/json',
     });

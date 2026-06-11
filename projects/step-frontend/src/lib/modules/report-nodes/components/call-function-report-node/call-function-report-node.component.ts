@@ -1,6 +1,5 @@
 import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DateFormat, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
-import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 import { of } from 'rxjs';
@@ -31,17 +30,10 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   protected measuresDataSource?: TableLocalDataSource<Measure>;
 
-  displayChildren: ReportNode[] = [];
-
   @Input() hideMeasures: boolean = false;
   @Input() hideRouting: boolean = true;
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cChildren = changes['children'];
-    if (cChildren?.previousValue !== cChildren?.currentValue || cChildren?.firstChange) {
-      this.filterChildren(cChildren?.currentValue);
-    }
-
     const cNode = changes['node'];
     if (cNode?.previousValue !== cNode?.currentValue || cNode?.firstChange) {
       this.setupMeasuresDataSource(cNode.currentValue.measures);
@@ -68,14 +60,6 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     const paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;
     this._window.open(url, '_blank');
-  }
-
-  private filterChildren(children?: ReportNode[]): void {
-    this.displayChildren = (children || []).filter((child) =>
-      ([ReportNodeType.ASSERT_REPORT_NODE, ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE] as string[]).includes(
-        child._class,
-      ),
-    );
   }
 
   private setupMeasuresDataSource(measures?: Measure[]): void {

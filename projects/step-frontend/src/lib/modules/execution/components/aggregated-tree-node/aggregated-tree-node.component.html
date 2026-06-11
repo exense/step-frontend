@@ -2,17 +2,19 @@
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info" stepUndraggedClick (undraggedClick)="showDetails(undefined, undefined, $event)">
-        <step-artefact-inline-details class="shift-rows smaller-view" [aggregatedInfo]="node">
+        @if (node.icon) {
+          <step-icon [name]="node.icon" [class]="iconClass()" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
+        }
+        <step-artefact-inline-details class="smaller-view" [aggregatedInfo]="node" [details]="details()">
           <ng-container *stepArtefactInlineDetailsHeader>
-            <div class="node-header" [class.larger-view]="useLargeView">
+            <div class="node-header" [class.larger-view]="_useLargeView">
               <step-aggregated-status
                 [hasDescendantInvocations]="node?.hasDescendantInvocations"
                 [countByStatus]="node?.countByStatus"
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
-              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
-              <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
-                node?.originalArtefact?.description | treeNodeDescription
+              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                node?.name
               }}</span>
             </div>
           </ng-container>

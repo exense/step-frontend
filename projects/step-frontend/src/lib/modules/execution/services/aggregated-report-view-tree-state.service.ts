@@ -55,23 +55,23 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.hasErrorsInternal.set(!this.errorsSearchIndex.isEmpty());
   });
 
-  private resolvedPartialPathInternal = signal<string | undefined>(undefined);
+  private readonly resolvedPartialPathInternal = signal<string | undefined>(undefined);
   readonly resolvedPartialPath = this.resolvedPartialPathInternal.asReadonly();
 
-  private searchForErrorsOnlyInternal = signal(false);
+  private readonly searchForErrorsOnlyInternal = signal(false);
   readonly searchForErrorsOnly = this.searchForErrorsOnlyInternal.asReadonly();
 
   readonly searchCtrl = this._fb.nonNullable.control('');
 
-  private selectedSearchResultItemInternal = signal<string | undefined>(undefined);
+  private readonly selectedSearchResultItemInternal = signal<string | undefined>(undefined);
   readonly selectedSearchResult = this.selectedSearchResultItemInternal.asReadonly();
 
-  private errorLeafsRootNameInternal = signal<string | undefined>(undefined);
-  private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
+  private readonly errorLeafsRootNameInternal = signal<string | undefined>(undefined);
+  private readonly errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
   readonly searchForErrorCause = computed(() => this.errorsLeafsSet() !== undefined);
   readonly errorLeafsRootName = this.errorLeafsRootNameInternal.asReadonly();
 
-  private hasErrorsInternal = signal(false);
+  private readonly hasErrorsInternal = signal(false);
   readonly hasErrors = this.hasErrorsInternal.asReadonly();
 
   private effectLeafsClean = effect(() => {
@@ -81,10 +81,10 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }
   });
 
-  private ctrlSearchValue$ = this.searchCtrl.valueChanges.pipe(debounceTime(300));
-  private ctrlSearchValue = toSignal(this.ctrlSearchValue$, { initialValue: this.searchCtrl.value });
+  private readonly ctrlSearchValue$ = this.searchCtrl.valueChanges.pipe(debounceTime(300));
+  private readonly ctrlSearchValue = toSignal(this.ctrlSearchValue$, { initialValue: this.searchCtrl.value });
 
-  private searchValue = computed(() => {
+  private readonly searchValue = computed(() => {
     const errorLeafsRootName = this.errorLeafsRootName();
     const searchErrorsOnly = this.searchForErrorsOnly();
     const ctrlSearchValue = this.ctrlSearchValue();
@@ -112,7 +112,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }),
   );
 
-  private searchResultSet = toSignal(this.searchResultSet$);
+  private readonly searchResultSet = toSignal(this.searchResultSet$);
 
   private prevSearchResultValue?: string[];
   private prevSearchResultHash?: string;
@@ -153,7 +153,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }
   });
 
-  override init(root?: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
+  override init(root?: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}): void {
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
     this.searchForErrorsOnlyInternal.set(false);
@@ -164,7 +164,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }
   }
 
-  override ngOnDestroy() {
+  override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.querySearchIndex.clear();
     this.errorsSearchIndex.clear();

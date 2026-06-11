@@ -38,18 +38,16 @@
       }
     }
     @for (item of _internalFilters; track item.attributeName; let i = $index) {
-      @if (showHiddenFilters() || !item.isHidden || true) {
-        <step-ts-filter-bar-item
-          #appliedFilter
-          [item]="item"
-          [openOnInit]="item.menuOpenOnInit"
-          [highlightRemoveButton]="editMode"
-          [readonly]="!!item.isHidden"
-          [removable]="item.removable || editMode"
-          (removeItem)="removeFilterItem(i)"
-          (filterChange)="handleFilterChange(i, $event)"
-        />
-      }
+      <step-ts-filter-bar-item
+        #appliedFilter
+        [item]="item"
+        [openOnInit]="item.menuOpenOnInit"
+        [highlightRemoveButton]="editMode"
+        [readonly]="!!item.isHidden"
+        [removable]="item.removable || editMode"
+        (removeItem)="removeFilterItem(i)"
+        (filterChange)="handleFilterChange(i, $event)"
+      />
     }
     <ng-container *ngTemplateOutlet="addFilterMenu" />
   }

@@ -1,8 +1,3 @@
-<step-btn-group class="with-round-borders">
-  <button type="button" mat-icon-button matTooltip="Print report" matTooltipPosition="below" [matMenuTriggerFor]="menu">
-    <step-icon name="file-text" />
-  </button>
-</step-btn-group>
 @if (!(_isSmallScreen$ | async)) {
   <step-grid-control-tool
     hintEditGrid="Edit report layout"
@@ -11,9 +6,7 @@
     layoutDeletePermission="reportLayout-delete"
     layoutSharedWritePermission="reportLayout-shared-write"
     layoutSharedDeletePermission="reportLayout-shared-delete"
+    [extraItems]="gridExtraItems"
+    (extraItemChange)="openPerformancePage($event)"
   />
 }
-<mat-menu #menu="matMenu">
-  <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
-  <button type="button" mat-menu-item (click)="_printService.printAll()">Print All</button>
-</mat-menu>

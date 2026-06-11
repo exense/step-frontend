@@ -11,6 +11,7 @@ export type MetricType = {
   name: string;
   displayName: string;
   description?: string;
+  instrumentType: string;
   attributes: Array<MetricAttribute>;
   unit?: string;
   defaultAggregation: MetricAggregation;

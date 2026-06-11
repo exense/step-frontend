@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { Measure } from '../models/Measure';
+import type { MetricSample } from '../models/MetricSample';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -22,6 +23,24 @@ export class LiveReportingService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/live-reporting/{contextId}/measures',
+      path: {
+        contextId: contextId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param contextId
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public injectMetrics(contextId: string, requestBody?: Array<MetricSample>): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/live-reporting/{contextId}/metrics',
       path: {
         contextId: contextId,
       },

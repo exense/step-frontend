@@ -29,6 +29,7 @@
         [startTime]="execution.startTime"
         [endTime]="execution.endTime"
         [isRunning]="execution.status === 'RUNNING'"
+        [refreshTrigger]="execution"
       />
       <div class="user" matTooltip="User that triggered the execution">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
@@ -81,14 +82,17 @@
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
       @if (execution?.executionParameters?.customParameters; as executionParameters) {
-        <step-alt-execution-parameters [executionParameters]="executionParameters" />
+        <step-alt-execution-parameters
+          [executionParameters]="executionParameters"
+          [executionProjectId]="execution?.executionParameters?.attributes?.['project']"
+        />
       }
     </div>
     <div class="controls">
       <step-execution-legacy-switcher [execution]="execution" />
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="without-borders">
+          <step-btn-group class="without-borders with-form-field-corners">
             <step-autorefresh-toggle
               [model]="activeExecution.autoRefreshModel"
               buttonType="stroke"
@@ -101,14 +105,14 @@
           </step-btn-group>
         }
       }
-      <step-btn-group class="with-round-borders">
+      <step-btn-group class="with-form-field-borders">
         <ng-container
           stepExecutionCommands
           #commands="StepExecutionCommands"
           [description]="execution.description"
           [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
           [execution]="execution"
-          [includedTestcases]="testCasesForRelaunch$ | async"
+          [includedTestcases]="testCasesForRelaunch()"
           (refresh)="manualRefresh()"
         >
           <button
@@ -209,7 +213,6 @@
 </section>
 
 <section class="main">
-  <step-alt-execution-tabs />
   @if (execution$ | async; as execution) {
     <step-alt-report-widget class="print-execution-details">
       <step-alt-report-widget-content>

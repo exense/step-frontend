@@ -13,13 +13,14 @@ import { TreeStateService } from '../../services/tree-state.service';
 import { TreeNode } from '../../types/tree-node';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { StepIconsModule } from '../../../step-icons/step-icons.module';
 
 @Component({
   selector: 'step-tree-node-name',
   templateUrl: './tree-node-name.component.html',
   styleUrl: './tree-node-name.component.scss',
   encapsulation: ViewEncapsulation.None,
-  imports: [StepBasicsModule],
+  imports: [StepBasicsModule, StepIconsModule],
 })
 export class TreeNodeNameComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);

@@ -37,7 +37,9 @@ export class ArtefactTreeNodeUtilsService
     const name = originalArtefact.attributes?.['name'] || '';
     const isSkipped = !!originalArtefact.skipNode?.value;
     const isVisuallySkipped = isSkipped ?? isParentVisuallySkipped ?? false;
-    const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
+    const artefactType = this._artefactTypes.getArtefactType(originalArtefact?._class);
+    const icon = artefactType?.icon ?? this._artefactTypes.defaultIcon;
+    const iconTooltip = artefactType?.label;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
     const children = this.createChildNodes(originalArtefact, isVisuallySkipped);
 
@@ -47,6 +49,7 @@ export class ArtefactTreeNodeUtilsService
       isSkipped,
       isVisuallySkipped,
       icon,
+      iconTooltip,
       expandable,
       children,
       parentId,

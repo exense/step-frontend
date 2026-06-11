@@ -33,11 +33,14 @@ export class MainViewComponent {
 
   private navigationEndSubscription = this._router.events
     .pipe(
-      filter((event) => event instanceof NavigationEnd),
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
       takeUntilDestroyed(),
     )
     .subscribe(() => {
       if (this._dialogRouteOpenState.isOpen()) {
+        return;
+      }
+      if ((window.history.state as Record<string, unknown>)?.['skipScrollReset']) {
         return;
       }
       this.mainScrollableContent()?.scrollTo?.({ top: 0, left: 0 });

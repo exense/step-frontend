@@ -8,16 +8,8 @@ import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
 import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '@exense/step-core';
 import { PLAN_ID } from '../../../services/plan-id.token';
 
-declare const uPlot: any;
-
-interface EntityWithKeywordsStats {
-  entity: string;
-  timestamp: number;
-  statuses: Record<string, number>;
-}
-
 @Component({
-  selector: 'step-scheduler-page',
+  selector: 'step-cross-exec-plan-page',
   templateUrl: './plan-page.component.html',
   styleUrls: ['./plan-page.component.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -47,7 +39,6 @@ interface EntityWithKeywordsStats {
 export class PlanPageComponent implements OnInit {
   _state = inject(CrossExecutionDashboardState);
   readonly _planIdFn = inject(PLAN_ID);
-  private _schedulerService = inject(AugmentedSchedulerService);
   private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {

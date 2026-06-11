@@ -208,6 +208,14 @@ $light-primary-text: var.$white;
     padding: 0;
   }
 
+  .mat-mdc-icon-button.mat-mdc-button-base.step-compact-icon-button {
+    width: 3.6rem;
+    height: 3.6rem;
+    min-width: 3.6rem;
+    min-height: 3.6rem;
+    --mdc-icon-button-state-layer-size: 3.6rem;
+  }
+
   .mat-mdc-button-base {
     display: inline-flex;
     align-items: center;

@@ -10,6 +10,7 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
     return {
       showProjectMessage: (message?: { icon: string; message: string }) => {},
       currentProject: () => undefined,
+      getProjects: () => [],
       getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
       getUrlForProject: (project: Project, navigationParams?: { url: string; search?: Record<string, any> }) => '',
       checkLoadErrors<T extends { attributes?: Record<string, string> }>({
@@ -36,6 +37,10 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
 
   currentProject(): Project | undefined {
     return this.strategy.currentProject();
+  }
+
+  getProjects(): Project[] {
+    return this.strategy.getProjects();
   }
 
   getProject(projectId: string): Project | undefined;

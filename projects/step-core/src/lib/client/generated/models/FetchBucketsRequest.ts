@@ -15,4 +15,5 @@ export type FetchBucketsRequest = {
   collectAttributesValuesLimit?: number;
   maxNumberOfSeries?: number;
   includeGlobalEntities?: boolean;
+  metricType?: string;
 };

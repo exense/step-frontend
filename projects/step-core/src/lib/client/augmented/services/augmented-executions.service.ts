@@ -117,6 +117,17 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       .pipe(map((response) => response.data));
   }
 
+  searchByCanonicalPlanName(canonicalPlanName: string): Observable<Execution[]> {
+    const filter: FieldFilter = {
+      field: 'importResult.canonicalPlanName',
+      regex: false,
+      value: canonicalPlanName,
+    };
+    return this._tableApiWrapper
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [filter] })
+      .pipe(map((response) => response.data));
+  }
+
   countExecutionsByStatus(status: string): Observable<number> {
     const runningFilter: FieldFilter = {
       field: 'status',

@@ -107,6 +107,7 @@ step-time-range-picker {
 .ranger-section {
   margin: 0 1rem 0 2rem;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .round-btn {
@@ -153,6 +154,7 @@ step-time-range-picker {
 .dual-columns-container {
   flex-grow: 1;
   flex-basis: 0;
+  min-width: 0;
 }
 
 .tools-bar {
@@ -177,6 +179,5 @@ step-time-range-picker {
 .full-width-grow {
   flex-grow: 1;
   flex-basis: 0;
-  width: 100%;
-  max-width: 100%;
+  min-width: 0;
 }

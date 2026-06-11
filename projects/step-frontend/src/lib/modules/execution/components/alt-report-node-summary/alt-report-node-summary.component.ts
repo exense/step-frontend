@@ -19,6 +19,7 @@ import { Status } from '../../../_common/shared/status.enum';
   encapsulation: ViewEncapsulation.None,
   host: {
     '[attr.title]': 'null',
+    '[class.summary-height-2]': 'heightInCells() === 2',
   },
   standalone: false,
   providers: [NumberSeparateThousandsPipe],
@@ -33,6 +34,7 @@ export class AltReportNodeSummaryComponent {
 
   readonly title = input('');
   readonly disableChartItemClick = input(false);
+  readonly heightInCells = input<number | undefined>();
 
   readonly summary = input.required<ReportNodeSummary>();
 

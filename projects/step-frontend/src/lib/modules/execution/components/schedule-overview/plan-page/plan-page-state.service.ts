@@ -1,4 +1,4 @@
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { inject, Injectable, signal, Signal } from '@angular/core';
 import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/modules/_common';
 import {
@@ -11,37 +11,30 @@ import { PLAN_ID } from '../../../services/plan-id.token';
 @Injectable()
 export class PlanPageStateService extends CrossExecutionDashboardState {
   readonly _planIdFn = inject(PLAN_ID);
-  viewType: Signal<CrossExecutionViewType> = signal('plan');
+  readonly viewType: Signal<CrossExecutionViewType> = signal('plan');
 
-  readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._planIdFn() };
+  readonly executionsTableFilters = signal({ planId: this._planIdFn() });
+
+  dashboardDisabledFilters: string[] = ['planId'];
 
   getViewType(): CrossExecutionViewType {
     return 'plan';
   }
 
-  getDashboardFilter(): FilterBarItem {
-    return {
-      attributeName: 'planId',
-      type: FilterBarItemType.TASK,
-      searchEntities: [{ searchValue: this._planIdFn() }],
-    };
+  getEntityId(): string {
+    return this._planIdFn();
+  }
+
+  getDashboardFilter(): string {
+    const planId = this._planIdFn();
+    return `attributes.planId = \"${planId}\"`;
   }
 
   fetchLastExecution(): Observable<Execution> {
-    return this._executionService
-      .findByCritera({
-        criteria: { planId: this._planIdFn() },
-        limit: 1,
-      })
-      .pipe(map((executions) => executions[0]));
+    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 1).pipe(map((list) => list[0]));
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    return this._executionService.findByCritera({
-      criteria: { planId: this._planIdFn() },
-      limit: 30,
-      start: timeRange.from.toString(),
-      end: timeRange.to.toString(),
-    });
+    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 30, timeRange.from, timeRange.to);
   }
 }
