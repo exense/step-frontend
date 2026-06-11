@@ -31,29 +31,31 @@
 } @else {
   <step-artefact-inline-details-header [template]="headerTemplate()" />
   <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="only" />
-  @if (inputItems(); as inputItems) {
-    <step-artefact-inline-field-list
-      class="bold-labels detailed-mode"
-      [items]="inputItems"
-      [isVertical]="true"
-      hiddenItemsTooltipSuffix="additional input(s)"
-    >
-      <step-artefact-inline-field-list-prefix>
-        <step-icon name="log-in" matTooltip="Inputs" />
-      </step-artefact-inline-field-list-prefix>
-    </step-artefact-inline-field-list>
-  }
-  @if (outputItems(); as outputItems) {
-    <step-artefact-inline-field-list
-      class="bold-labels detailed-mode"
-      [items]="outputItems"
-      [isVertical]="true"
-      hiddenItemsTooltipSuffix="additional output(s)"
-    >
-      <step-artefact-inline-field-list-prefix>
-        <step-icon name="log-out" matTooltip="Outputs" />
-      </step-artefact-inline-field-list-prefix>
-    </step-artefact-inline-field-list>
+  @defer (on idle) {
+    @if (inputItems(); as inputItems) {
+      <step-artefact-inline-field-list
+        class="bold-labels detailed-mode"
+        [items]="inputItems"
+        [isVertical]="true"
+        hiddenItemsTooltipSuffix="additional input(s)"
+      >
+        <step-artefact-inline-field-list-prefix>
+          <step-icon name="log-in" matTooltip="Inputs" />
+        </step-artefact-inline-field-list-prefix>
+      </step-artefact-inline-field-list>
+    }
+    @if (outputItems(); as outputItems) {
+      <step-artefact-inline-field-list
+        class="bold-labels detailed-mode"
+        [items]="outputItems"
+        [isVertical]="true"
+        hiddenItemsTooltipSuffix="additional output(s)"
+      >
+        <step-artefact-inline-field-list-prefix>
+          <step-icon name="log-out" matTooltip="Outputs" />
+        </step-artefact-inline-field-list-prefix>
+      </step-artefact-inline-field-list>
+    }
   }
 }
 @if (assertionErrors(); as assertionErrors) {
@@ -69,10 +71,12 @@
   <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="errorOnly" />
 }
 @if (showAgentRouting() && routingItems(); as routingItems) {
-  <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
-    <step-artefact-inline-field-list-prefix>
-      <step-icon name="routing" matTooltip="Keyword routing" />
-    </step-artefact-inline-field-list-prefix>
-  </step-artefact-inline-field-list>
+  @defer (on idle) {
+    <step-artefact-inline-field-list class="bold-labels detailed-mode" [items]="routingItems" [isVertical]="true">
+      <step-artefact-inline-field-list-prefix>
+        <step-icon name="routing" matTooltip="Keyword routing" />
+      </step-artefact-inline-field-list-prefix>
+    </step-artefact-inline-field-list>
+  }
 }
 <step-artefact-inline-additional-info [context]="currentContext()" descriptionMode="attachmentsOnly" />
