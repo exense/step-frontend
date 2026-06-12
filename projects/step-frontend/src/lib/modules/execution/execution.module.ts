@@ -202,7 +202,6 @@ import {
 } from './shared/drilldown-stack-item';
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
-import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
 
 @NgModule({
@@ -316,7 +315,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     ExecutionHistoryNodeTooltipComponent,
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
-    AltExecutionAnalyticsControlsComponent,
     DashletEmptyColumnComponent,
   ],
   imports: [
@@ -383,7 +381,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionReportComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
-    AltExecutionAnalyticsControlsComponent,
     AltExecutionTreeComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeDetailsComponent,
@@ -764,11 +761,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionAnalyticsComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionAnalyticsControlsComponent,
-                  outlet: 'controls',
                 },
               ],
             },

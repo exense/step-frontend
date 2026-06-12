@@ -6,20 +6,34 @@ step-alt-execution-tabs {
 
   .execution-view-tabs {
     display: flex;
-    align-items: stretch;
+    align-items: flex-end;
     min-width: 0;
+    height: 3.6rem;
+    box-sizing: border-box;
+    border-bottom: 0.1rem solid var.$gray-300;
   }
 
   step-tabs.tab-mode-tabs {
     display: block;
     flex: 1 1 auto;
     min-width: 0;
+    overflow: visible;
 
     .mat-mdc-tab-header {
+      height: 3.6rem;
       border-bottom: none;
+      overflow: visible;
+    }
+
+    .mat-mdc-tab-link-container,
+    .mat-mdc-tab-list,
+    .mat-mdc-tab-links {
+      height: 3.6rem;
+      overflow: visible;
     }
 
     .mat-mdc-tab-links {
+      align-items: flex-end;
       margin-left: 0;
     }
 
@@ -28,6 +42,10 @@ step-alt-execution-tabs {
       min-width: 0;
       padding: 0 0.8rem;
       max-width: 24rem;
+      box-sizing: border-box;
+      border: 0.1rem solid var.$transparent;
+      border-bottom-color: var.$transparent;
+      border-radius: 0.4rem 0.4rem 0 0;
 
       .mdc-tab__text-label,
       .mdc-tab__content {
@@ -40,9 +58,8 @@ step-alt-execution-tabs {
         display: none;
       }
 
-      .mdc-tab-indicator__content--underline {
-        border-color: var.$blue-600;
-        border-top-width: 0.1rem;
+      .mdc-tab-indicator {
+        display: none;
       }
 
       .tab-content {
@@ -71,6 +88,21 @@ step-alt-execution-tabs {
           margin-left: 0;
           color: inherit;
         }
+
+        .tab-action-slot:not(.tab-close-slot) .tab-action {
+          width: 1.6rem;
+          height: 1.6rem;
+          min-width: 1.6rem;
+          min-height: 1.6rem;
+          transform: translateX(-0.1rem);
+        }
+
+        .tab-close-slot .tab-action {
+          width: 1.6rem;
+          height: 1.6rem;
+          min-width: 1.6rem;
+          min-height: 1.6rem;
+        }
       }
 
       .mdc-tab__text-label {
@@ -85,6 +117,14 @@ step-alt-execution-tabs {
       &.mdc-tab--active:hover .mdc-tab__text-label {
         color: var.$blue-600;
       }
+
+      &.mdc-tab--active {
+        z-index: 1;
+        margin-bottom: -0.1rem;
+        border-color: var.$gray-300;
+        border-bottom-color: var.$white;
+        background: var.$white;
+      }
     }
   }
 
@@ -92,20 +132,41 @@ step-alt-execution-tabs {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 2rem;
-    width: 2rem;
-    height: 2rem;
+    flex: 0 0 1.8rem;
+    width: 1.8rem;
+    height: 1.8rem;
     margin-right: -0.8rem;
   }
 
+  .tab-close-slot {
+    margin-right: -0.4rem;
+    margin-left: -0.4rem;
+  }
+
   .tab-action {
+    width: 1.4rem;
+    height: 1.4rem;
+    min-width: 1.4rem;
+    min-height: 1.4rem;
     opacity: 0;
     cursor: pointer;
+    transition: opacity 180ms ease-in-out;
+  }
+
+  .tab-action-visible {
+    opacity: 1;
   }
 
   .mat-mdc-tab-link:hover .tab-action,
   .tab-action[aria-expanded='true'] {
     opacity: 1;
+  }
+
+  .layout-actions-menu {
+    .mat-mdc-menu-item,
+    .mat-mdc-menu-item .mdc-list-item__primary-text {
+      font-weight: 500;
+    }
   }
 
   .add-layout-button {
