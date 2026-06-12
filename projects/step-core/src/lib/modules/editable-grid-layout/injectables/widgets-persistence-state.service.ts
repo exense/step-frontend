@@ -5,8 +5,8 @@ import { WidgetsPositionsStateService } from './widgets-positions-state.service'
 import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { WidgetState } from '../types/widget-state';
-import { KeyValue } from '@angular/common';
 import { WidgetStatePreset } from '../types/widget-state-preset';
+import { GridPresetListItem } from '../types/grid-preset-list-item';
 import { v4 } from 'uuid';
 import { GridPersistenceStateService } from './grid-persistence-state.service';
 
@@ -27,7 +27,7 @@ export class WidgetsPersistenceStateService {
   private readonly isInitializedInternal = signal(false);
   readonly isInitialized = this.isInitializedInternal.asReadonly();
 
-  private readonly gridPresetsInternal = signal<KeyValue<string, string>[]>([]);
+  private readonly gridPresetsInternal = signal<GridPresetListItem[]>([]);
   readonly gridPresets = this.gridPresetsInternal.asReadonly();
 
   private readonly selectedPresetInternal = signal<WidgetStatePreset | undefined>(undefined);

@@ -4,18 +4,13 @@ import {
   AuthService,
   DialogsService,
   GridEditableService,
+  GridPresetListItem,
   WidgetStatePreset,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
-import { KeyValue } from '@angular/common';
 import { filter, Observable, of, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, DrilldownExecutionTab, STATIC_TABS } from '../../services/alt-execution-tabs.service';
-
-interface LayoutPresetTab extends KeyValue<string, string> {
-  visibility?: WidgetStatePreset['visibility'];
-  creationUser?: string;
-}
 
 type EditMode = 'create' | 'edit' | 'duplicate';
 
@@ -48,11 +43,11 @@ export class AltExecutionTabsComponent {
   private _auth = inject(AuthService);
 
   protected readonly STATIC_TABS = STATIC_TABS;
-  protected readonly layoutPresets = computed(() => this._widgetsPersistence.gridPresets() as LayoutPresetTab[]);
+  protected readonly layoutPresets = this._widgetsPersistence.gridPresets;
   protected readonly selectedPreset = this._widgetsPersistence.selectedPreset;
   protected readonly drilldownTabs = this._tabsService.drilldownTabs;
   protected readonly activeDrilldownTabId = this._tabsService.activeDrilldownTabId;
-  protected readonly selectedMenuLayout = signal<LayoutPresetTab | undefined>(undefined);
+  protected readonly selectedMenuLayout = signal<GridPresetListItem | undefined>(undefined);
   protected readonly editState = signal<LayoutEditState | undefined>(undefined);
   protected readonly currentUrl = signal(this._router.url);
 
@@ -78,7 +73,7 @@ export class AltExecutionTabsComponent {
       });
   }
 
-  protected isLayoutActive(layout: LayoutPresetTab): boolean {
+  protected isLayoutActive(layout: GridPresetListItem): boolean {
     return (
       !this.isPerformanceActive() &&
       !this.activeDrilldownTabId() &&
@@ -91,7 +86,7 @@ export class AltExecutionTabsComponent {
     return this.activeDrilldownTabId() === tab.id;
   }
 
-  protected selectLayout(layout: LayoutPresetTab): void {
+  protected selectLayout(layout: GridPresetListItem): void {
     if (this.isLayoutActive(layout)) {
       return;
     }
@@ -149,7 +144,7 @@ export class AltExecutionTabsComponent {
     this.navigateToReport();
   }
 
-  protected startEdit(layout: LayoutPresetTab | undefined = this.selectedMenuLayout()): void {
+  protected startEdit(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
     if (!layout || !this.canEditLayout(layout)) {
       return;
     }
@@ -171,7 +166,7 @@ export class AltExecutionTabsComponent {
       });
   }
 
-  protected startDuplicate(layout: LayoutPresetTab | undefined = this.selectedMenuLayout()): void {
+  protected startDuplicate(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
     if (!layout || !this.canCreateLayout()) {
       return;
     }
@@ -182,7 +177,7 @@ export class AltExecutionTabsComponent {
       .subscribe((preset) => this.initializeDuplicatePreset(layout, previousTarget, preset));
   }
 
-  protected deleteLayout(layout: LayoutPresetTab | undefined = this.selectedMenuLayout()): void {
+  protected deleteLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
     if (!layout || !this.canDeleteLayout(layout)) {
       return;
     }
@@ -244,7 +239,7 @@ export class AltExecutionTabsComponent {
     });
   }
 
-  protected canEditLayout(layout: LayoutPresetTab | undefined = this.selectedMenuLayout()): boolean {
+  protected canEditLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
     if (!layout || layout.visibility === 'Preset') {
       return false;
     }
@@ -254,7 +249,7 @@ export class AltExecutionTabsComponent {
     return this.hasPermission('reportLayout-write');
   }
 
-  protected canDeleteLayout(layout: LayoutPresetTab | undefined = this.selectedMenuLayout()): boolean {
+  protected canDeleteLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
     if (!layout || layout.visibility === 'Preset') {
       return false;
     }
@@ -289,7 +284,7 @@ export class AltExecutionTabsComponent {
   }
 
   private initializeDuplicatePreset(
-    layout: LayoutPresetTab,
+    layout: GridPresetListItem,
     previousTarget: PreviousTarget,
     preset?: WidgetStatePreset,
   ): void {
@@ -346,7 +341,7 @@ export class AltExecutionTabsComponent {
     return !permission || this._auth.hasRight(permission);
   }
 
-  private isForeignSharedLayout(layout: LayoutPresetTab): boolean {
+  private isForeignSharedLayout(layout: GridPresetListItem): boolean {
     return (
       layout.visibility === 'Shared' &&
       !!this._auth.isAuthenticated() &&

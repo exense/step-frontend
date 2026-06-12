@@ -5,7 +5,7 @@
 step-alt-execution-progress {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 2rem;
   padding: 0 2.5rem;
   position: relative;
 
@@ -164,6 +164,7 @@ step-alt-execution-progress {
     }
   }
 
+  // reduces the surrounding 2rem flex gap to 1.2rem around the tab bar
   > step-alt-execution-tabs {
     margin-top: -0.8rem;
     margin-bottom: -0.8rem;
@@ -250,7 +251,7 @@ step-alt-execution-progress {
   .node-details-drilldown {
     display: block;
     min-height: 0;
-    height: calc(100vh - 19rem);
+    flex: 1 1 auto;
   }
 }
 

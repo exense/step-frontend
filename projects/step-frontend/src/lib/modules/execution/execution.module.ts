@@ -81,7 +81,6 @@ import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-n
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
-import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
 import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -243,7 +242,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionProgressComponent,
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
-    AltExecutionReportControlsComponent,
     AltExecutionReportSettingsComponent,
     AltExecutionReportGridSettingsActionComponent,
     AltExecutionAnalyticsComponent,
@@ -383,7 +381,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
-    AltExecutionReportControlsComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionAnalyticsControlsComponent,
@@ -745,11 +742,6 @@ export class ExecutionModule {
                     path: '',
                     component: AltExecutionReportComponent,
                     canDeactivate: [canLeaveComponent],
-                  },
-                  {
-                    path: '',
-                    component: AltExecutionReportControlsComponent,
-                    outlet: 'controls',
                   },
                 ],
               },
