@@ -1,5 +1,4 @@
 @use 'projects/step-core/styles/core-variables' as var;
-@use 'projects/step-core/styles/core-mixins' as core;
 
 step-alt-execution-tabs {
   display: block;
@@ -11,56 +10,82 @@ step-alt-execution-tabs {
     min-width: 0;
   }
 
-  .tabs-scroll {
-    display: flex;
-    align-items: stretch;
+  step-tabs.tab-mode-tabs {
+    display: block;
+    flex: 1 1 auto;
     min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-  }
 
-  .execution-view-tab {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    flex: 0 0 auto;
-    max-width: 24rem;
-    min-height: 3.6rem;
-    padding: 0 0.8rem;
-    gap: 0.6rem;
-    color: var.$gray-550;
-    border: none;
-    border-bottom: 0.1rem solid transparent;
-    background: transparent;
-    font: inherit;
-    cursor: pointer;
-
-    &:hover {
-      color: var.$gray-800;
+    .mat-mdc-tab-header {
+      border-bottom: none;
     }
 
-    &.active {
-      color: var.$blue-600;
-      border-bottom-color: var.$blue-600;
+    .mat-mdc-tab-links {
+      margin-left: 0;
     }
 
-    .tab-label {
+    a.mdc-tab.mat-mdc-tab-link {
+      height: 3.6rem;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      padding: 0 0.8rem;
+      max-width: 24rem;
 
-    step-icon {
-      flex: none;
-      @include core.step-icon(1.6rem);
-    }
-  }
+      .mdc-tab__text-label,
+      .mdc-tab__content {
+        min-width: 0;
+        max-width: 100%;
+      }
 
-  .layout-tab,
-  .drilldown-tab {
-    padding-right: 0;
+      .mat-ripple,
+      .mdc-tab__ripple {
+        display: none;
+      }
+
+      .mdc-tab-indicator__content--underline {
+        border-color: var.$blue-600;
+        border-top-width: 0.1rem;
+      }
+
+      .tab-content {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-width: 0;
+        font-weight: 400;
+        letter-spacing: normal;
+        color: inherit;
+
+        .tab-label {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: inherit;
+        }
+
+        step-icon {
+          flex: none;
+          width: 2rem;
+          height: 2rem;
+          min-width: 2rem;
+          min-height: 2rem;
+          margin-left: 0;
+          color: inherit;
+        }
+      }
+
+      .mdc-tab__text-label {
+        color: var.$gray-550;
+      }
+
+      &:hover .mdc-tab__text-label {
+        color: var.$dark-blue;
+      }
+
+      &.mdc-tab--active .mdc-tab__text-label,
+      &.mdc-tab--active:hover .mdc-tab__text-label {
+        color: var.$blue-600;
+      }
+    }
   }
 
   .tab-action-slot {
@@ -70,31 +95,17 @@ step-alt-execution-tabs {
     flex: 0 0 2rem;
     width: 2rem;
     height: 2rem;
+    margin-right: -0.8rem;
   }
 
   .tab-action {
     opacity: 0;
-    width: 2rem !important;
-    height: 2rem !important;
-    min-width: 2rem !important;
-    min-height: 2rem !important;
-    padding: 0 !important;
-
-    .mat-mdc-button-touch-target {
-      width: 2rem;
-      height: 2rem;
-    }
+    cursor: pointer;
   }
 
-  .execution-view-tab:hover .tab-action,
-  .tab-action.cdk-focused,
-  .tab-action.cdk-program-focused,
+  .mat-mdc-tab-link:hover .tab-action,
   .tab-action[aria-expanded='true'] {
     opacity: 1;
-  }
-
-  .performance-tab {
-    padding-right: 1rem;
   }
 
   .add-layout-button {

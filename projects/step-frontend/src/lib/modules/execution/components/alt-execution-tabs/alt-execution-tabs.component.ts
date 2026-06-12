@@ -5,6 +5,7 @@ import {
   DialogsService,
   GridEditableService,
   GridPresetListItem,
+  Tab,
   WidgetStatePreset,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
@@ -13,6 +14,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, DrilldownExecutionTab, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 
 type EditMode = 'create' | 'edit' | 'duplicate';
+
+type ExecutionViewTabType = 'layout' | 'performance' | 'drilldown';
+
+interface ExecutionViewTab extends Tab<string> {
+  type: ExecutionViewTabType;
+  layout?: GridPresetListItem;
+  drilldown?: DrilldownExecutionTab;
+}
 
 interface PreviousTarget {
   type: 'layout' | 'performance' | 'drilldown';
@@ -42,7 +51,6 @@ export class AltExecutionTabsComponent {
   private _dialogs = inject(DialogsService);
   private _auth = inject(AuthService);
 
-  protected readonly STATIC_TABS = STATIC_TABS;
   protected readonly layoutPresets = this._widgetsPersistence.gridPresets;
   protected readonly selectedPreset = this._widgetsPersistence.selectedPreset;
   protected readonly drilldownTabs = this._tabsService.drilldownTabs;
@@ -59,6 +67,35 @@ export class AltExecutionTabsComponent {
   protected readonly canCreateLayout = computed(() => this.hasPermission('reportLayout-write'));
   protected readonly canSaveEdit = computed(() => !!this.editState()?.name.trim());
 
+  protected readonly tabs = computed<ExecutionViewTab[]>(() => {
+    const layoutTabs: ExecutionViewTab[] = !this.canReadLayouts()
+      ? []
+      : this.layoutPresets().map((layout) => ({
+          id: layout.key,
+          label: layout.value,
+          type: 'layout',
+          layout,
+        }));
+    const drilldownTabs: ExecutionViewTab[] = this.drilldownTabs().map((drilldown) => ({
+      id: drilldown.id,
+      label: drilldown.label,
+      type: 'drilldown',
+      drilldown,
+    }));
+    return [...layoutTabs, { id: STATIC_TABS.ANALYTICS, label: 'Performance', type: 'performance' }, ...drilldownTabs];
+  });
+
+  protected readonly activeTabId = computed<string | undefined>(() => {
+    const drilldownId = this.activeDrilldownTabId();
+    if (drilldownId) {
+      return drilldownId;
+    }
+    if (this.isPerformanceActive()) {
+      return STATIC_TABS.ANALYTICS;
+    }
+    return this.selectedPreset()?.id;
+  });
+
   constructor() {
     this._router.events
       .pipe(
@@ -73,7 +110,22 @@ export class AltExecutionTabsComponent {
       });
   }
 
-  protected isLayoutActive(layout: GridPresetListItem): boolean {
+  protected selectTab(id: string): void {
+    const tab = this.tabs().find((item) => item.id === id);
+    switch (tab?.type) {
+      case 'layout':
+        this.selectLayout(tab.layout!);
+        break;
+      case 'performance':
+        this.selectPerformance();
+        break;
+      case 'drilldown':
+        this.selectDrilldown(tab.drilldown!);
+        break;
+    }
+  }
+
+  private isLayoutActive(layout: GridPresetListItem): boolean {
     return (
       !this.isPerformanceActive() &&
       !this.activeDrilldownTabId() &&
@@ -82,11 +134,7 @@ export class AltExecutionTabsComponent {
     );
   }
 
-  protected isDrilldownActive(tab: DrilldownExecutionTab): boolean {
-    return this.activeDrilldownTabId() === tab.id;
-  }
-
-  protected selectLayout(layout: GridPresetListItem): void {
+  private selectLayout(layout: GridPresetListItem): void {
     if (this.isLayoutActive(layout)) {
       return;
     }
@@ -95,7 +143,7 @@ export class AltExecutionTabsComponent {
     this.navigateToReport();
   }
 
-  protected selectPerformance(): void {
+  private selectPerformance(): void {
     this._tabsService.clearActiveDrilldownTab();
     this._router.navigate([{ outlets: { primary: STATIC_TABS.ANALYTICS, nodeDetails: null } }], {
       relativeTo: this._activatedRoute,
@@ -103,7 +151,7 @@ export class AltExecutionTabsComponent {
     });
   }
 
-  protected selectDrilldown(tab: DrilldownExecutionTab): void {
+  private selectDrilldown(tab: DrilldownExecutionTab): void {
     const activeTab = this._tabsService.activateDrilldownTab(tab.id);
     if (!activeTab) {
       return;
@@ -343,9 +391,7 @@ export class AltExecutionTabsComponent {
 
   private isForeignSharedLayout(layout: GridPresetListItem): boolean {
     return (
-      layout.visibility === 'Shared' &&
-      !!this._auth.isAuthenticated() &&
-      layout.creationUser !== this._auth.getUserID()
+      layout.visibility === 'Shared' && !!this._auth.isAuthenticated() && layout.creationUser !== this._auth.getUserID()
     );
   }
 }
