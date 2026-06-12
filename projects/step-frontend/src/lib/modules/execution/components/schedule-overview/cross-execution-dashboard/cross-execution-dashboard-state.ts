@@ -406,6 +406,7 @@ export abstract class CrossExecutionDashboardState {
             };
 
             return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              catchError(() => of({ matrixKeys: [], matrix: [] })),
               map((timeSeriesResponse) => {
                 let executionStats: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
@@ -495,6 +496,7 @@ export abstract class CrossExecutionDashboardState {
             };
 
             return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              catchError(() => of({ matrixKeys: [], matrix: [] })),
               map((timeSeriesResponse) => {
                 let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
@@ -563,7 +565,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly errorsDataSource = this._timeSeriesService.createErrorsFetchDataSource();
 
-  private readonly errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
+  private readonly errorTableRefreshSub = this.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
     let entityParams = undefined;
     switch (this.getViewType()) {
       case 'task':

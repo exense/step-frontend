@@ -15,6 +15,9 @@
       @let keywordsInProgress =
         !keywordsSettings || (_state.keywordsCountChartLoading() && _state.isLastRefreshManual());
       @if (keywordsSettings) {
+        @if (keywordsInProgress) {
+          <ng-container *ngTemplateOutlet="skeleton" />
+        }
         <div class="count-container" [class.hidden]="keywordsInProgress">
           <step-timeseries-chart class="auto-height" [settings]="keywordsSettings.chartSettings" [height]="0">
             <ng-template tooltipContent let-data>
