@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   OnDestroy,
@@ -38,8 +39,7 @@ import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -77,15 +77,12 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
   private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
   private _reportSettings = inject(AltExecutionReportSettingsService);
+  private _tabs = inject(AltExecutionTabsService);
   protected readonly _executionState = inject(AltExecutionStateService);
 
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
-  protected readonly fullTimeRangeLabel = this._executionState.timeRange$.pipe(
-    filter((range) => range !== undefined),
-    map((range) => TimeSeriesUtils.formatRange(range)),
-  );
 
   protected readonly selectedRootReportNodeId = computed(() => {
     const stackItems = this.stackItems();
@@ -159,21 +156,19 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       });
     });
 
+  private readonly updateTabLabel = effect(() => {
+    const label = this.getTabLabel(this.stackItems());
+    this._tabs.updateActiveDrilldownLabel(label);
+  });
+
   ngOnInit(): void {
+    const nodeDetailsPath = ['node-details', ...this._activatedRoute.snapshot.url.map((item) => item.path)];
+    this._tabs.ensureActiveDrilldownTab(nodeDetailsPath, this._activatedRoute.snapshot.queryParams);
     this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
   }
 
   ngOnDestroy(): void {
     this.executionProgressElement?.classList?.remove?.(IS_DRILLDOWN_OPENED);
-  }
-
-  protected handleCloseAll(): void {
-    const items = this.stackItemsUntracked;
-    this.removeItem(items[0].id);
-  }
-
-  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
-    this._executionState.updateTimeRangeSelection(selection);
   }
 
   protected removeItem(id: string, withLocationUpdate?: boolean): void {
@@ -363,6 +358,26 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         };
       }),
     );
+  }
+
+  private getTabLabel(items: DrillDownStackItem[]): string {
+    const lastNamedItem = [...items].reverse().find((item) => 'data' in item && !!item.data?.name);
+    const name = lastNamedItem && 'data' in lastNamedItem ? lastNamedItem.data?.name : undefined;
+    if (name) {
+      return `Drilldown: ${name}`;
+    }
+    const root = items[0];
+    if (root?.type === DrillDownStackItemType.ROOT) {
+      switch (root.rootType) {
+        case DrilldownRootType.KEYWORDS:
+          return 'Drilldown: Steps';
+        case DrilldownRootType.TESTCASES:
+          return 'Drilldown: Testcases';
+        case DrilldownRootType.TREE:
+          return 'Drilldown: Tree';
+      }
+    }
+    return 'Drilldown';
   }
 
   protected readonly DrilldownRootType = DrilldownRootType;

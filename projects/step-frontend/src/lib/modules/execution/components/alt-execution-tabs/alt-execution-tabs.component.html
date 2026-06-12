@@ -1,8 +1,107 @@
-<step-tabs [tabs]="tabs()" [userRouteLinks]="true">
-  <div *stepTabTemplate="let tab" class="tab-content">
-    <span>{{ tab.label }}</span>
-    @if (tab.id !== STATIC_TABS.REPORT && tab.id !== STATIC_TABS.ANALYTICS) {
-      <step-icon name="x" (click)="closeTab(tab, $event)" />
-    }
-  </div>
-</step-tabs>
+@if (editState(); as state) {
+  <form class="layout-edit-bar" (ngSubmit)="saveEdit()">
+    <input
+      class="layout-name-input"
+      placeholder="Name"
+      name="layoutName"
+      required
+      autocomplete="off"
+      [ngModel]="state.name"
+      (ngModelChange)="updateEditName($event)"
+    />
+    <button type="submit" mat-flat-button color="primary" class="layout-edit-button" [disabled]="!canSaveEdit()">
+      Save Layout
+    </button>
+    <button type="button" mat-stroked-button class="layout-edit-button" (click)="cancelEdit()">Cancel</button>
+  </form>
+} @else {
+  <nav class="execution-view-tabs" aria-label="Execution views">
+    <div class="tabs-scroll">
+      @if (canReadLayouts()) {
+        @for (layout of layoutPresets(); track layout.key) {
+          <button
+            type="button"
+            class="execution-view-tab layout-tab"
+            [class.active]="isLayoutActive(layout)"
+            (click)="selectLayout(layout)"
+          >
+            <span class="tab-label">{{ layout.value }}</span>
+            <span class="tab-action-slot" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                mat-icon-button
+                class="tab-action"
+                matTooltip="Modify Layout"
+                matTooltipPosition="below"
+                [matMenuTriggerFor]="layoutMenu"
+                (menuOpened)="selectedMenuLayout.set(layout)"
+              >
+                <step-icon name="edit-2" />
+              </button>
+            </span>
+          </button>
+        }
+      }
+
+      <button
+        type="button"
+        class="execution-view-tab performance-tab"
+        [class.active]="isPerformanceActive()"
+        (click)="selectPerformance()"
+      >
+        <step-icon name="bar-chart-2" />
+        <span class="tab-label">Performance</span>
+      </button>
+
+      @for (tab of drilldownTabs(); track tab.id) {
+        <button
+          type="button"
+          class="execution-view-tab drilldown-tab"
+          [class.active]="isDrilldownActive(tab)"
+          (click)="selectDrilldown(tab)"
+        >
+          <span class="tab-label">{{ tab.label }}</span>
+          <span class="tab-action-slot">
+            <button
+              type="button"
+              mat-icon-button
+              class="tab-action"
+              matTooltip="Close drilldown"
+              matTooltipPosition="below"
+              (click)="closeDrilldown(tab, $event)"
+            >
+              <step-icon name="x" />
+            </button>
+          </span>
+        </button>
+      }
+    </div>
+
+    <button
+      type="button"
+      mat-icon-button
+      class="add-layout-button"
+      matTooltip="Add layout"
+      matTooltipPosition="below"
+      [disabled]="!canCreateLayout()"
+      (click)="startCreate()"
+    >
+      <step-icon name="plus" />
+    </button>
+  </nav>
+
+  <mat-menu #layoutMenu="matMenu">
+    <button type="button" mat-menu-item (click)="startEdit()" [disabled]="!canEditLayout()">
+      <step-icon name="edit-2" />
+      <span>Edit</span>
+    </button>
+    <button type="button" mat-menu-item (click)="startDuplicate()" [disabled]="!canCreateLayout()">
+      <step-icon name="copy" />
+      <span>Duplicate</span>
+    </button>
+    <button type="button" mat-menu-item (click)="deleteLayout()" [disabled]="!canDeleteLayout()">
+      <step-icon name="trash-2" />
+      <span>Delete</span>
+    </button>
+  </mat-menu>
+}

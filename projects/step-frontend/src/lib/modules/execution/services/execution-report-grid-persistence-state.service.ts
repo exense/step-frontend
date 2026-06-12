@@ -52,7 +52,7 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
         result.map((layout) => {
           const key = layout.id;
           const value = layout.attributes?.['name'] ?? '';
-          return { key, value } as KeyValue<string, string>;
+          return { key, value, ...layout } as KeyValue<string, string>;
         }),
       ),
     );

@@ -1,21 +1,137 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
 step-alt-execution-tabs {
-  step-tabs {
-    nav.mat-mdc-tab-header {
-      border-bottom: none !important;
+  display: block;
+  min-width: 0;
+
+  .execution-view-tabs {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+  }
+
+  .tabs-scroll {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  .execution-view-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    max-width: 24rem;
+    min-height: 3.6rem;
+    padding: 0 0.8rem;
+    gap: 0.6rem;
+    color: var.$gray-550;
+    border: none;
+    border-bottom: 0.1rem solid transparent;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: var.$gray-800;
     }
 
-    .mat-mdc-tab-list {
-      width: 100%;
+    &.active {
+      color: var.$blue-600;
+      border-bottom-color: var.$blue-600;
     }
-    .mat-mdc-tab-links {
-      margin: 0 !important;
+
+    .tab-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    step-icon {
+      flex: none;
+      @include core.step-icon(1.6rem);
     }
   }
 
-  .tab-content {
+  .layout-tab,
+  .drilldown-tab {
+    padding-right: 0;
+  }
+
+  .tab-action-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .tab-action {
+    opacity: 0;
+    width: 2rem !important;
+    height: 2rem !important;
+    min-width: 2rem !important;
+    min-height: 2rem !important;
+    padding: 0 !important;
+
+    .mat-mdc-button-touch-target {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .execution-view-tab:hover .tab-action,
+  .tab-action.cdk-focused,
+  .tab-action.cdk-program-focused,
+  .tab-action[aria-expanded='true'] {
+    opacity: 1;
+  }
+
+  .performance-tab {
+    padding-right: 1rem;
+  }
+
+  .add-layout-button {
+    flex: 0 0 3.6rem;
+    width: 3.6rem;
+    height: 3.6rem;
+    margin-left: auto;
+    border-radius: 0;
+  }
+
+  .layout-edit-bar {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
+    min-height: 3.4rem;
+  }
+
+  .layout-name-input {
+    width: min(24rem, 100%);
+    height: 3.2rem;
+    padding: 0 1.2rem;
+    border: 0.1rem solid var.$gray-300;
+    border-radius: var(--form-field-border-radius, 0.4rem);
+    background: var.$white;
+    color: var.$gray-800;
+    font: inherit;
+    outline: none;
+
+    &:focus {
+      border-color: var.$blue-600;
+    }
+  }
+
+  .layout-edit-button {
+    height: 3.2rem;
+    min-height: 3.2rem;
+    line-height: 3.2rem;
   }
 
   @media print {

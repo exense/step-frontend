@@ -114,11 +114,29 @@ export class WidgetsPersistenceStateService {
     );
   }
 
-  removePreset(id: string): Observable<void> {
+  selectLocalPreset(preset: WidgetStatePreset): void {
+    this.selectedPresetInternal.set(preset);
+  }
+
+  loadPreset(presetId: string): Observable<WidgetStatePreset | undefined> {
+    return this._gridPersistence.load(this._gridConfig.gridId, presetId);
+  }
+
+  removePreset(id: string, selectFallback = true): Observable<void> {
     return this._gridPersistence.removeGridPreset(this._gridConfig.gridId, id).pipe(
       switchMap(() => this._gridPersistence.getGridPresets(this._gridConfig.gridId)),
       tap((presets) => this.gridPresetsInternal.set(presets)),
-      tap((presets) => this.selectPreset(presets[0].key)),
+      tap((presets) => {
+        if (!selectFallback) {
+          return;
+        }
+        const fallbackPreset = presets[0];
+        if (fallbackPreset) {
+          this.selectPreset(fallbackPreset.key);
+        } else {
+          this.selectedPresetInternal.set(undefined);
+        }
+      }),
       map(() => {}),
     );
   }
@@ -188,14 +206,20 @@ export class WidgetsPersistenceStateService {
   }
 
   selectPreset(presetId: string): void {
-    this._gridPersistence.load(this._gridConfig.gridId, presetId).subscribe((preset) => {
-      if (!preset) {
-        this.selectFallbackPreset(presetId);
-        return;
-      }
-      this.selectedPresetInternal.set(preset);
-      this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
-    });
+    this.selectPresetAndLoad(presetId).subscribe();
+  }
+
+  selectPresetAndLoad(presetId: string): Observable<WidgetStatePreset | undefined> {
+    return this._gridPersistence.load(this._gridConfig.gridId, presetId).pipe(
+      tap((preset) => {
+        if (!preset) {
+          this.selectFallbackPreset(presetId);
+          return;
+        }
+        this.selectedPresetInternal.set(preset);
+        this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
+      }),
+    );
   }
 
   private initialize(): void {
