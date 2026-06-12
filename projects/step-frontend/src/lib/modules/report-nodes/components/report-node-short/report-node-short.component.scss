@@ -21,6 +21,8 @@ step-report-node-short {
 
   section.name {
     @include flexCenter;
+    gap: 0.5rem;
+
     .mat-mdc-subheading-1 {
       margin: 0;
     }
