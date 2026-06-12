@@ -144,6 +144,9 @@ export class WidgetsPersistenceStateService {
   sharePreset(id: string): Observable<void> {
     return this._gridPersistence.shareGridPreset(this._gridConfig.gridId, id).pipe(
       tap(() => {
+        this.gridPresetsInternal.update((presets) =>
+          presets.map((preset) => (preset.key === id ? { ...preset, visibility: 'Shared' } : preset)),
+        );
         const preset = untracked(() => this.selectedPresetInternal());
         if (preset?.id === id) {
           this.selectedPresetInternal.update(
@@ -161,6 +164,9 @@ export class WidgetsPersistenceStateService {
   unsharePreset(id: string): Observable<void> {
     return this._gridPersistence.unshareGridPreset(this._gridConfig.gridId, id).pipe(
       tap(() => {
+        this.gridPresetsInternal.update((presets) =>
+          presets.map((preset) => (preset.key === id ? { ...preset, visibility: 'Private' } : preset)),
+        );
         const preset = untracked(() => this.selectedPresetInternal());
         if (preset?.id === id) {
           this.selectedPresetInternal.update(

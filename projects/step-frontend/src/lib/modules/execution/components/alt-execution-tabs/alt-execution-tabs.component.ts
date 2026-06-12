@@ -9,7 +9,7 @@ import {
   WidgetStatePreset,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
-import { filter, Observable, of, switchMap, take } from 'rxjs';
+import { filter, map, Observable, of, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, DrilldownExecutionTab, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 
@@ -31,6 +31,8 @@ interface PreviousTarget {
 interface LayoutEditState {
   mode: EditMode;
   name: string;
+  isShared: boolean;
+  originalIsShared: boolean;
   previousTarget: PreviousTarget;
 }
 
@@ -187,7 +189,7 @@ export class AltExecutionTabsComponent {
       visibility: 'Private',
       layout: { widgets: [] } as WidgetStatePreset['layout'],
     });
-    this.editState.set({ mode: 'create', name: '', previousTarget });
+    this.editState.set({ mode: 'create', name: '', isShared: false, originalIsShared: false, previousTarget });
     this._gridEditable.setEditMode(true);
     this.navigateToReport();
   }
@@ -207,6 +209,8 @@ export class AltExecutionTabsComponent {
         this.editState.set({
           mode: 'edit',
           name: preset.attributes?.['name'] ?? layout.value,
+          isShared: preset.visibility === 'Shared',
+          originalIsShared: preset.visibility === 'Shared',
           previousTarget,
         });
         this._gridEditable.setEditMode(true);
@@ -253,19 +257,30 @@ export class AltExecutionTabsComponent {
     this.editState.update((state) => (state ? { ...state, name } : state));
   }
 
+  protected updateEditShared(isShared: boolean): void {
+    this.editState.update((state) => (state ? { ...state, isShared } : state));
+  }
+
   protected saveEdit(): void {
     const state = this.editState();
     const name = state?.name.trim();
     if (!state || !name) {
       return;
     }
-    const save$: Observable<unknown> =
-      state.mode === 'edit' ? this._widgetsPersistence.saveState(name) : this._widgetsPersistence.createPreset(name);
-    save$.pipe(take(1)).subscribe(() => {
-      this.editState.set(undefined);
-      this._gridEditable.setEditMode(false);
-      this.navigateToReport();
-    });
+    const save$: Observable<string | undefined> =
+      state.mode === 'edit'
+        ? this._widgetsPersistence.saveState(name).pipe(map(() => this.selectedPreset()?.id))
+        : this._widgetsPersistence.createPreset(name);
+    save$
+      .pipe(
+        switchMap((presetId) => this.saveSharedState(presetId, state)),
+        take(1),
+      )
+      .subscribe(() => {
+        this.editState.set(undefined);
+        this._gridEditable.setEditMode(false);
+        this.navigateToReport();
+      });
   }
 
   protected cancelEdit(): void {
@@ -354,9 +369,23 @@ export class AltExecutionTabsComponent {
       } as WidgetStatePreset['layout'],
     };
     this._widgetsPersistence.selectLocalPreset(duplicatedPreset);
-    this.editState.set({ mode: 'duplicate', name, previousTarget });
+    const isShared = preset.visibility === 'Shared';
+    this.editState.set({ mode: 'duplicate', name, isShared, originalIsShared: false, previousTarget });
     this._gridEditable.setEditMode(true);
     this.navigateToReport();
+  }
+
+  private saveSharedState(presetId: string | undefined, state: LayoutEditState): Observable<unknown> {
+    if (!presetId) {
+      return of(undefined);
+    }
+    if (state.isShared) {
+      return state.originalIsShared ? of(undefined) : this._widgetsPersistence.sharePreset(presetId);
+    }
+    if (state.mode === 'edit' && state.originalIsShared) {
+      return this._widgetsPersistence.unsharePreset(presetId);
+    }
+    return of(undefined);
   }
 
   private getCurrentTarget(): PreviousTarget {

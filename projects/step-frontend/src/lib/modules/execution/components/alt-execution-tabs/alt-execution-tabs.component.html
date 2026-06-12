@@ -9,6 +9,21 @@
       [ngModel]="state.name"
       (ngModelChange)="updateEditName($event)"
     />
+    <span class="layout-shared-control">
+      <mat-slide-toggle
+        name="layoutShared"
+        color="primary"
+        [ngModel]="state.isShared"
+        (ngModelChange)="updateEditShared($event)"
+      >
+        Shared
+      </mat-slide-toggle>
+      <step-icon
+        name="help-circle"
+        matTooltip="If selected, the layout will be displayed to all users"
+        matTooltipPosition="below"
+      />
+    </span>
     <button type="submit" mat-flat-button color="primary" class="layout-edit-button" [disabled]="!canSaveEdit()">
       Save Layout
     </button>

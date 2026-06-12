@@ -139,6 +139,21 @@ step-alt-execution-tabs {
     }
   }
 
+  .layout-shared-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    font-size: 1.4rem;
+
+    step-icon {
+      width: 1.6rem;
+      height: 1.6rem;
+      color: var.$gray-500;
+      cursor: help;
+    }
+  }
+
   .layout-edit-button {
     height: 3.2rem;
     min-height: 3.2rem;
