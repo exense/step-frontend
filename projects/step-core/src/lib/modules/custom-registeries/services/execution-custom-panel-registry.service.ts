@@ -4,7 +4,7 @@ import { CustomComponent } from '../shared/custom-component';
 import { CustomRegistryItem } from '../shared/custom-registry-item';
 import { CustomRegistryType } from '../shared/custom-registry-type.enum';
 import { GridElementInfo, GridSettingsRegistryService } from './grid-settings-registry.service';
-import { EXECUTION_REPORT_GRID } from '../../execution-common/types/execution-report-grid';
+import { EXECUTION_REPORT_GRID } from '../../execution-common/types/execution-grid-ids';
 
 export interface ExecutionCustomPanelMetadata extends Omit<GridElementInfo, 'widgetType' | 'title'> {
   cssClassName?: string;

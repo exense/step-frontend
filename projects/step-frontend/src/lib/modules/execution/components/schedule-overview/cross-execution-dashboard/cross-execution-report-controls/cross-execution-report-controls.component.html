@@ -1,0 +1,10 @@
+<step-grid-control-tool
+  hintEditGrid="Edit report layout"
+  layoutReadPermission="reportLayout-read"
+  layoutWritePermission="reportLayout-write"
+  layoutDeletePermission="reportLayout-delete"
+  layoutSharedWritePermission="reportLayout-shared-write"
+  layoutSharedDeletePermission="reportLayout-shared-delete"
+  [extraItems]="gridExtraItems"
+  (extraItemChange)="openPerformancePage($event)"
+/>

@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
+import { ExecutionNamePipe, IS_SMALL_SCREEN, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Subject } from 'rxjs';
 import {
@@ -22,8 +22,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
-
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';
     switch (this._state.viewType()) {
@@ -35,7 +33,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
         if (task == null) {
           return 'Deleted task';
         }
-        return task.attributes?.['name']
+        return task.attributes?.['name'];
       case 'plan':
         const plan = this._state.plan();
         if (plan === undefined) {
@@ -54,7 +52,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
           // TODO handle
         }
         return ExecutionNamePipe.transform(execution!);
-
     }
   });
 
@@ -88,7 +85,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.fetchLastExecutionTrigger$.next();
   }
 
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams): void {
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }
@@ -99,13 +96,5 @@ export class CrossExecutionDashboardComponent implements OnInit {
     } else {
       this._state.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
-  }
-
-  private createTab(id: string, label: string, link?: string): Tab<string> {
-    return {
-      id,
-      label,
-      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
-    };
   }
 }

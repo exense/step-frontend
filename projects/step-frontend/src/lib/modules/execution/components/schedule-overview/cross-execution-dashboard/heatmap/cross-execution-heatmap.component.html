@@ -1,33 +1,35 @@
-<step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
-  <step-alt-report-widget-content class="widget-content">
-    <div class="chart-actions-container">
+<step-alt-report-widget [title]="dashletTitle()">
+  <step-alt-report-widget-filter>
+    <div>
       <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
     </div>
-    @if (heatMapData$ | async; as heatmapData) {
-      @if (isLoading() && _state.lastRefreshTrigger() !== 'auto') {
+  </step-alt-report-widget-filter>
+  <step-alt-report-widget-content class="widget-content">
+    @let heatMapData = heatMapData$ | async;
+    @let inProgress = !heatMapData || (isLoading() && _state.lastRefreshTrigger() !== 'auto');
+    @if (heatMapData) {
+      @if (inProgress) {
         <ng-container *ngTemplateOutlet="skeleton" />
       }
-      <div [class.hidden]="isLoading() && _state.lastRefreshTrigger() !== 'auto'">
-        @if (heatmapData.truncated) {
+      <div class="heatmap-container" [class.hidden]="inProgress">
+        @if (heatMapData.truncated) {
           <div class="trimmed-heatmap-placeholder">
             <span>Results were trimmed (too much data). Refine filters to see the heatmap.</span>
           </div>
         } @else {
           <step-heatmap
-            [rows]="heatmapData.data.rows"
-            [columns]="heatmapData.data.columns"
+            [rows]="heatMapData.data.rows"
+            [columns]="heatMapData.data.columns"
             [legendColors]="legendColors"
           />
         }
       </div>
-    } @else {
+    } @else if (inProgress) {
       <ng-container *ngTemplateOutlet="skeleton" />
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>
 
 <ng-template #skeleton>
-  @if (_state.lastRefreshTrigger() !== 'auto') {
-    <step-chart-skeleton />
-  }
+  <step-chart-skeleton />
 </ng-template>
