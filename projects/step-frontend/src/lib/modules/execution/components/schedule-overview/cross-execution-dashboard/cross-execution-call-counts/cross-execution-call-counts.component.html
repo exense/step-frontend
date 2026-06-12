@@ -19,14 +19,13 @@
           <step-timeseries-chart class="auto-height" [settings]="keywordsSettings.chartSettings" [height]="0">
             <ng-template tooltipContent let-data>
               <div class="ts-tooltip">
-                <div
-                  class="link-item"
-                  (click)="jumpToExecution(keywordsSettings.lastExecutions[data.idx!].id!)"
-                  title="See Execution"
-                >
-                  <span>{{ keywordsSettings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                  <span class="link-icon"></span>
-                </div>
+                @let execution = keywordsSettings.lastExecutions[data?.idx ?? -1];
+                @if (execution) {
+                  <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                    <span>{{ execution.description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
+                }
               </div>
             </ng-template>
           </step-timeseries-chart>
@@ -46,14 +45,13 @@
           <step-timeseries-chart class="auto-height" [settings]="testCasesData.chart!" [height]="0">
             <ng-template tooltipContent let-data>
               <div class="ts-tooltip">
-                <div
-                  class="link-item"
-                  (click)="jumpToExecution(testCasesData.lastExecutions[data.idx!].id!)"
-                  title="See Execution"
-                >
-                  <span>{{ testCasesData.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                  <span class="link-icon"></span>
-                </div>
+                @let execution = testCasesData.lastExecutions[data?.idx ?? -1];
+                @if (execution) {
+                  <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                    <span>{{ execution.description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
+                }
               </div>
             </ng-template>
           </step-timeseries-chart>

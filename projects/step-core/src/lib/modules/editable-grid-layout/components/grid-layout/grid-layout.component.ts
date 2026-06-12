@@ -114,8 +114,11 @@ export class GridLayoutComponent implements AfterViewInit {
     const itemsAtFirstRow = Object.values(this._widgetPositions.positions()).filter((position) => position.row === 1);
 
     // Apply auto-height if all items at first row, belong to autoheight and have single cell in height
-    return itemsAtFirstRow.every(
-      (position) => autoHeightWidgetTypes.has(position.widgetType) && position.heightInCells === 1,
+    return (
+      itemsAtFirstRow.length > 0 &&
+      itemsAtFirstRow.every(
+        (position) => autoHeightWidgetTypes.has(position.widgetType) && position.heightInCells === 1,
+      )
     );
   });
 

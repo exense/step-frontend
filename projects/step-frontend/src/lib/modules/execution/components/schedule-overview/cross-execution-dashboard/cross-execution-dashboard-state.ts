@@ -1,4 +1,17 @@
-import { filter, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, take, tap } from 'rxjs';
+import {
+  catchError,
+  filter,
+  finalize,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  Subject,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
   AugmentedExecutionsService,
@@ -151,6 +164,15 @@ export abstract class CrossExecutionDashboardState {
         groupDimensions: ['result'],
       };
       return this._timeSeriesService.fetchBuckets(request).pipe(
+        catchError(() =>
+          of({
+            start: timeRange.from,
+            end: timeRange.to,
+            interval: Math.max(timeRange.to - timeRange.from, 1),
+            matrixKeys: [],
+            matrix: [],
+          }),
+        ),
         finalize(() => {
           this.timeSeriesLoading.set(false);
         }),
@@ -196,7 +218,7 @@ export abstract class CrossExecutionDashboardState {
         return res;
       }, {});
 
-      const total = Object.values(items).reduce((res, item) => res + item);
+      const total = Object.values(items).reduce((res, item) => res + item, 0);
 
       return { total, items };
     }),
@@ -229,6 +251,15 @@ export abstract class CrossExecutionDashboardState {
         groupDimensions: [statusAttribute],
       };
       return this._timeSeriesService.fetchBuckets(request).pipe(
+        catchError(() =>
+          of({
+            start: timeRange.from,
+            end: timeRange.to,
+            interval: Math.max(timeRange.to - timeRange.from, 1),
+            matrixKeys: [],
+            matrix: [],
+          }),
+        ),
         map((response) => {
           const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
           const responseTimeData: (number | undefined | null)[] = [];
