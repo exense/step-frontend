@@ -24,7 +24,7 @@
         <step-icon name="home" />
       </span>
     }
-    @if (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) {
+    @if (!_isCliMode && (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) ) {
       <step-settings-button
         data-step-testid="sidebar-settings-button"
         class="sidebar-home-and-settings-icon"

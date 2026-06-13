@@ -14,6 +14,7 @@ import {
   tableColumnsConfigProvider,
   AlertType,
   entitySelectionStateProvider,
+  AppModeService,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -52,6 +53,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   private _schedulerService = inject(AugmentedSchedulerService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  readonly _isCliMode = inject(AppModeService).isCliMode();
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: DialogRouteResult) => {
