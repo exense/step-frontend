@@ -35,4 +35,8 @@ export class AltReportNodeKeywordsWidgetComponent {
   protected openDetails(node: ReportNode): void {
     this._dialogs.openIterationDetails(DrilldownRootType.KEYWORDS, node);
   }
+
+  protected openMaximized(): void {
+    this._dialogs.openDrilldownRoot(DrilldownRootType.KEYWORDS);
+  }
 }

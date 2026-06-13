@@ -37,6 +37,13 @@ export class AltExecutionDrilldownNavigationUtilsService {
     return undefined;
   }
 
+  openDrilldownRoot(drilldownRootType: DrilldownRootType): void {
+    this._router.navigate([{ outlets: { nodeDetails: ['node-details', drilldownRootType] } }], {
+      relativeTo: this._nodeDetailsRelativeParent,
+      queryParamsHandling: 'merge',
+    });
+  }
+
   openDrilldown(
     drilldownRootType: DrilldownRootType,
     type: DrillDownStackItemTypeWORoot,
