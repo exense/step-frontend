@@ -1,3 +1,16 @@
 <step-alt-report-node-list-widget [mode]="_mode">
+  <step-alt-report-widget-filter>
+    <step-btn-group class="with-borders maximize-button">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Maximize"
+        matTooltipPosition="below"
+        (click)="openMaximized()"
+      >
+        <step-icon name="maximize-2" />
+      </button>
+    </step-btn-group>
+  </step-alt-report-widget-filter>
   <step-alt-report-node-testcases (openIterations)="handleOpenIteration($event)" />
 </step-alt-report-node-list-widget>
