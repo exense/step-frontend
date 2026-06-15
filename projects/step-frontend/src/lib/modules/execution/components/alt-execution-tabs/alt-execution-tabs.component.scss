@@ -160,6 +160,7 @@ step-alt-execution-tabs {
   }
 
   .mat-mdc-tab-link:hover .tab-action,
+  .mat-mdc-tab-link.mdc-tab--active .tab-action,
   .tab-action[aria-expanded='true'] {
     opacity: 1;
   }
