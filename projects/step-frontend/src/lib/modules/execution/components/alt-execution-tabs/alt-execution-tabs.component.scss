@@ -41,7 +41,7 @@ step-alt-execution-tabs {
       height: 3.6rem;
       min-width: 0;
       padding: 0 0.8rem;
-      max-width: 24rem;
+      max-width: 32rem;
       box-sizing: border-box;
       border: 0.1rem solid var.$transparent;
       border-bottom-color: var.$transparent;
@@ -105,17 +105,20 @@ step-alt-execution-tabs {
         }
       }
 
-      .mdc-tab__text-label {
+      &.mdc-tab.mat-mdc-tab-link .tab-content {
         color: var.$gray-550;
+        transition: all 100ms;
       }
 
-      &:hover .mdc-tab__text-label {
-        color: var.$dark-blue;
+      &.mdc-tab.mat-mdc-tab-link:hover .tab-content {
+        color: var.$gray-800;
+        font-weight: 500;
       }
 
-      &.mdc-tab--active .mdc-tab__text-label,
+      &.mdc-tab.mat-mdc-tab-link.mdc-tab--active .tab-content,
       &.mdc-tab--active:hover .mdc-tab__text-label {
-        color: var.$blue-600;
+        color: var.$gray-800;
+        font-weight: 500;
       }
 
       &.mdc-tab--active {
@@ -135,7 +138,7 @@ step-alt-execution-tabs {
     flex: 0 0 1.8rem;
     width: 1.8rem;
     height: 1.8rem;
-    margin-right: -0.8rem;
+    margin-right: -0.4rem;
   }
 
   .tab-close-slot {
