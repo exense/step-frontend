@@ -111,8 +111,7 @@ step-alt-execution-tabs {
       }
 
       &.mdc-tab.mat-mdc-tab-link:hover .tab-content {
-        color: var.$gray-800;
-        font-weight: 500;
+        color: var.$black;
       }
 
       &.mdc-tab.mat-mdc-tab-link.mdc-tab--active .tab-content,
