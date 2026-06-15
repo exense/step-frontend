@@ -19,4 +19,8 @@ export class AltReportNodeTestcasesWidgetComponent {
   protected handleOpenIteration({ node, restParams }: OpenIterationsEvent): void {
     this._executionDialogs.openIterations(DrilldownRootType.TESTCASES, node, restParams);
   }
+
+  protected openMaximized(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.TESTCASES);
+  }
 }

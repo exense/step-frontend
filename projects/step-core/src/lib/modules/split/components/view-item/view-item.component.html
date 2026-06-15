@@ -9,12 +9,12 @@
     </div>
     <div class="item-actions">
       @if (canMinimize()) {
-        <button mat-icon-button matTooltip="Minimise panel" matTooltipPosition="below" (click)="minimize.emit()">
+        <button mat-icon-button matTooltip="Minimize panel" matTooltipPosition="below" (click)="minimize.emit()">
           <step-icon name="minimize-2" />
         </button>
       }
       @if (canMaximize()) {
-        <button mat-icon-button matTooltip="Maximise panel" matTooltipPosition="below" (click)="maximize.emit()">
+        <button mat-icon-button matTooltip="Maximize panel" matTooltipPosition="below" (click)="maximize.emit()">
           <step-icon name="maximize-2" />
         </button>
       }
