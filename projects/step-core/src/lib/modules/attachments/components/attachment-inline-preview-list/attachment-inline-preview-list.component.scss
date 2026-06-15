@@ -17,12 +17,15 @@ step-attachment-inline-preview-list {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
     overflow: hidden;
+    padding: 0.1rem 0.2rem;
 
     &.invisible-items {
       width: 0;
       max-width: unset;
       overflow: visible;
+      padding: 0;
     }
   }
 }

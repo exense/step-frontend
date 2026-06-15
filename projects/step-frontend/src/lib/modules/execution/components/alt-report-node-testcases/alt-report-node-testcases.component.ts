@@ -25,6 +25,7 @@ import { AltReportNodeListSearchDirective } from '../../directives/alt-report-no
 import { VIEW_MODE } from '../../shared/view-mode';
 import { Status } from '../../../_common/shared/status.enum';
 import { AltReportNodeListItemsPerPageDirective } from '../../directives/alt-report-node-list-items-per-page.directive';
+import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
 
 @Component({
   selector: 'step-alt-report-node-testcases',
@@ -52,6 +53,7 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
 
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
   readonly selectedId = input<string | undefined>(undefined);
+  protected readonly detailsTooltip = OPEN_EXECUTION_DETAILS_TOOLTIP;
 
   private get tableSearchUntracked(): TableSearch | undefined {
     return untracked(() => this.tableSearch());

@@ -44,8 +44,8 @@ import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-d
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 
-const PAGE_SIZE = 100;
-const PAGE_SIZE_OPTIONS = [25, 50, PAGE_SIZE, 250];
+const PAGE_SIZE = 25;
+const PAGE_SIZE_OPTIONS = [PAGE_SIZE, 50, 100, 250];
 
 @Component({
   selector: 'step-aggregated-tree-node-iteration-list',

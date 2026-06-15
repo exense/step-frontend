@@ -54,9 +54,8 @@ export class AltExecutionNodesHelperService implements OnDestroy {
       switchMap((range) => {
         const isManualChange = !!range?.isManualChange;
         const nodeInCache = !reportNodeId ? undefined : this.reportNodesCache.get(reportNodeId);
-        const isNotRunning = nodeInCache?.status !== Status.RUNNING;
-        const useCacheValue = !isManualChange && !!nodeInCache && isNotRunning;
-        return this.getReportNode<T>(reportNodeId, useCacheValue);
+        const shouldRefresh = isManualChange || nodeInCache?.status === Status.RUNNING;
+        return this.getReportNode<T>(reportNodeId, shouldRefresh);
       }),
     );
   }

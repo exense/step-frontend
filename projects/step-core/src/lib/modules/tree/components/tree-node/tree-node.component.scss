@@ -8,12 +8,12 @@
 .step-tree-node-container {
   display: flex;
   position: relative;
-  padding-left: calc(var(--level, 0) * 3rem);
+  padding-left: calc(var(--level, 0) * var(--tree-node-indent-size, 3rem));
 
   .node-line {
     position: absolute;
     top: 0;
-    left: calc(var(--idx) * 3rem + 1.5rem);
+    left: calc(var(--idx) * var(--tree-node-indent-size, 3rem) + var(--tree-node-line-offset, 1.5rem));
     border-right: 1px solid var.$gray-100;
     height: 100%;
   }

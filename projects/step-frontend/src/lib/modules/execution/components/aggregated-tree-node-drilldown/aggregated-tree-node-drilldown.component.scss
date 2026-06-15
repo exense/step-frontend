@@ -22,8 +22,26 @@ step-aggregated-tree-node-drilldown {
     }
   }
 
-  .root-content step-alt-execution-tree {
-    min-height: 30rem;
+  .root-content {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+
+    step-alt-execution-tree {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 30rem;
+      overflow: auto;
+
+      step-tree {
+        flex: 1;
+        min-height: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+        overflow: auto;
+      }
+    }
   }
 
   .breadcrumb-title {
