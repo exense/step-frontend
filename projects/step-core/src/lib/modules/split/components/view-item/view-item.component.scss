@@ -11,18 +11,23 @@ step-view-item {
     .item-header {
       align-items: center;
       gap: 0.5rem;
-      justify-content: space-between;
       display: flex;
       margin-bottom: 1rem;
 
-      & > div:first-child {
-        flex: 1;
-      }
-
       .item-title {
+        flex: 1;
+        min-width: 0;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         font-size: 1.7rem;
         font-weight: 500;
+      }
+      
+      .item-actions {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
       }
     }
 

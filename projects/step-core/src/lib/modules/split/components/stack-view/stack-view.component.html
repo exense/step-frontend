@@ -15,7 +15,8 @@
       <step-split-area sizeType="flex">
         <step-view-item
           [view]="view"
-          [canClose]="canClosePanels()"
+          [canClose]="canClosePanels() && (!isFirst || isLast)"
+          [closeTooltip]="isFirst ? rootCloseTooltip() : 'Close panel'"
           [canMinimize]="isMaximized() && isLast && !isFirst"
           [canMaximize]="!isMaximized() && isLast && !isFirst"
           [isLast]="isLast"

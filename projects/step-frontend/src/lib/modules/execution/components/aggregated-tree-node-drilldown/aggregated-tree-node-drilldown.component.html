@@ -1,4 +1,9 @@
-<step-stack-view [withOverflow]="true" [canClosePanels]="true" (removeItem)="removeItem($event, true)">
+<step-stack-view
+  [withOverflow]="true"
+  [canClosePanels]="true"
+  rootCloseTooltip="Close drilldown"
+  (removeItem)="removeItem($event, true)"
+>
   <div *stepStackViewGroupTooltip>
     <strong>Minimized panels</strong><br />
     <div>When opening more panels than fit the screen, previous panels will automatically be minimized</div>
