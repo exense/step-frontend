@@ -26,9 +26,9 @@ export class TreeNodeNameComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
   protected readonly _injector = inject(Injector);
 
-  readonly templateContainer = inject(TreeNodeTemplateContainerService);
+  protected readonly _templateContainer = inject(TreeNodeTemplateContainerService);
 
-  node = input<TreeNode | undefined>();
+  readonly node = input<TreeNode | undefined>();
 
   readonly isEditMode = computed(() => {
     const editNodeId = this._treeState.editNodeId();
