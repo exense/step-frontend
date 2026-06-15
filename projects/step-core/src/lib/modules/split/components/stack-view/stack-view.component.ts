@@ -22,9 +22,7 @@ import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
 import { SplitComponent } from '../split/split.component';
 import { StackViewItemComponent } from '../stack-view-item/stack-view-item.component';
 import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-view-breadcrumbs.component';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { StackViewGroupTooltipDirective } from '../../directives/stack-view-group-tooltip.directive';
-import { StackViewCloseAllDirective } from '../../directives/stack-view-close-all.directive';
 
 @Component({
   selector: 'step-stack-view',
@@ -36,7 +34,6 @@ import { StackViewCloseAllDirective } from '../../directives/stack-view-close-al
     ViewGroupComponent,
     ViewItemComponent,
     StackViewBreadcrumbsComponent,
-    StepBasicsModule,
   ],
   templateUrl: './stack-view.component.html',
   styleUrl: './stack-view.component.scss',
@@ -45,7 +42,6 @@ export class StackViewComponent {
   protected readonly GROUP_WIDTH = 100;
 
   readonly removeItem = output<string>();
-  readonly closeAll = output<void>();
 
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -61,9 +57,6 @@ export class StackViewComponent {
   private readonly splitAreas = viewChildren(SplitAreaComponent);
   private readonly items = contentChildren(StackViewItemComponent);
   protected readonly viewGroupTooltip = contentChild(StackViewGroupTooltipDirective);
-  private readonly contentCloseAll = contentChild(StackViewCloseAllDirective);
-
-  protected readonly templateCloseAll = computed(() => this.contentCloseAll()?._templateRef);
 
   protected readonly isMaximized = this.isMaximizedInternal.asReadonly();
   protected readonly views = signal<StackViewInfo[]>([]);
