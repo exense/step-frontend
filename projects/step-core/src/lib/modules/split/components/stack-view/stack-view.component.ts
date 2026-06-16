@@ -21,7 +21,6 @@ import { SplitAreaComponent } from '../split-area/split-area.component';
 import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
 import { SplitComponent } from '../split/split.component';
 import { StackViewItemComponent } from '../stack-view-item/stack-view-item.component';
-import { StackViewBreadcrumbsComponent } from '../stack-view-breadcrumbs/stack-view-breadcrumbs.component';
 import { StackViewGroupTooltipDirective } from '../../directives/stack-view-group-tooltip.directive';
 
 @Component({
@@ -33,7 +32,6 @@ import { StackViewGroupTooltipDirective } from '../../directives/stack-view-grou
     IsSplitViewGroupPipe,
     ViewGroupComponent,
     ViewItemComponent,
-    StackViewBreadcrumbsComponent,
   ],
   templateUrl: './stack-view.component.html',
   styleUrl: './stack-view.component.scss',

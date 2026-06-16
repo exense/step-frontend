@@ -1,6 +1,3 @@
-@if (false) {
-  <step-stack-view-breadcrumbs [views]="views()" (openView)="openView($event)" />
-}
 <step-split [class.with-overflow]="withOverflow()">
   @for (view of viewsAndGroups(); track view.id; let isLast = $last; let isFirst = $first) {
     @if (view | isSplitViewGroup; as group) {

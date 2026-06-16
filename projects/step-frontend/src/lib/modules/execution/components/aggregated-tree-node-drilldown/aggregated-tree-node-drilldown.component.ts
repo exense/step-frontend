@@ -1,7 +1,6 @@
 import {
   Component,
   computed,
-  effect,
   ElementRef,
   inject,
   OnDestroy,
@@ -151,15 +150,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
     )
     .subscribe(({ newItems, keepIndex }) => {
-      this.stackItems.update((items) => {
+      this.updateStackItems((items) => {
         return [...items.slice(0, keepIndex), ...newItems];
       });
     });
-
-  private readonly updateTabLabel = effect(() => {
-    const label = this.getTabLabel(this.stackItems());
-    this._tabs.updateActiveDrilldownLabel(label);
-  });
 
   ngOnInit(): void {
     const nodeDetailsPath = ['node-details', ...this._activatedRoute.snapshot.url.map((item) => item.path)];
@@ -171,6 +165,11 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     this.executionProgressElement?.classList?.remove?.(IS_DRILLDOWN_OPENED);
   }
 
+  private updateStackItems(updater: (items: DrillDownStackItem[]) => DrillDownStackItem[]): void {
+    this.stackItems.set(updater(this.stackItemsUntracked));
+    this._tabs.updateActiveDrilldownLabel(this.getTabLabel(this.stackItemsUntracked));
+  }
+
   protected removeItem(id: string, withLocationUpdate?: boolean): void {
     const items = this.stackItemsUntracked;
     // By closing of the first item, close entire view
@@ -178,7 +177,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       this._drilldownNavigationUtils.closeDrilldown();
       return;
     }
-    this.stackItems.update((value) => {
+    this.updateStackItems((value) => {
       const index = value.findIndex((item) => item.id === id);
       const result = value.splice(0, index);
       if (withLocationUpdate) {
@@ -220,7 +219,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
@@ -242,7 +241,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
@@ -264,7 +263,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;

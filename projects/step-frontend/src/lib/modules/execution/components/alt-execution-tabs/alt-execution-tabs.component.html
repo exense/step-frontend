@@ -82,15 +82,15 @@
   <mat-menu #layoutMenu="matMenu" class="layout-actions-menu">
     <button type="button" mat-menu-item (click)="startEdit()" [disabled]="!canEditLayout()">
       <step-icon name="edit-2" />
-      <span>Edit</span>
+      <span>Edit Layout</span>
     </button>
     <button type="button" mat-menu-item (click)="startDuplicate()" [disabled]="!canCreateLayout()">
       <step-icon name="copy" />
-      <span>Duplicate</span>
+      <span>Duplicate Layout</span>
     </button>
     <button type="button" mat-menu-item (click)="deleteLayout()" [disabled]="!canDeleteLayout()">
       <step-icon name="trash-2" />
-      <span>Delete</span>
+      <span>Delete Layout</span>
     </button>
   </mat-menu>
 }
