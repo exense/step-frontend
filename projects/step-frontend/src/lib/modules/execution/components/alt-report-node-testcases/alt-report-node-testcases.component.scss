@@ -66,9 +66,9 @@ step-alt-report-node-testcases {
       text-overflow: ellipsis;
     }
 
-    .chip {
-      border-radius: 4rem;
+    .test-case-status-summary {
       display: flex;
+      gap: 0.6rem;
       padding-left: 1rem;
       min-height: 3rem;
       padding-right: 1rem;

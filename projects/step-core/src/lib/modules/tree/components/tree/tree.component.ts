@@ -10,12 +10,11 @@ import {
   HostListener,
   inject,
   input,
-  Input,
+  OnDestroy,
   Output,
   signal,
   TrackByFunction,
   viewChild,
-  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -25,7 +24,6 @@ import { TreeAction } from '../../types/tree-action';
 import { TreeNode } from '../../types/tree-node';
 import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
-import { DragDataService } from '../../../drag-drop';
 import { TreeFlatNode } from '../../types/tree-flat-node';
 import { TreeFocusStateService } from '../../services/tree-focus-state.service';
 import { AsyncPipe, DOCUMENT, NgTemplateOutlet } from '@angular/common';
@@ -52,7 +50,9 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   encapsulation: ViewEncapsulation.None,
   imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })
-export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService {
+export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService, OnDestroy {
+  private static readonly SCROLL_TO_NODE_MAX_ATTEMPTS = 5;
+
   private _treeActions = inject(TreeActionsService, { optional: true });
   private _treeFocusState = inject(TreeFocusStateService, { optional: true });
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -65,9 +65,14 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
   protected readonly itemTrackBy: TrackByFunction<N> = (index, item) => item.id;
+  protected readonly virtualScrollSkeletonRows = [0, 1, 2, 3, 4, 5, 6, 7];
+  protected readonly showVirtualScrollSkeletons = signal(false);
+  private virtualScrollSkeletonTimeout?: ReturnType<typeof setTimeout>;
+  private scrollToNodeCorrectionFrame?: number;
 
-  private applyVirtualScrollFrom = this._strepTreeAutoChooseVirtualScroll?.applyVirtualScrollFrom ?? signal(undefined);
-  private displayedItems = computed(() => this._treeState.flatTree()?.length ?? 0);
+  private readonly applyVirtualScrollFrom =
+    this._strepTreeAutoChooseVirtualScroll?.applyVirtualScrollFrom ?? signal(undefined);
+  private readonly displayedItems = computed(() => this._treeState.flatTree()?.length ?? 0);
 
   protected readonly hasVirtualScroll = computed(() => {
     const applyVirtualScrollFrom = this.applyVirtualScrollFrom();
@@ -83,17 +88,15 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   @HostBinding('class.in-focus')
   private isTreeInFocus = false;
 
-  @ViewChild(DragDataService, { static: true }) private dragData!: DragDataService;
-
-  @ViewChild('nodeContextMenuTrigger', { static: true, read: MatMenuTrigger }) contextMenuTrigger!: MatMenuTrigger;
-
-  private virtualScrollViewport = viewChild('virtualViewport', { read: CdkVirtualScrollViewport });
+  private readonly contextMenuTrigger = viewChild.required('nodeContextMenuTrigger', { read: MatMenuTrigger });
+  private readonly virtualScrollViewport = viewChild('virtualViewport', { read: CdkVirtualScrollViewport });
 
   readonly treeNodeTemplate = contentChild(TreeNodeTemplateDirective);
   readonly treeNodeNameTemplate = contentChild(TreeNodeNameTemplateDirective);
   readonly treeNodeDetailsTemplate = contentChild(TreeNodeDetailsTemplateDirective);
 
-  @Input() dragDisabled: boolean = false;
+  /** @Input() **/
+  readonly dragDisabled = input<boolean>(false);
 
   /** @Input() **/
   readonly forceFocus = input<boolean>(false);
@@ -104,7 +107,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   openedMenuNodeId?: string;
 
-  private forceFocusChange = effect(() => {
+  private readonly forceFocusChange = effect(() => {
     if (this.forceFocus()) {
       this.setFocus(true);
     }
@@ -125,14 +128,15 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX;
     this.contextMenuPosition.y = event.clientY;
-    this.contextMenuTrigger.menuData = { node, multipleNodes };
-    this.contextMenuTrigger.openMenu();
+    const contextMenuTrigger = this.contextMenuTrigger();
+    contextMenuTrigger.menuData = { node, multipleNodes };
+    contextMenuTrigger.openMenu();
     this.openedMenuNodeId = nodeId;
   }
 
   handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
-    const multipleNodes = this.contextMenuTrigger.menuData.multipleNodes;
+    const multipleNodes = this.contextMenuTrigger().menuData.multipleNodes;
     this.treeContextAction.emit({ actionId, node, multipleNodes });
   }
 
@@ -143,6 +147,16 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   handleContextClose(): void {
     this.openedMenuNodeId = undefined;
+  }
+
+  protected handleVirtualScrollActivity(): void {
+    if (!this.hasVirtualScroll()) {
+      return;
+    }
+
+    this.showVirtualScrollSkeletons.set(true);
+    clearTimeout(this.virtualScrollSkeletonTimeout);
+    this.virtualScrollSkeletonTimeout = setTimeout(() => this.showVirtualScrollSkeletons.set(false), 180);
   }
 
   scrollToNode(nodeId?: string): void {
@@ -159,11 +173,8 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
       return;
     }
 
-    this.virtualScrollViewport()?.scrollToIndex?.(index, 'smooth');
-    this.nativeScroll(nodeId);
-    // sometimes scroll to element doesn't performed correctly after virtual scroll
-    // invoke another autoscroll to correct the position (but without scrolling effect)
-    setTimeout(() => this.nativeScroll(nodeId, 'instant'), 300);
+    this.handleVirtualScrollActivity();
+    this.scrollToNodeWhenRendered(nodeId, index, 'smooth');
   }
 
   private nativeScroll(nodeId: string, behavior: ScrollBehavior = 'smooth'): void {
@@ -171,7 +182,41 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     nodeElement?.scrollIntoView?.({ behavior, block: 'nearest' });
   }
 
-  private setFocus(isInFocus: boolean) {
+  private scrollToNodeWhenRendered(nodeId: string, index: number, behavior: ScrollBehavior, attempt = 0): void {
+    const viewport = this.virtualScrollViewport();
+    if (!viewport) {
+      return;
+    }
+
+    this.cancelScrollToNodeCorrection();
+    viewport.scrollToIndex(index, attempt === 0 ? behavior : 'instant');
+
+    this.scrollToNodeCorrectionFrame = requestAnimationFrame(() => {
+      const range = viewport.getRenderedRange();
+      const isRendered = index >= range.start && index < range.end;
+      if (!isRendered && attempt < TreeComponent.SCROLL_TO_NODE_MAX_ATTEMPTS) {
+        this.scrollToNodeWhenRendered(nodeId, index, 'instant', attempt + 1);
+        return;
+      }
+
+      this.nativeScroll(nodeId, isRendered ? behavior : 'instant');
+    });
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.virtualScrollSkeletonTimeout);
+    this.cancelScrollToNodeCorrection();
+  }
+
+  private cancelScrollToNodeCorrection(): void {
+    if (this.scrollToNodeCorrectionFrame === undefined) {
+      return;
+    }
+    cancelAnimationFrame(this.scrollToNodeCorrectionFrame);
+    this.scrollToNodeCorrectionFrame = undefined;
+  }
+
+  private setFocus(isInFocus: boolean): void {
     this.isTreeInFocus = isInFocus;
     this._treeFocusState?.setTreeFocus(isInFocus);
   }

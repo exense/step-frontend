@@ -3,8 +3,11 @@ import {
   Component,
   computed,
   ElementRef,
+  effect,
   inject,
   input,
+  OnDestroy,
+  signal,
   viewChild,
   viewChildren,
   ViewEncapsulation,
@@ -19,6 +22,10 @@ const PADDINGS = 6;
 const GAP = 6;
 const CAP_ICON_SPACE = 20;
 const OFFSET = 15;
+const MAX_MEASURABLE_ITEMS = 20;
+const INITIAL_VERTICAL_RENDERED_ITEMS = 20;
+const MIN_VERTICAL_RENDER_CHUNK = 20;
+const MAX_VERTICAL_RENDER_CHUNK = 160;
 
 @Component({
   selector: 'step-artefact-inline-field-list',
@@ -28,11 +35,14 @@ const OFFSET = 15;
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class ArtefactInlineFieldListComponent {
+export class ArtefactInlineFieldListComponent implements OnDestroy {
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
 
   private readonly renderedElements = viewChildren('items', { read: ArtefactInlineFieldComponent });
   private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
+  private readonly verticalRenderState = signal<{ target: number; limit: number } | undefined>(undefined);
+  private verticalRenderFrame?: number;
+  private verticalRenderChunkSize = MIN_VERTICAL_RENDER_CHUNK;
 
   readonly isVertical = input(false);
   readonly hideIcons = input(false);
@@ -41,6 +51,8 @@ export class ArtefactInlineFieldListComponent {
   readonly items = input([], {
     transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],
   });
+
+  protected readonly measurableItems = computed(() => this.items().slice(0, MAX_MEASURABLE_ITEMS));
 
   protected readonly displayItems = computed(() => {
     const items = this.items();
@@ -79,6 +91,63 @@ export class ArtefactInlineFieldListComponent {
     const displayItems = this.displayItems();
     return displayItems.length < items.length;
   });
+
+  protected readonly renderedDisplayItems = computed(() => {
+    const displayItems = this.displayItems();
+    const verticalRenderTarget = this.verticalRenderTarget();
+    if (verticalRenderTarget === undefined) {
+      return displayItems;
+    }
+    const verticalRenderState = this.verticalRenderState();
+    const limit = verticalRenderState?.target === verticalRenderTarget ? verticalRenderState.limit : undefined;
+    return displayItems.slice(0, limit ?? INITIAL_VERTICAL_RENDERED_ITEMS);
+  });
+
+  private readonly verticalRenderTarget = computed(() => {
+    const displayItemsLength = this.displayItems().length;
+    const isVertical = this.isVertical();
+    return isVertical && displayItemsLength > INITIAL_VERTICAL_RENDERED_ITEMS ? displayItemsLength : undefined;
+  });
+
+  private readonly progressiveVerticalRenderEffect = effect(() => {
+    const verticalRenderTarget = this.verticalRenderTarget();
+
+    this.cancelProgressiveVerticalRender();
+    this.verticalRenderChunkSize = MIN_VERTICAL_RENDER_CHUNK;
+
+    if (verticalRenderTarget === undefined) {
+      return;
+    }
+
+    this.scheduleProgressiveVerticalRender(verticalRenderTarget);
+  });
+
+  ngOnDestroy(): void {
+    this.cancelProgressiveVerticalRender();
+  }
+
+  private scheduleProgressiveVerticalRender(totalItems: number): void {
+    this.verticalRenderFrame = requestAnimationFrame(() => {
+      const currentState = this.verticalRenderState();
+      const currentLimit = currentState?.target === totalItems ? currentState.limit : INITIAL_VERTICAL_RENDERED_ITEMS;
+      if (currentLimit >= totalItems) {
+        return;
+      }
+
+      const nextLimit = Math.min(totalItems, currentLimit + this.verticalRenderChunkSize);
+      this.verticalRenderState.set({ target: totalItems, limit: nextLimit });
+      this.verticalRenderChunkSize = Math.min(this.verticalRenderChunkSize * 2, MAX_VERTICAL_RENDER_CHUNK);
+      this.scheduleProgressiveVerticalRender(totalItems);
+    });
+  }
+
+  private cancelProgressiveVerticalRender(): void {
+    if (this.verticalRenderFrame === undefined) {
+      return;
+    }
+    cancelAnimationFrame(this.verticalRenderFrame);
+    this.verticalRenderFrame = undefined;
+  }
 
   private determineElementsToDisplay(
     renderedElements: readonly ArtefactInlineFieldComponent[],
