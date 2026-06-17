@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -185,6 +186,23 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       }
       return result;
     });
+  }
+
+  @HostListener('window:keyup.esc', ['$event'])
+  protected handleEscape(event: KeyboardEvent): void {
+    const target = event.target as Node | null;
+    const isEventFromDrilldown = !target || target === document.body || this._el.nativeElement.contains(target);
+    if (!isEventFromDrilldown) {
+      return;
+    }
+    const items = this.stackItemsUntracked;
+    const lastItem = items[items.length - 1];
+    if (!lastItem) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.removeItem(lastItem.id, true);
   }
 
   protected handleOpenIteration(
