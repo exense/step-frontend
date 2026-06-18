@@ -31,7 +31,7 @@ export class AltExecutionParametersComponent {
   private _screensService = inject(AugmentedScreenService);
   private _multipleProjects = inject(MultipleProjectsService);
 
-  private executionParametersInfo = toSignal(
+  private readonly executionParametersInfo = toSignal(
     this._screensService.getScreenInputsByScreenIdWithCache('executionParameters'),
     { initialValue: [] },
   );
@@ -70,9 +70,11 @@ export class AltExecutionParametersComponent {
     const parametersInfo = this.executionParametersInfo();
     const executionProjectId = this.executionProjectId();
     const projects = this._multipleProjects.getProjects();
-    const currentProjectId = this._multipleProjects.currentProject()?.projectId;
+    const currentProject = this._multipleProjects.currentProject();
+    const currentProjectId = currentProject?.projectId;
+    const isAllProjectsView = currentProject?.name === '[All]';
 
-    if (!executionProjectId || currentProjectId === executionProjectId || !projects.length) {
+    if (!executionProjectId || currentProjectId === executionProjectId || isAllProjectsView || !projects.length) {
       return this.deduplicateByInputId(parametersInfo, executionProjectId);
     }
 
