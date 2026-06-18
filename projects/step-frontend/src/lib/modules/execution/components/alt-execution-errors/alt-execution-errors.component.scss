@@ -33,9 +33,5 @@
 
 .error-actions {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  a {
-    white-space: nowrap;
-  }
 }

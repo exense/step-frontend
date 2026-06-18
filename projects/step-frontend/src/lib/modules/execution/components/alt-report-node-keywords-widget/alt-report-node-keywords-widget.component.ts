@@ -8,7 +8,7 @@ import {
   ALT_REPORT_NODE_KEYWORDS_TABLE_ID,
   ALT_REPORT_NODE_LIST_DEFAULT_PAGE_SIZE,
 } from '../../shared/alt-report-node-keywords-list-config.tokens';
-import {AltReportNodesFilterService} from '../../services/alt-report-nodes-filter.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords-widget',
@@ -43,6 +43,7 @@ export class AltReportNodeKeywordsWidgetComponent {
   }
 
   search(value: string): void {
+    this._filters.updateStatusCtrl([]);
     this._filters.searchCtrl.setValue(value);
   }
 }
