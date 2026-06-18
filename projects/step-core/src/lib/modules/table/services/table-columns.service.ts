@@ -297,20 +297,19 @@ export class TableColumnsService implements Reloadable, OnDestroy {
       Also remove action columns from remote settings, because remote settings position might be wrong
       in case if new custom columns have been added
      */
-    remoteTableSettings.columnSettingList = (remoteTableSettings.columnSettingList ?? []).filter(
-      (col) => defaultColumnKeys.has(col.columnId) && !actionColumnKeys.has(col.columnId!),
-    );
+    const columnSettingList = (remoteTableSettings.columnSettingList ?? [])
+      .filter((col) => defaultColumnKeys.has(col.columnId) && !actionColumnKeys.has(col.columnId!))
+      .map((col) => ({ ...col }));
 
     /*
       Add new columns at their default positions and shift the saved positions accordingly.
       This keeps hardcoded columns from being pushed after columns persisted in the BE
     */
-    const removeColumnsKey = new Set(remoteTableSettings.columnSettingList.map((col) => col.columnId));
+    const removeColumnsKey = new Set(columnSettingList.map((col) => col.columnId));
     const columnsToAdd = (defaultTableSettings.columnSettingList ?? []).filter(
       (col) => !removeColumnsKey.has(col.columnId),
     );
 
-    const columnSettingList = remoteTableSettings.columnSettingList;
     columnSettingList.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
     columnSettingList.forEach((col, i) => (col.position = i));
     columnsToAdd
@@ -325,6 +324,9 @@ export class TableColumnsService implements Reloadable, OnDestroy {
         columnSettingList.push({ ...colToAdd, position: insertPosition });
       });
 
-    return remoteTableSettings;
+    return {
+      ...remoteTableSettings,
+      columnSettingList,
+    };
   }
 }
