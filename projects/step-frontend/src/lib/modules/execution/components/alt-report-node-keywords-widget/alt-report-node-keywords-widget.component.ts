@@ -38,6 +38,10 @@ export class AltReportNodeKeywordsWidgetComponent {
     this._dialogs.openIterationDetails(DrilldownRootType.KEYWORDS, node);
   }
 
+  protected openMaximized(): void {
+    this._dialogs.openDrilldownRoot(DrilldownRootType.KEYWORDS);
+  }
+
   search(value: string): void {
     this._filters.searchCtrl.setValue(value);
   }

@@ -22,6 +22,10 @@ export class AltReportNodeTestcasesWidgetComponent {
     this._executionDialogs.openIterations(DrilldownRootType.TESTCASES, node, restParams);
   }
 
+  protected openMaximized(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.TESTCASES);
+  }
+
   search(value: string): void {
     this._filters.searchCtrl.setValue(value);
   }

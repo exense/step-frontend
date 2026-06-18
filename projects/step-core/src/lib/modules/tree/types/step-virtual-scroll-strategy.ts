@@ -13,11 +13,11 @@ export class ItemSizeCalculator {
     this.minItemSize = signal(minItemSize);
   }
 
-  private minItemSize: WritableSignal<number>;
-  private itemHeights = signal<number[]>([]);
-  private dataLength = signal<number>(0);
+  private readonly minItemSize: WritableSignal<number>;
+  private readonly itemHeights = signal<number[]>([]);
+  private readonly dataLength = signal<number>(0);
 
-  private itemCache = computed(() => {
+  private readonly itemCache = computed(() => {
     const dataLength = this.dataLength();
     const itemHeights = this.itemHeights();
     const minItemSize = this.minItemSize();
@@ -35,21 +35,27 @@ export class ItemSizeCalculator {
 
   readonly totalContentSize = computed(() => {
     const itemsCache = this.itemCache();
-    return itemsCache[itemsCache.length - 1].totalHeight;
+    return itemsCache[itemsCache.length - 1]?.totalHeight ?? 0;
   });
 
   getIndexByOffset(offset: number): number {
     const itemsCache = this.itemCache();
+    if (itemsCache.length === 0) {
+      return 0;
+    }
     for (let i = 0; i < itemsCache.length; i++) {
-      if (itemsCache[i].offset >= offset) {
+      if (itemsCache[i].totalHeight > offset) {
         return i;
       }
     }
-    return 0;
+    return itemsCache.length - 1;
   }
 
   getItemOffset(itemIndex: number): number {
     const itemsCache = this.itemCache();
+    if (itemsCache.length === 0) {
+      return 0;
+    }
     itemIndex = Math.min(itemIndex, itemsCache.length - 1);
     itemIndex = Math.max(itemIndex, 0);
     return itemsCache[itemIndex].offset;
@@ -59,7 +65,7 @@ export class ItemSizeCalculator {
     this.dataLength.set(value);
   }
 
-  setMinItemSize(minItemSize: number) {
+  setMinItemSize(minItemSize: number): void {
     this.minItemSize.set(minItemSize);
   }
 
@@ -100,20 +106,20 @@ export class StepVirtualScrollStrategy implements VirtualScrollStrategy {
 
   constructor(private minItemSize: number) {}
 
-  attach(viewport: CdkVirtualScrollViewport) {
+  attach(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
     this.itemSizeCalculator = new ItemSizeCalculator(this.minItemSize, viewport);
     this.updateTotalContentSize();
     this.updateRenderedRange();
   }
 
-  detach() {
+  detach(): void {
     this.scrolledIndexChangeInternal$.complete();
     this.viewport = undefined;
     this.itemSizeCalculator = undefined;
   }
 
-  updateMinItemSize(minItemSize: number) {
+  updateMinItemSize(minItemSize: number): void {
     this.minItemSize = minItemSize;
     if (this.viewport) {
       if (this.itemSizeCalculator) {
@@ -126,20 +132,20 @@ export class StepVirtualScrollStrategy implements VirtualScrollStrategy {
     this.updateRenderedRange();
   }
 
-  onContentScrolled() {
+  onContentScrolled(): void {
     this.updateRenderedRange();
   }
 
-  onDataLengthChanged() {
+  onDataLengthChanged(): void {
     this.updateTotalContentSize();
     this.updateRenderedRange();
   }
 
-  onContentRendered() {
+  onContentRendered(): void {
     /* no-op */
   }
 
-  onRenderedOffsetChanged() {
+  onRenderedOffsetChanged(): void {
     /* no-op */
   }
 
@@ -150,7 +156,7 @@ export class StepVirtualScrollStrategy implements VirtualScrollStrategy {
     }
   }
 
-  private updateTotalContentSize() {
+  private updateTotalContentSize(): void {
     if (!this.viewport) {
       return;
     }
@@ -158,7 +164,7 @@ export class StepVirtualScrollStrategy implements VirtualScrollStrategy {
     this.viewport.setTotalContentSize(this.itemSizeCalculator!.totalContentSize());
   }
 
-  private updateRenderedRange() {
+  private updateRenderedRange(): void {
     if (!this.viewport) {
       return;
     }

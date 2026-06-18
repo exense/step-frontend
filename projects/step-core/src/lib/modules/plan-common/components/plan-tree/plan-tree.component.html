@@ -18,34 +18,37 @@
             (dropNode)="handleDropNode($event)"
           />
         </ng-container>
-        <div
-          *stepTreeNodeNameTemplate="let node"
-          class="node-name"
-          [class.node-displayed]="node.id === activeNode()?.id"
-        >
-          <span>{{ node?.name }}</span>
-          @if (_planInteractiveSession?.isInteractiveSessionActive$ | async) {
-            <button
-              type="button"
-              mat-flat-button
-              matTooltip="Execute in interactive session"
-              (click)="_planInteractiveSession?.execute(node.id)"
-            >
-              <step-icon name="play-circle" />
-            </button>
+        <ng-container *stepTreeNodeNameTemplate="let node">
+          @if (node?.icon; as icon) {
+            <div class="node-icon">
+              <step-icon [name]="icon" [class]="node?.iconClassName" [matTooltip]="node?.iconTooltip ?? ''" />
+            </div>
           }
-          @if (!isReadonly && (node | treeNodeHasActions)) {
-            <button
-              class="actions-button"
-              type="button"
-              mat-flat-button
-              matTooltip="Show actions menu (right click)"
-              (click)="openTreeMenu($event, node.id)"
-            >
-              <step-icon name="more-horizontal" />
-            </button>
-          }
-        </div>
+          <div class="node-name" [class.node-displayed]="node.id === activeNode()?.id">
+            <span>{{ node?.name }}</span>
+            @if (_planInteractiveSession?.isInteractiveSessionActive$ | async) {
+              <button
+                type="button"
+                mat-flat-button
+                matTooltip="Execute in interactive session"
+                (click)="_planInteractiveSession?.execute(node.id)"
+              >
+                <step-icon name="play-circle" />
+              </button>
+            }
+            @if (!isReadonly && (node | treeNodeHasActions)) {
+              <button
+                class="actions-button"
+                type="button"
+                mat-flat-button
+                matTooltip="Show actions menu (right click)"
+                (click)="openTreeMenu($event, node.id)"
+              >
+                <step-icon name="more-horizontal" />
+              </button>
+            }
+          </div>
+        </ng-container>
       </step-tree>
       <step-drag-preview>
         <step-tree-drag-preview />
