@@ -1,0 +1,24 @@
+.severity-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+
+  .severity-info {
+    color: var(--info-color, #1976d2);
+  }
+
+  .severity-warning {
+    color: var(--warning-color, #e6a200);
+  }
+
+  .severity-error {
+    color: var(--danger-color, #d32f2f);
+  }
+}
+
+.notice-message {
+  ::ng-deep a {
+    text-decoration: underline;
+  }
+}

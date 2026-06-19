@@ -229,6 +229,12 @@ export class AltExecutionProgressComponent
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
+  readonly notices$ = this.activeExecution$.pipe(
+    switchMap((active) => active.resolvedNotices$),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads

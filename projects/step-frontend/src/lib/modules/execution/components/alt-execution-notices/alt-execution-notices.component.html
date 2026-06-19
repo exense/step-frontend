@@ -1,0 +1,10 @@
+@if (firstNotice(); as notice) {
+  <div class="notices">
+    <step-alt-execution-notice [notice]="notice" />
+    @if (totalCount() > 1) {
+      <button type="button" mat-button color="primary" class="view-all-notices" (click)="showAll()">
+        View all notices ({{ totalCount() }})
+      </button>
+    }
+  </div>
+}

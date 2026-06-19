@@ -5,7 +5,11 @@ import {
   AutoRefreshModel,
   AutoRefreshModelFactoryService,
   Execution,
-  durationSwitchMap, Reloadable, GlobalReloadService,
+  ExecutionOverview,
+  ResolvedExecutionNotice,
+  durationSwitchMap,
+  Reloadable,
+  GlobalReloadService,
 } from '@exense/step-core';
 import { BehaviorSubject, concatMap, filter, Observable, of, startWith, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -15,6 +19,7 @@ import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types
 export interface ActiveExecution {
   readonly executionId: string;
   readonly execution$: Observable<Execution>;
+  readonly resolvedNotices$: Observable<ResolvedExecutionNotice[]>;
   readonly autoRefreshModel: AutoRefreshModel;
   readonly timeRangeSelectionChange$: Observable<TimeRangePickerSelection>;
   readonly performanceTabSettings: PerformanceTabSettings;
@@ -37,7 +42,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   constructor(
     readonly executionId: string,
     readonly autoRefreshModel: AutoRefreshModel,
-    private loadExecution: (eId: string) => Observable<Execution>,
+    private loadOverview: (eId: string) => Observable<ExecutionOverview>,
   ) {
     this.setupExecutionRefresh();
   }
@@ -49,7 +54,10 @@ class ActiveExecutionImpl implements ActiveExecution {
 
   readonly execution$ = this.executionInternal$.pipe(filter((execution) => !!execution)) as Observable<Execution>;
 
-  updateTimeRange(timeRangeSelection: TimeRangePickerSelection) {
+  private noticesInternal$ = new BehaviorSubject<ResolvedExecutionNotice[]>([]);
+  readonly resolvedNotices$ = this.noticesInternal$.asObservable();
+
+  updateTimeRange(timeRangeSelection: TimeRangePickerSelection): void {
     this.timeRangeSelectionInternal$.next(timeRangeSelection);
   }
 
@@ -59,6 +67,7 @@ class ActiveExecutionImpl implements ActiveExecution {
 
   destroy(): void {
     this.executionInternal$.complete();
+    this.noticesInternal$.complete();
     this.autoRefreshModel.destroy();
     this.timeRangeSelectionInternal$.complete();
   }
@@ -68,33 +77,38 @@ class ActiveExecutionImpl implements ActiveExecution {
       return;
     }
 
+    // Configure the auto-refresh model BEFORE subscribing. The startWith below triggers the first load
+    // synchronously on subscribe; when that load reuses the cached overview it completes synchronously
+    // and an ENDED execution disables auto-refresh right away. Doing the configuration afterwards would
+    // re-enable it (setDisabled(false) emits a refresh), causing a redundant second load.
+    this.autoRefreshModel.setDisabled(false);
+    this.autoRefreshModel.setInterval(100);
+    this.autoRefreshModel.setAutoIncreaseTo(5000);
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
         concatMap(() => {
           return of(this.executionId).pipe(
             durationSwitchMap(
-              (executionId) => this.loadExecution(executionId),
+              (executionId) => this.loadOverview(executionId),
               (requestDuration) => this.adjustAutoRefresh(requestDuration),
             ),
           );
         }),
       )
-      .subscribe((execution) => {
+      .subscribe((overview) => {
+        const execution = overview.execution;
         this.executionInternal$.next(execution);
+        this.noticesInternal$.next(overview.resolvedNotices ?? []);
         if (execution.status === 'ENDED') {
           this.autoRefreshModel.setDisabled(true);
           this.autoRefreshModel.setInterval(0);
           this.autoRefreshModel.setAutoIncreaseTo(0);
         }
       });
-    this.autoRefreshModel.setDisabled(false);
-    this.autoRefreshModel.setInterval(100);
-    this.autoRefreshModel.setAutoIncreaseTo(5000);
   }
 
   adjustAutoRefresh(requestDuration: number): void {
-
     // If auto-refresh has been disabled, don't set new interval
     // Otherwise it may restart the timer
     if (this.autoRefreshModel.disabled) {
@@ -132,8 +146,9 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   manualRefresh(): void {
-    this.loadExecution(this.executionId).subscribe((execution) => {
-      this.executionInternal$.next(execution);
+    this.loadOverview(this.executionId).subscribe((overview) => {
+      this.executionInternal$.next(overview.execution);
+      this.noticesInternal$.next(overview.resolvedNotices ?? []);
       this.timeRangeSelectionInternal$.next(this.timeRangeSelectionInternal$.value);
     });
   }
@@ -201,7 +216,7 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
     return true;
   }
 
-  reload(isCausedByProjectChange?: boolean) {
+  reload(isCausedByProjectChange?: boolean): void {
     if (!isCausedByProjectChange) {
       return;
     }
@@ -210,8 +225,15 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
 
   private createActiveExecution(executionId: string): ActiveExecution {
     const autoRefreshModel = this._autoRefreshFactory.create();
-    return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) =>
-      this._executionService.getExecutionById(executionId).pipe(
+    // The first load reuses the overview already fetched by the route guards (cached), so opening an
+    // execution issues a single /overview request. Subsequent refreshes always fetch fresh data.
+    let isFirstLoad = true;
+    return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) => {
+      const overview$ = isFirstLoad
+        ? this._executionService.getExecutionOverviewCached(executionId)
+        : this._executionService.getExecutionOverview(executionId);
+      isFirstLoad = false;
+      return overview$.pipe(
         catchError((error) => {
           if (!(error instanceof ApiError)) {
             throw error;
@@ -223,7 +245,7 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
 
           throw error;
         }),
-      ),
-    );
+      );
+    });
   }
 }

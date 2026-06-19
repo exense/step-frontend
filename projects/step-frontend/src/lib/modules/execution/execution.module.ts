@@ -124,6 +124,9 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
+import { AltExecutionNoticeComponent } from './components/alt-execution-notice/alt-execution-notice.component';
+import { AltExecutionNoticesComponent } from './components/alt-execution-notices/alt-execution-notices.component';
+import { AltExecutionNoticesDialogComponent } from './components/alt-execution-notices-dialog/alt-execution-notices-dialog.component';
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
@@ -239,6 +242,9 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
+    AltExecutionNoticeComponent,
+    AltExecutionNoticesComponent,
+    AltExecutionNoticesDialogComponent,
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportSettingsComponent,
@@ -533,7 +539,7 @@ export class ExecutionModule {
                 checkEntityGuardFactory({
                   entityType: 'execution',
                   idExtractor: (route) => route.url[0].path,
-                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
                   isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                   getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
@@ -667,7 +673,7 @@ export class ExecutionModule {
             sequenceCanActivateGuards([
               checkEntityGuardFactory({
                 entityType: 'execution',
-                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                 getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
                 isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                 getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
@@ -680,7 +686,7 @@ export class ExecutionModule {
               const id = route.params['id'];
               inject(ActiveExecutionContextService).setupExecutionId(id);
               return true;
-            }
+            },
           },
           canDeactivate: [
             () => {

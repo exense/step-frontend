@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.notices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.view-all-notices {
+  align-self: flex-end;
+}

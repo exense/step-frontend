@@ -7,6 +7,8 @@ import {
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
+import { ExecutionOverview } from '../models/execution-overview';
+import { ResolvedExecutionNotice } from '../models/resolved-execution-notice';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
@@ -32,6 +34,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   private _requestContextHolder = inject(HttpRequestContextHolderService);
 
   private cachedExecution?: Execution;
+  private cachedOverview?: ExecutionOverview;
 
   getExecutionByIdCached(id: string): Observable<Execution> {
     if (this.cachedExecution && this.cachedExecution.id === id) {
@@ -40,8 +43,26 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     return super.getExecutionById(id).pipe(tap((plan) => (this.cachedExecution = plan)));
   }
 
+  /**
+   * Fetches the execution overview and caches it, so guards and the overview page can share a single
+   * request for the same execution instead of also calling getExecutionById. The cache is cleared on
+   * route deactivation via cleanupCache().
+   */
+  getExecutionOverviewCached(id: string): Observable<ExecutionOverview> {
+    if (this.cachedOverview && this.cachedOverview.execution?.id === id) {
+      return of(this.cachedOverview);
+    }
+    return this.getExecutionOverview(id).pipe(tap((overview) => (this.cachedOverview = overview)));
+  }
+
+  /** Like getExecutionOverviewCached, but exposes only the execution (for guards / entity checks). */
+  getExecutionViaOverviewCached(id: string): Observable<Execution> {
+    return this.getExecutionOverviewCached(id).pipe(map((overview) => overview.execution));
+  }
+
   cleanupCache(): void {
     this.cachedExecution = undefined;
+    this.cachedOverview = undefined;
   }
 
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
@@ -98,6 +119,32 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
         mediaType: 'application/json',
       }),
     );
+  }
+
+  /**
+   * Returns the execution together with its resolved notices, for the overview page.
+   */
+  getExecutionOverview(id: string): Observable<ExecutionOverview> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/overview',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Returns the resolved notices of the execution with the given execution id.
+   */
+  getExecutionNotices(id: string): Observable<ResolvedExecutionNotice[]> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/notices',
+      path: {
+        id: id,
+      },
+    });
   }
 
   searchByIds(executionIds: string[]): Observable<Execution[]> {

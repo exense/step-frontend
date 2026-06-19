@@ -208,6 +208,8 @@
       }
     }
 
+    <step-alt-execution-notices [notices]="notices$ | async" />
+
     @for (message of _executionMessages; track message.id) {
       <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
     }
