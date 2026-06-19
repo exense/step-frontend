@@ -1,17 +1,17 @@
-import { inject, NgModule } from '@angular/core';
-import { ExecutionListComponent } from './components/execution-list/execution-list.component';
-import { Status, StepCommonModule } from '../_common/step-common.module';
-import { StatusComponent } from './components/status/status.component';
-import { StatusDistributionComponent } from './components/status-distribution/status-distribution.component';
-import { ExecutionResultComponent } from './components/execution-result/execution-result.component';
+import {inject, NgModule} from '@angular/core';
+import {ExecutionListComponent} from './components/execution-list/execution-list.component';
+import {Status, StepCommonModule} from '../_common/step-common.module';
+import {StatusComponent} from './components/status/status.component';
+import {StatusDistributionComponent} from './components/status-distribution/status-distribution.component';
+import {ExecutionResultComponent} from './components/execution-result/execution-result.component';
 
-import { ExecutionStepComponent } from './components/execution-step/execution-step.component';
+import {ExecutionStepComponent} from './components/execution-step/execution-step.component';
 import './components/execution-step/execution-step.component';
 
-import { PanelIdPipe } from './pipes/panel-id.pipe';
-import { OperationsModule } from '../operations/operations.module';
-import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
-import { ReportNodesModule } from '../report-nodes/report-nodes.module';
+import {PanelIdPipe} from './pipes/panel-id.pipe';
+import {OperationsModule} from '../operations/operations.module';
+import {KeywordCallsComponent} from './components/keyword-calls/keyword-calls.component';
+import {ReportNodesModule} from '../report-nodes/report-nodes.module';
 import {
   AugmentedExecutionsService,
   canLeaveComponent,
@@ -21,6 +21,7 @@ import {
   DialogParentService,
   dialogRoute,
   editScheduledTaskRoute,
+  EntityRefDirective,
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
@@ -39,170 +40,270 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  EntityRefDirective,
 } from '@exense/step-core';
-import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
-import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
-import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
-import { ExecutionCommandsComponent } from './components/execution-commands/execution-commands.component';
-import { ExecutionProgressComponent } from './components/execution-progress/execution-progress.component';
-import { DashletExecutionStepComponent } from './components/dashlet-execution-step/dashlet-execution-step.component';
-import { DashletExecutionTreeComponent } from './components/dashlet-execution-tree/dashlet-execution-tree.component';
-import { IncludeTabPipe } from './pipes/include-tab.pipe';
-import { DashletExecutionVizComponent } from './components/dashlet-execution-viz/dashlet-execution-viz.component';
-import { TimeSeriesModule } from '../timeseries/time-series.module';
-import { DashletExecutionErrorsComponent } from './components/dashlet-execution-errors/dashlet-execution-errors.component';
-import { PanelExecutionDetailsComponent } from './components/panel-execution-details/panel-execution-details.component';
-import { PanelComponent } from './components/panel/panel.component';
-import { PanelOperationsComponent } from './components/panel-operations/panel-operations.component';
-import { RepositoryComponent } from './components/repository/repository.component';
-import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
-import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
-import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
-import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
-import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
-import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
-import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
-import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
-import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
-import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
-import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
-import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
-import { AltReportNodeListWidgetComponent } from './components/alt-report-node-list-widget/alt-report-node-list-widget.component';
-import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
-import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
-import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
-import { AltReportCurrentOperationsComponent } from './components/alt-report-current-operations/alt-report-current-operations.component';
-import { AltReportWidgetComponent } from './components/alt-report-widget/alt-report-widget.component';
-import { AltReportWidgetFilterDirective } from './directives/alt-report-widget-filter.directive';
-import { AltReportWidgetContentDirective } from './directives/alt-report-widget-content.directive';
-import { AltReportNodeKeywordsWidgetComponent } from './components/alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
-import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
-import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
-import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
-import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
-import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
-import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
-import { ViewMode } from './shared/view-mode';
-import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
-import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
-import { altExecutionGuard } from './guards/alt-execution.guard';
-import { legacyExecutionGuard } from './guards/legacy-execution.guard';
-import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
-import { AltReportNodeDetailsComponent } from './components/alt-report-node-details/alt-report-node-details.component';
-import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
-import { ArtefactsModule } from '../artefacts/artefacts.module';
-import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
-import { DOUGHNUT_CHART_IMPORTS } from '../charts';
-import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
-import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
-import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
-import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
-import { ActiveExecutionsService } from './services/active-executions.service';
-import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
-import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
+import {ExecutionErrorsComponent} from './components/execution-errors/execution-errors.component';
+import {
+  RepositoryPlanTestcaseListComponent
+} from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
+import {ExecutionTreeComponent} from './components/execution-tree/execution-tree.component';
+import {ExecutionCommandsComponent} from './components/execution-commands/execution-commands.component';
+import {ExecutionProgressComponent} from './components/execution-progress/execution-progress.component';
+import {DashletExecutionStepComponent} from './components/dashlet-execution-step/dashlet-execution-step.component';
+import {DashletExecutionTreeComponent} from './components/dashlet-execution-tree/dashlet-execution-tree.component';
+import {IncludeTabPipe} from './pipes/include-tab.pipe';
+import {DashletExecutionVizComponent} from './components/dashlet-execution-viz/dashlet-execution-viz.component';
+import {TimeSeriesModule} from '../timeseries/time-series.module';
+import {
+  DashletExecutionErrorsComponent
+} from './components/dashlet-execution-errors/dashlet-execution-errors.component';
+import {PanelExecutionDetailsComponent} from './components/panel-execution-details/panel-execution-details.component';
+import {PanelComponent} from './components/panel/panel.component';
+import {PanelOperationsComponent} from './components/panel-operations/panel-operations.component';
+import {RepositoryComponent} from './components/repository/repository.component';
+import {
+  ExecutionSelectionTableComponent
+} from './components/execution-selection-table/execution-selection-table.component';
+import {ExecutionBulkOperationsRegisterService} from './services/execution-bulk-operations-register.service';
+import {IsExecutionProgressPipe} from './pipes/is-execution-progress.pipe';
+import {ExecutionOpenerComponent} from './components/execution-opener/execution-opener.component';
+import {
+  ExecutionRunningStatusHeaderComponent
+} from './components/execution-running-status-header/execution-running-status-header.component';
+import {ExecutionStatusComponent} from './components/execution-status/execution-status.component';
+import {ExecutionDurationComponent} from './components/execution-duration/execution-duration.component';
+import {AltExecutionsComponent} from './components/alt-executions/alt-executions.component';
+import {AltExecutionProgressComponent} from './components/alt-execution-progress/alt-execution-progress.component';
+import {AltExecutionReportComponent} from './components/alt-execution-report/alt-execution-report.component';
+import {AltExecutionAnalyticsComponent} from './components/alt-execution-analytics/alt-execution-analytics.component';
+import {AltReportNodeSummaryComponent} from './components/alt-report-node-summary/alt-report-node-summary.component';
+import {
+  AltReportNodeListWidgetComponent
+} from './components/alt-report-node-list-widget/alt-report-node-list-widget.component';
+import {AltExecutionTimeComponent} from './components/alt-execution-time/alt-execution-time.component';
+import {ExecutionActionsComponent} from './components/execution-actions/execution-actions.component';
+import {
+  AltReportPerformanceOverviewChartComponent
+} from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
+import {
+  AltReportCurrentOperationsComponent
+} from './components/alt-report-current-operations/alt-report-current-operations.component';
+import {AltReportWidgetComponent} from './components/alt-report-widget/alt-report-widget.component';
+import {AltReportWidgetFilterDirective} from './directives/alt-report-widget-filter.directive';
+import {AltReportWidgetContentDirective} from './directives/alt-report-widget-content.directive';
+import {
+  AltReportNodeKeywordsWidgetComponent
+} from './components/alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import {
+  AltReportNodeTestcasesWidgetComponent
+} from './components/alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
+import {ExecutionDetailsComponent} from './components/execution-details/execution-details.component';
+import {AppliedStatusPipe} from './pipes/applied-status.pipe';
+import {AltExecutionTabsComponent} from './components/alt-execution-tabs/alt-execution-tabs.component';
+import {
+  AltExecutionReportSettingsComponent
+} from './components/alt-execution-report-settings/alt-execution-report-settings.component';
+import {
+  AltExecutionReportGridSettingsActionComponent
+} from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
+import {AggregatedTreeNodeComponent} from './components/aggregated-tree-node/aggregated-tree-node.component';
+import {ViewMode} from './shared/view-mode';
+import {TreeNodeDescriptionPipe} from './pipes/tree-node-description.pipe';
+import {ExecutionActionsExecuteContentDirective} from './directives/execution-actions-execute-content.directive';
+import {altExecutionGuard} from './guards/alt-execution.guard';
+import {legacyExecutionGuard} from './guards/legacy-execution.guard';
+import {executionDeactivateGuard} from './guards/execution-deactivate.guard';
+import {AltReportNodeDetailsComponent} from './components/alt-report-node-details/alt-report-node-details.component';
+import {
+  AggregatedTreeNodeIterationListComponent
+} from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
+import {ArtefactsModule} from '../artefacts/artefacts.module';
+import {AltReportWidgetSortDirective} from './directives/alt-report-widget-sort.directive';
+import {DOUGHNUT_CHART_IMPORTS} from '../charts';
+import {
+  AltExecutionRepositoryComponent
+} from './components/alt-execution-repository/alt-execution-repository.component';
+import {ExecutionCommandsDirective} from './directives/execution-commands.directive';
+import {
+  AltExecutionParametersComponent
+} from './components/alt-execution-parameters/alt-execution-parameters.component';
+import {
+  AltExecutionLaunchDialogComponent
+} from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
+import {ActiveExecutionsService} from './services/active-executions.service';
+import {ActiveExecutionContextService} from './services/active-execution-context.service';
+import {ActivatedRouteSnapshot, Router} from '@angular/router';
+import {catchError, map, of, switchMap, take} from 'rxjs';
+import {AggregatedReportViewTreeNodeUtilsService} from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
 } from './services/aggregated-report-view-tree-state.service';
-import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
-import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
-import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
-import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
-import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
-import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
-import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
-import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
-import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
-import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
-import { ChartSkeletonComponent, TimeSeriesChartComponent } from '../timeseries/modules/chart';
-import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
-import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
-import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
-import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
-import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
-import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
-import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
-import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
-import { AltExecutionTreePartialComponent } from './components/alt-execution-tree-partial/alt-execution-tree-partial.component';
-import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
-import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
-import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { AltReportNodeStatusFilterComponent } from './components/alt-report-node-status-filter/alt-report-node-status-filter.component';
-import { TreeNodeVisualStateDirective } from './directives/tree-node-visual-state.directive';
-import { AltReportNodeArtefactFilterComponent } from './components/alt-report-node-artefact-filter/alt-report-node-artefact-filter.component';
-import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
-import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
-import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
-import { ReportNodeDurationPipe } from './pipes/report-node-duration.pipe';
-import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
-import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
-import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
-import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
-import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
-import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
-import { CrossExecutionDashboardComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
-import { PlanPageComponent } from './components/schedule-overview/plan-page/plan-page.component';
-import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
-import { AltExecutionTimePopoverAddonDirective } from './components/alt-execution-time/alt-execution-time-popover-addon.directive';
-import { SchedulerPerformanceViewComponent } from './components/schedule-overview/cross-execution-dashboard/performance/scheduler-performance-view.component';
-import { SchedulerReportViewComponent } from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
-import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
-import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
-import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
-import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
-import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
-import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
-import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
-import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
-import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
-import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
-import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
-import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
-import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
-import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
-import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
-import { DOCUMENT } from '@angular/common';
-import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
-import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
-import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
-import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
-import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
-import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
-import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
-import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
-import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
-import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
-import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
-import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
-import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
-import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
-import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
-import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
-import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
-import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
-import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
-import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
-import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
-import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
-import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
-import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
-import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
+import {AltReportNodeDetailsStateService} from './services/alt-report-node-details-state.service';
+import {AltExecutionTreeComponent} from './components/alt-execution-tree/alt-execution-tree.component';
+import {
+  AltExecutionTreeWidgetComponent
+} from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
+import {
+  ExecutionLegacySwitcherComponent
+} from './components/execution-legacy-switcher/execution-legacy-switcher.component';
+import {PlanNodeDetailsDialogComponent} from './components/plan-node-details-dialog/plan-node-details-dialog.component';
+import {ExecutionNavigatorQueryParamsCleanupService} from './services/execution-navigator-query-params-cleanup.service';
+import {AltPanelComponent} from './components/alt-panel/alt-panel.component';
+import {ExecutionViewDialogUrlCleanupService} from './services/execution-view-dialog-url-cleanup-service';
+import {
+  TimeRangePickerComponent
+} from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
+import {StatusCountBadgeComponent} from './components/status-count-badge/status-count-badge.component';
+import {ChartSkeletonComponent, TimeSeriesChartComponent} from '../timeseries/modules/chart';
+import {
+  ExecutionsChartTooltipComponent
+} from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
+import {
+  TooltipContentDirective
+} from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
+import {ErrorDetailsMenuComponent} from './components/error-details-menu/error-details-menu.component';
+import {AltExecutionErrorsComponent} from './components/alt-execution-errors/alt-execution-errors.component';
+import {AgentsCellComponent} from './components/execution-agent-cell/execution-agent-cell.component';
+import {AgentsModalComponent} from './components/execution-agent-modal/execution-agent-modal.component';
+import {
+  AltExecutionResolvedParametersComponent
+} from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import {AggregatedStatusComponent} from './components/aggregated-status/aggregated-status.component';
+import {
+  AltExecutionTreePartialComponent
+} from './components/alt-execution-tree-partial/alt-execution-tree-partial.component';
+import {DurationDescriptionComponent} from './components/duration-description/duration-description.component';
+import {AltReportWidgetFooterDirective} from './directives/alt-report-widget-footer.directive';
+import {DashboardUrlParamsService} from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import {
+  AltReportNodeStatusFilterComponent
+} from './components/alt-report-node-status-filter/alt-report-node-status-filter.component';
+import {TreeNodeVisualStateDirective} from './directives/tree-node-visual-state.directive';
+import {
+  AltReportNodeArtefactFilterComponent
+} from './components/alt-report-node-artefact-filter/alt-report-node-artefact-filter.component';
+import {
+  ExecutionDurationSimpleComponent
+} from './components/execution-duration-simple/execution-duration-simple.component';
+import {AggregatedReportViewDurationValuePipe} from './pipes/aggregated-report-view-duration-value.pipe';
+import {IsAverageDurationPipe} from './pipes/is-average-duration.pipe';
+import {ReportNodeDurationPipe} from './pipes/report-node-duration.pipe';
+import {DashboardPageComponent} from '../timeseries/components/dashboard-page/dashboard-page.component';
+import {LegacyExecutionViewComponent} from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
+import {AltExecutionTreeNodeAddonDirective} from './directives/alt-execution-tree-node-addon.directive';
+import {IsEmptyStatusPipe} from './pipes/is-empty-status.pipe';
+import {IsCurrentReportDetailsOpenedPipe} from './pipes/is-current-report-details-opened.pipe';
+import {ToggleRequestWarningDirective} from './directives/toggle-request-warning.directive';
+import {
+  CrossExecutionDashboardComponent
+} from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
+import {PlanPageComponent} from './components/schedule-overview/plan-page/plan-page.component';
+import {ParentElementSizeDirective} from './directives/parent-element-size.directive';
+import {
+  AltExecutionTimePopoverAddonDirective
+} from './components/alt-execution-time/alt-execution-time-popover-addon.directive';
+import {
+  SchedulerPerformanceViewComponent
+} from './components/schedule-overview/cross-execution-dashboard/performance/scheduler-performance-view.component';
+import {
+  SchedulerReportViewComponent
+} from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
+import {SchedulerPageComponent} from './components/schedule-overview/scheduler-page/scheduler-page.component';
+import {AltExecutionTimePrefixDirective} from './components/alt-execution-time/alt-execution-time-prefix.directive';
+import {AltExecutionTimeSuffixDirective} from './components/alt-execution-time/alt-execution-time-suffix.directive';
+import {
+  AltExecutionRepositoryLinkComponent
+} from './components/alt-execution-repository-link/alt-execution-repository-link.component';
+import {
+  CrossExecutionExecutionTableComponent
+} from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
+import {ExecutionAgentsListComponent} from './components/execution-agents-list/execution-agents-list.component';
+import {
+  TestCaseInlineRootCauseComponent
+} from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
+import {ErrorRootCausesComponent} from './components/error-root-causes/error-root-causes.component';
+import {
+  AltExecutionErrorsWidgetComponent
+} from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import {
+  ReportViewHeaderComponent
+} from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
+import {
+  CrossExecutionHeatmapComponent
+} from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import {
+  GradientLegendComponent
+} from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import {HeatmapComponent} from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import {
+  AggregatedTreeNodeHistoryComponent
+} from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import {
+  ExecutionHistorySectionComponent
+} from './components/execution-history-section/execution-history-section.component';
+import {DOCUMENT} from '@angular/common';
+import {
+  AltExecutionTimePopoverTitleDirective
+} from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import {
+  AggregatedTreeNodeStatusesPiechartComponent
+} from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import {HistoryNodesComponent} from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import {ExecutionHistoryNodesComponent} from './components/execution-history-node/execution-history-nodes.component';
+import {
+  StatusDistributionTooltipComponent
+} from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import {TableCountsToggleComponent} from './components/table-counts-toggle/table-counts-toggle.component';
+import {AltReportWidgetTitleDirective} from './directives/alt-report-widget-title.directive';
+import {AggregatedReportViewCountErrorsPipe} from './pipes/aggregated-report-view-count-errors.pipe';
+import {CalcElementWidthDirective} from './directives/calc-element-width.directive';
+import {CalcElementWidthAggregatorDirective} from './directives/calc-element-width-aggregator.directive';
+import {CalcElementWidthItemDirective} from './directives/calc-element-width-item.directive';
+import {
+  AggregatedTreeNodeDrilldownComponent
+} from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
+import {AltReportNodeHeaderComponent} from './components/alt-report-node-header/alt-report-node-header.component';
+import {
+  AltExecutionTreeControlPanelComponent
+} from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
+import {AltExecutionTreeWidgetDirective} from './directives/alt-execution-tree-widget.directive';
+import {AltExecutionTreeSearchFocusDirective} from './directives/alt-execution-tree-search-focus.directive';
+import {AltReportNodeListSortDirective} from './directives/alt-report-node-list-sort.directive';
+import {AltReportNodeSearchComponent} from './components/alt-report-node-search/alt-report-node-search.component';
+import {AltReportNodeKeywordsComponent} from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import {
+  AltReportNodeTestcasesComponent
+} from './components/alt-report-node-testcases/alt-report-node-testcases.component';
+import {AltReportNodeListProvideKeywordsDirective} from './directives/alt-report-node-list-provide-keywords.directive';
+import {
+  AltReportNodeListProvideTestcasesDirective
+} from './directives/alt-report-node-list-provide-testcases.directive';
+import {AltIterationListTitleComponent} from './components/alt-iteration-list-title/alt-iteration-list-title.component';
+import {
+  AltReportNodeDetailsTestcasesStepsComponent
+} from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
+import {
+  StatusDistributionBadgeComponent
+} from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import {
+  ExecutionHistoryNodeTooltipComponent
+} from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import {RepositoryPageComponent} from './components/schedule-overview/repository-page/repository-page.component';
 import {
   DRILL_DOWN_ROOT_ID,
   DrillDownStackItemConfig,
   DrillDownStackItemType,
   DrillDownStackItemTypeWORoot,
 } from './shared/drilldown-stack-item';
-import { DrilldownRootType } from './shared/drilldown-root-type';
-import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
-import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
+import {DrilldownRootType} from './shared/drilldown-root-type';
+import {DrilldownPartialTreeStateDirective} from './directives/drilldown-partial-tree-state.directive';
+import {DashletEmptyColumnComponent} from './components/dashlet-empty-column/dashlet-empty-column.component';
+import {AltExecutionRefreshActivityService} from './services/alt-execution-refresh-activity.service';
+import {
+  ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+  AltExecutionRefreshActivity
+} from './shared/alt-execution-refresh-activity.enum';
 
 @NgModule({
   declarations: [
@@ -646,6 +747,7 @@ export class ExecutionModule {
           path: ':id',
           component: AltExecutionProgressComponent,
           providers: [
+            AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
@@ -733,6 +835,10 @@ export class ExecutionModule {
                     _ctx.setState(_treeState);
                     return true;
                   },
+                  () => {
+                    inject(AltExecutionRefreshActivityService).setupRefreshActivity(...ALL_ALT_EXECUTION_REFRESH_ACTIVITY);
+                    return true;
+                  }
                 ],
                 children: [
                   {
@@ -761,6 +867,10 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionAnalyticsComponent,
+                  canActivate: [() => {
+                    inject(AltExecutionRefreshActivityService).setupRefreshActivity();
+                    return true;
+                  }]
                 },
               ],
             },
@@ -851,6 +961,14 @@ export class ExecutionModule {
                     }
                     return null;
                   },
+                  canActivate: [() => {
+                    inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+                      AltExecutionRefreshActivity.TREE,
+                      AltExecutionRefreshActivity.KEYWORDS_TABLE,
+                      AltExecutionRefreshActivity.TEST_CASES_TABLE
+                    );
+                    return true;
+                  }],
                   resolve: {
                     drilldownState: (route: ActivatedRouteSnapshot) => {
                       const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);

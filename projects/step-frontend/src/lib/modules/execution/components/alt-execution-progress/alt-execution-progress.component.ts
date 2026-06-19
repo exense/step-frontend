@@ -1,4 +1,4 @@
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import {ActivatedRoute, NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {
   Component,
   computed,
@@ -40,9 +40,9 @@ import {
   Execution,
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
-  GridPersistenceStateService,
-  GridEditableService,
   GRID_ELEMENT_HEADER_ACTIONS,
+  GridEditableService,
+  GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
@@ -57,37 +57,47 @@ import {
   TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { KeywordParameters } from '../../shared/keyword-parameters';
-import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
-import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
-import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
-import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
-import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
-import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
-import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
-import { KeyValue } from '@angular/common';
-import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
-import { EXECUTION_ID } from '../../services/execution-id.token';
-import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
-import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { Status } from '../../../_common/step-common.module';
-import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
-import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
-import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
-import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
-import { TimeRangeExt } from '../../shared/time-range-ext';
-import { ExecutionReportGridPersistenceStateService } from '../../services/execution-report-grid-persistence-state.service';
-import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
-import { AltExecutionReportGridSettingsActionComponent } from '../alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
-import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
-import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
+import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {AltExecutionStateService} from '../../services/alt-execution-state.service';
+import {KeywordParameters} from '../../shared/keyword-parameters';
+import {TYPE_LEAF_REPORT_NODES_TABLE_PARAMS} from '../../shared/type-leaf-report-nodes-table-params';
+import {AGGREGATED_TREE_WIDGET_STATE} from '../../services/aggregated-report-view-tree-state.service';
+import {AltExecutionTabsService} from '../../services/alt-execution-tabs.service';
+import {AltTestCasesNodesStateService} from '../../services/alt-test-cases-nodes-state.service';
+import {AltKeywordNodesStateService} from '../../services/alt-keyword-nodes-state.service';
+import {AltExecutionReportPrintService} from '../../services/alt-execution-report-print.service';
+import {ALT_EXECUTION_REPORT_IN_PROGRESS} from '../../services/alt-execution-report-in-progress.token';
+import {AltExecutionViewAllService} from '../../services/alt-execution-view-all.service';
+import {KeyValue} from '@angular/common';
+import {AltExecutionDialogsService} from '../../services/alt-execution-dialogs.service';
+import {EXECUTION_ID} from '../../services/execution-id.token';
+import {SchedulerInvokerService} from '../../services/scheduler-invoker.service';
+import {ActiveExecutionContextService} from '../../services/active-execution-context.service';
+import {DashboardUrlParamsService} from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import {
+  TimeRangePickerSelection
+} from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import {TimeSeriesConfig, TimeSeriesUtils} from '../../../timeseries/modules/_common';
+import {ActiveExecutionsService} from '../../services/active-executions.service';
+import {Status} from '../../../_common/step-common.module';
+import {AltExecutionCloseHandleService} from '../../services/alt-execution-close-handle.service';
+import {AggregatedTreeDataLoaderService} from '../../services/aggregated-tree-data-loader.service';
+import {ToggleRequestWarningDirective} from '../../directives/toggle-request-warning.directive';
+import {convertPickerSelectionToTimeRange} from '../../shared/convert-picker-selection';
+import {TimeRangeExt} from '../../shared/time-range-ext';
+import {
+  ExecutionReportGridPersistenceStateService
+} from '../../services/execution-report-grid-persistence-state.service';
+import {AltExecutionReportSettingsService} from '../../services/alt-execution-report-settings.service';
+import {
+  AltExecutionReportGridSettingsActionComponent
+} from '../alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
+import {TestCasesDisplayMode} from '../../shared/test-cases-display-mode';
+import {
+  AltExecutionDrilldownNavigationUtilsService
+} from '../../services/alt-execution-drilldown-navigation-utils.service';
+import {AltExecutionRefreshActivityService} from '../../services/alt-execution-refresh-activity.service';
+import {AltExecutionRefreshActivity} from '../../shared/alt-execution-refresh-activity.enum';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -179,6 +189,7 @@ interface RefreshParams {
 export class AltExecutionProgressComponent
   implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
 {
+  private _refreshActivityService = inject(AltExecutionRefreshActivityService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
@@ -316,8 +327,13 @@ export class AltExecutionProgressComponent
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  readonly testCases$ = combineLatest([this.execution$.pipe(startWith(undefined)), this.timeRangeSelection$]).pipe(
-    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+  readonly testCases$ = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TEST_CASES_TABLE),
+    this.execution$.pipe(startWith(undefined)),
+    this.timeRangeSelection$
+  ]).pipe(
+    filter(([isActive]) => isActive),
+    map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
     smartSwitchMap(
       (curr, prev) => {
         return (
@@ -420,19 +436,32 @@ export class AltExecutionProgressComponent
   /**
    * Logic to reload keyword's datasource when execution is refreshed
    * **/
-  private refreshKeywordsSubscription = this.execution$
+  private readonly executionRefresh$ = this.execution$
     .pipe(
       map((execution) => execution.id),
       pairwise(),
       filter((pair) => pair[0] === pair[1]),
+    );
+
+  private refreshKeywordsSubscription = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.KEYWORDS_TABLE),
+    this.executionRefresh$
+  ])
+    .pipe(
+      filter(([isActive,]) => isActive),
       takeUntilDestroyed(),
     )
     .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
-  readonly errors$ = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
-    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+  readonly errors$ = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
+    this.execution$,
+    this.timeRangeSelection$
+  ]).pipe(
+    filter(([isActive,]) => isActive),
+    map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
     smartSwitchMap(
       (curr, prev) => {
         return (
@@ -523,9 +552,14 @@ export class AltExecutionProgressComponent
   }
 
   private setupTreeRefresh(): void {
-    combineLatest([this.execution$, this.timeRangeSelection$])
+    combineLatest([
+      this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TREE),
+      this.execution$,
+      this.timeRangeSelection$
+    ])
       .pipe(
-        map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+        filter(([isActive,]) => isActive),
+        map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
         debounceTime(300),
         smartSwitchMap(
           (curr, prev) => {

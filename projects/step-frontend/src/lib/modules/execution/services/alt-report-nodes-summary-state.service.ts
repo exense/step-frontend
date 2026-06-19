@@ -1,5 +1,16 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, catchError, combineLatest, finalize, map, Observable, of, switchMap } from 'rxjs';
+import {inject, Injectable, OnDestroy} from '@angular/core';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  filter,
+  finalize,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap
+} from 'rxjs';
 import {
   Execution,
   ExecutionSummaryDto,
@@ -11,19 +22,24 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { ReportNodeSummary } from '../shared/report-node-summary';
-import { convertPickerSelectionToTimeRange } from '../shared/convert-picker-selection';
-import { AltReportNodesStateService } from './alt-report-nodes-state.service';
+import {ReportNodeSummary} from '../shared/report-node-summary';
+import {convertPickerSelectionToTimeRange} from '../shared/convert-picker-selection';
+import {AltReportNodesStateService} from './alt-report-nodes-state.service';
+import {AltExecutionRefreshActivity} from '../shared/alt-execution-refresh-activity.enum';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AltExecutionRefreshActivityService} from './alt-execution-refresh-activity.service';
 
 @Injectable()
 export abstract class AltReportNodesSummaryStateService<T> extends AltReportNodesStateService<T> implements OnDestroy {
   // eslint-disable-next-line @angular-eslint/prefer-inject
-  protected constructor(datasource$: Observable<TableDataSource<T>>, storagePrefix: string) {
+  protected constructor(datasource$: Observable<TableDataSource<T>>, storagePrefix: string, refreshActivity: AltExecutionRefreshActivity) {
     super(datasource$, storagePrefix);
+    this.summary$ = this.setupSummaryStream(refreshActivity);
   }
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _viewService = inject(PrivateViewPluginService);
+  private _refreshActivityService = inject(AltExecutionRefreshActivityService);
 
   private isFullRangeSelection$ = this._executionState.timeRangeSelection$.pipe(
     map((rangeSelection) => rangeSelection.type === 'FULL'),
@@ -33,49 +49,7 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
   protected summaryInProgressInternal$ = new BehaviorSubject(false);
   readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
 
-  private forecastSummaryTotal$ = combineLatest([this._executionState.execution$, this.isFullRangeSelection$]).pipe(
-    switchMap(([execution, isFullRangeSelected]) => {
-      if (execution.status !== 'RUNNING' || !isFullRangeSelected) {
-        return of(undefined);
-      }
-      return this._viewService
-        .getView(this.statusDistributionViewId, execution.id!)
-        .pipe(map((status) => status as ExecutionSummaryDto));
-    }),
-    map((summary) => summary?.countForecast),
-  );
-
-  private summaryTimeSeries$ = combineLatest([
-    this._executionState.execution$,
-    this._executionState.timeRangeSelection$,
-  ]).pipe(
-    map(([execution, range]) => ({ execution, range })),
-    smartSwitchMap(
-      (curr, prev) => {
-        return (
-          curr.execution?.id !== prev?.execution?.id ||
-          !this._dateUtils.areTimeRangeSelectionsEquals(curr.range, prev?.range)
-        );
-      },
-      ({ execution, range }) => {
-        const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
-        if (!timeRange) {
-          return of(undefined);
-        }
-        const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
-        this.summaryInProgressInternal$.next(true);
-        return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
-          catchError(() => of(undefined)),
-          finalize(() => this.summaryInProgressInternal$.next(false)),
-        );
-      },
-      this._destroyRef,
-    ),
-  );
-
-  readonly summary$ = combineLatest([this.summaryTimeSeries$, this.forecastSummaryTotal$]).pipe(
-    map(([summaryTimeSeries, countForecast]) => this.protectedTimeSeriesResponse(summaryTimeSeries, countForecast)),
-  );
+  readonly summary$: Observable<ReportNodeSummary>;
 
   ngOnDestroy(): void {
     this.summaryInProgressInternal$.complete();
@@ -85,7 +59,7 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
 
   protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse, countForecast?: number): ReportNodeSummary {
     if (!response) {
-      return { total: 0, items: {} } as ReportNodeSummary;
+      return {total: 0, items: {}} as ReportNodeSummary;
     }
 
     return response.matrixKeys.reduce(
@@ -96,7 +70,65 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
         res.total += bucket.count;
         return res;
       },
-      { total: 0, countForecast, items: {} },
+      {total: 0, countForecast, items: {}},
     ) as ReportNodeSummary;
+  }
+
+  private setupSummaryStream(refreshActivity: AltExecutionRefreshActivity): Observable<ReportNodeSummary> {
+
+    const isActive$ = this._refreshActivityService.isActive$(refreshActivity);
+
+    const forecastSummaryTotal$ = combineLatest([
+      isActive$,
+      this._executionState.execution$,
+      this.isFullRangeSelection$
+    ]).pipe(
+      filter(([isActive,]) => isActive),
+      switchMap(([, execution, isFullRangeSelected]) => {
+        if (execution.status !== 'RUNNING' || !isFullRangeSelected) {
+          return of(undefined);
+        }
+        return this._viewService
+          .getView(this.statusDistributionViewId, execution.id!)
+          .pipe(map((status) => status as ExecutionSummaryDto));
+      }),
+      map((summary) => summary?.countForecast),
+    );
+
+    const summaryTimeSeries$ = combineLatest([
+      isActive$,
+      this._executionState.execution$,
+      this._executionState.timeRangeSelection$,
+    ]).pipe(
+      filter(([isActive,]) => isActive),
+      map(([,execution, range]) => ({execution, range})),
+      smartSwitchMap(
+        (curr, prev) => {
+          return (
+            curr.execution?.id !== prev?.execution?.id ||
+            !this._dateUtils.areTimeRangeSelectionsEquals(curr.range, prev?.range)
+          );
+        },
+        ({execution, range}) => {
+          const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
+          if (!timeRange) {
+            return of(undefined);
+          }
+          const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
+          this.summaryInProgressInternal$.next(true);
+          return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
+            catchError(() => of(undefined)),
+            finalize(() => this.summaryInProgressInternal$.next(false)),
+          );
+        },
+        this._destroyRef,
+      ),
+    );
+
+    return combineLatest([summaryTimeSeries$, forecastSummaryTotal$]).pipe(
+      map(([summaryTimeSeries, countForecast]) => this.protectedTimeSeriesResponse(summaryTimeSeries, countForecast)),
+      shareReplay(1),
+      takeUntilDestroyed(this._destroyRef)
+    );
   }
 }
