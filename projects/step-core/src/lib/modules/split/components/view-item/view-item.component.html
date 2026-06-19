@@ -7,21 +7,23 @@
         <span>{{ title() }}</span>
       }
     </div>
-    @if (canMinimize()) {
-      <button mat-icon-button (click)="minimize.emit()">
-        <step-icon name="minimize-2" />
-      </button>
-    }
-    @if (canMaximize()) {
-      <button mat-icon-button matTooltip="Maximize panel" matTooltipPosition="below" (click)="maximize.emit()">
-        <step-icon name="maximize-2" />
-      </button>
-    }
-    @if (canClose()) {
-      <button mat-icon-button (click)="remove.emit()">
-        <step-icon name="x" />
-      </button>
-    }
+    <div class="item-actions">
+      @if (canMinimize()) {
+        <button mat-icon-button matTooltip="Minimize panel" matTooltipPosition="below" (click)="minimize.emit()">
+          <step-icon name="minimize-2" />
+        </button>
+      }
+      @if (canMaximize()) {
+        <button mat-icon-button matTooltip="Maximize panel" matTooltipPosition="below" (click)="maximize.emit()">
+          <step-icon name="maximize-2" />
+        </button>
+      }
+      @if (canClose()) {
+        <button mat-icon-button [matTooltip]="closeTooltip()" matTooltipPosition="below" (click)="remove.emit()">
+          <step-icon name="x" />
+        </button>
+      }
+    </div>
   </div>
   <div class="item-content">
     @if (contentTemplateRef(); as templateRef) {

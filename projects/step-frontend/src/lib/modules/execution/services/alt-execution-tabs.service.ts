@@ -1,54 +1,92 @@
 import { Injectable, signal } from '@angular/core';
-import { Tab } from '@exense/step-core';
+import { Params } from '@angular/router';
+import { v4 } from 'uuid';
 
 export enum STATIC_TABS {
   REPORT = 'report',
   ANALYTICS = 'analytics',
 }
 
+export interface DrilldownExecutionTab {
+  id: string;
+  label: string;
+  nodeDetailsPath: string[];
+  queryParams?: Params;
+}
+
 @Injectable()
 export class AltExecutionTabsService {
-  private addedTabs = new Set<string>([STATIC_TABS.REPORT, STATIC_TABS.ANALYTICS]);
+  private readonly drilldownTabsInternal = signal<DrilldownExecutionTab[]>([]);
+  private readonly activeDrilldownTabIdInternal = signal<string | undefined>(undefined);
 
-  private readonly tabsInternal = signal<Tab<string>[]>([
-    this.createTab(STATIC_TABS.REPORT, 'Report'),
-    this.createTab(STATIC_TABS.ANALYTICS, 'Performance'),
-  ]);
+  readonly drilldownTabs = this.drilldownTabsInternal.asReadonly();
+  readonly activeDrilldownTabId = this.activeDrilldownTabIdInternal.asReadonly();
 
-  readonly tabs = this.tabsInternal.asReadonly();
-
-  addTab(id: string, label: string, link?: string, before?: string | STATIC_TABS): void {
-    if (this.addedTabs.has(id)) {
-      return;
-    }
-    this.tabsInternal.update((tabs) => {
-      if (!before) {
-        return [...tabs, this.createTab(id, label, link)];
-      }
-      const index = tabs.findIndex((tab) => tab.id === before);
-      if (index < 0) {
-        return [...tabs, this.createTab(id, label, link)];
-      }
-      const result = [...tabs];
-      result.splice(index, 0, this.createTab(id, label, link));
-      return result;
-    });
-    this.addedTabs.add(id);
+  openDrilldownTab(nodeDetailsPath: string[], queryParams?: Params, label = 'Drilldown'): string {
+    const id = v4();
+    this.drilldownTabsInternal.update((tabs) => [...tabs, { id, label, nodeDetailsPath, queryParams }]);
+    this.activeDrilldownTabIdInternal.set(id);
+    return id;
   }
 
-  removeTab(id: string): void {
-    if (!this.addedTabs.has(id)) {
-      return;
+  ensureActiveDrilldownTab(nodeDetailsPath: string[], queryParams?: Params): string {
+    const activeId = this.activeDrilldownTabIdInternal();
+    if (activeId && this.drilldownTabsInternal().some((tab) => tab.id === activeId)) {
+      this.updateDrilldownTab(activeId, nodeDetailsPath, queryParams);
+      return activeId;
     }
-    this.tabsInternal.update((tabs) => tabs.filter((tab) => tab.id !== id));
-    this.addedTabs.delete(id);
+    return this.openDrilldownTab(nodeDetailsPath, queryParams);
   }
 
-  private createTab(id: string, label: string, link?: string): Tab<string> {
-    return {
-      id,
-      label,
-      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
-    };
+  activateDrilldownTab(id: string): DrilldownExecutionTab | undefined {
+    const tab = this.drilldownTabsInternal().find((item) => item.id === id);
+    if (tab) {
+      this.activeDrilldownTabIdInternal.set(id);
+    }
+    return tab;
+  }
+
+  updateActiveDrilldownTab(nodeDetailsPath: string[], queryParams?: Params): void {
+    const activeId = this.activeDrilldownTabIdInternal();
+    if (!activeId) {
+      this.openDrilldownTab(nodeDetailsPath, queryParams);
+      return;
+    }
+    this.updateDrilldownTab(activeId, nodeDetailsPath, queryParams);
+  }
+
+  updateActiveDrilldownLabel(label: string): void {
+    const activeId = this.activeDrilldownTabIdInternal();
+    if (!activeId) {
+      return;
+    }
+    this.drilldownTabsInternal.update((tabs) => tabs.map((tab) => (tab.id === activeId ? { ...tab, label } : tab)));
+  }
+
+  removeDrilldownTab(id: string): DrilldownExecutionTab | undefined {
+    const tabs = this.drilldownTabsInternal();
+    const index = tabs.findIndex((tab) => tab.id === id);
+    if (index < 0) {
+      return undefined;
+    }
+    const isActive = this.activeDrilldownTabIdInternal() === id;
+    const nextTabs = tabs.filter((tab) => tab.id !== id);
+    this.drilldownTabsInternal.set(nextTabs);
+    if (!isActive) {
+      return this.drilldownTabsInternal().find((tab) => tab.id === this.activeDrilldownTabIdInternal());
+    }
+    const nextActive = nextTabs[index - 1] ?? nextTabs[index] ?? nextTabs[nextTabs.length - 1];
+    this.activeDrilldownTabIdInternal.set(nextActive?.id);
+    return nextActive;
+  }
+
+  clearActiveDrilldownTab(): void {
+    this.activeDrilldownTabIdInternal.set(undefined);
+  }
+
+  private updateDrilldownTab(id: string, nodeDetailsPath: string[], queryParams?: Params): void {
+    this.drilldownTabsInternal.update((tabs) =>
+      tabs.map((tab) => (tab.id === id ? { ...tab, nodeDetailsPath, queryParams } : tab)),
+    );
   }
 }

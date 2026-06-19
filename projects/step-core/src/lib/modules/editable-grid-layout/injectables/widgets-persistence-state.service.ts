@@ -5,8 +5,8 @@ import { WidgetsPositionsStateService } from './widgets-positions-state.service'
 import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { WidgetState } from '../types/widget-state';
-import { KeyValue } from '@angular/common';
 import { WidgetStatePreset } from '../types/widget-state-preset';
+import { GridPresetListItem } from '../types/grid-preset-list-item';
 import { v4 } from 'uuid';
 import { GridPersistenceStateService } from './grid-persistence-state.service';
 
@@ -27,7 +27,7 @@ export class WidgetsPersistenceStateService {
   private readonly isInitializedInternal = signal(false);
   readonly isInitialized = this.isInitializedInternal.asReadonly();
 
-  private readonly gridPresetsInternal = signal<KeyValue<string, string>[]>([]);
+  private readonly gridPresetsInternal = signal<GridPresetListItem[]>([]);
   readonly gridPresets = this.gridPresetsInternal.asReadonly();
 
   private readonly selectedPresetInternal = signal<WidgetStatePreset | undefined>(undefined);
@@ -114,11 +114,29 @@ export class WidgetsPersistenceStateService {
     );
   }
 
-  removePreset(id: string): Observable<void> {
+  selectLocalPreset(preset: WidgetStatePreset): void {
+    this.selectedPresetInternal.set(preset);
+  }
+
+  loadPreset(presetId: string): Observable<WidgetStatePreset | undefined> {
+    return this._gridPersistence.load(this._gridConfig.gridId, presetId);
+  }
+
+  removePreset(id: string, selectFallback = true): Observable<void> {
     return this._gridPersistence.removeGridPreset(this._gridConfig.gridId, id).pipe(
       switchMap(() => this._gridPersistence.getGridPresets(this._gridConfig.gridId)),
       tap((presets) => this.gridPresetsInternal.set(presets)),
-      tap((presets) => this.selectPreset(presets[0].key)),
+      tap((presets) => {
+        if (!selectFallback) {
+          return;
+        }
+        const fallbackPreset = presets[0];
+        if (fallbackPreset) {
+          this.selectPreset(fallbackPreset.key);
+        } else {
+          this.selectedPresetInternal.set(undefined);
+        }
+      }),
       map(() => {}),
     );
   }
@@ -126,6 +144,9 @@ export class WidgetsPersistenceStateService {
   sharePreset(id: string): Observable<void> {
     return this._gridPersistence.shareGridPreset(this._gridConfig.gridId, id).pipe(
       tap(() => {
+        this.gridPresetsInternal.update((presets) =>
+          presets.map((preset) => (preset.key === id ? { ...preset, visibility: 'Shared' } : preset)),
+        );
         const preset = untracked(() => this.selectedPresetInternal());
         if (preset?.id === id) {
           this.selectedPresetInternal.update(
@@ -143,6 +164,9 @@ export class WidgetsPersistenceStateService {
   unsharePreset(id: string): Observable<void> {
     return this._gridPersistence.unshareGridPreset(this._gridConfig.gridId, id).pipe(
       tap(() => {
+        this.gridPresetsInternal.update((presets) =>
+          presets.map((preset) => (preset.key === id ? { ...preset, visibility: 'Private' } : preset)),
+        );
         const preset = untracked(() => this.selectedPresetInternal());
         if (preset?.id === id) {
           this.selectedPresetInternal.update(
@@ -188,14 +212,20 @@ export class WidgetsPersistenceStateService {
   }
 
   selectPreset(presetId: string): void {
-    this._gridPersistence.load(this._gridConfig.gridId, presetId).subscribe((preset) => {
-      if (!preset) {
-        this.selectFallbackPreset(presetId);
-        return;
-      }
-      this.selectedPresetInternal.set(preset);
-      this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
-    });
+    this.selectPresetAndLoad(presetId).subscribe();
+  }
+
+  selectPresetAndLoad(presetId: string): Observable<WidgetStatePreset | undefined> {
+    return this._gridPersistence.load(this._gridConfig.gridId, presetId).pipe(
+      tap((preset) => {
+        if (!preset) {
+          this.selectFallbackPreset(presetId);
+          return;
+        }
+        this.selectedPresetInternal.set(preset);
+        this._gridPersistence.setGridSelectedPresetSelection(this._gridConfig.gridId, preset.id!);
+      }),
+    );
   }
 
   private initialize(): void {
