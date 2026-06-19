@@ -133,8 +133,9 @@ export class AltExecutionReportComponent
   }
 
   canLeave(): boolean | Observable<boolean> {
+    const isEditMode = untracked(() => this._gridEditable.editMode());
     const hasChanges = untracked(() => this._gridEditable.hasChanges());
-    if (!hasChanges) {
+    if (!isEditMode || !hasChanges) {
       return true;
     }
 

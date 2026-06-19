@@ -17,6 +17,7 @@ export class ViewItemComponent {
   readonly canMinimize = input(false);
   readonly canMaximize = input(false);
   readonly canClose = input(false);
+  readonly closeTooltip = input('Close panel');
   readonly isLast = input(false);
   readonly remove = output();
   readonly minimize = output();

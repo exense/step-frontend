@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -38,8 +39,7 @@ import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -77,15 +77,12 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
   private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
   private _reportSettings = inject(AltExecutionReportSettingsService);
+  private _tabs = inject(AltExecutionTabsService);
   protected readonly _executionState = inject(AltExecutionStateService);
 
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
-  protected readonly fullTimeRangeLabel = this._executionState.timeRange$.pipe(
-    filter((range) => range !== undefined),
-    map((range) => TimeSeriesUtils.formatRange(range)),
-  );
 
   protected readonly selectedRootReportNodeId = computed(() => {
     const stackItems = this.stackItems();
@@ -154,12 +151,14 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
     )
     .subscribe(({ newItems, keepIndex }) => {
-      this.stackItems.update((items) => {
+      this.updateStackItems((items) => {
         return [...items.slice(0, keepIndex), ...newItems];
       });
     });
 
   ngOnInit(): void {
+    const nodeDetailsPath = ['node-details', ...this._activatedRoute.snapshot.url.map((item) => item.path)];
+    this._tabs.ensureActiveDrilldownTab(nodeDetailsPath, this._activatedRoute.snapshot.queryParams);
     this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
   }
 
@@ -167,13 +166,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     this.executionProgressElement?.classList?.remove?.(IS_DRILLDOWN_OPENED);
   }
 
-  protected handleCloseAll(): void {
-    const items = this.stackItemsUntracked;
-    this.removeItem(items[0].id);
-  }
-
-  protected handleTimeRangeChange(selection: TimeRangePickerSelection): void {
-    this._executionState.updateTimeRangeSelection(selection);
+  private updateStackItems(updater: (items: DrillDownStackItem[]) => DrillDownStackItem[]): void {
+    this.stackItems.set(updater(this.stackItemsUntracked));
+    this._tabs.updateActiveDrilldownLabel(this.getTabLabel(this.stackItemsUntracked));
   }
 
   protected removeItem(id: string, withLocationUpdate?: boolean): void {
@@ -183,7 +178,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       this._drilldownNavigationUtils.closeDrilldown();
       return;
     }
-    this.stackItems.update((value) => {
+    this.updateStackItems((value) => {
       const index = value.findIndex((item) => item.id === id);
       const result = value.splice(0, index);
       if (withLocationUpdate) {
@@ -191,6 +186,23 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       }
       return result;
     });
+  }
+
+  @HostListener('window:keyup.esc', ['$event'])
+  protected handleEscape(event: KeyboardEvent): void {
+    const target = event.target as Node | null;
+    const isEventFromDrilldown = !target || target === document.body || this._el.nativeElement.contains(target);
+    if (!isEventFromDrilldown) {
+      return;
+    }
+    const items = this.stackItemsUntracked;
+    const lastItem = items[items.length - 1];
+    if (!lastItem) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.removeItem(lastItem.id, true);
   }
 
   protected handleOpenIteration(
@@ -225,7 +237,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
@@ -247,7 +259,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
@@ -269,7 +281,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     };
 
     queueMicrotask(() => {
-      this.stackItems.update((value) => {
+      this.updateStackItems((value) => {
         const result = [...value, newItem];
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
@@ -363,6 +375,26 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         };
       }),
     );
+  }
+
+  private getTabLabel(items: DrillDownStackItem[]): string {
+    const lastNamedItem = [...items].reverse().find((item) => 'data' in item && !!item.data?.name);
+    const name = lastNamedItem && 'data' in lastNamedItem ? lastNamedItem.data?.name : undefined;
+    if (name) {
+      return `Drilldown: ${name}`;
+    }
+    const root = items[0];
+    if (root?.type === DrillDownStackItemType.ROOT) {
+      switch (root.rootType) {
+        case DrilldownRootType.KEYWORDS:
+          return 'Drilldown: Steps';
+        case DrilldownRootType.TESTCASES:
+          return 'Drilldown: Testcases';
+        case DrilldownRootType.TREE:
+          return 'Drilldown: Tree';
+      }
+    }
+    return 'Drilldown';
   }
 
   protected readonly DrilldownRootType = DrilldownRootType;

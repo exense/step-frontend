@@ -56,16 +56,4 @@ step-aggregated-tree-node-drilldown {
       @include core.step-icon-size(2.5rem, true);
     }
   }
-
-  .close-all {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-
-  step-btn-group.shrink button.mat-mdc-icon-button.mat-mdc-button-base {
-    height: 3.4rem;
-    width: 3.6rem;
-  }
 }
