@@ -946,7 +946,6 @@ export class ExecutionModule {
             }),
             {
               path: 'node-details',
-              outlet: 'nodeDetails',
               component: SimpleOutletComponent,
               children: [
                 {

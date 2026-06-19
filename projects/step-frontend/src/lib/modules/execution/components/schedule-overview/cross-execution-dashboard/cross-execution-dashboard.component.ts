@@ -105,7 +105,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     return {
       id,
       label,
-      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
+      link: [{ outlets: { primary: link ?? id, modal: null } }],
     };
   }
 }
