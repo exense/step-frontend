@@ -1,9 +1,9 @@
-import { KeyValue } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
 import {
   LOCAL_STORAGE,
   AppConfigContainerService,
   GridPersistenceStateService,
+  GridPresetListItem,
   ReportLayoutService,
   WidgetStatePreset,
 } from '@exense/step-core';
@@ -45,15 +45,16 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
     );
   }
 
-  getGridPresets(gridId: string): Observable<KeyValue<string, string>[]> {
+  getGridPresets(gridId: string): Observable<GridPresetListItem[]> {
     return this._api.getAllReportLayouts().pipe(
       logAndRethrow(),
       map((result) =>
-        result.map((layout) => {
-          const key = layout.id;
-          const value = layout.attributes?.['name'] ?? '';
-          return { key, value } as KeyValue<string, string>;
-        }),
+        result.map((layout) => ({
+          key: layout.id!,
+          value: layout.attributes?.['name'] ?? '',
+          visibility: layout.visibility,
+          creationUser: layout.creationUser,
+        })),
       ),
     );
   }
