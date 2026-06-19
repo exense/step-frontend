@@ -317,9 +317,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
       .forEach((colToAdd) => {
         const insertPosition = Math.min(colToAdd.position ?? columnSettingList.length, columnSettingList.length);
         columnSettingList.forEach((col) => {
-          if ((col.position ?? 0) >= insertPosition) {
-            col.position = (col.position ?? 0) + 1;
-          }
+              if (col.position >= insertPosition) col.position++;
         });
         columnSettingList.push({ ...colToAdd, position: insertPosition });
       });
