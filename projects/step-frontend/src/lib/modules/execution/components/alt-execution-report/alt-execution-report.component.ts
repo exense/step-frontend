@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -9,6 +10,7 @@ import {
   untracked,
   viewChild,
   ViewEncapsulation,
+  signal,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
@@ -83,6 +85,7 @@ export class AltExecutionReportComponent
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
   protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly renderReportContent = signal(this._mode === ViewMode.PRINT);
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(
     map((testCases) => {
@@ -178,6 +181,15 @@ export class AltExecutionReportComponent
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   protected readonly ViewMode = ViewMode;
+
+  constructor() {
+    afterNextRender(() => {
+      if (this._mode === ViewMode.PRINT) {
+        return;
+      }
+      requestAnimationFrame(() => this.renderReportContent.set(true));
+    });
+  }
 
   searchFor($event: string): void {
     if (!this.treeWidget() || !this.treeWidgetContainer()) {
