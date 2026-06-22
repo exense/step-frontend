@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
@@ -51,6 +52,7 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionReportComponent
