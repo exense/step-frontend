@@ -13,12 +13,12 @@
       *stepGridItem="'errorsWidget'; autoHeightOnFirstRow: true"
       [errors]="errors"
       (showDetails)="scrollToErrorsSection()"
-      (searchFor)="searchFor($event)"
+      (searchFor)="searchErrorInTree($event)"
     />
   }
   @if (hasTestCases$ | async) {
     @if (_state.testCases$ | async) {
-      <step-alt-report-node-testcases-widget *stepGridItem="'testCases'" />
+      <step-alt-report-node-testcases-widget *stepGridItem="'testCases'" #testCasesWidget />
     }
     <step-alt-report-node-summary
       *stepGridItem="'testCasesSummary'; let rowHeightInCells = heightInCells"
@@ -43,7 +43,7 @@
     <step-alt-execution-tree-widget *stepGridItem="'executionTree'" #treeWidget class="widget" />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords-widget *stepGridItem="'keywordsList'" class="keywords" />
+    <step-alt-report-node-keywords-widget *stepGridItem="'keywordsList'" #keywordWidget class="keywords" />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
@@ -63,7 +63,8 @@
         [dataSource]="_state.errors$"
         [statusFilterItems]="_state.availableErrorTypes$ | async"
         [showExecutionsMenu]="false"
-        (searchFor)="searchFor($event)"
+        [hasTestCases]="!!(hasTestCases$ | async)"
+        (searchFor)="searchError($event)"
       />
     </step-alt-report-widget-content>
   </step-alt-report-widget>
