@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   DateFormat,
   ExecutionNoticeSeverity,
@@ -34,7 +33,6 @@ export interface AltExecutionNoticesDialogData {
   standalone: false,
 })
 export class AltExecutionNoticesDialogComponent {
-  private _sanitizer = inject(DomSanitizer);
   private _notices = inject<AltExecutionNoticesDialogData>(MAT_DIALOG_DATA).notices ?? [];
 
   protected readonly DateFormat = DateFormat;
@@ -54,10 +52,4 @@ export class AltExecutionNoticesDialogComponent {
     .build();
 
   protected readonly dataSource = new TableLocalDataSource(this._notices, this.dataSourceConfig);
-
-  // See AltExecutionNoticeComponent: the message is HTML already sanitized server-side; bypass the
-  // Angular sanitizer so embedded links (incl. target="_blank") survive.
-  protected trustMessage(message: string): SafeHtml {
-    return this._sanitizer.bypassSecurityTrustHtml(message);
-  }
 }

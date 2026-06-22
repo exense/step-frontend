@@ -49,7 +49,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
    * route deactivation via cleanupCache().
    */
   getExecutionOverviewCached(id: string): Observable<ExecutionOverview> {
-    if (this.cachedOverview && this.cachedOverview.execution?.id === id) {
+    if (this.cachedOverview && this.cachedOverview.execution.id === id) {
       return of(this.cachedOverview);
     }
     return this.getExecutionOverview(id).pipe(tap((overview) => (this.cachedOverview = overview)));

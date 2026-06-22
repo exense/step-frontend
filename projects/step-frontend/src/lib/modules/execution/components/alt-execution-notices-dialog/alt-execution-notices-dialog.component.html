@@ -22,7 +22,7 @@
         <step-input-filter *stepSearchCellDef stepFilterConnect />
         <th mat-header-cell *matHeaderCellDef>Message</th>
         <td mat-cell *matCellDef="let element">
-          <span class="notice-message" [innerHTML]="trustMessage(element.message)"></span>
+          <span class="notice-message" [innerHTML]="element.message | safeHtml"></span>
         </td>
       </ng-container>
       <ng-container matColumnDef="timestamp">
