@@ -641,7 +641,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   private composeColorKey(items: (string | undefined)[]): string {
-    return items?.map((item) => (item || '').trim().toLowerCase()).join('|') || '';
+    return items.map((item) => (item || '').trim().toLowerCase()).join('|');
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
