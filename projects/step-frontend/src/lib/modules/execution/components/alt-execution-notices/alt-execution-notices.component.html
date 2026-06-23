@@ -1,10 +1,28 @@
-@if (firstNotice(); as notice) {
-  <div class="notices">
-    <step-alt-execution-notice [notice]="notice" />
-    @if (totalCount() > 1) {
-      <button type="button" mat-button color="primary" class="view-all-notices" (click)="showAll()">
-        View all notices ({{ totalCount() }})
-      </button>
-    }
-  </div>
-}
+<step-table class="compact-rows" [dataSource]="notices()">
+  <ng-container matColumnDef="severity">
+    <th mat-header-cell *matHeaderCellDef>Severity</th>
+    <td mat-cell *matCellDef="let notice">
+      <span
+        class="severity"
+        [class.warning]="notice.severity === 'WARNING'"
+        [class.error]="notice.severity === 'ERROR'"
+      >
+        {{ notice.severity ?? 'INFO' }}
+      </span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="message">
+    <th mat-header-cell *matHeaderCellDef>Message</th>
+    <td mat-cell *matCellDef="let notice" class="message-cell">
+      <span [innerHTML]="notice.message"></span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="timestamp">
+    <th mat-header-cell *matHeaderCellDef>Time</th>
+    <td mat-cell *matCellDef="let notice" class="timestamp-cell">
+      @if (notice.timestamp) {
+        {{ notice.timestamp | date: 'medium' }}
+      }
+    </td>
+  </ng-container>
+</step-table>

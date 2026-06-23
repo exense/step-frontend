@@ -1,35 +1,27 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, ViewContainerRef } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ResolvedExecutionNotice } from '@exense/step-core';
+import { Component, input } from '@angular/core';
 import {
-  AltExecutionNoticesDialogComponent,
-  AltExecutionNoticesDialogData,
-} from '../alt-execution-notices-dialog/alt-execution-notices-dialog.component';
+  ResolvedExecutionNotice,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
+  TableMemoryStorageService,
+  TablePersistenceStateService,
+  TableStorageService,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-execution-notices',
   templateUrl: './alt-execution-notices.component.html',
   styleUrl: './alt-execution-notices.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: TableStorageService,
+      useClass: TableMemoryStorageService,
+    },
+    TablePersistenceStateService,
+    tablePersistenceConfigProvider('executionNoticesList', STORE_ALL),
+  ],
   standalone: false,
 })
 export class AltExecutionNoticesComponent {
-  private _dialog = inject(MatDialog);
-  private _viewContainerRef = inject(ViewContainerRef);
-
-  readonly notices = input<ResolvedExecutionNotice[] | undefined | null>();
-
-  protected readonly firstNotice = computed(() => this.notices()?.[0]);
-  protected readonly totalCount = computed(() => this.notices()?.length ?? 0);
-
-  protected showAll(): void {
-    const notices = this.notices() ?? [];
-    if (!notices.length) {
-      return;
-    }
-    this._dialog.open(AltExecutionNoticesDialogComponent, {
-      data: { notices } as AltExecutionNoticesDialogData,
-      viewContainerRef: this._viewContainerRef,
-    });
-  }
+  readonly notices = input<ResolvedExecutionNotice[]>([]);
 }

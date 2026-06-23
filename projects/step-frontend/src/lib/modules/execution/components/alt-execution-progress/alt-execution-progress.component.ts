@@ -229,7 +229,7 @@ export class AltExecutionProgressComponent
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
-  readonly notices$ = this.activeExecution$.pipe(
+  protected readonly notices$ = this.activeExecution$.pipe(
     switchMap((active) => active.resolvedNotices$),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -275,6 +275,13 @@ export class AltExecutionProgressComponent
     this.updateTimeRangeSelection(selection);
   }
 
+  protected noticeBadgeLabel(count: number): string {
+    if (count === 0) {
+      return '';
+    }
+    return count < 10 ? count.toString() : '+';
+  }
+
   readonly executionPlan$ = this.execution$.pipe(
     map((execution) => execution.planId),
     switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
@@ -288,6 +295,7 @@ export class AltExecutionProgressComponent
     }),
   );
   protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
