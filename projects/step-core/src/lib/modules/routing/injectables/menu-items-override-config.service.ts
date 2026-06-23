@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Mutable } from '../../basics/step-basics.module';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { MenuEntry } from '../types/menu-entry';
-
-type FieldAccessor = Mutable<Pick<MenuItemsOverrideConfigService, 'menuItemsOverride$'>>;
 
 @Injectable({
   providedIn: 'root',
 })
 export class MenuItemsOverrideConfigService {
-  readonly menuItemsOverride$?: Observable<MenuEntry[]>;
+  private readonly _menuItemsOverride$ = new BehaviorSubject<Observable<MenuEntry[]> | undefined>(undefined);
+
+  readonly menuItemsOverride$ = this._menuItemsOverride$.asObservable();
+
   configure(items$: Observable<MenuEntry[]>): void {
-    (this as FieldAccessor).menuItemsOverride$ = items$;
+    this._menuItemsOverride$.next(items$);
   }
 }
