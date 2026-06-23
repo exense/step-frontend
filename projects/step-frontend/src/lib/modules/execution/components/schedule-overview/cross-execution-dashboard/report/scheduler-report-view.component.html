@@ -1,152 +1,57 @@
-<section>
-  <step-scheduler-report-view-header />
-  <div class="row">
-    <div class="piechart-container">
-      @if (_state.summaryData$ | async; as summary) {
-        @if (_state.summaryWidgetLoading() && _state.lastRefreshTrigger() !== 'auto') {
-          <ng-container *ngTemplateOutlet="summarySkeleton" />
-        }
-        <div [class.hidden]="_state.summaryWidgetLoading() && _state.lastRefreshTrigger() !== 'auto'">
-          <step-alt-report-node-summary
-            title="Summary: Executions"
-            [summary]="summary"
-            [disableChartItemClick]="true"
-          />
-        </div>
-      } @else {
-        <ng-container *ngTemplateOutlet="summarySkeleton" />
-      }
-    </div>
-
-    <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
-      <step-alt-report-widget-content class="widget-content">
-        @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
-          @if (_state.executionsChartLoading()) {
-            <ng-container *ngTemplateOutlet="skeleton" />
-          }
-          <div [class.hidden]="_state.executionsChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
-            <step-timeseries-chart
-              [settings]="executionsChartSettings"
-              (zoomChange)="handleMainChartZoom($event)"
-              [height]="340"
-            >
-              <ng-template tooltipContent let-data let-reposition="reposition">
-                <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />
-              </ng-template>
-            </step-timeseries-chart>
-          </div>
-        } @else {
-          <ng-container *ngTemplateOutlet="skeleton" />
-        }
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
+@if (hasNoLayout()) {
+  <div class="no-layout-message">
+    <h3>Configure a layout to see the Cross Execution Report</h3>
   </div>
-  <div class="row">
-    <div class="flex-grow-1">
-      <step-cross-execution-heatmap [defaultDateRange]="luxonDateRange()" #heatmap />
-    </div>
-  </div>
-  <div class="row">
-    <step-alt-report-widget class="flex-grow-1" [title]="countChartTitle()">
-      <step-alt-report-widget-content class="widget-content">
-        <div class="chart-actions-container">
-          <step-tabs
-            [tabs]="primaryChartTypes"
-            [shrink]="true"
-            [activeTabId]="reportNodesChartType()"
-            (activeTabIdChange)="switchReportNodesChart($event)"
-          />
-        </div>
-        @if (reportNodesChartType() === 'keywords') {
-          @if (_state.keywordsChartSettings$ | async; as settings) {
-            <div [class.hidden]="_state.keywordsCountChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
-              <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
-                <ng-template tooltipContent let-data>
-                  <div class="ts-tooltip">
-                    <div
-                      class="link-item"
-                      (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
-                      title="See Execution"
-                    >
-                      <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                      <span class="link-icon"></span>
-                    </div>
-                  </div>
-                </ng-template>
-              </step-timeseries-chart>
-            </div>
-          } @else {
-            <ng-container *ngTemplateOutlet="skeleton" />
-          }
-        } @else if (reportNodesChartType() === 'testcases') {
-          @if (_state.testCasesChartSettings$ | async; as testCasesData) {
-            @if (_state.testCasesCountChartLoading() && _state.lastRefreshTrigger() !== 'auto') {
-              <ng-container *ngTemplateOutlet="skeleton" />
-            }
-            <div [class.hidden]="_state.testCasesCountChartLoading() && _state.lastRefreshTrigger() !== 'auto'">
-              <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
-                <ng-template tooltipContent let-data>
-                  <div class="ts-tooltip">
-                    <div
-                      class="link-item"
-                      (click)="jumpToExecution(testCasesData.lastExecutions[data.idx!].id!)"
-                      title="See Execution"
-                    >
-                      <span>{{ testCasesData.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                      <span class="link-icon"></span>
-                    </div>
-                  </div>
-                </ng-template>
-              </step-timeseries-chart>
-            </div>
-          } @else {
-            <ng-container *ngTemplateOutlet="skeleton" />
-          }
-        } @else {
-          <ng-container *ngTemplateOutlet="skeleton" />
-        }
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-  <div class="row">
-    <step-alt-report-widget class="flex-grow-1" title="Errors">
-      <step-alt-report-widget-content class="widget-content">
-        <step-alt-execution-errors
-          [dataSource]="_state.errorsDataSource"
-          [statusFilterItems]="availableErrorTypes()"
-          [showActions]="false"
-          [indicatorMode]="TableIndicatorMode.SKELETON"
+}
+<step-grid-layout [class.hidden]="hasNoLayout()">
+  <step-summary-card
+    *stepGridItem="'successRate'; autoHeightOnFirstRow: true"
+    [value]="_state.successRateValue$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-summary-card
+    *stepGridItem="'averageExecutionDuration'; autoHeightOnFirstRow: true"
+    [value]="_state.averageExecutionDurationLabel$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-summary-card
+    *stepGridItem="'totalExecutions'; autoHeightOnFirstRow: true"
+    [value]="_state.totalExecutionsCount$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-alt-report-node-summary
+    *stepGridItem="'summaryExecutions'"
+    [summary]="_state.summaryData$ | async"
+    [disableChartItemClick]="true"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
+  <step-cross-execution-status *stepGridItem="'crossExecutionStatus'" />
+  <step-cross-execution-heatmap *stepGridItem="'heatMap'" [defaultDateRange]="luxonDateRange()" />
+  <step-cross-execution-call-counts *stepGridItem="'callsCount'" />
+  <step-alt-report-widget *stepGridItem="'errors'" class="full-height">
+    <step-alt-report-widget-title>
+      <step-grid-element-title />
+    </step-alt-report-widget-title>
+    <step-alt-report-widget-content class="widget-content">
+      <step-alt-execution-errors
+        [dataSource]="_state.errorsDataSource"
+        [statusFilterItems]="availableErrorTypes()"
+        [showActions]="false"
+        [indicatorMode]="TableIndicatorMode.SKELETON"
+      />
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
+  <step-alt-report-widget *stepGridItem="'executions'" class="full-height">
+    <step-alt-report-widget-title>
+      <step-grid-element-title />
+    </step-alt-report-widget-title>
+    <step-alt-report-widget-content class="widget-content">
+      @if (luxonDateRange(); as dateRange) {
+        <step-cross-execution-executions-table
+          [defaultDateRange]="dateRange!"
+          [hiddenFilters]="_state.executionsTableFilters()"
         />
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-  <div class="row">
-    <step-alt-report-widget class="flex-grow-1" title="Executions">
-      <step-alt-report-widget-content class="widget-content">
-        @if (luxonDateRange(); as dateRange) {
-          <step-cross-execution-executions-table
-            [defaultDateRange]="dateRange!"
-            #executionList
-            [hiddenFilters]="_state.executionsTableFilters()"
-          />
-        }
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-</section>
-
-<ng-template #summarySkeleton>
-  @if (_state.lastRefreshTrigger() !== 'auto') {
-    <step-alt-report-widget title="Summary: Executions">
-      <step-alt-report-widget-content class="summary-skeleton-content">
-        <step-chart-skeleton />
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  }
-</ng-template>
-
-<ng-template #skeleton>
-  @if (_state.lastRefreshTrigger() !== 'auto') {
-    <step-chart-skeleton />
-  }
-</ng-template>
+      }
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
+</step-grid-layout>

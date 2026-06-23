@@ -8,6 +8,6 @@ export * from './types/execution-params-config';
 export * from './types/execution-view-mode';
 export * from './pipes/execution-url.pipe';
 export * from './pipes/execution-name.pipe';
-export * from './types/execution-report-grid';
+export * from './types/execution-grid-ids';
 
 export const EXECUTION_COMMON_EXPORTS = [ExecutionUrlPipe, ExecutionNamePipe];

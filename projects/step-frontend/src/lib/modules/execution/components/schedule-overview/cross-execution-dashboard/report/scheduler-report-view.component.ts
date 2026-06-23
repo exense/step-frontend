@@ -1,16 +1,13 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { DateRange, Tab, TableIndicatorMode, TimeRange } from '@exense/step-core';
+import { Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
+import { DateRange, GridEditableService, TableIndicatorMode, WidgetsPersistenceStateService } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, filter, map, pairwise, scan, take } from 'rxjs';
+import { filter, map, pairwise, scan } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
-import { ExecutionListComponent } from '../../../execution-list/execution-list.component';
 import { DateTime } from 'luxon';
-
-export type ReportNodesChartType = 'keywords' | 'testcases';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -24,22 +21,17 @@ export class SchedulerReportViewComponent implements OnInit {
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
 
-  protected readonly reportNodesChartType = signal<ReportNodesChartType | undefined>(undefined);
+  private _widgetsPersistence = inject(WidgetsPersistenceStateService);
+  private _gridEditable = inject(GridEditableService);
 
-  protected readonly primaryChartTypes: Tab<ReportNodesChartType>[] = [
-    {
-      id: 'testcases',
-      label: 'Test Cases',
-    },
-    {
-      id: 'keywords',
-      label: 'Keywords',
-    },
-  ];
+  protected readonly hasNoLayout = computed(
+    () =>
+      this._widgetsPersistence.isInitialized() &&
+      !this._widgetsPersistence.gridPresets().length &&
+      !this._gridEditable.editMode(),
+  );
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
-
-  @ViewChild('executionList') executionList!: ExecutionListComponent;
 
   protected readonly luxonDateRange = toSignal(
     this._state.timeRange$.pipe(
@@ -52,25 +44,6 @@ export class SchedulerReportViewComponent implements OnInit {
       ),
     ),
   );
-
-  protected switchReportNodesChart(type: ReportNodesChartType): void {
-    if (this.reportNodesChartType() === type) {
-      // nothing happened
-      return;
-    }
-    this._state.lastRefreshTrigger.set('manual');
-    if (type === 'keywords') {
-      this._state.keywordsCountChartLoading.set(true);
-    } else {
-      this._state.testCasesCountChartLoading.set(true);
-    }
-    this.reportNodesChartType.set(type);
-  }
-
-  protected readonly countChartTitle = computed(() => {
-    const label = this.reportNodesChartType() === 'keywords' ? 'Keyword calls count' : 'Test cases count';
-    return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
-  });
 
   private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(
@@ -104,26 +77,6 @@ export class SchedulerReportViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribeToBackEvents();
-
-    this._state.testCasesChartSettings$.pipe(take(1)).subscribe(({ hasData }) => {
-      this.reportNodesChartType.set(hasData ? 'testcases' : 'keywords');
-    });
-  }
-
-  protected jumpToExecution(eId: string): void {
-    window.open(`#/executions/${eId!}/report`);
-  }
-
-  protected handleMainChartZoom(timeRange: TimeRange): void {
-    this._state.lastRefreshTrigger.set('manual');
-    this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
-      const base = chartSettings.xAxesSettings.values[0];
-      const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];
-      const snappedFrom = base + Math.ceil((timeRange.from - base) / interval) * interval;
-      const snappedTo = base + Math.ceil((timeRange.to - base) / interval) * interval;
-      timeRange = { from: Math.round(snappedFrom), to: Math.round(snappedTo) };
-      this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
-    });
   }
 
   protected readonly availableErrorTypes = toSignal(

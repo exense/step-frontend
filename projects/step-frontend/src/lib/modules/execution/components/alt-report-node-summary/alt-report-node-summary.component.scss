@@ -3,6 +3,10 @@ step-alt-report-node-summary {
   width: 100%;
   container: summary-node-widget / size;
 
+  step-alt-report-widget {
+    height: 100%;
+  }
+
   step-alt-report-widget-content {
     font-size: 1.2rem;
     display: flex;

@@ -1,6 +1,11 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-heatmap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   .heatmap-table {
     font-size: 1.2rem;
     border-collapse: collapse;
@@ -80,7 +85,6 @@ step-heatmap {
     overscroll-behavior-x: contain; /* prevent scroll chaining to body */
     -webkit-overflow-scrolling: touch;
     min-width: 0; /* important if parent is a flex child */
-    min-height: 40rem;
     margin-bottom: 2rem;
   }
 

@@ -22,7 +22,7 @@
           </a>
         }
       }
-      @if (_state.viewType() === 'repository' ) {
+      @if (_state.viewType() === 'repository') {
         @if (_state.execution(); as execution) {
           @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
             @if (repositoryParams.repositoryID !== 'local') {
@@ -59,6 +59,7 @@
     }
   </div>
   <div class="controls">
+    <router-outlet name="controls" />
     <step-autorefresh-toggle
       [interval]="_state.refreshInterval()"
       (refresh)="_state.triggerRefresh()"
@@ -78,6 +79,5 @@
 </section>
 
 <section class="main">
-  <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
   <router-outlet />
 </section>

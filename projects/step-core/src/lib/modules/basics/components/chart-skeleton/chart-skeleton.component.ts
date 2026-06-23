@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, Input, ViewEncapsulation } from '@angular/core';
-import { COMMON_IMPORTS } from '../../../_common';
+import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
 
 /**
  * This component represents a visual effect for a loading chart.
@@ -10,7 +9,7 @@ import { COMMON_IMPORTS } from '../../../_common';
   styleUrls: ['./chart-skeleton.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [COMMON_IMPORTS],
+  imports: [],
 })
 export class ChartSkeletonComponent {
   readonly height = input<number>(300);
