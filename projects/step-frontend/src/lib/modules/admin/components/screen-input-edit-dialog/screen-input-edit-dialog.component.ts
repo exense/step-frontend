@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostBinding, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, viewChild } from '@angular/core';
 import { AugmentedScreenService, DialogRouteResult, Input as SInput, ReloadableDirective } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
@@ -6,6 +6,7 @@ import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
+import { NgModel } from '@angular/forms';
 
 type InputType = SInput['type'];
 type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>;
@@ -24,16 +25,27 @@ export class ScreenInputEditDialogComponent {
   private _destroyRef = inject(DestroyRef);
   private _route = inject(ActivatedRoute);
   protected screenInput = this._dialogData.screenInput;
-  readonly modalTitle = `${!!this.screenInput.id ? 'Edit' : 'New'} Input`;
-  readonly ALLOWED_TYPES: InputType[] = ['DROPDOWN', 'TEXT', 'CHECKBOX'];
+  protected readonly modalTitle = `${!!this.screenInput.id ? 'Edit' : 'New'} Input`;
+  protected readonly ALLOWED_TYPES: InputType[] = ['DROPDOWN', 'TEXT', 'CHECKBOX'];
 
   protected showAdvanced = false;
 
-  readonly customUIComponentsFormatter = CUSTOM_UI_COMPONENTS_FORMATTER;
-  readonly activationExpressionFormatter = EXPRESSION_SCRIPT_FORMATTER;
+  protected readonly customUIComponentsFormatter = CUSTOM_UI_COMPONENTS_FORMATTER;
+  protected readonly activationExpressionFormatter = EXPRESSION_SCRIPT_FORMATTER;
+  protected readonly errorsDictionary: Record<string, string> = {
+    required: 'This field is required',
+  };
 
-  @HostBinding('keydown.enter')
-  save(): void {
+  private readonly attributeInput = viewChild<NgModel>('attributeInput');
+
+  @HostListener('keydown.enter')
+  protected save(): void {
+    const attributeInput = this.attributeInput();
+    if (attributeInput?.invalid) {
+      attributeInput.control.markAsTouched();
+      return;
+    }
+
     this._route.queryParams
       .pipe(
         takeUntilDestroyed(this._destroyRef),
