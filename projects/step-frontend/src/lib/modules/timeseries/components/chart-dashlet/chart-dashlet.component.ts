@@ -296,16 +296,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
   }
 
-  private getSeriesStroke(id: string, axes: AxesSettings): SeriesStroke {
+  private getSeriesStroke(colorKey: string, axes: AxesSettings): SeriesStroke {
     const hasGrouping = this.getGroupDimensions()?.length > 0;
     if (!hasGrouping) {
       return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
     }
-    const customSeriesColor = axes.renderingSettings?.seriesColors?.[id];
+    const customSeriesColor = axes.renderingSettings?.seriesColors?.[colorKey];
     if (customSeriesColor) {
       return { color: customSeriesColor, type: MarkerType.SQUARE };
     }
-    return this.context().colorsPool.getSeriesColor(id);
+    return this.context().colorsPool.getSeriesColor(colorKey);
   }
 
   /**
@@ -348,7 +348,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
         labelItems = [this.context().getMetric(this.item().metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
+      const colorKey = this.composeColorKey(labelItems);
+      const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         let lastSecondaryValue: number | undefined;
@@ -637,6 +638,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private removeDataGaps(data: (number | undefined)[]): number[] {
     for (let i = 0; i < data.length; i++) {}
     return [];
+  }
+
+  private composeColorKey(items: (string | undefined)[]): string {
+    return items.map((item) => (item || '').trim().toLowerCase()).join('|');
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
