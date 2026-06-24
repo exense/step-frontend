@@ -1,17 +1,18 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import {Component, computed, inject, input, output} from '@angular/core';
 import {
   AceMode,
   AugmentedTimeSeriesService,
   RichEditorDialogService,
   TableDataSource,
   TableIndicatorMode,
-  tablePersistenceConfigProvider,
   TableLocalDataSource,
+  tablePersistenceConfigProvider,
   TableRemoteDataSource,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
-import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
-import { map, Observable } from 'rxjs';
+import {EXECUTION_ENDED_STATUSES, Status} from '../../../_common/step-common.module';
+import {map, Observable} from 'rxjs';
+import {SearchError, SearchErrorType} from '../../shared/search-error';
 
 const ALL_COLUMNS = {
   errorMessage: 'errorMessage',
@@ -38,7 +39,7 @@ const ALL_COLUMNS = {
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);
   private _timeSeriesApi = inject(AugmentedTimeSeriesService);
-  readonly searchFor = output<string>();
+  readonly searchFor = output<SearchError>();
 
   readonly dataSourceInput = input<
     | TableDataSource<TimeSeriesErrorEntry>
@@ -67,6 +68,7 @@ export class AltExecutionErrorsComponent {
 
   readonly showExecutionsMenu = input(true);
   readonly showActions = input(true);
+  readonly hasTestCases = input(false);
   readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SPINNER);
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
@@ -91,7 +93,15 @@ export class AltExecutionErrorsComponent {
     });
   }
 
-  onFindInTree(message: string): void {
-    this.searchFor.emit(message);
+  protected findInTree(value: string): void {
+    this.searchFor.emit({type: SearchErrorType.TREE, value});
+  }
+
+  protected findInTestCases(value: string): void {
+    this.searchFor.emit({type: SearchErrorType.TEST_CASE, value});
+  }
+
+  protected findInKeywords(value: string): void{
+    this.searchFor.emit({type: SearchErrorType.KEYWORD, value});
   }
 }
