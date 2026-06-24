@@ -3,6 +3,7 @@ import { VIEW_MODE } from '../../shared/view-mode';
 import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 import { DrilldownRootType } from '../../shared/drilldown-root-type';
 import { AltReportNodeListProvideTestcasesDirective } from '../../directives/alt-report-node-list-provide-testcases.directive';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-testcases-widget',
@@ -13,6 +14,7 @@ import { AltReportNodeListProvideTestcasesDirective } from '../../directives/alt
   standalone: false,
 })
 export class AltReportNodeTestcasesWidgetComponent {
+  private _filters = inject(AltReportNodesFilterService);
   private _executionDialogs = inject(AltExecutionDialogsService);
   protected readonly _mode = inject(VIEW_MODE);
 
@@ -22,5 +24,10 @@ export class AltReportNodeTestcasesWidgetComponent {
 
   protected openMaximized(): void {
     this._executionDialogs.openDrilldownRoot(DrilldownRootType.TESTCASES);
+  }
+
+  search(value: string): void {
+    this._filters.updateStatusCtrl([]);
+    this._filters.searchCtrl.setValue(value);
   }
 }
