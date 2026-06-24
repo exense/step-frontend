@@ -1,10 +1,9 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, map, Observable} from 'rxjs';
-import {AltExecutionRefreshActivity} from '../shared/alt-execution-refresh-activity.enum';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+import { AltExecutionRefreshActivity } from '../shared/alt-execution-refresh-activity.enum';
 
 @Injectable()
 export class AltExecutionRefreshActivityService implements OnDestroy {
-
   private readonly refreshActivityState$ = new BehaviorSubject<Set<AltExecutionRefreshActivity>>(new Set());
 
   ngOnDestroy(): void {
@@ -16,10 +15,6 @@ export class AltExecutionRefreshActivityService implements OnDestroy {
   }
 
   isActive$(activity: AltExecutionRefreshActivity): Observable<boolean> {
-    return this.refreshActivityState$
-      .pipe(
-        map((activityState) => activityState.has(activity)),
-      );
+    return this.refreshActivityState$.pipe(map((activityState) => activityState.has(activity)));
   }
-
 }

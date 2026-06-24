@@ -35,7 +35,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
         if (task == null) {
           return 'Deleted task';
         }
-        return task.attributes?.['name']
+        return task.attributes?.['name'];
       case 'plan':
         const plan = this._state.plan();
         if (plan === undefined) {
@@ -54,7 +54,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
           // TODO handle
         }
         return ExecutionNamePipe.transform(execution!);
-
     }
   });
 
@@ -88,7 +87,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.fetchLastExecutionTrigger$.next();
   }
 
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams): void {
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }

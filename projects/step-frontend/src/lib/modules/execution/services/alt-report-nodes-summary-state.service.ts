@@ -1,4 +1,4 @@
-import {inject, Injectable, OnDestroy} from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -9,7 +9,7 @@ import {
   Observable,
   of,
   shareReplay,
-  switchMap
+  switchMap,
 } from 'rxjs';
 import {
   Execution,
@@ -22,20 +22,25 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import {ReportNodeSummary} from '../shared/report-node-summary';
-import {convertPickerSelectionToTimeRange} from '../shared/convert-picker-selection';
-import {AltReportNodesStateService} from './alt-report-nodes-state.service';
-import {AltExecutionRefreshActivity} from '../shared/alt-execution-refresh-activity.enum';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AltExecutionRefreshActivityService} from './alt-execution-refresh-activity.service';
+import { ReportNodeSummary } from '../shared/report-node-summary';
+import { convertPickerSelectionToTimeRange } from '../shared/convert-picker-selection';
+import { AltReportNodesStateService } from './alt-report-nodes-state.service';
+import { AltExecutionRefreshActivity } from '../shared/alt-execution-refresh-activity.enum';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AltExecutionRefreshActivityService } from './alt-execution-refresh-activity.service';
 
 @Injectable()
 export abstract class AltReportNodesSummaryStateService<T> extends AltReportNodesStateService<T> implements OnDestroy {
-  // eslint-disable-next-line @angular-eslint/prefer-inject
-  protected constructor(datasource$: Observable<TableDataSource<T>>, storagePrefix: string, refreshActivity: AltExecutionRefreshActivity) {
+  /* eslint-disable @angular-eslint/prefer-inject */
+  protected constructor(
+    datasource$: Observable<TableDataSource<T>>,
+    storagePrefix: string,
+    refreshActivity: AltExecutionRefreshActivity,
+  ) {
     super(datasource$, storagePrefix);
     this.summary$ = this.setupSummaryStream(refreshActivity);
   }
+  /* eslint-enable @angular-eslint/prefer-inject */
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _viewService = inject(PrivateViewPluginService);
@@ -59,7 +64,7 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
 
   protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse, countForecast?: number): ReportNodeSummary {
     if (!response) {
-      return {total: 0, items: {}} as ReportNodeSummary;
+      return { total: 0, items: {} } as ReportNodeSummary;
     }
 
     return response.matrixKeys.reduce(
@@ -70,20 +75,19 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
         res.total += bucket.count;
         return res;
       },
-      {total: 0, countForecast, items: {}},
+      { total: 0, countForecast, items: {} },
     ) as ReportNodeSummary;
   }
 
   private setupSummaryStream(refreshActivity: AltExecutionRefreshActivity): Observable<ReportNodeSummary> {
-
     const isActive$ = this._refreshActivityService.isActive$(refreshActivity);
 
     const forecastSummaryTotal$ = combineLatest([
       isActive$,
       this._executionState.execution$,
-      this.isFullRangeSelection$
+      this.isFullRangeSelection$,
     ]).pipe(
-      filter(([isActive,]) => isActive),
+      filter(([isActive]) => isActive),
       switchMap(([, execution, isFullRangeSelected]) => {
         if (execution.status !== 'RUNNING' || !isFullRangeSelected) {
           return of(undefined);
@@ -100,8 +104,8 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
       this._executionState.execution$,
       this._executionState.timeRangeSelection$,
     ]).pipe(
-      filter(([isActive,]) => isActive),
-      map(([,execution, range]) => ({execution, range})),
+      filter(([isActive]) => isActive),
+      map(([, execution, range]) => ({ execution, range })),
       smartSwitchMap(
         (curr, prev) => {
           return (
@@ -109,7 +113,7 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
             !this._dateUtils.areTimeRangeSelectionsEquals(curr.range, prev?.range)
           );
         },
-        ({execution, range}) => {
+        ({ execution, range }) => {
           const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
           if (!timeRange) {
             return of(undefined);
@@ -128,7 +132,7 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
     return combineLatest([summaryTimeSeries$, forecastSummaryTotal$]).pipe(
       map(([summaryTimeSeries, countForecast]) => this.protectedTimeSeriesResponse(summaryTimeSeries, countForecast)),
       shareReplay(1),
-      takeUntilDestroyed(this._destroyRef)
+      takeUntilDestroyed(this._destroyRef),
     );
   }
 }
