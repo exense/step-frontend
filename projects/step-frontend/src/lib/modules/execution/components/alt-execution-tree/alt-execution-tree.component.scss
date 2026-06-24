@@ -26,6 +26,17 @@ step-alt-execution-tree {
     padding-right: 1rem;
   }
 
+  step-tree {
+    --tree-node-indent-size: 1.5rem;
+    --tree-node-line-offset: 0.75rem;
+  }
+
+  step-artefact-inline-details.execution-tree-inline-details {
+    .execution-report-node-inline-details > :not(:first-child) {
+      transform: translateX(0.2rem);
+    }
+  }
+
   .node-details-panel {
     padding-left: 1rem;
   }
@@ -85,7 +96,6 @@ step-alt-execution-tree {
     padding-bottom: 0.5rem;
     z-index: 2;
 
-    padding-left: 1rem;
     > .node-icon {
       display: none;
     }

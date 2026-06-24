@@ -5,6 +5,7 @@ import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { filter, first, map, pairwise, switchMap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TABLE_PERSISTENCE_URL_PARAMS_SERIALIZERS } from './table-persistence-url-params-serializer.token';
+import { FilterCondition } from '../shared/filter-condition';
 
 export const TABLE_QUERY_PREFIX = 'tq_';
 
@@ -21,7 +22,7 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
 
   private storagePath = this.currentRouterUrlPath;
 
-  private get currentRouterUrlPath() {
+  private get currentRouterUrlPath(): string {
     const url = this._router.url;
     return !url.includes('?') ? url : url.slice(0, url.indexOf('?'));
   }
@@ -152,7 +153,12 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
   private parseUrlValue(value: string): SearchValue | undefined {
     const serializer = this._urlParamsSerializers.find((item) => item.isValueMatchForDeserialize(value))!;
 
-    return serializer.deserialize(value);
+    const searchValue = serializer.deserialize(value);
+    if (!(searchValue instanceof FilterCondition)) {
+      return searchValue;
+    }
+
+    return this._filterConditionFactory.create(searchValue);
   }
 
   private hasUrlSearch(queryParams: Params): boolean {

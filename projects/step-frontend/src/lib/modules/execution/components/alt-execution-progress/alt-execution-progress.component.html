@@ -184,6 +184,8 @@
   }
 </section>
 
+<step-alt-execution-tabs />
+
 <section class="no-gap">
   @if (execution$ | async; as execution) {
     @if (execution?.importResult && !execution!.importResult!.successful) {
@@ -212,7 +214,7 @@
   }
 </section>
 
-<section class="main">
+<section class="main" [class.has-drilldown]="!!activeDrilldownTabId()" [class.is-layout-edit]="isLayoutEditMode()">
   @if (execution$ | async; as execution) {
     <step-alt-report-widget class="print-execution-details">
       <step-alt-report-widget-content>
@@ -220,7 +222,9 @@
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   }
-  <router-outlet />
+  <div class="primary-content">
+    <router-outlet />
+  </div>
+  <router-outlet name="nodeDetails" />
 </section>
 <router-outlet name="modal" />
-<router-outlet name="nodeDetails" />

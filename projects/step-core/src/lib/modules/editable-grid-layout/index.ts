@@ -44,3 +44,4 @@ export * from './components/grid-add-widget/grid-add-widget.component';
 export * from './injectables/grid-editable.service';
 export * from './types/widget-state-preset';
 export * from './types/widget-state';
+export * from './types/grid-preset-list-item';

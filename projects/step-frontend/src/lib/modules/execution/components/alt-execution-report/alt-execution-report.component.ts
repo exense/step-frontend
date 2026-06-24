@@ -9,7 +9,7 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import {AltExecutionStateService} from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
   CanLeaveComponent,
@@ -21,21 +21,30 @@ import {
   TimeRange,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
-import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, map, noop, Observable, scan, tap } from 'rxjs';
-import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Status } from '../../../_common/shared/status.enum';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AltKeywordNodesStateService} from '../../services/alt-keyword-nodes-state.service';
+import {AltTestCasesNodesStateService} from '../../services/alt-test-cases-nodes-state.service';
+import {VIEW_MODE, ViewMode} from '../../shared/view-mode';
+import {DashboardUrlParamsService} from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {first, map, noop, Observable, scan, tap} from 'rxjs';
+import {AltExecutionTreeWidgetComponent} from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
+import {
+  TimeRangePickerSelection
+} from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import {Status} from '../../../_common/shared/status.enum';
 import {
   AggregatedTreeNodeDialogHooksService,
   AggregatedTreeNodeDialogHooksStrategy,
 } from '../../services/aggregated-tree-node-dialog-hooks.service';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
+import {ReportNodeSummary} from '../../shared/report-node-summary';
+import {
+  AltReportNodeTestcasesWidgetComponent
+} from '../alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
+import {
+  AltReportNodeKeywordsWidgetComponent
+} from '../alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import {SearchError, SearchErrorType} from '../../shared/search-error';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -54,8 +63,7 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
   standalone: false,
 })
 export class AltExecutionReportComponent
-  implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy, CanLeaveComponent
-{
+  implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy, CanLeaveComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _widgetsPersistence = inject(WidgetsPersistenceStateService);
   protected readonly _mode = inject(VIEW_MODE);
@@ -71,16 +79,21 @@ export class AltExecutionReportComponent
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
-  private readonly treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
-  private readonly treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
-  private readonly errors = viewChild('errors', { read: ElementRef });
+  private readonly treeWidget = viewChild('treeWidget', {read: AltExecutionTreeWidgetComponent});
+  private readonly treeWidgetContainer = viewChild('treeWidget', {read: ElementRef});
+  private readonly testCasesWidget = viewChild('testCasesWidget', {read: AltReportNodeTestcasesWidgetComponent});
+  private readonly testCasesWidgetContainer = viewChild('testCasesWidget', {read: ElementRef});
+  private readonly keywordWidget = viewChild('keywordWidget', {read: AltReportNodeKeywordsWidgetComponent});
+  private readonly keywordWidgetContainer = viewChild('keywordWidget', {read: ElementRef});
+
+  private readonly errors = viewChild('errors', {read: ElementRef});
 
   protected readonly _state = inject(AltExecutionStateService);
 
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
-  protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly emptyReportNodeSummary = {total: 0, items: {}} as ReportNodeSummary;
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(
     map((testCases) => {
@@ -100,14 +113,14 @@ export class AltExecutionReportComponent
       scan(
         (acc, range) => {
           const isFirst = !acc.hasEmitted;
-          return { range, isFirst, hasEmitted: true };
+          return {range, isFirst, hasEmitted: true};
         },
-        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+        {range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false},
       ),
       takeUntilDestroyed(),
       first(),
     )
-    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+    .subscribe(({range, isFirst}: { range: TimeRangePickerSelection; isFirst: boolean }) => {
       this._urlParamsService.patchUrlParams(range, undefined, isFirst);
     });
 
@@ -120,8 +133,9 @@ export class AltExecutionReportComponent
   }
 
   canLeave(): boolean | Observable<boolean> {
+    const isEditMode = untracked(() => this._gridEditable.editMode());
     const hasChanges = untracked(() => this._gridEditable.hasChanges());
-    if (!hasChanges) {
+    if (!isEditMode || !hasChanges) {
       return true;
     }
 
@@ -141,19 +155,19 @@ export class AltExecutionReportComponent
   }
 
   protected handleOpenNodeInTreePage(reportNode: ReportNode): void {
-    const { artefactID: artefactId, artefactHash, id: reportNodeId } = reportNode;
+    const {artefactID: artefactId, artefactHash, id: reportNodeId} = reportNode;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], {
-      queryParams: { reportNodeId, artefactId, artefactHash },
+      queryParams: {reportNodeId, artefactId, artefactHash},
       relativeTo: this._activatedRoute,
     });
   }
 
   protected scrollToErrorsSection(): void {
     const errorsElement = this.errors()?.nativeElement as HTMLHtmlElement | undefined;
-    errorsElement?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    errorsElement?.scrollIntoView?.({behavior: 'smooth', block: 'start'});
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
@@ -161,7 +175,7 @@ export class AltExecutionReportComponent
   }
 
   protected handleChartZooming(range: TimeRange): void {
-    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
+    this._state.updateTimeRangeSelection({type: 'ABSOLUTE', absoluteSelection: range});
   }
 
   protected handleTestCasesSummaryStatusSelection(statuses: Status[]): void {
@@ -176,13 +190,55 @@ export class AltExecutionReportComponent
 
   protected readonly ViewMode = ViewMode;
 
-  searchFor($event: string): void {
-    if (!this.treeWidget() || !this.treeWidgetContainer()) {
+  protected searchErrorInTree(error: string): void {
+    const treeWidget = untracked(() => this.treeWidget());
+    const treeWidgetContainer = untracked(() => this.treeWidgetContainer());
+
+    if (!treeWidget || !treeWidgetContainer) {
       return;
     }
 
-    this.treeWidgetContainer()!.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    treeWidgetContainer.nativeElement.scrollIntoView({behavior: 'smooth'});
+    treeWidget.focusAndSearch(error);
+  }
 
-    this.treeWidget()!.focusAndSearch($event);
+  private searchErrorInTestCases(error: string): void {
+    const testCasesWidget = untracked(() => this.testCasesWidget());
+    const testCasesContainer = untracked(() => this.testCasesWidgetContainer());
+
+    if (!testCasesWidget || !testCasesContainer) {
+      return;
+    }
+
+    testCasesContainer.nativeElement.scrollIntoView({behavior: 'smooth'});
+    testCasesWidget.search(error);
+  }
+
+  private searchErrorInKeywords(error: string): void {
+    const keywordsWidget = untracked(() => this.keywordWidget());
+    const keywordsContainer = untracked(() => this.keywordWidgetContainer());
+
+    if (!keywordsWidget || !keywordsContainer) {
+      return;
+    }
+
+    keywordsContainer.nativeElement.scrollIntoView({behavior: 'smooth'});
+    keywordsWidget.search(error);
+  }
+
+  protected searchError({type, value}: SearchError): void {
+    switch (type) {
+      case SearchErrorType.TREE:
+        this.searchErrorInTree(value);
+        break;
+      case SearchErrorType.KEYWORD:
+        this.searchErrorInKeywords(value);
+        break;
+      case SearchErrorType.TEST_CASE:
+        this.searchErrorInTestCases(value);
+        break;
+      default:
+        break;
+    }
   }
 }

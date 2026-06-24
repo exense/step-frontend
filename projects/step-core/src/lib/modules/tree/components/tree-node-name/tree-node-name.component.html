@@ -1,15 +1,25 @@
-@if (node()?.icon; as icon) {
-  <div class="node-icon">
-    <step-icon [name]="icon" [class]="node()?.iconClassName" [matTooltip]="node()?.iconTooltip ?? ''" />
-  </div>
+@if (!_templateContainer.treeNodeNameTemplate()) {
+  @if (node()?.icon; as icon) {
+    <div class="node-icon">
+      <step-icon [name]="icon" [class]="node()?.iconClassName" [matTooltip]="node()?.iconTooltip ?? ''" />
+    </div>
+  }
 }
 @if (!isEditMode()) {
-  @if (templateContainer.treeNodeNameTemplate()?.templateRef; as templateRef) {
+  @if (_templateContainer.treeNodeNameTemplate()?.templateRef; as templateRef) {
     <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: node() }; injector: _injector" />
   } @else {
     {{ node()?.name }}
   }
 }
-<step-form-field [class.hidden]="!isEditMode()">
-  <input #inputElement dynamicInputWidth type="text" (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
-</step-form-field>
+@if (isEditMode()) {
+  <step-form-field>
+    <input
+      #inputElement
+      dynamicInputWidth
+      type="text"
+      (blur)="submitNameChange()"
+      (keydown.enter)="submitNameChange()"
+    />
+  </step-form-field>
+}

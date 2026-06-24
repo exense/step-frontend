@@ -41,6 +41,7 @@ import {
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   GridPersistenceStateService,
+  GridEditableService,
   GRID_ELEMENT_HEADER_ACTIONS,
   IncludeTestcases,
   IS_SMALL_SCREEN,
@@ -197,6 +198,8 @@ export class AltExecutionProgressComponent
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
+  protected readonly activeDrilldownTabId = inject(AltExecutionTabsService).activeDrilldownTabId;
+  protected readonly isLayoutEditMode = inject(GridEditableService).editMode;
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
@@ -589,6 +592,23 @@ export class AltExecutionProgressComponent
           'name',
           (item) => item.singleInstanceReportNode?.name ?? item?.artefact?.attributes?.['name'] ?? '',
         )
+        .addCustomSearchPredicate('nameOrErrors', (item, searchValue) => {
+          const search = searchValue.toLowerCase().trim();
+
+          const errorMessages = Object.keys(item.countByErrorMessage ?? {});
+          const childErrorMessages = Object.keys(item.countByChildrenErrorMessage ?? {});
+
+          const anyErrorMatched =
+            errorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search) ||
+            childErrorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search);
+
+          if (anyErrorMatched) {
+            return true;
+          }
+
+          const name = (item.singleInstanceReportNode?.name ?? item?.artefact?.attributes?.['name'] ?? '').toLowerCase();
+          return name.includes(search);
+        })
         .addSearchStringRegexPredicate('status', (item) =>
           Object.keys(item.countByStatus ?? {})
             .join(' ')

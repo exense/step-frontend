@@ -3,7 +3,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { PaginatorComponent } from '../components/paginator/paginator.component';
 import { ItemsPerPageDefaultService } from '../services/items-per-page-default.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, Observable, of, startWith, switchMap } from 'rxjs';
+import { map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 import { TablePersistenceStateService } from '../services/table-persistence-state.service';
 import { ItemsPerPageService } from '../services/items-per-page.service';
 import { StepPageEvent } from '../types/step-page-event';
@@ -52,9 +52,10 @@ export class TablePartPaginationDirective implements OnDestroy {
       initialPage$ = of(statePage);
     } else {
       this.page?.firstPage?.();
-      initialPage$ = this._itemsPerPageService
-        .getDefaultPageSizeItem()
-        .pipe(map((pageSize) => this.createPageInitialValue(pageSize)));
+      initialPage$ = this._itemsPerPageService.getDefaultPageSizeItem().pipe(
+        tap((pageSize) => this.page?.pageSize?.set?.(pageSize)),
+        map((pageSize) => this.createPageInitialValue(pageSize)),
+      );
     }
 
     if (!this.page) {

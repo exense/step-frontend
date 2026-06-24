@@ -28,17 +28,17 @@ export class ReportNodeIconComponent {
   /** @Input() **/
   readonly roundBox = input(false);
 
-  private artefact = computed(() => {
+  private readonly artefact = computed(() => {
     const node = this.node();
     return (node as ReportNode)?.resolvedArtefact ?? (node as AggregatedReportView)?.artefact ?? undefined;
   });
 
-  private reportNodeStatus = computed(() => {
+  private readonly reportNodeStatus = computed(() => {
     const node = this.node() as ReportNode;
     return node?.status;
   });
 
-  private aggregatedReportViewStatus = computed(() => {
+  private readonly aggregatedReportViewStatus = computed(() => {
     const node = this.node() as AggregatedReportView;
     if (!node?.countByStatus) {
       return undefined;

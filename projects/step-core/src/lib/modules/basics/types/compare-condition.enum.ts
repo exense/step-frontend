@@ -6,7 +6,7 @@ export enum CompareCondition {
   EQUALS = 'Equals',
   AND = 'And',
   FALSE = 'False',
-  FULL_TEXT = 'FullText',
+  FULL_TEXT = 'Fulltext',
   IN = 'In',
   NOT = 'Not',
   OR = 'Or',

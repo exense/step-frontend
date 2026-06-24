@@ -1,13 +1,66 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 step-tree {
   padding-left: 2.4rem;
   padding-bottom: 4rem;
   display: block;
 
+  .virtual-scroll-wrapper {
+    height: var(--style__height);
+    position: relative;
+  }
+
   .virtual-scroll-container {
     width: 100%;
-    height: var(--style__height);
+    height: 100%;
+    position: relative;
+    z-index: 2;
+
+    .cdk-virtual-scroll-content-wrapper {
+      background: var.$white;
+    }
+  }
+
+  .virtual-scroll-skeletons {
+    background: var.$white;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    z-index: 1;
+
+    &::before {
+      border-right: 1px solid var.$gray-100;
+      content: '';
+      height: 100%;
+      left: 1.5rem;
+      position: absolute;
+      top: 0;
+    }
+  }
+
+  .virtual-scroll-skeleton-row {
+    align-items: center;
+    display: flex;
+    height: 4.7rem;
+    padding-left: 3rem;
+    width: 100%;
+
+    > span {
+      @include core.skeleton-background;
+      flex: none;
+
+      &::after {
+        @include core.skeleton-content;
+      }
+    }
+  }
+
+  .virtual-scroll-skeleton-line {
+    height: 2.8rem;
+    max-width: 46rem;
+    width: min(62%, 46rem);
   }
 
   .node-container {

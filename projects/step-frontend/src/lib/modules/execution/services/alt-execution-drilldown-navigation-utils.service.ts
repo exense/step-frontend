@@ -11,6 +11,7 @@ import {
 import { Status } from '../../_common/shared/status.enum';
 import { AbstractArtefact, ReportNodeWithArtefact } from '@exense/step-core';
 import { ALT_EXECUTION_DRILLDOWN_SEGMENTS_LIMIT } from './alt-execution-drilldown-segments-limit.token';
+import { AltExecutionTabsService, STATIC_TABS } from './alt-execution-tabs.service';
 
 export interface DrilldownAggregatedParams {
   searchStatus?: Status;
@@ -24,6 +25,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
   private _activatedRoute = inject(ActivatedRoute);
   private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
   private _segmentsLimit = inject(ALT_EXECUTION_DRILLDOWN_SEGMENTS_LIMIT);
+  private _tabs = inject(AltExecutionTabsService);
 
   getSingleReportNode(data: {
     countByStatus?: Record<string, number>;
@@ -35,6 +37,13 @@ export class AltExecutionDrilldownNavigationUtilsService {
       return singleInstanceReportNode!;
     }
     return undefined;
+  }
+
+  openDrilldownRoot(drilldownRootType: DrilldownRootType): void {
+    this._router.navigate([{ outlets: { nodeDetails: ['node-details', drilldownRootType] } }], {
+      relativeTo: this._nodeDetailsRelativeParent,
+      queryParamsHandling: 'merge',
+    });
   }
 
   openDrilldown(
@@ -53,6 +62,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
       detailsValueId += `;${params?.searchStatus ?? ''};${params?.statusCount ?? ''}`;
     }
     const nodeDetails = ['node-details', drilldownRootType, type, detailsValueId];
+    this._tabs.openDrilldownTab(nodeDetails, queryParams);
     this._router.navigate([{ outlets: { nodeDetails } }], {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParams,
@@ -93,6 +103,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
     if (searchFor) {
       queryParams = { searchFor };
     }
+    this._tabs.updateActiveDrilldownTab(path, queryParams);
 
     const urlTree = this._router.createUrlTree([{ outlets: { nodeDetails: path } }], {
       relativeTo: this._nodeDetailsRelativeParent,
@@ -105,6 +116,17 @@ export class AltExecutionDrilldownNavigationUtilsService {
   }
 
   closeDrilldown(): void {
+    const nextTab = this._tabs.activeDrilldownTabId()
+      ? this._tabs.removeDrilldownTab(this._tabs.activeDrilldownTabId()!)
+      : undefined;
+    if (nextTab) {
+      this._router.navigate([{ outlets: { primary: STATIC_TABS.REPORT, nodeDetails: nextTab.nodeDetailsPath } }], {
+        relativeTo: this._nodeDetailsRelativeParent,
+        queryParams: nextTab.queryParams,
+        queryParamsHandling: 'merge',
+      });
+      return;
+    }
     this._router.navigate([{ outlets: { nodeDetails: null } }], {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParamsHandling: 'merge',

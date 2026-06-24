@@ -81,7 +81,6 @@ import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-n
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
-import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
 import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -203,7 +202,6 @@ import {
 } from './shared/drilldown-stack-item';
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
-import { AltExecutionAnalyticsControlsComponent } from './components/alt-execution-analytics-controls/alt-execution-analytics-controls.component';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
 
 @NgModule({
@@ -243,7 +241,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionProgressComponent,
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
-    AltExecutionReportControlsComponent,
     AltExecutionReportSettingsComponent,
     AltExecutionReportGridSettingsActionComponent,
     AltExecutionAnalyticsComponent,
@@ -318,7 +315,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     ExecutionHistoryNodeTooltipComponent,
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
-    AltExecutionAnalyticsControlsComponent,
     DashletEmptyColumnComponent,
   ],
   imports: [
@@ -383,10 +379,8 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
-    AltExecutionReportControlsComponent,
     AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
-    AltExecutionAnalyticsControlsComponent,
     AltExecutionTreeComponent,
     AltExecutionTreeWidgetComponent,
     AltReportNodeDetailsComponent,
@@ -746,11 +740,6 @@ export class ExecutionModule {
                     component: AltExecutionReportComponent,
                     canDeactivate: [canLeaveComponent],
                   },
-                  {
-                    path: '',
-                    component: AltExecutionReportControlsComponent,
-                    outlet: 'controls',
-                  },
                 ],
               },
             ),
@@ -772,11 +761,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionAnalyticsComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionAnalyticsControlsComponent,
-                  outlet: 'controls',
                 },
               ],
             },

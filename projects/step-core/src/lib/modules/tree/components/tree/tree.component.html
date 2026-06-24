@@ -1,30 +1,41 @@
 @if (hasVirtualScroll()) {
-  <cdk-virtual-scroll-viewport
-    #virtualViewport
-    class="virtual-scroll-container"
-    [style.--style__height]="_stepTreeVirtualScroll!.containerHeight()"
-    orientation="vertical"
-  >
-    <ng-container *cdkVirtualFor="let item of _treeState.flatTree(); trackBy: itemTrackBy">
-      <div
-        draggable="false"
-        (mousedown)="_treeState.selectNode(item, $event, true)"
-        (dblclick)="handleDblClick(item, $event)"
-      >
-        @if (treeNodeTemplate(); as treeNode) {
-          <ng-container
-            *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
-          />
-        } @else {
-          <step-tree-node
-            [class.context-menu-open]="item.id === openedMenuNodeId"
-            [node]="item"
-            (contextMenu)="openContextMenu($event)"
-          />
+  <div class="virtual-scroll-wrapper" [style.--style__height]="_stepTreeVirtualScroll!.containerHeight()">
+    <cdk-virtual-scroll-viewport
+      #virtualViewport
+      class="virtual-scroll-container"
+      orientation="vertical"
+      (scroll)="handleVirtualScrollActivity()"
+    >
+      <ng-container *cdkVirtualFor="let item of _treeState.flatTree(); trackBy: itemTrackBy">
+        <div
+          draggable="false"
+          (mousedown)="_treeState.selectNode(item, $event, true)"
+          (dblclick)="handleDblClick(item, $event)"
+        >
+          @if (treeNodeTemplate(); as treeNode) {
+            <ng-container
+              *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
+            />
+          } @else {
+            <step-tree-node
+              [class.context-menu-open]="item.id === openedMenuNodeId"
+              [node]="item"
+              (contextMenu)="openContextMenu($event)"
+            />
+          }
+        </div>
+      </ng-container>
+    </cdk-virtual-scroll-viewport>
+    @if (showVirtualScrollSkeletons()) {
+      <div class="virtual-scroll-skeletons" aria-hidden="true">
+        @for (row of virtualScrollSkeletonRows; track row) {
+          <div class="virtual-scroll-skeleton-row">
+            <span class="virtual-scroll-skeleton-line"></span>
+          </div>
         }
       </div>
-    </ng-container>
-  </cdk-virtual-scroll-viewport>
+    }
+  </div>
 } @else {
   @for (item of _treeState.flatTree(); track item.id) {
     <div
