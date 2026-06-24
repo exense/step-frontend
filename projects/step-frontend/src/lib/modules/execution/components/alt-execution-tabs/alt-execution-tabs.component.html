@@ -83,10 +83,10 @@
     @if (selectedMenuLayout()?.visibility === 'Preset') {
       <div
         class="layout-readonly-info"
-        matTooltip="Default execution layout can only be changed in step.properties."
+        matTooltip="System layouts are read-only. Duplicate this layout to make your own modifications."
         matTooltipPosition="left"
       >
-        <div class="caption">System layout <step-icon name="help-circle" /></div>
+        <div class="caption">System Layout <step-icon name="help-circle" /></div>
         <div class="sub-title">read-only</div>
       </div>
     } @else if (isForeignSharedLayout()) {
@@ -95,7 +95,7 @@
         matTooltip="This layout belongs to another user and can only be edited by that user."
         matTooltipPosition="left"
       >
-        <div class="caption">Shared layout <step-icon name="help-circle" /></div>
+        <div class="caption">Shared Layout <step-icon name="help-circle" /></div>
         <div class="sub-title">read-only</div>
       </div>
     }
