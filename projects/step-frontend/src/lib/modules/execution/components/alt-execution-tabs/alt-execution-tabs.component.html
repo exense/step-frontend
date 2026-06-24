@@ -80,6 +80,25 @@
   </div>
 
   <mat-menu #layoutMenu="matMenu" class="layout-actions-menu">
+    @if (selectedMenuLayout()?.visibility === 'Preset') {
+      <div
+        class="layout-readonly-info"
+        matTooltip="Default execution layout can only be changed in step.properties."
+        matTooltipPosition="left"
+      >
+        <div class="caption">System layout <step-icon name="help-circle" /></div>
+        <div class="sub-title">read-only</div>
+      </div>
+    } @else if (isForeignSharedLayout()) {
+      <div
+        class="layout-readonly-info"
+        matTooltip="This layout belongs to another user and can only be edited by that user."
+        matTooltipPosition="left"
+      >
+        <div class="caption">Shared layout <step-icon name="help-circle" /></div>
+        <div class="sub-title">read-only</div>
+      </div>
+    }
     <button type="button" mat-menu-item (click)="startEdit()" [disabled]="!canEditLayout()">
       <step-icon name="edit-2" />
       <span>Edit Layout</span>
@@ -88,6 +107,12 @@
       <step-icon name="copy" />
       <span>Duplicate Layout</span>
     </button>
+    @if (isAdmin()) {
+      <button type="button" mat-menu-item (click)="downloadLayout()" [disabled]="!canDownloadLayout()">
+        <step-icon name="download" />
+        <span>Download layout</span>
+      </button>
+    }
     <button type="button" mat-menu-item (click)="deleteLayout()" [disabled]="!canDeleteLayout()">
       <step-icon name="trash-2" />
       <span>Delete Layout</span>

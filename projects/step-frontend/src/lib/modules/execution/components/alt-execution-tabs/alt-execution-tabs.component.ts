@@ -3,8 +3,11 @@ import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import {
   AuthService,
   DialogsService,
+  FileDownloaderService,
   GridEditableService,
   GridPresetListItem,
+  ReportLayoutJson,
+  ReportLayoutService,
   Tab,
   WidgetStatePreset,
   WidgetsPersistenceStateService,
@@ -52,6 +55,8 @@ export class AltExecutionTabsComponent {
   private _gridEditable = inject(GridEditableService);
   private _dialogs = inject(DialogsService);
   private _auth = inject(AuthService);
+  private _reportLayoutApi = inject(ReportLayoutService);
+  private _fileDownloader = inject(FileDownloaderService);
 
   protected readonly layoutPresets = this._widgetsPersistence.gridPresets;
   protected readonly selectedPreset = this._widgetsPersistence.selectedPreset;
@@ -67,6 +72,7 @@ export class AltExecutionTabsComponent {
 
   protected readonly canReadLayouts = computed(() => this.hasPermission('reportLayout-read'));
   protected readonly canCreateLayout = computed(() => this.hasPermission('reportLayout-write'));
+  protected readonly isAdmin = computed(() => this.hasPermission('admin-ui-menu'));
   protected readonly canSaveEdit = computed(() => !!this.editState()?.name.trim());
 
   protected readonly tabs = computed<ExecutionViewTab[]>(() => {
@@ -253,6 +259,16 @@ export class AltExecutionTabsComponent {
       });
   }
 
+  protected downloadLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
+    if (!layout || !this.canDownloadLayout(layout)) {
+      return;
+    }
+    this._reportLayoutApi
+      .exportLayout(layout.key)
+      .pipe(take(1))
+      .subscribe((layoutJson) => this.downloadLayoutJson(layout, layoutJson));
+  }
+
   protected updateEditName(name: string): void {
     this.editState.update((state) => (state ? { ...state, name } : state));
   }
@@ -303,11 +319,8 @@ export class AltExecutionTabsComponent {
   }
 
   protected canEditLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
-    if (!layout || layout.visibility === 'Preset') {
+    if (!layout || layout.visibility === 'Preset' || this.isForeignLayout(layout)) {
       return false;
-    }
-    if (this.isForeignSharedLayout(layout)) {
-      return this.hasPermission('reportLayout-shared-write');
     }
     return this.hasPermission('reportLayout-write');
   }
@@ -320,6 +333,10 @@ export class AltExecutionTabsComponent {
       return this.hasPermission('reportLayout-shared-delete');
     }
     return this.hasPermission('reportLayout-delete');
+  }
+
+  protected canDownloadLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+    return !!layout && this.isAdmin() && this.canReadLayouts();
   }
 
   private restorePreviousTarget(previousTarget?: PreviousTarget): void {
@@ -418,9 +435,28 @@ export class AltExecutionTabsComponent {
     return !permission || this._auth.hasRight(permission);
   }
 
-  private isForeignSharedLayout(layout: GridPresetListItem): boolean {
+  private downloadLayoutJson(layout: GridPresetListItem, layoutJson: ReportLayoutJson): void {
+    const blob = new Blob([JSON.stringify(layoutJson, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    this._fileDownloader.download(url, this.getLayoutDownloadFileName(layout, layoutJson));
+    setTimeout(() => URL.revokeObjectURL(url));
+  }
+
+  private getLayoutDownloadFileName(layout: GridPresetListItem, layoutJson: ReportLayoutJson): string {
+    const name = layoutJson.name || layout.value || 'execution-layout';
+    const safeName = name.trim().replace(/[^a-zA-Z0-9._-]+/g, '_') || 'execution-layout';
+    return `${safeName}.json`;
+  }
+
+  protected isForeignSharedLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
     return (
-      layout.visibility === 'Shared' && !!this._auth.isAuthenticated() && layout.creationUser !== this._auth.getUserID()
+      layout?.visibility === 'Shared' &&
+      !!this._auth.isAuthenticated() &&
+      layout.creationUser !== this._auth.getUserID()
     );
+  }
+
+  protected isForeignLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+    return !!layout?.creationUser && !!this._auth.isAuthenticated() && layout.creationUser !== this._auth.getUserID();
   }
 }
