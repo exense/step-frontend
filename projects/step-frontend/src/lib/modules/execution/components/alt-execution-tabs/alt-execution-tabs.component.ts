@@ -73,6 +73,10 @@ export class AltExecutionTabsComponent {
   protected readonly canReadLayouts = computed(() => this.hasPermission('reportLayout-read'));
   protected readonly canCreateLayout = computed(() => this.hasPermission('reportLayout-write'));
   protected readonly isAdmin = computed(() => this.hasPermission('admin-ui-menu'));
+  protected readonly isSelectedMenuLayoutForeignShared = computed(() =>
+    this.isForeignSharedLayout(this.selectedMenuLayout()),
+  );
+  protected readonly canDownloadSelectedMenuLayout = computed(() => this.canDownloadLayout(this.selectedMenuLayout()));
   protected readonly canSaveEdit = computed(() => !!this.editState()?.name.trim());
 
   protected readonly tabs = computed<ExecutionViewTab[]>(() => {
@@ -435,15 +439,15 @@ export class AltExecutionTabsComponent {
     return !permission || this._auth.hasRight(permission);
   }
 
-  private downloadLayoutJson(layout: GridPresetListItem, layoutJson: ReportLayoutJson): void {
-    const blob = new Blob([JSON.stringify(layoutJson, null, 2)], { type: 'application/json' });
+  private downloadLayoutJson(layout: GridPresetListItem, layoutJson?: ReportLayoutJson): void {
+    const blob = new Blob([JSON.stringify(layoutJson ?? {}, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     this._fileDownloader.download(url, this.getLayoutDownloadFileName(layout, layoutJson));
     setTimeout(() => URL.revokeObjectURL(url));
   }
 
-  private getLayoutDownloadFileName(layout: GridPresetListItem, layoutJson: ReportLayoutJson): string {
-    const name = layoutJson.name || layout.value || 'execution-layout';
+  private getLayoutDownloadFileName(layout: GridPresetListItem, layoutJson?: ReportLayoutJson): string {
+    const name = layoutJson?.name || layout.value || 'execution-layout';
     const safeName = name.trim().replace(/[^a-zA-Z0-9._-]+/g, '_') || 'execution-layout';
     return `${safeName}.json`;
   }

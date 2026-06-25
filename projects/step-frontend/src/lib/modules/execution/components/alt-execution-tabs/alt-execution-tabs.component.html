@@ -89,7 +89,7 @@
         <div class="caption">System Layout <step-icon name="help-circle" /></div>
         <div class="sub-title">read-only</div>
       </div>
-    } @else if (isForeignSharedLayout()) {
+    } @else if (isSelectedMenuLayoutForeignShared()) {
       <div
         class="layout-readonly-info"
         matTooltip="This layout belongs to another user and can only be edited by that user."
@@ -108,7 +108,7 @@
       <span>Duplicate Layout</span>
     </button>
     @if (isAdmin()) {
-      <button type="button" mat-menu-item (click)="downloadLayout()" [disabled]="!canDownloadLayout()">
+      <button type="button" mat-menu-item (click)="downloadLayout()" [disabled]="!canDownloadSelectedMenuLayout()">
         <step-icon name="download" />
         <span>Download layout</span>
       </button>
