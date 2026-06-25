@@ -34,7 +34,7 @@
     <step-tabs tabMode="tabs" [tabs]="tabs()" [activeTabId]="activeTabId()" (activeTabIdChange)="selectTab($event)">
       <div *stepTabTemplate="let tab" class="tab-content">
         @switch (tab.type) {
-          @case ('layout') {
+          @case (ExecutionViewTabType.LAYOUT) {
             <span class="tab-label">{{ tab.label }}</span>
             <span class="tab-action-slot" (click)="$event.stopPropagation()">
               <step-icon
@@ -47,10 +47,10 @@
               />
             </span>
           }
-          @case ('performance') {
+          @case (ExecutionViewTabType.PERFORMANCE) {
             <span class="tab-label">{{ tab.label }}</span>
           }
-          @case ('drilldown') {
+          @case (ExecutionViewTabType.DRILLDOWN) {
             <span class="tab-label">{{ tab.label }}</span>
             <span class="tab-action-slot tab-close-slot">
               <step-icon

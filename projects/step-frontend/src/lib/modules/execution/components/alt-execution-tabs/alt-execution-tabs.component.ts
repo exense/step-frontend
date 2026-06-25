@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, untracked, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import {
   AuthService,
@@ -16,9 +16,17 @@ import { filter, map, Observable, of, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, DrilldownExecutionTab, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 
-type EditMode = 'create' | 'edit' | 'duplicate';
+enum EditMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+  DUPLICATE = 'duplicate',
+}
 
-type ExecutionViewTabType = 'layout' | 'performance' | 'drilldown';
+enum ExecutionViewTabType {
+  LAYOUT = 'layout',
+  PERFORMANCE = 'performance',
+  DRILLDOWN = 'drilldown',
+}
 
 interface ExecutionViewTab extends Tab<string> {
   type: ExecutionViewTabType;
@@ -27,7 +35,7 @@ interface ExecutionViewTab extends Tab<string> {
 }
 
 interface PreviousTarget {
-  type: 'layout' | 'performance' | 'drilldown';
+  type: ExecutionViewTabType;
   id?: string;
 }
 
@@ -66,46 +74,71 @@ export class AltExecutionTabsComponent {
   protected readonly editState = signal<LayoutEditState | undefined>(undefined);
   protected readonly currentUrl = signal(this._router.url);
 
-  protected readonly isPerformanceActive = computed(
-    () => this.currentUrl().includes(`/${STATIC_TABS.ANALYTICS}`) && !this.activeDrilldownTabId(),
-  );
+  protected readonly isPerformanceActive = computed(() => {
+    const currentUrl = this.currentUrl();
+    const activeDrilldownTabId = this.activeDrilldownTabId();
+    return currentUrl.includes(`/${STATIC_TABS.ANALYTICS}`) && !activeDrilldownTabId;
+  });
 
   protected readonly canReadLayouts = computed(() => this.hasPermission('reportLayout-read'));
   protected readonly canCreateLayout = computed(() => this.hasPermission('reportLayout-write'));
   protected readonly isAdmin = computed(() => this.hasPermission('admin-ui-menu'));
-  protected readonly isSelectedMenuLayoutForeignShared = computed(() =>
-    this.isForeignSharedLayout(this.selectedMenuLayout()),
-  );
-  protected readonly canDownloadSelectedMenuLayout = computed(() => this.canDownloadLayout(this.selectedMenuLayout()));
+  protected readonly canDownloadLayout = computed(() => {
+    const isAdmin = this.isAdmin();
+    const canReadLayouts = this.canReadLayouts();
+    return isAdmin || canReadLayouts;
+  });
+  protected readonly isSelectedMenuLayoutForeignShared = computed(() => {
+    const layout = this.selectedMenuLayout();
+    return !!layout && this.isForeignSharedLayout(layout);
+  });
+  protected readonly canDownloadSelectedMenuLayout = computed(() => {
+    const layout = this.selectedMenuLayout();
+    const canDownloadLayout = this.canDownloadLayout();
+    return !!layout && !!canDownloadLayout;
+  });
+
   protected readonly canSaveEdit = computed(() => !!this.editState()?.name.trim());
 
   protected readonly tabs = computed<ExecutionViewTab[]>(() => {
-    const layoutTabs: ExecutionViewTab[] = !this.canReadLayouts()
-      ? []
-      : this.layoutPresets().map((layout) => ({
-          id: layout.key,
-          label: layout.value,
-          type: 'layout',
-          layout,
-        }));
-    const drilldownTabs: ExecutionViewTab[] = this.drilldownTabs().map((drilldown) => ({
+    const canReadLayouts = this.canReadLayouts();
+    const layoutPresets = this.layoutPresets();
+    const drilldownExecutionTabs = this.drilldownTabs();
+
+    const layoutTabs: ExecutionViewTab[] = (!canReadLayouts ? [] : layoutPresets).map((layout) => ({
+      id: layout.key,
+      label: layout.value,
+      type: ExecutionViewTabType.LAYOUT,
+      layout,
+    }));
+
+    const performanceTab: ExecutionViewTab = {
+      id: STATIC_TABS.ANALYTICS,
+      label: 'Performance',
+      type: ExecutionViewTabType.PERFORMANCE,
+    };
+
+    const drilldownTabs: ExecutionViewTab[] = drilldownExecutionTabs.map((drilldown) => ({
       id: drilldown.id,
       label: drilldown.label,
-      type: 'drilldown',
+      type: ExecutionViewTabType.DRILLDOWN,
       drilldown,
     }));
-    return [...layoutTabs, { id: STATIC_TABS.ANALYTICS, label: 'Performance', type: 'performance' }, ...drilldownTabs];
+
+    return [...layoutTabs, performanceTab, ...drilldownTabs];
   });
 
   protected readonly activeTabId = computed<string | undefined>(() => {
     const drilldownId = this.activeDrilldownTabId();
+    const isPerformanceActive = this.isPerformanceActive();
+    const selectedPreset = this.selectedPreset();
     if (drilldownId) {
       return drilldownId;
     }
-    if (this.isPerformanceActive()) {
+    if (isPerformanceActive) {
       return STATIC_TABS.ANALYTICS;
     }
-    return this.selectedPreset()?.id;
+    return selectedPreset?.id;
   });
 
   constructor() {
@@ -125,13 +158,13 @@ export class AltExecutionTabsComponent {
   protected selectTab(id: string): void {
     const tab = this.tabs().find((item) => item.id === id);
     switch (tab?.type) {
-      case 'layout':
+      case ExecutionViewTabType.LAYOUT:
         this.selectLayout(tab.layout!);
         break;
-      case 'performance':
+      case ExecutionViewTabType.PERFORMANCE:
         this.selectPerformance();
         break;
-      case 'drilldown':
+      case ExecutionViewTabType.DRILLDOWN:
         this.selectDrilldown(tab.drilldown!);
         break;
     }
@@ -199,12 +232,16 @@ export class AltExecutionTabsComponent {
       visibility: 'Private',
       layout: { widgets: [] } as WidgetStatePreset['layout'],
     });
-    this.editState.set({ mode: 'create', name: '', isShared: false, originalIsShared: false, previousTarget });
+    this.editState.set({ mode: EditMode.CREATE, name: '', isShared: false, originalIsShared: false, previousTarget });
     this._gridEditable.setEditMode(true);
     this.navigateToReport();
   }
 
-  protected startEdit(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
+  private get defaultMenuLayout(): GridPresetListItem | undefined {
+    return untracked(() => this.selectedMenuLayout());
+  }
+
+  protected startEdit(layout = this.defaultMenuLayout): void {
     if (!layout || !this.canEditLayout(layout)) {
       return;
     }
@@ -217,7 +254,7 @@ export class AltExecutionTabsComponent {
           return;
         }
         this.editState.set({
-          mode: 'edit',
+          mode: EditMode.EDIT,
           name: preset.attributes?.['name'] ?? layout.value,
           isShared: preset.visibility === 'Shared',
           originalIsShared: preset.visibility === 'Shared',
@@ -228,7 +265,7 @@ export class AltExecutionTabsComponent {
       });
   }
 
-  protected startDuplicate(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
+  protected startDuplicate(layout = this.defaultMenuLayout): void {
     if (!layout || !this.canCreateLayout()) {
       return;
     }
@@ -239,7 +276,7 @@ export class AltExecutionTabsComponent {
       .subscribe((preset) => this.initializeDuplicatePreset(layout, previousTarget, preset));
   }
 
-  protected deleteLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
+  protected deleteLayout(layout = this.defaultMenuLayout): void {
     if (!layout || !this.canDeleteLayout(layout)) {
       return;
     }
@@ -263,8 +300,8 @@ export class AltExecutionTabsComponent {
       });
   }
 
-  protected downloadLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): void {
-    if (!layout || !this.canDownloadLayout(layout)) {
+  protected downloadLayout(layout = this.defaultMenuLayout): void {
+    if (!layout || !this.canDownloadLayout()) {
       return;
     }
     this._reportLayoutApi
@@ -322,14 +359,14 @@ export class AltExecutionTabsComponent {
     });
   }
 
-  protected canEditLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+  protected canEditLayout(layout = this.defaultMenuLayout): boolean {
     if (!layout || layout.visibility === 'Preset' || this.isForeignLayout(layout)) {
       return false;
     }
     return this.hasPermission('reportLayout-write');
   }
 
-  protected canDeleteLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+  protected canDeleteLayout(layout = this.defaultMenuLayout): boolean {
     if (!layout || layout.visibility === 'Preset') {
       return false;
     }
@@ -339,23 +376,19 @@ export class AltExecutionTabsComponent {
     return this.hasPermission('reportLayout-delete');
   }
 
-  protected canDownloadLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
-    return !!layout && this.isAdmin() && this.canReadLayouts();
-  }
-
   private restorePreviousTarget(previousTarget?: PreviousTarget): void {
-    if (previousTarget?.type === 'performance') {
+    if (previousTarget?.type === ExecutionViewTabType.PERFORMANCE) {
       this.selectPerformance();
       return;
     }
-    if (previousTarget?.type === 'drilldown' && previousTarget.id) {
+    if (previousTarget?.type === ExecutionViewTabType.DRILLDOWN && previousTarget.id) {
       const tab = this._tabsService.activateDrilldownTab(previousTarget.id);
       if (tab) {
         this.navigateToDrilldown(tab);
         return;
       }
     }
-    const presetId = previousTarget?.type === 'layout' ? previousTarget.id : undefined;
+    const presetId = previousTarget?.type === ExecutionViewTabType.LAYOUT ? previousTarget.id : undefined;
     const layout =
       this.layoutPresets().find((item) => item.key === presetId) ??
       this.layoutPresets().find((item) => item.key === this.selectedPreset()?.id) ??
@@ -391,7 +424,7 @@ export class AltExecutionTabsComponent {
     };
     this._widgetsPersistence.selectLocalPreset(duplicatedPreset);
     const isShared = preset.visibility === 'Shared';
-    this.editState.set({ mode: 'duplicate', name, isShared, originalIsShared: false, previousTarget });
+    this.editState.set({ mode: EditMode.DUPLICATE, name, isShared, originalIsShared: false, previousTarget });
     this._gridEditable.setEditMode(true);
     this.navigateToReport();
   }
@@ -412,12 +445,12 @@ export class AltExecutionTabsComponent {
   private getCurrentTarget(): PreviousTarget {
     const activeDrilldownId = this.activeDrilldownTabId();
     if (activeDrilldownId) {
-      return { type: 'drilldown', id: activeDrilldownId };
+      return { type: ExecutionViewTabType.DRILLDOWN, id: activeDrilldownId };
     }
     if (this.isPerformanceActive()) {
-      return { type: 'performance' };
+      return { type: ExecutionViewTabType.PERFORMANCE };
     }
-    return { type: 'layout', id: this.selectedPreset()?.id };
+    return { type: ExecutionViewTabType.LAYOUT, id: this.selectedPreset()?.id };
   }
 
   private navigateToReport(): void {
@@ -440,19 +473,16 @@ export class AltExecutionTabsComponent {
   }
 
   private downloadLayoutJson(layout: GridPresetListItem, layoutJson?: ReportLayoutJson): void {
-    const blob = new Blob([JSON.stringify(layoutJson ?? {}, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    this._fileDownloader.download(url, this.getLayoutDownloadFileName(layout, layoutJson));
-    setTimeout(() => URL.revokeObjectURL(url));
+    const name = layoutJson?.name || layout?.value;
+    const safeName = name?.trim?.().replace?.(/[^a-zA-Z0-9._-]+/g, '_') || 'execution-layout';
+    const finalName = `${safeName}.json`;
+
+    const jsonData = JSON.stringify(layoutJson ?? {}, null, 2);
+
+    this._fileDownloader.downloadJson(jsonData, finalName);
   }
 
-  private getLayoutDownloadFileName(layout: GridPresetListItem, layoutJson?: ReportLayoutJson): string {
-    const name = layoutJson?.name || layout.value || 'execution-layout';
-    const safeName = name.trim().replace(/[^a-zA-Z0-9._-]+/g, '_') || 'execution-layout';
-    return `${safeName}.json`;
-  }
-
-  protected isForeignSharedLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+  protected isForeignSharedLayout(layout = this.defaultMenuLayout): boolean {
     return (
       layout?.visibility === 'Shared' &&
       !!this._auth.isAuthenticated() &&
@@ -460,7 +490,9 @@ export class AltExecutionTabsComponent {
     );
   }
 
-  protected isForeignLayout(layout: GridPresetListItem | undefined = this.selectedMenuLayout()): boolean {
+  protected isForeignLayout(layout = this.defaultMenuLayout): boolean {
     return !!layout?.creationUser && !!this._auth.isAuthenticated() && layout.creationUser !== this._auth.getUserID();
   }
+
+  protected readonly ExecutionViewTabType = ExecutionViewTabType;
 }
