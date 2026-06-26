@@ -1,0 +1,22 @@
+div[step-modal-window-body] {
+  display: flex;
+  flex-direction: column;
+  height: 40rem;
+  gap: 1rem;
+}
+
+.folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  button {
+    min-height: 3rem;
+    justify-content: flex-start;
+    &:not(.selected) step-icon {
+      visibility: hidden;
+    }
+  }
+}

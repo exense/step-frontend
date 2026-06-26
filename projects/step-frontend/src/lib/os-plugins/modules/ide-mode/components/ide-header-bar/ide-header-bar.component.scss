@@ -1,0 +1,14 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  padding: .5rem 0;
+  gap: 1rem;
+  display: flex;
+}
+
+button {
+  step-icon,
+  span {
+    color: var.$white;
+  }
+}

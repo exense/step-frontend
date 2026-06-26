@@ -18,6 +18,7 @@ export { ApiError } from './generated/core/ApiError';
 export * from './generated/index';
 export * from './async-task/async-task.module';
 export * from './augmented';
+export * from './ide-generated'
 export { provideLazyLoadedInterceptor, LAZY_LOAD_INTERCEPTORS } from './augmented/interceptros/lazy-loaded.interceptor';
 export * from './table';
 export * from './_common';

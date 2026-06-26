@@ -1,0 +1,36 @@
+<step-modal-window title="Select Folder">
+  <div step-modal-window-body>
+    @if (currentPath()) {
+      <mat-chip-listbox aria-label="Current path">
+        @for (path of pathSegments(); track $index) {
+          <mat-chip
+            (click)="navigateTo($index)">
+            {{ path }}
+          </mat-chip>
+        }
+      </mat-chip-listbox>
+    }
+
+    <div class="folder-list">
+      @for (item of items(); track item.absolutePath) {
+        @if (item.isDirectory && !item.isHidden) {
+          <button
+            mat-button
+            [class.selected]="selectedFolder() === item.absolutePath"
+            (click)="onSelectFolder(item.absolutePath)"
+            (dblclick)="onLoadSubfolder(item.absolutePath)">
+              <step-icon name="check"/>
+              {{ item.name }}
+          </button>
+        }
+      }
+    </div>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="_dialogRef.close(null)">Cancel</button>
+    <button type="button" mat-stroked-button (click)="onCreateFolder()">Create Folder</button>
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!selectedFolder()">
+      Select
+    </button>
+  </div>
+</step-modal-window>

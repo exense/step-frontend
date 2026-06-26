@@ -58,12 +58,12 @@
               },
               {
                 "glob": "**/*",
-                "input": "../node_modules/playwright-core/lib/vite/traceViewer",
+                "input": "node_modules/playwright-core/lib/vite/traceViewer",
                 "output": "/trace-viewer"
               },
               {
                 "glob": "worker-javascript.js",
-                "input": "../node_modules/ace-builds/src-min-noconflict",
+                "input": "node_modules/ace-builds/src-min-noconflict",
                 "output": "/"
               },
               {
@@ -72,8 +72,8 @@
                 "output": "/"
               }
             ],
-            "styles": ["projects/step-app/src/styles.scss", "../node_modules/uplot/dist/uPlot.min.css"],
-            "scripts": ["../node_modules/uplot/dist/uPlot.iife.min.js"],
+            "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
+            "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
             "allowedCommonJsDependencies": ["@angular-architects/module-federation", "ace-builds", "luxon"]
@@ -113,17 +113,19 @@
               "sourceMap": true,
               "namedChunks": true
             },
-            "development-cli": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true,
+            "dev-ide": {
               "fileReplacements": [
                 {
                   "replace": "projects/step-app/src/environments/environment.ts",
-                  "with": "projects/step-app/src/environments/environment.cli.ts"
+                  "with": "projects/step-app/src/environments/environment.ide.ts"
+                }
+              ]
+            },
+            "prod-ide": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/step-app/src/environments/environment.ts",
+                  "with": "projects/step-app/src/environments/environment.ide.prod.ts"
                 }
               ]
             }
@@ -137,7 +139,7 @@
               "buildTarget": "@exense/step-app:build:production",
               "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
             },
-            "development": {
+            "dev": {
               "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
@@ -145,12 +147,12 @@
               "buildTarget": "@exense/step-app:build:development",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             },
-            "cli": {
-              "buildTarget": "@exense/step-app:build:development-cli",
+            "ide": {
+              "buildTarget": "@exense/step-app:build:development,dev-ide",
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
-            "local-cli": {
-              "buildTarget": "@exense/step-app:build:development-cli",
+            "local-ide": {
+              "buildTarget": "@exense/step-app:build:development,dev-ide",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },
