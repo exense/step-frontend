@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostListener, inject, viewChild } from '@angular/core';
+import { Component, DestroyRef, inject, viewChild } from '@angular/core';
 import { AugmentedScreenService, DialogRouteResult, Input as SInput, ReloadableDirective } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
@@ -16,6 +16,9 @@ type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>
   templateUrl: './screen-input-edit-dialog.component.html',
   styleUrls: ['./screen-input-edit-dialog.component.scss'],
   hostDirectives: [ReloadableDirective],
+  host: {
+    '(keydown.enter)': 'save()',
+  },
   standalone: false,
 })
 export class ScreenInputEditDialogComponent {
@@ -38,7 +41,6 @@ export class ScreenInputEditDialogComponent {
 
   private readonly attributeInput = viewChild<NgModel>('attributeInput');
 
-  @HostListener('keydown.enter')
   protected save(): void {
     const attributeInput = this.attributeInput();
     if (attributeInput?.invalid) {
