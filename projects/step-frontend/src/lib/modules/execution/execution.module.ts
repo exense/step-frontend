@@ -636,6 +636,7 @@ export class ExecutionModule {
         {
           path: '',
           redirectTo: 'list',
+          pathMatch: 'full',
         },
         {
           path: 'list',
@@ -680,6 +681,12 @@ export class ExecutionModule {
               }),
               altExecutionGuard,
             ]),
+            () => {
+              const _ctx = inject(AggregatedReportViewTreeStateContextService);
+              const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+              _ctx.setState(_treeState);
+              return true;
+            },
           ],
           resolve: {
             setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
@@ -702,6 +709,7 @@ export class ExecutionModule {
             {
               path: '',
               redirectTo: 'report',
+              pathMatch: 'full',
             },
             {
               /**
