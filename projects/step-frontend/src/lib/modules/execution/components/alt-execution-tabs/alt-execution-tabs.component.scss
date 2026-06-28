@@ -165,13 +165,6 @@ step-alt-execution-tabs {
     opacity: 1;
   }
 
-  .layout-actions-menu {
-    .mat-mdc-menu-item,
-    .mat-mdc-menu-item .mdc-list-item__primary-text {
-      font-weight: 500;
-    }
-  }
-
   .add-layout-button {
     flex: 0 0 3.6rem;
     width: 3.6rem;
@@ -226,5 +219,33 @@ step-alt-execution-tabs {
 
   @media print {
     display: none;
+  }
+}
+
+.layout-actions-menu {
+  .layout-readonly-info {
+    box-sizing: border-box;
+    padding: 1.2rem 1.6rem 0.6rem 2rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    cursor: help;
+    border-bottom: 1px solid var.$gray-100;
+
+    div.caption {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    div.sub-title {
+      margin-top: 0.1rem;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var.$gray-500;
+    }
+  }
+
+  .mat-mdc-menu-item,
+  .mat-mdc-menu-item .mdc-list-item__primary-text {
+    font-weight: 500;
   }
 }
