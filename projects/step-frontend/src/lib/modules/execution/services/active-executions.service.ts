@@ -16,6 +16,8 @@ import { catchError } from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
+type LoadedExecutionOverview = ExecutionOverview & { execution: Execution };
+
 export interface ActiveExecution {
   readonly executionId: string;
   readonly execution$: Observable<Execution>;
@@ -97,9 +99,10 @@ class ActiveExecutionImpl implements ActiveExecution {
         }),
       )
       .subscribe((overview) => {
-        const execution = overview.execution;
+        const loadedOverview = requireExecution(overview);
+        const execution = loadedOverview.execution;
         this.executionInternal$.next(execution);
-        this.noticesInternal$.next(overview.resolvedNotices ?? []);
+        this.noticesInternal$.next(loadedOverview.resolvedNotices ?? []);
         if (execution.status === 'ENDED') {
           this.autoRefreshModel.setDisabled(true);
           this.autoRefreshModel.setInterval(0);
@@ -147,8 +150,9 @@ class ActiveExecutionImpl implements ActiveExecution {
 
   manualRefresh(): void {
     this.loadOverview(this.executionId).subscribe((overview) => {
-      this.executionInternal$.next(overview.execution);
-      this.noticesInternal$.next(overview.resolvedNotices ?? []);
+      const loadedOverview = requireExecution(overview);
+      this.executionInternal$.next(loadedOverview.execution);
+      this.noticesInternal$.next(loadedOverview.resolvedNotices ?? []);
       this.timeRangeSelectionInternal$.next(this.timeRangeSelectionInternal$.value);
     });
   }
@@ -160,6 +164,13 @@ class ActiveExecutionImpl implements ActiveExecution {
   updateCompareModeEnabled(enabled: boolean): void {
     this.performanceTabSettings.compareModeEnabled = enabled;
   }
+}
+
+function requireExecution(overview: ExecutionOverview): LoadedExecutionOverview {
+  if (!overview.execution) {
+    throw new Error('Execution overview response does not include an execution.');
+  }
+  return overview as LoadedExecutionOverview;
 }
 
 @Injectable()

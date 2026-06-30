@@ -2,13 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import {
   AsyncTaskStatusTableBulkOperationReport,
   Execution,
+  ExecutionOverview,
   ExecutionParameters,
   ExecutionsService,
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { ExecutionOverview } from '../models/execution-overview';
-import { ResolvedExecutionNotice } from '../models/resolved-execution-notice';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
@@ -49,7 +48,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
    * route deactivation via cleanupCache().
    */
   getExecutionOverviewCached(id: string): Observable<ExecutionOverview> {
-    if (this.cachedOverview && this.cachedOverview.execution.id === id) {
+    if (this.cachedOverview && this.cachedOverview.execution?.id === id) {
       return of(this.cachedOverview);
     }
     return this.getExecutionOverview(id).pipe(tap((overview) => (this.cachedOverview = overview)));
@@ -57,7 +56,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
 
   /** Like getExecutionOverviewCached, but exposes only the execution (for guards / entity checks). */
   getExecutionViaOverviewCached(id: string): Observable<Execution> {
-    return this.getExecutionOverviewCached(id).pipe(map((overview) => overview.execution));
+    return this.getExecutionOverviewCached(id).pipe(map((overview) => this.getOverviewExecution(overview)));
   }
 
   cleanupCache(): void {
@@ -121,32 +120,6 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     );
   }
 
-  /**
-   * Returns the execution together with its resolved notices, for the overview page.
-   */
-  getExecutionOverview(id: string): Observable<ExecutionOverview> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/executions/{id}/overview',
-      path: {
-        id: id,
-      },
-    });
-  }
-
-  /**
-   * Returns the resolved notices of the execution with the given execution id.
-   */
-  getExecutionNotices(id: string): Observable<ResolvedExecutionNotice[]> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/executions/{id}/notices',
-      path: {
-        id: id,
-      },
-    });
-  }
-
   searchByIds(executionIds: string[]): Observable<Execution[]> {
     const idsFilter: TableCollectionFilter = {
       collectionFilter: {
@@ -188,5 +161,12 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
         false,
       )
       .pipe(map((response) => response.data.length || 0));
+  }
+
+  private getOverviewExecution(overview: ExecutionOverview): Execution {
+    if (!overview.execution) {
+      throw new Error('Execution overview response does not include an execution.');
+    }
+    return overview.execution;
   }
 }

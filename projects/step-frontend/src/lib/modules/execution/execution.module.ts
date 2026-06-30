@@ -176,6 +176,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { NoticeBadgeLabelPipe } from './pipes/notice-badge-label.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
@@ -318,6 +319,7 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
     DashletEmptyColumnComponent,
+    NoticeBadgeLabelPipe,
   ],
   imports: [
     StepCommonModule,
@@ -856,7 +858,7 @@ export class ExecutionModule {
                   resolve: {
                     drilldownState: (route: ActivatedRouteSnapshot) => {
                       const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
-                      const resolvedPartialPath = _aggregatedViewTreeStateContext.getState().resolvedPartialPath();
+                      const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
 
                       const url = route.url;
 
@@ -896,7 +898,7 @@ export class ExecutionModule {
                             nodeId,
                             searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
                             searchStatusCount,
-                            resolvedPartialPath,
+                            partialTreeRootNodeId,
                           });
                         }
                       }

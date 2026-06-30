@@ -72,7 +72,7 @@
             [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
           >
             <step-icon name="bell" />
-            @if (noticeBadgeLabel(notices.length); as noticeBadgeLabel) {
+            @if (notices.length | noticeBadgeLabel; as noticeBadgeLabel) {
               <span class="dot">
                 <span class="unread-messages">
                   {{ noticeBadgeLabel }}

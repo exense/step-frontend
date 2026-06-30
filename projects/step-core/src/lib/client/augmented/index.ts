@@ -1,6 +1,4 @@
 export type { ExecutionSummaryDto } from './models/execution-summary-dto';
-export type { ResolvedExecutionNotice, ExecutionNoticeSeverity } from './models/resolved-execution-notice';
-export type { ExecutionOverview } from './models/execution-overview';
 export type { AugmentedTokenWrapperOwner } from './models/augmented-token-wrapper-owner';
 export type { AugmentedPlan } from './models/augmented-plan';
 export { AugmentedPlansService } from './services/augmented-plans.service';

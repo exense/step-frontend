@@ -275,13 +275,6 @@ export class AltExecutionProgressComponent
     this.updateTimeRangeSelection(selection);
   }
 
-  protected noticeBadgeLabel(count: number): string {
-    if (count === 0) {
-      return '';
-    }
-    return count < 10 ? count.toString() : '+';
-  }
-
   readonly executionPlan$ = this.execution$.pipe(
     map((execution) => execution.planId),
     switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
@@ -556,7 +549,7 @@ export class AltExecutionProgressComponent
         ),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+      .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
@@ -564,7 +557,7 @@ export class AltExecutionProgressComponent
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
         this.isTreeInitialized = true;
       });
 
@@ -620,7 +613,11 @@ export class AltExecutionProgressComponent
             return true;
           }
 
-          const name = (item.singleInstanceReportNode?.name ?? item?.artefact?.attributes?.['name'] ?? '').toLowerCase();
+          const name = (
+            item.singleInstanceReportNode?.name ??
+            item?.artefact?.attributes?.['name'] ??
+            ''
+          ).toLowerCase();
           return name.includes(search);
         })
         .addSearchStringRegexPredicate('status', (item) =>
