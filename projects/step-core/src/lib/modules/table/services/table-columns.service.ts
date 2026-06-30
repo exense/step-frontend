@@ -48,7 +48,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   readonly entityScreenSubPath = this._columnsConfig?.entityScreenSubPath;
   readonly customColumnOptions = this._columnsConfig?.customColumnOptions;
 
-  private entityTableRemoteId = signal(
+  private readonly entityTableRemoteId = signal(
     !this._columnsConfig?.entityTableRemoteId ? undefined : new String(this._columnsConfig.entityTableRemoteId),
   );
   private readonly settingsReloadVersion = signal(0);
@@ -292,21 +292,42 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     const defaultColumnKeys = new Set((defaultTableSettings.columnSettingList ?? []).map((col) => col.columnId));
     const actionColumnKeys = new Set(actionColumnIds);
 
-    // Remove columns from settings, that was deleted
-    // Also remove action columns from remote settings, because remote settings position might be wrong
-    // in case if new custom columns have been added
-    remoteTableSettings.columnSettingList = (remoteTableSettings.columnSettingList ?? []).filter(
-      (col) => defaultColumnKeys.has(col.columnId) && !actionColumnKeys.has(col.columnId!),
-    );
+    /*
+      Remove columns from settings, that was deleted
+      Also remove action columns from remote settings, because remote settings position might be wrong
+      in case if new custom columns have been added
+     */
+    const columnSettingList = (remoteTableSettings.columnSettingList ?? [])
+      .filter((col) => defaultColumnKeys.has(col.columnId) && !actionColumnKeys.has(col.columnId!))
+      .map((col) => ({ ...col }));
 
-    // Add new columns
-    const removeColumnsKey = new Set(remoteTableSettings.columnSettingList.map((col) => col.columnId));
+    /*
+      Add new columns at their default positions and shift the saved positions accordingly.
+      This keeps hardcoded columns from being pushed after columns persisted in the BE
+    */
+    const removeColumnsKey = new Set(columnSettingList.map((col) => col.columnId));
     const columnsToAdd = (defaultTableSettings.columnSettingList ?? []).filter(
       (col) => !removeColumnsKey.has(col.columnId),
     );
 
-    remoteTableSettings.columnSettingList = remoteTableSettings.columnSettingList.concat(columnsToAdd);
+    columnSettingList.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    columnSettingList.forEach((col, i) => (col.position = i));
+    columnsToAdd
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+      .forEach((colToAdd) => {
+        const insertPosition = Math.min(colToAdd.position ?? columnSettingList.length, columnSettingList.length);
+        columnSettingList.forEach((col) => {
+          const position = col.position ?? 0;
+          if (position >= insertPosition) {
+            col.position = position + 1;
+          }
+        });
+        columnSettingList.push({ ...colToAdd, position: insertPosition });
+      });
 
-    return remoteTableSettings;
+    return {
+      ...remoteTableSettings,
+      columnSettingList,
+    };
   }
 }
