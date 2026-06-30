@@ -21,6 +21,7 @@ import {
   DialogParentService,
   dialogRoute,
   editScheduledTaskRoute,
+  EntityRefDirective,
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
@@ -39,7 +40,6 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -203,6 +203,11 @@ import {
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
+import { AltExecutionRefreshActivityService } from './services/alt-execution-refresh-activity.service';
+import {
+  ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+  AltExecutionRefreshActivity,
+} from './shared/alt-execution-refresh-activity.enum';
 
 @NgModule({
   declarations: [
@@ -631,6 +636,7 @@ export class ExecutionModule {
         {
           path: '',
           redirectTo: 'list',
+          pathMatch: 'full',
         },
         {
           path: 'list',
@@ -646,6 +652,7 @@ export class ExecutionModule {
           path: ':id',
           component: AltExecutionProgressComponent,
           providers: [
+            AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
@@ -674,13 +681,19 @@ export class ExecutionModule {
               }),
               altExecutionGuard,
             ]),
+            () => {
+              const _ctx = inject(AggregatedReportViewTreeStateContextService);
+              const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+              _ctx.setState(_treeState);
+              return true;
+            },
           ],
           resolve: {
             setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
               inject(ActiveExecutionContextService).setupExecutionId(id);
               return true;
-            }
+            },
           },
           canDeactivate: [
             () => {
@@ -696,6 +709,7 @@ export class ExecutionModule {
             {
               path: '',
               redirectTo: 'report',
+              pathMatch: 'full',
             },
             {
               /**
@@ -733,6 +747,12 @@ export class ExecutionModule {
                     _ctx.setState(_treeState);
                     return true;
                   },
+                  () => {
+                    inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+                      ...ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+                    );
+                    return true;
+                  },
                 ],
                 children: [
                   {
@@ -761,6 +781,12 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionAnalyticsComponent,
+                  canActivate: [
+                    () => {
+                      inject(AltExecutionRefreshActivityService).setupRefreshActivity();
+                      return true;
+                    },
+                  ],
                 },
               ],
             },
@@ -836,7 +862,6 @@ export class ExecutionModule {
             }),
             {
               path: 'node-details',
-              outlet: 'nodeDetails',
               component: SimpleOutletComponent,
               children: [
                 {
@@ -851,6 +876,16 @@ export class ExecutionModule {
                     }
                     return null;
                   },
+                  canActivate: [
+                    () => {
+                      inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+                        AltExecutionRefreshActivity.TREE,
+                        AltExecutionRefreshActivity.KEYWORDS_TABLE,
+                        AltExecutionRefreshActivity.TEST_CASES_TABLE,
+                      );
+                      return true;
+                    },
+                  ],
                   resolve: {
                     drilldownState: (route: ActivatedRouteSnapshot) => {
                       const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);

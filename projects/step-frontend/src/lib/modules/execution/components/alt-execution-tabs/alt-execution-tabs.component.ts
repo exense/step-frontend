@@ -149,7 +149,7 @@ export class AltExecutionTabsComponent {
       )
       .subscribe(() => {
         this.currentUrl.set(this._router.url);
-        if (!this._router.url.includes('nodeDetails:')) {
+        if (!this._router.url.includes('node-details')) {
           this._tabsService.clearActiveDrilldownTab();
         }
       });
@@ -190,7 +190,7 @@ export class AltExecutionTabsComponent {
 
   private selectPerformance(): void {
     this._tabsService.clearActiveDrilldownTab();
-    this._router.navigate([{ outlets: { primary: STATIC_TABS.ANALYTICS, nodeDetails: null } }], {
+    this._router.navigate([STATIC_TABS.ANALYTICS], {
       relativeTo: this._activatedRoute,
       queryParamsHandling: 'merge',
     });
@@ -216,7 +216,7 @@ export class AltExecutionTabsComponent {
       this.navigateToDrilldown(nextTab!);
       return;
     }
-    this._router.navigate([{ outlets: { nodeDetails: null } }], {
+    this._router.navigate([STATIC_TABS.REPORT], {
       relativeTo: this._activatedRoute,
       queryParamsHandling: 'merge',
     });
@@ -454,14 +454,14 @@ export class AltExecutionTabsComponent {
   }
 
   private navigateToReport(): void {
-    this._router.navigate([{ outlets: { primary: STATIC_TABS.REPORT, nodeDetails: null } }], {
+    this._router.navigate([STATIC_TABS.REPORT], {
       relativeTo: this._activatedRoute,
       queryParamsHandling: 'merge',
     });
   }
 
   private navigateToDrilldown(tab: DrilldownExecutionTab): void {
-    this._router.navigate([{ outlets: { primary: STATIC_TABS.REPORT, nodeDetails: tab.nodeDetailsPath } }], {
+    this._router.navigate(tab.nodeDetailsPath, {
       relativeTo: this._activatedRoute,
       queryParams: tab.queryParams as Params | undefined,
       queryParamsHandling: 'merge',

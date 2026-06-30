@@ -135,9 +135,11 @@ step-alt-execution-progress {
       step-btn-group {
         .mat-mdc-icon-button.mat-mdc-button-base {
           margin: 0;
+
           &:first-child {
             margin-left: 0.25rem;
           }
+
           &:last-child {
             margin-right: 0.25rem;
           }
@@ -158,6 +160,7 @@ step-alt-execution-progress {
 
     step-skeleton-placeholder {
       min-height: 3.7rem;
+
       & > div {
         margin: 0;
       }
@@ -181,21 +184,11 @@ step-alt-execution-progress {
       gap: 1.8rem;
     }
 
-    &.has-drilldown {
+    &.has-drilldown > step-simple-outlet {
+      display: flex;
+      flex-direction: column;
       flex: 1 1 auto;
       min-height: 0;
-      padding-top: 1rem;
-
-      .primary-content {
-        display: none;
-      }
-      
-      > step-simple-outlet {
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 auto;
-        min-height: 0;
-      }
     }
 
     &.is-layout-edit {
@@ -248,12 +241,6 @@ step-alt-execution-progress {
     step-icon {
       color: var.$orange;
     }
-  }
-
-  &.is-drilldown-opened {
-    $header-height: 6.4rem;
-    height: calc(100vh - $header-height);
-    overflow: hidden;
   }
 
   .node-details-drilldown {
