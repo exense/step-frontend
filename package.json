@@ -64,6 +64,8 @@
     "angular-split": "19.0.0",
     "feather-icons": "4.29.0",
     "luxon": "3.4.4",
+    "marked": "15.0.12",
+    "ngx-markdown": "19.1.1",
     "ngx-mat-select-search": "^7.0.6",
     "normalize.css": "8.0.1",
     "rxjs": "7.4.0",

@@ -29,13 +29,22 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../auth';
+import { MarkdownComponent, provideMarkdown } from 'ngx-markdown';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
 const IMAGE_ZOOM_PADDING_PX = 16;
 
 @Component({
   selector: 'step-attachment-dialog',
-  imports: [StepBasicsModule, AttachmentUrlPipe, RichEditorComponent, StreamingTextComponent, TraceViewerComponent],
+  imports: [
+    StepBasicsModule,
+    AttachmentUrlPipe,
+    RichEditorComponent,
+    StreamingTextComponent,
+    TraceViewerComponent,
+    MarkdownComponent,
+  ],
+  providers: [provideMarkdown()],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -111,13 +120,23 @@ export class AttachmentDialogComponent implements OnInit {
   });
   protected readonly isTextContentLoading = signal(false);
   protected readonly isTextContentLoaded = signal(false);
+  protected readonly textContent = signal('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
+  protected readonly isHtmlAttachment = this.matchesAttachmentType(FILE_TYPES.HTML, FILE_TYPES.HTM);
   protected readonly isXmlAttachment = this.matchesAttachmentType(FILE_TYPES.XML, FILE_TYPES.XML_TEXT);
+  protected readonly isMarkdownAttachment = this.matchesAttachmentType(FILE_TYPES.MD, FILE_TYPES.MARKDOWN);
   protected readonly isPdfAttachment = this.matchesAttachmentType(FILE_TYPES.PDF);
   protected readonly canRenderAttachment = this.determineCanRenderAttachment();
   protected readonly canOpenRenderedAttachmentInSeparateTab =
-    this.canRenderAttachment || this.isXmlAttachment || this.isPdfAttachment;
+    this.isHtmlAttachment || this.isXmlAttachment || this.isPdfAttachment;
   protected readonly isSourceView = signal(!this.canRenderAttachment);
+  protected readonly shouldDisplaySource = computed(() => !this.canRenderAttachment || this.isSourceView());
+  protected readonly sourceViewTooltip = computed(() => {
+    if (this.isSourceView()) {
+      return this.isMarkdownAttachment ? 'View rendered markdown' : 'View rendered content';
+    }
+    return 'View source';
+  });
   protected readonly renderedAttachmentUrl = computed<SafeResourceUrl | undefined>(() => {
     const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
     return this._sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -201,7 +220,7 @@ export class AttachmentDialogComponent implements OnInit {
     if (this.attachmentType !== AttachmentType.TEXT) {
       return;
     }
-    if (this.isSourceView() || this.isXmlAttachment) {
+    if (this.isSourceView() || this.isXmlAttachment || this.isMarkdownAttachment) {
       this.loadTextContent();
     }
   }
@@ -218,6 +237,7 @@ export class AttachmentDialogComponent implements OnInit {
         finalize(() => this.isTextContentLoading.set(false)),
       )
       .subscribe((content) => {
+        this.textContent.set(content);
         this.contentCtrl.setValue(content);
         this.isTextContentLoaded.set(true);
         this.richEditor()?.clearSelection?.();
@@ -266,7 +286,7 @@ export class AttachmentDialogComponent implements OnInit {
   }
 
   private determineCanRenderAttachment(): boolean {
-    return this.matchesAttachmentType(FILE_TYPES.HTML, FILE_TYPES.HTM);
+    return this.isHtmlAttachment || this.isMarkdownAttachment;
   }
 
   private matchesAttachmentType(...types: Array<{ readonly extension?: string; readonly mimeType?: string }>): boolean {

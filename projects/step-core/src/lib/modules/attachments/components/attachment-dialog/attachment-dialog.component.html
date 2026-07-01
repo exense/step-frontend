@@ -2,7 +2,7 @@
   <div step-modal-window-title>
     <div>{{ _data.name }}</div>
     <section class="attachment-dialog-actions">
-      @if (attachmentType === AttachmentType.TEXT && (!canRenderAttachment || isSourceView())) {
+      @if (attachmentType === AttachmentType.TEXT && shouldDisplaySource()) {
         <button
           type="button"
           tabindex="-1"
@@ -20,7 +20,7 @@
           tabindex="-1"
           mat-icon-button
           [class.active]="isSourceView()"
-          [matTooltip]="isSourceView() ? 'View rendered content' : 'View source'"
+          [matTooltip]="sourceViewTooltip()"
           matTooltipPosition="below"
           (click)="toggleSourceView()"
         >
@@ -130,7 +130,7 @@
         }
       }
       @case (AttachmentType.TEXT) {
-        @if (!canRenderAttachment || isSourceView()) {
+        @if (shouldDisplaySource()) {
           <div class="text-attachment-container" [class.loading]="isTextContentLoading()">
             <step-rich-editor
               #richEditor
@@ -140,6 +140,17 @@
             />
             @if (isTextContentLoading()) {
               <div class="text-attachment-loading">
+                <mat-spinner [diameter]="40" />
+              </div>
+            }
+          </div>
+        } @else if (isMarkdownAttachment) {
+          <div class="markdown-attachment-container" [class.loading]="isTextContentLoading()">
+            @if (isTextContentLoaded()) {
+              <markdown [data]="textContent()" />
+            }
+            @if (isTextContentLoading()) {
+              <div class="rendered-attachment-loading">
                 <mat-spinner [diameter]="40" />
               </div>
             }
