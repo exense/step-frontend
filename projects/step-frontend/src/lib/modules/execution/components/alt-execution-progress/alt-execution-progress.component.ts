@@ -17,6 +17,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  fromEvent,
   map,
   Observable,
   of,
@@ -45,6 +46,7 @@ import {
   GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
+  PopoverComponent,
   PopoverMode,
   provideGridLayoutConfig,
   ReloadableDirective,
@@ -100,6 +102,41 @@ enum UpdateSelection {
 interface RefreshParams {
   execution?: Execution;
   updateSelection?: UpdateSelection;
+}
+
+type ExecutionWithAgentProvisioning = Execution & {
+  agentProvisioningStatus?: AgentProvisioningStatusInfo;
+  provisioningStatus?: AgentProvisioningStatusInfo;
+  tokenProvisioningStatus?: AgentProvisioningStatusInfo;
+};
+
+interface AgentProvisioningInfo {
+  count: number;
+  isActive: boolean;
+}
+
+interface AgentProvisioningStatusInfo {
+  completed?: boolean;
+  error?: unknown;
+  provisioningLogs?: Record<string, unknown>;
+  provisioningReport?: {
+    pools?: Array<{
+      completed?: boolean;
+      spec?: {
+        numberOfAgents?: number;
+      };
+    }>;
+  };
+}
+
+interface ControlledPopover {
+  toggled: boolean;
+  openPopover(): void;
+}
+
+interface AgentProvisioningBadgeEvent {
+  count: number;
+  executionId: string;
 }
 
 @Component({
@@ -215,6 +252,8 @@ export class AltExecutionProgressComponent
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
+  private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
+  private readonly agentProvisioningCounts = signal<Record<string, number>>({});
 
   selectFullRange(): void {
     this.updateTimeRangeSelection({ type: 'FULL' });
@@ -293,6 +332,30 @@ export class AltExecutionProgressComponent
   protected readonly isResolvedParametersVisible = signal(false);
   protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
+  protected readonly isAgentProvisioningVisible = signal(false);
+
+  protected readonly agentProvisioningInfo$ = combineLatest([
+    this.execution$,
+    toObservable(this.agentProvisioningCounts),
+  ]).pipe(
+    map(([execution, agentProvisioningCounts]) => {
+      const status = this.getAgentProvisioningStatus(execution);
+      const eventCount = agentProvisioningCounts[execution.id ?? ''] ?? 0;
+      const isActive =
+        execution.status === 'PROVISIONING' || eventCount > 0 || (!!status && !status.completed && !status.error);
+      const count = isActive ? this.countProvisioningAgents(status, execution, eventCount) : 0;
+
+      return {
+        count,
+        isActive,
+      } as AgentProvisioningInfo;
+    }),
+    distinctUntilChanged(
+      (previous, current) => previous.count === current.count && previous.isActive === current.isActive,
+    ),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -515,6 +578,8 @@ export class AltExecutionProgressComponent
     this.setupTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
+    this.setupAgentProvisioningPopover();
+    this.setupAgentProvisioningBadgeEvents();
   }
 
   readonly currentEntity = this.execution;
@@ -541,6 +606,92 @@ export class AltExecutionProgressComponent
           }
         }
       });
+  }
+
+  private setupAgentProvisioningPopover(): void {
+    this.agentProvisioningInfo$
+      .pipe(
+        map(({ isActive }) => isActive),
+        startWith(false),
+        pairwise(),
+        filter(([wasActive, isActive]) => !wasActive && isActive),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.openAgentProvisioningPopover());
+  }
+
+  private setupAgentProvisioningBadgeEvents(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    fromEvent<CustomEvent<AgentProvisioningBadgeEvent>>(window, 'step-agent-provisioning-status')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(({ detail }) => {
+        this.agentProvisioningCounts.update((counts) => ({
+          ...counts,
+          [detail.executionId]: detail.count,
+        }));
+      });
+  }
+
+  private openAgentProvisioningPopover(attempt = 0): void {
+    setTimeout(() => {
+      if (this.isAgentProvisioningVisible()) {
+        return;
+      }
+
+      const popover = this.agentProvisioningPopover();
+      if (popover) {
+        const controlledPopover = popover as unknown as ControlledPopover;
+        controlledPopover.toggled = true;
+        controlledPopover.openPopover();
+        this.isAgentProvisioningVisible.set(true);
+        return;
+      }
+
+      if (attempt < 40) {
+        this.openAgentProvisioningPopover(attempt + 1);
+      }
+    }, 100);
+  }
+
+  private getAgentProvisioningStatus(execution: Execution): AgentProvisioningStatusInfo | undefined {
+    const extension = execution as ExecutionWithAgentProvisioning;
+    return (
+      extension.tokenProvisioningStatus ??
+      extension.agentProvisioningStatus ??
+      extension.provisioningStatus ??
+      (execution.customFields?.['tokenProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['agentProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['provisioningStatus'] as AgentProvisioningStatusInfo | undefined)
+    );
+  }
+
+  private countProvisioningAgents(
+    status: AgentProvisioningStatusInfo | undefined,
+    execution: Execution,
+    eventCount: number,
+  ): number {
+    if (eventCount) {
+      return eventCount;
+    }
+
+    const provisioningLogCount = Object.keys(status?.provisioningLogs ?? {}).length;
+    if (provisioningLogCount) {
+      return provisioningLogCount;
+    }
+
+    const provisioningReportCount =
+      status?.provisioningReport?.pools
+        ?.filter((pool) => !pool.completed)
+        .reduce((sum, pool) => sum + (pool.spec?.numberOfAgents ?? 0), 0) ?? 0;
+
+    return provisioningReportCount || this.countAgentsInvolved(execution.agentsInvolved);
+  }
+
+  private countAgentsInvolved(agentsInvolved?: string): number {
+    return (agentsInvolved ?? '').split(' ').filter((agent) => agent.trim() !== '').length;
   }
 
   ngOnDestroy(): void {

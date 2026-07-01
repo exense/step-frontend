@@ -67,7 +67,7 @@
           <button
             type="button"
             mat-icon-button
-            class="execution-notices-button"
+            class="header-icon-button execution-notices-button"
             [color]="isExecutionNoticesVisible() ? 'primary' : 'default'"
             [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
           >
@@ -87,6 +87,42 @@
             </div>
           </step-popover-content>
         </step-popover>
+      }
+      @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
+        @if (_executionMessages.length) {
+          <step-popover
+            #agentProvisioningPopover
+            yPosition="below"
+            [mode]="PopoverMode.CLICK"
+            (toggledEvent)="isAgentProvisioningVisible.set($event)"
+            [whiteBackground]="true"
+            [smallFont]="false"
+          >
+            <button
+              type="button"
+              mat-icon-button
+              class="header-icon-button agent-provisioning-button"
+              [color]="isAgentProvisioningVisible() ? 'primary' : 'default'"
+              matTooltip="Show agent provisioning"
+            >
+              <step-icon name="agent-token" />
+              @if (agentProvisioningInfo.count) {
+                <span class="dot">
+                  <span class="unread-messages">
+                    {{ agentProvisioningInfo.count }}
+                  </span>
+                </span>
+              }
+            </button>
+            <step-popover-content>
+              <div class="execution-popover-table agent-provisioning-popover">
+                @for (message of _executionMessages; track message.id) {
+                  <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
+                }
+              </div>
+            </step-popover-content>
+          </step-popover>
+        }
       }
       <step-popover
         yPosition="below"
@@ -238,10 +274,6 @@
           {{ error.msg }}
         </step-alert>
       }
-    }
-
-    @for (message of _executionMessages; track message.id) {
-      <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
     }
   }
 </section>
