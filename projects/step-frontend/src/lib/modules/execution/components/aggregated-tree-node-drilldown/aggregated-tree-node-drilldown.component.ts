@@ -233,7 +233,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       id: v4(),
       searchStatus: params.nodeStatus,
       searchStatusCount: params.nodeStatusCount,
-      resolvedPartialPath: untracked(() => this._treeStateContext.getState().resolvedPartialPath()),
+      partialTreeRootNodeId: untracked(() => this._treeStateContext.getState().partialTreeRootNodeId()),
     };
 
     queueMicrotask(() => {

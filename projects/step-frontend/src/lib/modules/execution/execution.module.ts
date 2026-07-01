@@ -124,6 +124,7 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
+import { AltExecutionNoticesComponent } from './components/alt-execution-notices/alt-execution-notices.component';
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
@@ -175,6 +176,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { NoticeBadgeLabelPipe } from './pipes/notice-badge-label.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
@@ -244,6 +246,7 @@ import {
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
+    AltExecutionNoticesComponent,
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportSettingsComponent,
@@ -321,6 +324,7 @@ import {
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
     DashletEmptyColumnComponent,
+    NoticeBadgeLabelPipe,
   ],
   imports: [
     StepCommonModule,
@@ -538,7 +542,7 @@ export class ExecutionModule {
                 checkEntityGuardFactory({
                   entityType: 'execution',
                   idExtractor: (route) => route.url[0].path,
-                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
                   isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                   getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
@@ -674,7 +678,7 @@ export class ExecutionModule {
             sequenceCanActivateGuards([
               checkEntityGuardFactory({
                 entityType: 'execution',
-                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                 getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
                 isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                 getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
@@ -889,7 +893,7 @@ export class ExecutionModule {
                   resolve: {
                     drilldownState: (route: ActivatedRouteSnapshot) => {
                       const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
-                      const resolvedPartialPath = _aggregatedViewTreeStateContext.getState().resolvedPartialPath();
+                      const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
 
                       const url = route.url;
 
@@ -929,7 +933,7 @@ export class ExecutionModule {
                             nodeId,
                             searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
                             searchStatusCount,
-                            resolvedPartialPath,
+                            partialTreeRootNodeId,
                           });
                         }
                       }

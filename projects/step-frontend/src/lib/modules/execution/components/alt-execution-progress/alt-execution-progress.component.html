@@ -56,6 +56,38 @@
           </step-popover-content>
         </step-popover>
       }
+      @if (notices$ | async; as notices) {
+        <step-popover
+          yPosition="below"
+          [mode]="PopoverMode.CLICK"
+          [whiteBackground]="true"
+          [smallFont]="false"
+          (toggledEvent)="isExecutionNoticesVisible.set($event)"
+        >
+          <button
+            type="button"
+            mat-icon-button
+            class="execution-notices-button"
+            [color]="isExecutionNoticesVisible() ? 'primary' : 'default'"
+            [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
+          >
+            <step-icon name="bell" />
+            @if (notices.length | noticeBadgeLabel; as noticeBadgeLabel) {
+              <span class="dot">
+                <span class="unread-messages">
+                  {{ noticeBadgeLabel }}
+                </span>
+              </span>
+            }
+          </button>
+          <step-popover-content>
+            <div class="execution-popover-table">
+              <strong>Execution Notices</strong>
+              <step-alt-execution-notices [notices]="notices" />
+            </div>
+          </step-popover-content>
+        </step-popover>
+      }
       <step-popover
         yPosition="below"
         [mode]="PopoverMode.CLICK"

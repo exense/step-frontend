@@ -232,6 +232,12 @@ export class AltExecutionProgressComponent
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
+  protected readonly notices$ = this.activeExecution$.pipe(
+    switchMap((active) => active.resolvedNotices$),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads
@@ -285,6 +291,7 @@ export class AltExecutionProgressComponent
     }),
   );
   protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
@@ -567,7 +574,7 @@ export class AltExecutionProgressComponent
         ),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+      .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
@@ -575,7 +582,7 @@ export class AltExecutionProgressComponent
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
         this.isTreeInitialized = true;
       });
 
