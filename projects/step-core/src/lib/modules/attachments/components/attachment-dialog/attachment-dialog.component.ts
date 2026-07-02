@@ -18,7 +18,12 @@ import { AttachmentUtilsService } from '../../injectables/attachment-utils.servi
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { FILE_TYPES, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
-import { AttachmentMeta, AugmentedResourcesService, UserService } from '../../../../client/step-client-module';
+import {
+  AttachmentMeta,
+  AugmentedResourcesService,
+  StreamingAttachmentMeta,
+  UserService,
+} from '../../../../client/step-client-module';
 import { DOCUMENT } from '@angular/common';
 import { AceMode, RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
@@ -73,7 +78,9 @@ export class AttachmentDialogComponent implements OnInit {
     initialValue: undefined,
   });
 
-  private readonly streamingStatus = computed(() => this.streamingText()?.status?.());
+  private readonly streamingStatus = computed(
+    () => this.streamingText()?.status?.() ?? (this._data as StreamingAttachmentMeta).status,
+  );
 
   protected readonly isStreamingInProgress = computed(() => {
     const status = this.streamingStatus();
@@ -115,8 +122,6 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly isXmlAttachment = this.matchesAttachmentType(FILE_TYPES.XML, FILE_TYPES.XML_TEXT);
   protected readonly isPdfAttachment = this.matchesAttachmentType(FILE_TYPES.PDF);
   protected readonly canRenderAttachment = this.determineCanRenderAttachment();
-  protected readonly canOpenRenderedAttachmentInSeparateTab =
-    this.canRenderAttachment || this.isXmlAttachment || this.isPdfAttachment;
   protected readonly isSourceView = signal(!this.canRenderAttachment);
   protected readonly renderedAttachmentUrl = computed<SafeResourceUrl | undefined>(() => {
     const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
@@ -124,6 +129,23 @@ export class AttachmentDialogComponent implements OnInit {
   });
   protected readonly textAttachmentSyntaxMode = this.isXmlAttachment ? AceMode.XML : AceMode.TEXT;
   protected readonly AttachmentType = AttachmentType;
+
+  protected readonly isAttachmentFinished = computed(() => {
+    if (
+      this.attachmentType !== AttachmentType.STREAMING_TEXT &&
+      this.attachmentType !== AttachmentType.STREAMING_BINARY
+    ) {
+      return true;
+    }
+    const status = this.streamingStatus();
+    return status === 'COMPLETED' || status === 'FAILED';
+  });
+
+  protected readonly canOpenAttachmentInSeparateTab = computed(() => {
+    return (
+      this.hasResourceReadPermission() && this.attachmentType !== AttachmentType.SKIPPED && this.isAttachmentFinished()
+    );
+  });
 
   constructor() {
     this._destroyRef.onDestroy(() => this.revokeVideoObjectUrl());
@@ -160,6 +182,9 @@ export class AttachmentDialogComponent implements OnInit {
   }
 
   protected openRenderedAttachmentInSeparateTab(): void {
+    if (!this.canOpenAttachmentInSeparateTab()) {
+      return;
+    }
     const url = this._attachmentUtils.getDownloadAttachmentUrl(this._data, true);
     this._doc.defaultView!.open(url, '_blank');
   }
