@@ -10,11 +10,11 @@ import {inject, NgModule} from '@angular/core';
 import {of} from 'rxjs';
 import {IDE_MENU_ITEMS} from './shared/ide-menu-items';
 import {IdeHeaderBarComponent} from './components/ide-header-bar/ide-header-bar.component';
-import {FolderPickerModalComponent} from './components/folder-picker-modal/folder-picker-modal.component';
+import {PackageFolderPickerModalComponent} from './components/package-folder-picker-modal/package-folder-picker-modal.component';
 import {IdeStateService} from './services/ide-state.service';
 
 @NgModule({
-  imports: [StepCoreModule, IdeHeaderBarComponent, FolderPickerModalComponent],
+  imports: [StepCoreModule, IdeHeaderBarComponent, PackageFolderPickerModalComponent],
 })
 export class IdeModeModule {
   private _isIdeMode = inject(IDE_MODE);

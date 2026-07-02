@@ -1,5 +1,15 @@
-<step-modal-window title="Select Folder">
+<step-modal-window [title]="_data.title">
   <div step-modal-window-body>
+
+    @if(_data.withName) {
+      <div [formGroup]="packageForm">
+        <step-form-field [showRequiredMarker]="true">
+          <step-label>Package name</step-label>
+          <input type="text" formControlName="name"/>
+        </step-form-field>
+      </div>
+    }
+
     @if (currentPath()) {
       <mat-chip-listbox aria-label="Current path">
         @for (path of pathSegments(); track path) {
@@ -27,7 +37,7 @@
     </div>
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button (click)="_dialogRef.close(null)">Cancel</button>
+    <button type="button" mat-stroked-button (click)="_dialogRef.close(undefined)">Cancel</button>
     <button type="button" mat-stroked-button (click)="onCreateFolder()">Create Folder</button>
     <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!selectedFolder()">
       Select

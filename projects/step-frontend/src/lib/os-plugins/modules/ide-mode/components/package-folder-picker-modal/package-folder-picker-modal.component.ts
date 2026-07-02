@@ -2,17 +2,30 @@ import {Component, signal, inject, OnInit} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {DialogsService, DirectoryListing, FileDescriptor, FilesystemService, StepCoreModule} from '@exense/step-core';
 import {switchMap, map, filter} from 'rxjs';
+import {FormBuilder, Validators} from '@angular/forms';
+
+export interface PackageFolderPickerModalData {
+  initialDirectory?: string;
+  title: string;
+  withName?: boolean;
+}
+
+export interface PackageFolderPickerModalResult {
+  name: string;
+  directory: string;
+}
 
 @Component({
-  selector: 'step-folder-picker-modal',
-  templateUrl: './folder-picker-modal.component.html',
-  styleUrls: ['./folder-picker-modal.component.scss'],
+  selector: 'step-package-folder-picker-modal',
+  templateUrl: './package-folder-picker-modal.component.html',
+  styleUrls: ['./package-folder-picker-modal.component.scss'],
   imports: [StepCoreModule],
 })
-export class FolderPickerModalComponent implements OnInit {
-  protected _dialogRef = inject<MatDialogRef<FolderPickerModalComponent, string | null>>(MatDialogRef);
-  private _initialPath = inject<string | undefined>(MAT_DIALOG_DATA, { optional: true }) ?? '';
+export class PackageFolderPickerModalComponent implements OnInit {
+  protected _dialogRef = inject<MatDialogRef<PackageFolderPickerModalComponent, PackageFolderPickerModalResult>>(MatDialogRef);
+  protected readonly _data = inject<PackageFolderPickerModalData>(MAT_DIALOG_DATA);
   private _filesystemService = inject(FilesystemService);
+  private _fb = inject(FormBuilder).nonNullable;
 
   protected readonly currentPath = signal<string | null>(null);
   protected readonly parentPath = signal<string | null>(null);
@@ -22,8 +35,12 @@ export class FolderPickerModalComponent implements OnInit {
 
   private _dialogService = inject(DialogsService);
 
+  protected readonly packageForm = this._fb.group({
+    name: this._fb.control('', Validators.required),
+  });
+
   ngOnInit(): void {
-    this.loadDirectory(this._initialPath);
+    this.loadDirectory(this._data.initialDirectory ?? '');
   }
 
   protected navigateTo(segmentIndex: number): void {
@@ -45,11 +62,24 @@ export class FolderPickerModalComponent implements OnInit {
     this.loadDirectory(path);
   }
 
-  apply(): void {
-    const folder = this.selectedFolder();
-    if (folder) {
-      this._dialogRef.close(folder);
+  protected apply(): void {
+
+    const directory = this.selectedFolder();
+    if (!directory) {
+      return;
     }
+
+    let name: string = '';
+
+    if (this._data.withName) {
+      if (this.packageForm.invalid) {
+        this.packageForm.markAllAsTouched();
+        return;
+      }
+      name = this.packageForm.value.name!;
+    }
+
+    this._dialogRef.close({name, directory});
   }
 
   protected onCreateFolder(): void {

@@ -1,8 +1,12 @@
-import {effect, inject, Injectable, signal, untracked} from '@angular/core';
+import {inject, Injectable, signal, untracked} from '@angular/core';
 import {GlobalReloadService, IdeService} from '@exense/step-core';
 import {MatDialog} from '@angular/material/dialog';
-import {FolderPickerModalComponent} from '../components/folder-picker-modal/folder-picker-modal.component';
-import {filter, switchMap} from 'rxjs';
+import {filter, Observable, switchMap} from 'rxjs';
+import {
+  PackageFolderPickerModalComponent,
+  PackageFolderPickerModalData,
+  PackageFolderPickerModalResult
+} from '../components/package-folder-picker-modal/package-folder-picker-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +20,7 @@ export class IdeStateService {
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private setPackage(automationPackage: string): void {
+  private setPackage(automationPackage: string | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
   }
@@ -41,23 +45,30 @@ export class IdeStateService {
   }
 
   create(): void {
-    this._matDialog.open(FolderPickerModalComponent, {data: ''}).afterClosed()
+    this.openPackageFolderDialog({title: 'Create package', withName: true})
       .pipe(
-        filter((folderName) => !!folderName),
-        switchMap((folderName) => this._ideApi.initializeNewAp(folderName, 'mayApp')),
+        filter((result) => !!result),
+        switchMap(({directory, name}) => this._ideApi.initializeNewAp(directory, name)),
         switchMap(() => this._ideApi.getCurrentAp())
       )
       .subscribe((result) => this.setPackage(result));
   }
 
   open(): void {
-    this._matDialog.open(FolderPickerModalComponent, {data: ''}).afterClosed()
+    this.openPackageFolderDialog({title: 'Open package'})
       .pipe(
-        filter((folderName) => !!folderName),
-        switchMap((folderName) => this._ideApi.useExistingAp(folderName)),
+        filter((result) => !!result),
+        switchMap(({directory}) => this._ideApi.useExistingAp(directory)),
         switchMap(() => this._ideApi.getCurrentAp())
       )
       .subscribe((result) => this.setPackage(result));
+  }
+
+  private openPackageFolderDialog(data: PackageFolderPickerModalData): Observable<PackageFolderPickerModalResult | undefined>  {
+    return this._matDialog.open<PackageFolderPickerModalComponent, PackageFolderPickerModalData, PackageFolderPickerModalResult>(
+      PackageFolderPickerModalComponent,
+      {data}
+    ).afterClosed();
   }
 
 }
