@@ -1,4 +1,4 @@
-import { computed, Directive, effect, inject, input, signal } from '@angular/core';
+import { computed, Directive, effect, inject, input, OnInit, signal } from '@angular/core';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { AltExecutionStateService } from '../services/alt-execution-state.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,7 +8,7 @@ import { of } from 'rxjs';
   selector: '[stepAltReportNodeListSort]',
   exportAs: 'AltReportNodeListSort',
 })
-export class AltReportNodeListSortDirective {
+export class AltReportNodeListSortDirective implements OnInit {
   private _matSort = inject(MatSort, { optional: true });
   private _executionState = inject(AltExecutionStateService, { optional: true });
 
@@ -24,6 +24,10 @@ export class AltReportNodeListSortDirective {
   readonly showSort = computed(() => {
     return this.sortByColumn() && this._matSort;
   });
+
+  ngOnInit(): void {
+    this.sortInternal.set(this._matSort?.direction || 'desc');
+  }
 
   private effectApplySort = effect(() => {
     this.applySort(this.sort(), true);

@@ -41,6 +41,7 @@ import {
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   GridPersistenceStateService,
+  GridEditableService,
   GRID_ELEMENT_HEADER_ACTIONS,
   IncludeTestcases,
   IS_SMALL_SCREEN,
@@ -197,6 +198,8 @@ export class AltExecutionProgressComponent
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
+  protected readonly activeDrilldownTabId = inject(AltExecutionTabsService).activeDrilldownTabId;
+  protected readonly isLayoutEditMode = inject(GridEditableService).editMode;
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
