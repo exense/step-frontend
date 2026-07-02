@@ -17,6 +17,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  fromEvent,
   map,
   Observable,
   of,
@@ -45,6 +46,7 @@ import {
   GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
+  PopoverComponent,
   PopoverMode,
   provideGridLayoutConfig,
   ReloadableDirective,
@@ -100,6 +102,44 @@ enum UpdateSelection {
 interface RefreshParams {
   execution?: Execution;
   updateSelection?: UpdateSelection;
+}
+
+type ExecutionWithAgentProvisioning = Execution & {
+  agentProvisioningStatus?: AgentProvisioningStatusInfo;
+  provisioningStatus?: AgentProvisioningStatusInfo;
+  tokenProvisioningStatus?: AgentProvisioningStatusInfo;
+};
+
+interface AgentProvisioningInfo {
+  errorCount: number;
+  isActive: boolean;
+}
+
+interface AgentProvisioningStatusInfo {
+  completed?: boolean;
+  error?: unknown;
+  provisioningReport?: {
+    pools?: Array<{
+      completed?: boolean;
+      error?: unknown;
+    }>;
+  };
+}
+
+interface ControlledPopover {
+  toggled: boolean;
+  openPopover(): void;
+}
+
+interface AgentProvisioningBadgeEvent {
+  errorCount?: number;
+  executionId: string;
+  isActive: boolean;
+}
+
+interface AgentProvisioningEventState {
+  errorCount: number;
+  isActive: boolean;
 }
 
 @Component({
@@ -215,6 +255,8 @@ export class AltExecutionProgressComponent
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
+  private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
+  private readonly agentProvisioningEvents = signal<Record<string, AgentProvisioningEventState>>({});
 
   selectFullRange(): void {
     this.updateTimeRangeSelection({ type: 'FULL' });
@@ -293,6 +335,32 @@ export class AltExecutionProgressComponent
   protected readonly isResolvedParametersVisible = signal(false);
   protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
+  protected readonly isAgentProvisioningVisible = signal(false);
+
+  protected readonly agentProvisioningInfo$ = combineLatest([
+    this.execution$,
+    toObservable(this.agentProvisioningEvents),
+  ]).pipe(
+    map(([execution, agentProvisioningEvents]) => {
+      const status = this.getAgentProvisioningStatus(execution);
+      const eventState = agentProvisioningEvents[execution.id ?? ''];
+      const eventIsActive = eventState?.isActive ?? false;
+      const eventErrorCount = eventState?.errorCount ?? 0;
+      const isActive =
+        execution.status === 'PROVISIONING' || eventIsActive || (!!status && !status.completed && !status.error);
+      const errorCount = eventErrorCount || this.countProvisioningErrors(status);
+
+      return {
+        errorCount,
+        isActive,
+      } as AgentProvisioningInfo;
+    }),
+    distinctUntilChanged(
+      (previous, current) => previous.errorCount === current.errorCount && previous.isActive === current.isActive,
+    ),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -515,6 +583,8 @@ export class AltExecutionProgressComponent
     this.setupTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
+    this.setupAgentProvisioningPopover();
+    this.setupAgentProvisioningBadgeEvents();
   }
 
   readonly currentEntity = this.execution;
@@ -541,6 +611,76 @@ export class AltExecutionProgressComponent
           }
         }
       });
+  }
+
+  private setupAgentProvisioningPopover(): void {
+    this.agentProvisioningInfo$
+      .pipe(
+        map(({ isActive }) => isActive),
+        startWith(false),
+        pairwise(),
+        filter(([wasActive, isActive]) => !wasActive && isActive),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.openAgentProvisioningPopover());
+  }
+
+  private setupAgentProvisioningBadgeEvents(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    fromEvent<CustomEvent<AgentProvisioningBadgeEvent>>(window, 'step-agent-provisioning-status')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(({ detail }) => {
+        this.agentProvisioningEvents.update((events) => ({
+          ...events,
+          [detail.executionId]: {
+            errorCount: detail.errorCount ?? 0,
+            isActive: detail.isActive,
+          },
+        }));
+      });
+  }
+
+  private openAgentProvisioningPopover(attempt = 0): void {
+    setTimeout(() => {
+      if (this.isAgentProvisioningVisible()) {
+        return;
+      }
+
+      const popover = this.agentProvisioningPopover();
+      if (popover) {
+        const controlledPopover = popover as unknown as ControlledPopover;
+        controlledPopover.toggled = true;
+        controlledPopover.openPopover();
+        this.isAgentProvisioningVisible.set(true);
+        return;
+      }
+
+      if (attempt < 40) {
+        this.openAgentProvisioningPopover(attempt + 1);
+      }
+    }, 100);
+  }
+
+  private getAgentProvisioningStatus(execution: Execution): AgentProvisioningStatusInfo | undefined {
+    const extension = execution as ExecutionWithAgentProvisioning;
+    return (
+      extension.tokenProvisioningStatus ??
+      extension.agentProvisioningStatus ??
+      extension.provisioningStatus ??
+      (execution.customFields?.['tokenProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['agentProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['provisioningStatus'] as AgentProvisioningStatusInfo | undefined)
+    );
+  }
+
+  private countProvisioningErrors(status: AgentProvisioningStatusInfo | undefined): number {
+    const statusErrorCount = status?.error ? 1 : 0;
+    const poolErrorCount = status?.provisioningReport?.pools?.filter((pool) => !!pool.error).length ?? 0;
+
+    return statusErrorCount + poolErrorCount;
   }
 
   ngOnDestroy(): void {
