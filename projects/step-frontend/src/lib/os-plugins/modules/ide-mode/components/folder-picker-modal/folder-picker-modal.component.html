@@ -2,7 +2,7 @@
   <div step-modal-window-body>
     @if (currentPath()) {
       <mat-chip-listbox aria-label="Current path">
-        @for (path of pathSegments(); track $index) {
+        @for (path of pathSegments(); track path) {
           <mat-chip
             (click)="navigateTo($index)">
             {{ path }}

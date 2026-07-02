@@ -16,10 +16,10 @@ export class IdeStateService {
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private effectPackageChange = effect(() => {
-    const currentPackage = this.currentPackage();
+  private setPackage(automationPackage: string): void {
+    this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
-  });
+  }
 
   get hasPackage(): boolean {
     return untracked(() => {
@@ -31,17 +31,13 @@ export class IdeStateService {
   initialize(): void {
     this._ideApi
       .getCurrentAp()
-      .subscribe((currentAp) => {
-        this.currentPackageInternal.set(currentAp);
-      });
+      .subscribe((currentAp) => this.setPackage(currentAp));
   }
 
   close(): void {
     this._ideApi
       .closeAp()
-      .subscribe(() => {
-        this.currentPackageInternal.set(undefined);
-      });
+      .subscribe(() => this.setPackage(undefined));
   }
 
   create(): void {
@@ -51,9 +47,7 @@ export class IdeStateService {
         switchMap((folderName) => this._ideApi.initializeNewAp(folderName, 'mayApp')),
         switchMap(() => this._ideApi.getCurrentAp())
       )
-      .subscribe((result) => {
-        this.currentPackageInternal.set(result);
-      });
+      .subscribe((result) => this.setPackage(result));
   }
 
   open(): void {
@@ -63,9 +57,7 @@ export class IdeStateService {
         switchMap((folderName) => this._ideApi.useExistingAp(folderName)),
         switchMap(() => this._ideApi.getCurrentAp())
       )
-      .subscribe((result) => {
-        this.currentPackageInternal.set(result);
-      });
+      .subscribe((result) => this.setPackage(result));
   }
 
 }
