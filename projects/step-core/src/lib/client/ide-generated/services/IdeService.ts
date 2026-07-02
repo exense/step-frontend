@@ -4,6 +4,8 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AutomationPackageDescriptor } from '../models/AutomationPackageDescriptor';
+
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
@@ -22,10 +24,10 @@ export class IdeService {
   }
 
   /**
-   * @returns string default response
+   * @returns AutomationPackageDescriptor default response
    * @throws ApiError
    */
-  public getCurrentAp(): Observable<string> {
+  public getCurrentAp(): Observable<AutomationPackageDescriptor> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/local/ide/ap/current',

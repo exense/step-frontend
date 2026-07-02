@@ -1,6 +1,14 @@
-<div class="package-name">{{_ideState.currentPackage()}}</div>
+<div class="package">
+  @if(_ideState.currentPackage(); as package) {
+    <span>
+      <step-icon name="file"/>
+      <span>{{package.name}}</span>
+    </span>
+    <span>{{package.directory}}</span>
+  }
+</div>
 <section>
-  <button type="button" mat-button mat-stroked-button (click)="_ideState.open()">
+  <button type="button" mat-button mat-stroked-button [matMenuTriggerFor]="openMenu">
     <step-icon name="folder"/>
     <span>Open package</span>
   </button>
@@ -13,3 +21,19 @@
     <span>Close package</span>
   </button>
 </section>
+<mat-menu #openMenu>
+  <button type="button" mat-menu-item (click)="_ideState.openWithPicker()">
+    <step-icon name="folder"/>
+    <span>Open from filesystem</span>
+  </button>
+  <mat-divider/>
+  @for(item of _apAccessHistory.history(); track item.directory) {
+    <button type="button" class="recent" mat-menu-item (click)="_ideState.openFromPath(item.directory!)">
+      <div class="btn-recent-content">
+        <step-icon name="file"/>
+        <span>{{item.name}}</span>
+        <span>{{item.directory}}</span>
+      </div>
+    </button>
+  }
+</mat-menu>

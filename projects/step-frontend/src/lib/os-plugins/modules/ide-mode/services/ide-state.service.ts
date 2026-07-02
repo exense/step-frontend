@@ -1,12 +1,13 @@
 import {inject, Injectable, signal, untracked} from '@angular/core';
-import {GlobalReloadService, IdeService} from '@exense/step-core';
+import {AutomationPackageDescriptor, GlobalReloadService, IdeService} from '@exense/step-core';
 import {MatDialog} from '@angular/material/dialog';
-import {filter, Observable, switchMap} from 'rxjs';
+import {filter, map, Observable, switchMap} from 'rxjs';
 import {
   PackageFolderPickerModalComponent,
   PackageFolderPickerModalData,
   PackageFolderPickerModalResult
 } from '../components/package-folder-picker-modal/package-folder-picker-modal.component';
+import {ApAccessHistoryService} from './ap-access-history.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +16,13 @@ export class IdeStateService {
   private _ideApi = inject(IdeService);
   private _matDialog = inject(MatDialog);
   private _reloadable = inject(GlobalReloadService);
+  private _accessHistory = inject(ApAccessHistoryService);
 
-  private readonly currentPackageInternal = signal<string | undefined>(undefined);
+  private readonly currentPackageInternal = signal<AutomationPackageDescriptor | undefined>(undefined);
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private setPackage(automationPackage: string | undefined): void {
+  private setPackage(automationPackage: AutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
   }
@@ -35,6 +37,9 @@ export class IdeStateService {
   initialize(): void {
     this._ideApi
       .getCurrentAp()
+      .pipe(
+        map((result) => !result?.directory ? undefined : result),
+      )
       .subscribe((currentAp) => this.setPackage(currentAp));
   }
 
@@ -49,19 +54,45 @@ export class IdeStateService {
       .pipe(
         filter((result) => !!result),
         switchMap(({directory, name}) => this._ideApi.initializeNewAp(directory, name)),
-        switchMap(() => this._ideApi.getCurrentAp())
+        switchMap(() => this._ideApi.getCurrentAp()),
+        map((result) => !result?.directory ? undefined : result),
       )
-      .subscribe((result) => this.setPackage(result));
+      .subscribe((result) => {
+        this.setPackage(result)
+        if (result) {
+          this._accessHistory.addToHistory(result);
+        }
+      });
   }
 
-  open(): void {
+  openWithPicker(): void {
     this.openPackageFolderDialog({title: 'Open package'})
       .pipe(
         filter((result) => !!result),
         switchMap(({directory}) => this._ideApi.useExistingAp(directory)),
-        switchMap(() => this._ideApi.getCurrentAp())
+        switchMap(() => this._ideApi.getCurrentAp()),
+        map((result) => !result?.directory ? undefined : result),
       )
-      .subscribe((result) => this.setPackage(result));
+      .subscribe((result) => {
+        this.setPackage(result)
+        if (result) {
+          this._accessHistory.addToHistory(result);
+        }
+      });
+  }
+
+  openFromPath(directory: string): void {
+    this._ideApi.useExistingAp(directory)
+      .pipe(
+        switchMap(() => this._ideApi.getCurrentAp()),
+        map((result) => !result?.directory ? undefined : result),
+      )
+      .subscribe((result) => {
+        this.setPackage(result)
+        if (result) {
+          this._accessHistory.addToHistory(result);
+        }
+      });
   }
 
   private openPackageFolderDialog(data: PackageFolderPickerModalData): Observable<PackageFolderPickerModalResult | undefined>  {

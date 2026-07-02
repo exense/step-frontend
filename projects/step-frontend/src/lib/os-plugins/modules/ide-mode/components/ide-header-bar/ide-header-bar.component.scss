@@ -8,14 +8,44 @@
   justify-content: space-between;
 }
 
-.package-name {
+.package {
   color: var.$white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  & > span {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
 }
 
-button {
+section > button {
   step-icon,
   span {
     color: var.$white;
   }
   margin-left: 1rem;
+}
+
+.btn-recent-content {
+  display: grid;
+  grid-template-areas:
+          'icon name'
+          'icon folder';
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.1rem;
+
+  step-icon {
+    grid-area: icon;
+  }
+  span:first-child {
+    grid-area: name;
+  }
+  span:last-child {
+    grid-area: folder;
+    font-size: 1.1rem;
+  }
 }
