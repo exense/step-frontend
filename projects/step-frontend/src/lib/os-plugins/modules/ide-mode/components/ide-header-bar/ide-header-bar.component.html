@@ -1,13 +1,14 @@
+<div class="package-name">{{_ideState.currentPackage()}}</div>
 <section>
-  <button type="button" mat-button mat-stroked-button>
+  <button type="button" mat-button mat-stroked-button (click)="_ideState.open()">
     <step-icon name="folder"/>
     <span>Open package</span>
   </button>
-  <button type="button" mat-button mat-stroked-button (click)="createPackage()">
+  <button type="button" mat-button mat-stroked-button (click)="_ideState.create()">
     <step-icon name="plus"/>
     <span>New package</span>
   </button>
-  <button type="button" mat-button mat-stroked-button>
+  <button type="button" mat-button mat-stroked-button (click)="_ideState.close()">
     <step-icon name="x"/>
     <span>Close package</span>
   </button>

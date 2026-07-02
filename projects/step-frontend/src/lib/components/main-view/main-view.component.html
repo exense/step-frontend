@@ -5,7 +5,7 @@
     <header class="app-header">
       <section class="content">
         @if (ideBar) {
-          <step-dashlet [itemKey]="ideBar.template"/>
+          <step-dashlet class="ide-bar" [itemKey]="ideBar.template"/>
         } @else {
           <div></div>
           <div class="app-header-nav">

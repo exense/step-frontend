@@ -11,6 +11,28 @@ export class IdeService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
+   * @returns any default response
+   * @throws ApiError
+   */
+  public closeAp(): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/local/ide/ap/close',
+    });
+  }
+
+  /**
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getCurrentAp(): Observable<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/local/ide/ap/current',
+    });
+  }
+
+  /**
    * @param existingEmptyDirectory
    * @param apName
    * @returns any default response

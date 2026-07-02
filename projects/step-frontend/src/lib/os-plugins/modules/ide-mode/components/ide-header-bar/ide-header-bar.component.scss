@@ -1,9 +1,15 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 :host {
-  padding: .5rem 0;
+  padding: .5rem 2.5rem;
   gap: 1rem;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.package-name {
+  color: var.$white;
 }
 
 button {
@@ -11,4 +17,5 @@ button {
   span {
     color: var.$white;
   }
+  margin-left: 1rem;
 }
