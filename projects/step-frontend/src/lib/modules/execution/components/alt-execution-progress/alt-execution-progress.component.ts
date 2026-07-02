@@ -111,20 +111,17 @@ type ExecutionWithAgentProvisioning = Execution & {
 };
 
 interface AgentProvisioningInfo {
-  count: number;
+  errorCount: number;
   isActive: boolean;
 }
 
 interface AgentProvisioningStatusInfo {
   completed?: boolean;
   error?: unknown;
-  provisioningLogs?: Record<string, unknown>;
   provisioningReport?: {
     pools?: Array<{
       completed?: boolean;
-      spec?: {
-        numberOfAgents?: number;
-      };
+      error?: unknown;
     }>;
   };
 }
@@ -135,8 +132,14 @@ interface ControlledPopover {
 }
 
 interface AgentProvisioningBadgeEvent {
-  count: number;
+  errorCount?: number;
   executionId: string;
+  isActive: boolean;
+}
+
+interface AgentProvisioningEventState {
+  errorCount: number;
+  isActive: boolean;
 }
 
 @Component({
@@ -253,7 +256,7 @@ export class AltExecutionProgressComponent
 
   private isTreeInitialized = false;
   private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
-  private readonly agentProvisioningCounts = signal<Record<string, number>>({});
+  private readonly agentProvisioningEvents = signal<Record<string, AgentProvisioningEventState>>({});
 
   selectFullRange(): void {
     this.updateTimeRangeSelection({ type: 'FULL' });
@@ -336,22 +339,24 @@ export class AltExecutionProgressComponent
 
   protected readonly agentProvisioningInfo$ = combineLatest([
     this.execution$,
-    toObservable(this.agentProvisioningCounts),
+    toObservable(this.agentProvisioningEvents),
   ]).pipe(
-    map(([execution, agentProvisioningCounts]) => {
+    map(([execution, agentProvisioningEvents]) => {
       const status = this.getAgentProvisioningStatus(execution);
-      const eventCount = agentProvisioningCounts[execution.id ?? ''] ?? 0;
+      const eventState = agentProvisioningEvents[execution.id ?? ''];
+      const eventIsActive = eventState?.isActive ?? false;
+      const eventErrorCount = eventState?.errorCount ?? 0;
       const isActive =
-        execution.status === 'PROVISIONING' || eventCount > 0 || (!!status && !status.completed && !status.error);
-      const count = isActive ? this.countProvisioningAgents(status, execution, eventCount) : 0;
+        execution.status === 'PROVISIONING' || eventIsActive || (!!status && !status.completed && !status.error);
+      const errorCount = eventErrorCount || this.countProvisioningErrors(status);
 
       return {
-        count,
+        errorCount,
         isActive,
       } as AgentProvisioningInfo;
     }),
     distinctUntilChanged(
-      (previous, current) => previous.count === current.count && previous.isActive === current.isActive,
+      (previous, current) => previous.errorCount === current.errorCount && previous.isActive === current.isActive,
     ),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -628,9 +633,12 @@ export class AltExecutionProgressComponent
     fromEvent<CustomEvent<AgentProvisioningBadgeEvent>>(window, 'step-agent-provisioning-status')
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(({ detail }) => {
-        this.agentProvisioningCounts.update((counts) => ({
-          ...counts,
-          [detail.executionId]: detail.count,
+        this.agentProvisioningEvents.update((events) => ({
+          ...events,
+          [detail.executionId]: {
+            errorCount: detail.errorCount ?? 0,
+            isActive: detail.isActive,
+          },
         }));
       });
   }
@@ -668,30 +676,11 @@ export class AltExecutionProgressComponent
     );
   }
 
-  private countProvisioningAgents(
-    status: AgentProvisioningStatusInfo | undefined,
-    execution: Execution,
-    eventCount: number,
-  ): number {
-    if (eventCount) {
-      return eventCount;
-    }
+  private countProvisioningErrors(status: AgentProvisioningStatusInfo | undefined): number {
+    const statusErrorCount = status?.error ? 1 : 0;
+    const poolErrorCount = status?.provisioningReport?.pools?.filter((pool) => !!pool.error).length ?? 0;
 
-    const provisioningLogCount = Object.keys(status?.provisioningLogs ?? {}).length;
-    if (provisioningLogCount) {
-      return provisioningLogCount;
-    }
-
-    const provisioningReportCount =
-      status?.provisioningReport?.pools
-        ?.filter((pool) => !pool.completed)
-        .reduce((sum, pool) => sum + (pool.spec?.numberOfAgents ?? 0), 0) ?? 0;
-
-    return provisioningReportCount || this.countAgentsInvolved(execution.agentsInvolved);
-  }
-
-  private countAgentsInvolved(agentsInvolved?: string): number {
-    return (agentsInvolved ?? '').split(' ').filter((agent) => agent.trim() !== '').length;
+    return statusErrorCount + poolErrorCount;
   }
 
   ngOnDestroy(): void {

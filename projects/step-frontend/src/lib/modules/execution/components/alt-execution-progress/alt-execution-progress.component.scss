@@ -64,14 +64,9 @@ step-alt-execution-progress {
 
         .dot {
           position: absolute;
-          right: 0.2rem;
-          bottom: 0.25rem;
           color: var.$white;
           border-radius: 50%;
-          height: 1.3rem;
-          width: 1.3rem;
           font-size: 0.9rem;
-          line-height: 1.3rem;
           text-align: center;
 
           .unread-messages {
@@ -81,11 +76,55 @@ step-alt-execution-progress {
       }
 
       .execution-notices-button .dot {
+        right: 0.2rem;
+        bottom: 0.25rem;
+        height: 1.3rem;
+        width: 1.3rem;
+        line-height: 1.3rem;
         background: var.$orange;
       }
 
-      .agent-provisioning-button .dot {
-        background: var(--status-PROVISIONING);
+      .agent-provisioning-button {
+        .running-badge {
+          right: 0.5rem;
+          bottom: 0.55rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.2rem;
+          min-width: 1.2rem;
+          height: 1.2rem;
+          min-height: 1.2rem;
+          padding: 0;
+          border-radius: 50%;
+          line-height: 1.2rem;
+          background: var(--status-RUNNING);
+        }
+
+        .error-badge {
+          right: 0.2rem;
+          bottom: 0.25rem;
+          height: 1.3rem;
+          width: 1.3rem;
+          line-height: 1.3rem;
+          background: var.$red-650;
+        }
+
+        &.has-provisioning-errors .running-badge {
+          top: 0.15rem;
+          right: 0.5rem;
+          bottom: auto;
+        }
+
+        .provisioning-badge-icon {
+          width: 1rem;
+          height: 1rem;
+          min-width: 1rem;
+          min-height: 1rem;
+          font-size: 1rem;
+          margin-top: 0;
+          transform-origin: center;
+        }
       }
     }
 
@@ -206,8 +245,52 @@ step-alt-execution-progress {
     margin-bottom: -0.8rem;
   }
 
+  .execution-lifecycle-errors {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 1.2rem 1.6rem;
+    border: 0.1rem solid var.$red-15;
+    border-left: 0.4rem solid var.$red-650;
+    border-radius: 0.8rem;
+    background: var.$red-10;
+    color: var.$gray-800;
+    margin-top: -0.8rem;
+    margin-bottom: 0.5rem;
+
+    .lifecycle-error-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 2.4rem;
+      height: 2.4rem;
+      color: var.$red-650;
+    }
+
+    .lifecycle-error-content {
+      min-width: 0;
+
+      strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: var.$gray-800;
+      }
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.6rem;
+      white-space: normal;
+    }
+
+    li:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+  }
+
   .agent-provisioning-popover {
-    max-width: min(96rem, calc(100vw - 4rem));
+    max-width: min(120rem, calc(100vw - 4rem));
     transition:
       width 180ms ease,
       min-width 180ms ease,
@@ -288,6 +371,22 @@ step-alt-execution-progress {
 
   button.warning {
     color: var.$red-50;
+  }
+
+  .spin-animation {
+    animation-name: spin;
+    animation-duration: 4000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   step-autorefresh-toggle.warning {
