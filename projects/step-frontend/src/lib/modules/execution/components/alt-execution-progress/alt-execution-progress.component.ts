@@ -112,7 +112,7 @@ type ExecutionWithAgentProvisioning = Execution & {
 };
 
 interface AgentProvisioningInfo {
-  errorCount: number;
+  hasError: boolean;
   hasProvisioning: boolean;
   isActive: boolean;
 }
@@ -134,14 +134,14 @@ interface ControlledPopover {
 }
 
 interface AgentProvisioningBadgeEvent {
-  errorCount?: number;
   executionId: string;
+  hasError?: boolean;
   hasProvisioning?: boolean;
   isActive: boolean;
 }
 
 interface AgentProvisioningEventState {
-  errorCount: number;
+  hasError: boolean;
   hasProvisioning: boolean;
   isActive: boolean;
 }
@@ -351,26 +351,26 @@ export class AltExecutionProgressComponent
       const status = this.getAgentProvisioningStatus(execution);
       const eventState = agentProvisioningEvents[execution.id ?? ''];
       const eventIsActive = eventState?.isActive ?? false;
-      const eventErrorCount = eventState?.errorCount ?? 0;
+      const eventHasError = eventState?.hasError ?? false;
       const isActive =
         execution.status === 'PROVISIONING' || eventIsActive || (!!status && !status.completed && !status.error);
-      const errorCount = eventErrorCount || this.countProvisioningErrors(status);
+      const hasError = eventHasError || this.hasProvisioningError(status);
       const hasProvisioning =
         execution.status === 'PROVISIONING' ||
         !!status ||
         eventState?.hasProvisioning ||
         eventIsActive ||
-        eventErrorCount > 0;
+        eventHasError;
 
       return {
-        errorCount,
+        hasError,
         hasProvisioning: !!hasProvisioning,
         isActive,
       } as AgentProvisioningInfo;
     }),
     distinctUntilChanged(
       (previous, current) =>
-        previous.errorCount === current.errorCount &&
+        previous.hasError === current.hasError &&
         previous.hasProvisioning === current.hasProvisioning &&
         previous.isActive === current.isActive,
     ),
@@ -661,7 +661,7 @@ export class AltExecutionProgressComponent
         this.agentProvisioningEvents.update((events) => ({
           ...events,
           [detail.executionId]: {
-            errorCount: detail.errorCount ?? 0,
+            hasError: detail.hasError ?? false,
             hasProvisioning: detail.hasProvisioning ?? true,
             isActive: detail.isActive,
           },
@@ -714,11 +714,8 @@ export class AltExecutionProgressComponent
     return this.agentProvisioningProbeContext!;
   }
 
-  private countProvisioningErrors(status: AgentProvisioningStatusInfo | undefined): number {
-    const statusErrorCount = status?.error ? 1 : 0;
-    const poolErrorCount = status?.provisioningReport?.pools?.filter((pool) => !!pool.error).length ?? 0;
-
-    return statusErrorCount + poolErrorCount;
+  private hasProvisioningError(status: AgentProvisioningStatusInfo | undefined): boolean {
+    return !!status?.error || !!status?.provisioningReport?.pools?.some((pool) => !!pool.error);
   }
 
   ngOnDestroy(): void {

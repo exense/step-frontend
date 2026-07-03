@@ -93,47 +93,25 @@ step-alt-execution-progress {
           stroke: var(--status-RUNNING);
         }
 
-        .provisioning-running-icon {
-          position: absolute;
-          right: 0.45rem;
-          bottom: 0.6rem;
-          width: 1.2rem;
-          height: 1.2rem;
-          min-width: 1.2rem;
-          min-height: 1.2rem;
-          color: var.$gray-800;
-          font-size: 1.2rem;
-          transform-origin: center;
-          animation: rotate-provisioning-icon 4s linear infinite;
-        }
-
-        &.has-provisioning-errors .provisioning-running-icon {
-          top: 0.2rem;
-          bottom: auto;
+        .provisioning-state-badge {
+          right: 0.6rem;
+          bottom: 0.65rem;
+          height: 0.9rem;
+          width: 0.9rem;
         }
 
         .error-badge {
-          right: 0.2rem;
-          bottom: 0.25rem;
-          height: 1.3rem;
-          width: 1.3rem;
-          line-height: 1.3rem;
           background: var.$red-650;
+        }
+
+        .running-badge {
+          background: var(--status-RUNNING);
         }
       }
     }
 
     .agent-provisioning-probe {
       display: none;
-    }
-
-    @keyframes rotate-provisioning-icon {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
     }
 
     .title {

@@ -102,21 +102,15 @@
               type="button"
               mat-icon-button
               class="header-icon-button agent-provisioning-button"
-              [class.has-provisioning-errors]="agentProvisioningInfo.errorCount"
               [class.is-provisioning-active]="agentProvisioningInfo.isActive"
               [color]="isAgentProvisioningVisible() ? 'primary' : 'default'"
               matTooltip="Show agent provisioning logs"
             >
               <step-icon name="agent-provisioning" />
-              @if (agentProvisioningInfo.isActive) {
-                <step-icon name="refresh-cw" class="provisioning-running-icon" />
-              }
-              @if (agentProvisioningInfo.errorCount) {
-                <span class="dot error-badge">
-                  <span class="unread-messages">
-                    {{ agentProvisioningInfo.errorCount }}
-                  </span>
-                </span>
+              @if (agentProvisioningInfo.hasError) {
+                <span class="dot provisioning-state-badge error-badge"></span>
+              } @else if (agentProvisioningInfo.isActive) {
+                <span class="dot provisioning-state-badge running-badge"></span>
               }
             </button>
             <step-popover-content>
@@ -267,12 +261,12 @@
 @if (execution$ | async; as execution) {
   @if (execution.lifecycleErrors; as errors) {
     @if (errors.length) {
-      <section class="execution-lifecycle-errors" aria-label="Execution lifecycle errors">
+      <section class="execution-lifecycle-errors" aria-label="Fatal execution errors">
         <div class="lifecycle-error-icon">
           <step-icon name="alert-circle" />
         </div>
         <div class="lifecycle-error-content">
-          <strong>Execution lifecycle {{ errors.length === 1 ? 'error' : 'errors' }}</strong>
+          <strong>Fatal execution {{ errors.length === 1 ? 'error' : 'errors' }}</strong>
           <ul>
             @for (error of errors; track error.msg) {
               <li>{{ error.msg }}</li>
