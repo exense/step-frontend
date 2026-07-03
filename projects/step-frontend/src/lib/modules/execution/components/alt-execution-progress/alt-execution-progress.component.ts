@@ -40,9 +40,9 @@ import {
   Execution,
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
-  GridPersistenceStateService,
-  GridEditableService,
   GRID_ELEMENT_HEADER_ACTIONS,
+  GridEditableService,
+  GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
@@ -88,6 +88,8 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 import { AltExecutionReportGridSettingsActionComponent } from '../alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
+import { AltExecutionRefreshActivityService } from '../../services/alt-execution-refresh-activity.service';
+import { AltExecutionRefreshActivity } from '../../shared/alt-execution-refresh-activity.enum';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -179,6 +181,7 @@ interface RefreshParams {
 export class AltExecutionProgressComponent
   implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
 {
+  private _refreshActivityService = inject(AltExecutionRefreshActivityService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
@@ -228,6 +231,12 @@ export class AltExecutionProgressComponent
   );
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
+
+  protected readonly notices$ = this.activeExecution$.pipe(
+    switchMap((active) => active.resolvedNotices$),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -282,6 +291,7 @@ export class AltExecutionProgressComponent
     }),
   );
   protected readonly isResolvedParametersVisible = signal(false);
+  protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
@@ -316,8 +326,13 @@ export class AltExecutionProgressComponent
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  readonly testCases$ = combineLatest([this.execution$.pipe(startWith(undefined)), this.timeRangeSelection$]).pipe(
-    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+  readonly testCases$ = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TEST_CASES_TABLE),
+    this.execution$.pipe(startWith(undefined)),
+    this.timeRangeSelection$,
+  ]).pipe(
+    filter(([isActive]) => isActive),
+    map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
     smartSwitchMap(
       (curr, prev) => {
         return (
@@ -420,19 +435,31 @@ export class AltExecutionProgressComponent
   /**
    * Logic to reload keyword's datasource when execution is refreshed
    * **/
-  private refreshKeywordsSubscription = this.execution$
+  private readonly executionRefresh$ = this.execution$.pipe(
+    map((execution) => execution.id),
+    pairwise(),
+    filter((pair) => pair[0] === pair[1]),
+  );
+
+  private refreshKeywordsSubscription = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.KEYWORDS_TABLE),
+    this.executionRefresh$,
+  ])
     .pipe(
-      map((execution) => execution.id),
-      pairwise(),
-      filter((pair) => pair[0] === pair[1]),
+      filter(([isActive]) => isActive),
       takeUntilDestroyed(),
     )
     .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
-  readonly errors$ = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
-    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+  readonly errors$ = combineLatest([
+    this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
+    this.execution$,
+    this.timeRangeSelection$,
+  ]).pipe(
+    filter(([isActive]) => isActive),
+    map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
     smartSwitchMap(
       (curr, prev) => {
         return (
@@ -523,9 +550,14 @@ export class AltExecutionProgressComponent
   }
 
   private setupTreeRefresh(): void {
-    combineLatest([this.execution$, this.timeRangeSelection$])
+    combineLatest([
+      this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TREE),
+      this.execution$,
+      this.timeRangeSelection$,
+    ])
       .pipe(
-        map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+        filter(([isActive]) => isActive),
+        map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
         debounceTime(300),
         smartSwitchMap(
           (curr, prev) => {
@@ -542,7 +574,7 @@ export class AltExecutionProgressComponent
         ),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+      .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
@@ -550,7 +582,7 @@ export class AltExecutionProgressComponent
         }
         // expand all items in tree, due first initialization
         const expandAllByDefault = !this.isTreeInitialized;
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
         this.isTreeInitialized = true;
       });
 
@@ -592,6 +624,27 @@ export class AltExecutionProgressComponent
           'name',
           (item) => item.singleInstanceReportNode?.name ?? item?.artefact?.attributes?.['name'] ?? '',
         )
+        .addCustomSearchPredicate('nameOrErrors', (item, searchValue) => {
+          const search = searchValue.toLowerCase().trim();
+
+          const errorMessages = Object.keys(item.countByErrorMessage ?? {});
+          const childErrorMessages = Object.keys(item.countByChildrenErrorMessage ?? {});
+
+          const anyErrorMatched =
+            errorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search) ||
+            childErrorMessages.map((item) => item.toLowerCase().trim()).some((item) => item === search);
+
+          if (anyErrorMatched) {
+            return true;
+          }
+
+          const name = (
+            item.singleInstanceReportNode?.name ??
+            item?.artefact?.attributes?.['name'] ??
+            ''
+          ).toLowerCase();
+          return name.includes(search);
+        })
         .addSearchStringRegexPredicate('status', (item) =>
           Object.keys(item.countByStatus ?? {})
             .join(' ')

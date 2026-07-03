@@ -2,7 +2,12 @@
   <step-report-node-icon class="artefact-icon" [node]="reportNode" />
   <step-status [status]="reportNode.status" [iconMode]="true" />
   <span>{{ reportNode.name }}</span>
-  <step-alt-execution-time [startTime]="reportNode.executionTime" [duration]="reportNode.duration" [timeOnly]="true" />
+  <step-alt-execution-time
+    [startTime]="reportNode.executionTime"
+    [duration]="reportNode | reportNodeDuration"
+    [isRunning]="reportNode.status === 'RUNNING'"
+    [timeOnly]="true"
+  />
   <div class="btn-show-details-container">
     <button
       type="button"

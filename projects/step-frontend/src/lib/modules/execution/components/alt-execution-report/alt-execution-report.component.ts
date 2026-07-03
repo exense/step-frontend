@@ -7,10 +7,10 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  signal,
   untracked,
   viewChild,
   ViewEncapsulation,
-  signal,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
@@ -39,6 +39,9 @@ import {
   AggregatedTreeNodeDialogHooksStrategy,
 } from '../../services/aggregated-tree-node-dialog-hooks.service';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
+import { AltReportNodeTestcasesWidgetComponent } from '../alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
+import { AltReportNodeKeywordsWidgetComponent } from '../alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import { SearchError, SearchErrorType } from '../../shared/search-error';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -77,6 +80,11 @@ export class AltExecutionReportComponent
 
   private readonly treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
   private readonly treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
+  private readonly testCasesWidget = viewChild('testCasesWidget', { read: AltReportNodeTestcasesWidgetComponent });
+  private readonly testCasesWidgetContainer = viewChild('testCasesWidget', { read: ElementRef });
+  private readonly keywordWidget = viewChild('keywordWidget', { read: AltReportNodeKeywordsWidgetComponent });
+  private readonly keywordWidgetContainer = viewChild('keywordWidget', { read: ElementRef });
+
   private readonly errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
@@ -115,6 +123,15 @@ export class AltExecutionReportComponent
     .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
       this._urlParamsService.patchUrlParams(range, undefined, isFirst);
     });
+
+  constructor() {
+    afterNextRender(() => {
+      if (this._mode === ViewMode.PRINT) {
+        return;
+      }
+      requestAnimationFrame(() => this.renderReportContent.set(true));
+    });
+  }
 
   ngOnInit(): void {
     this._hooks.useStrategy(this);
@@ -182,22 +199,55 @@ export class AltExecutionReportComponent
 
   protected readonly ViewMode = ViewMode;
 
-  constructor() {
-    afterNextRender(() => {
-      if (this._mode === ViewMode.PRINT) {
-        return;
-      }
-      requestAnimationFrame(() => this.renderReportContent.set(true));
-    });
-  }
+  protected searchErrorInTree(error: string): void {
+    const treeWidget = untracked(() => this.treeWidget());
+    const treeWidgetContainer = untracked(() => this.treeWidgetContainer());
 
-  searchFor($event: string): void {
-    if (!this.treeWidget() || !this.treeWidgetContainer()) {
+    if (!treeWidget || !treeWidgetContainer) {
       return;
     }
 
-    this.treeWidgetContainer()!.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    treeWidgetContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    treeWidget.focusAndSearch(error);
+  }
 
-    this.treeWidget()!.focusAndSearch($event);
+  private searchErrorInTestCases(error: string): void {
+    const testCasesWidget = untracked(() => this.testCasesWidget());
+    const testCasesContainer = untracked(() => this.testCasesWidgetContainer());
+
+    if (!testCasesWidget || !testCasesContainer) {
+      return;
+    }
+
+    testCasesContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    testCasesWidget.search(error);
+  }
+
+  private searchErrorInKeywords(error: string): void {
+    const keywordsWidget = untracked(() => this.keywordWidget());
+    const keywordsContainer = untracked(() => this.keywordWidgetContainer());
+
+    if (!keywordsWidget || !keywordsContainer) {
+      return;
+    }
+
+    keywordsContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    keywordsWidget.search(error);
+  }
+
+  protected searchError({ type, value }: SearchError): void {
+    switch (type) {
+      case SearchErrorType.TREE:
+        this.searchErrorInTree(value);
+        break;
+      case SearchErrorType.KEYWORD:
+        this.searchErrorInKeywords(value);
+        break;
+      case SearchErrorType.TEST_CASE:
+        this.searchErrorInTestCases(value);
+        break;
+      default:
+        break;
+    }
   }
 }

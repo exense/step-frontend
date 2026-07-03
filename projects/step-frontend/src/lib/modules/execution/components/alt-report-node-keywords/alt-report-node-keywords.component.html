@@ -12,32 +12,35 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
       <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
-        <step-artefact-inline-details
-          parentElementSize
-          [reportInfo]="element"
-          [details]="details()"
-          class="smaller-view indent-call-keyword-inline"
-        >
-          <ng-container *stepArtefactInlineDetailsHeader>
-            <div class="larger-view artefact-header" [class.has-description]="!showFullDescription()">
-              <step-alt-execution-time
-                mode="text"
-                displayFormat="time"
-                [preserveDurationSpace]="true"
-                [startTime]="element.executionTime"
-                [duration]="element.duration"
-                [isRunning]="element.status === 'RUNNING'"
-                [singleUnit]="true"
-                [popoverMode]="PopoverMode.HOVER"
-              />
-              <step-report-node-icon [node]="element" />
-              <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
-                element.name
-              }}</span>
-            </div>
-          </ng-container>
-        </step-artefact-inline-details>
+        <div class="step-row-content">
+          <step-alt-execution-time
+            class="step-time"
+            mode="text"
+            displayFormat="time"
+            [preserveDurationSpace]="true"
+            [startTime]="element.executionTime"
+            [duration]="element | reportNodeDuration"
+            [isRunning]="element.status === 'RUNNING'"
+            [singleUnit]="true"
+            [popoverMode]="PopoverMode.HOVER"
+          />
+          <step-artefact-inline-details
+            parentElementSize
+            [reportInfo]="element"
+            [details]="details()"
+            class="smaller-view indent-call-keyword-inline step-entity"
+          >
+            <ng-container *stepArtefactInlineDetailsHeader>
+              <div class="larger-view artefact-header" [class.has-description]="!showFullDescription()">
+                <step-report-node-icon [node]="element" />
+                <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+                <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                  element.name
+                }}</span>
+              </div>
+            </ng-container>
+          </step-artefact-inline-details>
+        </div>
       </div>
     </td>
   </ng-container>

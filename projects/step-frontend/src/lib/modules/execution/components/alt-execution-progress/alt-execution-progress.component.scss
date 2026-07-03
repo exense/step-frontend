@@ -54,6 +54,32 @@ step-alt-execution-progress {
         margin-left: -0.5rem;
         margin-right: -0.5rem;
       }
+
+      .execution-notices-button {
+        overflow: visible;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .dot {
+          position: absolute;
+          right: 0.2rem;
+          bottom: 0.25rem;
+          background: var.$orange;
+          color: var.$white;
+          border-radius: 50%;
+          height: 1.3rem;
+          width: 1.3rem;
+          font-size: 0.9rem;
+          line-height: 1.3rem;
+          text-align: center;
+
+          .unread-messages {
+            display: block;
+          }
+        }
+      }
     }
 
     .title {
@@ -135,9 +161,11 @@ step-alt-execution-progress {
       step-btn-group {
         .mat-mdc-icon-button.mat-mdc-button-base {
           margin: 0;
+
           &:first-child {
             margin-left: 0.25rem;
           }
+
           &:last-child {
             margin-right: 0.25rem;
           }
@@ -158,6 +186,7 @@ step-alt-execution-progress {
 
     step-skeleton-placeholder {
       min-height: 3.7rem;
+
       & > div {
         margin: 0;
       }
@@ -181,7 +210,9 @@ step-alt-execution-progress {
       gap: 1.8rem;
     }
 
-    &.has-drilldown {
+    &.has-drilldown > step-simple-outlet {
+      display: flex;
+      flex-direction: column;
       flex: 1 1 auto;
       min-height: 0;
       padding-top: 1rem;
@@ -189,7 +220,7 @@ step-alt-execution-progress {
       .primary-content {
         display: none;
       }
-      
+
       > step-simple-outlet {
         display: flex;
         flex-direction: column;
@@ -250,12 +281,6 @@ step-alt-execution-progress {
     }
   }
 
-  &.is-drilldown-opened {
-    $header-height: 6.4rem;
-    height: calc(100vh - $header-height);
-    overflow: hidden;
-  }
-
   .node-details-drilldown {
     display: block;
     min-height: 0;
@@ -275,6 +300,7 @@ step-alt-execution-progress {
   overflow: hidden;
 
   step-alt-execution-resolved-parameters,
+  step-alt-execution-notices,
   step-execution-agents-list {
     flex: 1 1 auto;
     min-height: 0;

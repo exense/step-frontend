@@ -155,7 +155,7 @@
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
-              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
               [initialStatus]="$any(item).searchStatus"
               (showDetails)="handleOpenDetails($event, item.id)"
             />

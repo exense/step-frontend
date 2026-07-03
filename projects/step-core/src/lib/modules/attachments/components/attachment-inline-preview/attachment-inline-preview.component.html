@@ -14,32 +14,21 @@
               matTooltipPosition="below"
             />
           }
-          @if (attachmentType === AttachmentType.STREAMING_BINARY) {
-            <span
-              [class.highlight-inline-item]="hasResourceReadPermission()"
-              [class.disabled-inline-item]="!hasResourceReadPermission()"
-              stepUndraggedClick
-              (undraggedClick)="downloadBinaryStream(att, $event)"
-            >
-              <step-long-inline-text [text]="att.name" />
-            </span>
-          } @else {
-            <span
-              [class.highlight-inline-item]="hasResourceReadPermission()"
-              [class.disabled-inline-item]="!hasResourceReadPermission()"
-              stepUndraggedClick
-              (undraggedClick)="open(att, $event)"
-            >
-              <step-long-inline-text [text]="att.name" />
-            </span>
-          }
+          <span
+            [class.highlight-inline-item]="hasResourceReadPermission()"
+            [class.disabled-inline-item]="!hasResourceReadPermission()"
+            stepUndraggedClick
+            (undraggedClick)="open(att, $event)"
+          >
+            <step-long-inline-text [text]="att.name" />
+          </span>
           @if (attachmentType === AttachmentType.STREAMING_TEXT || attachmentType === AttachmentType.STREAMING_BINARY) {
             <step-streaming-attachment-indicator [attachment]="att" />
           }
         </div>
       } @else {
         <div class="attachment-name-container">
-          <step-icon class="skipped" name="alert-circle" matTooltip="Skipped" matTooltipPosition="below" />
+          <step-icon class="skipped" name="alert-circle" />
           <span class="highlight-inline-item">
             <step-long-inline-text [text]="att.name" />
           </span>
@@ -55,10 +44,11 @@
           @case (AttachmentType.IMG) {
             <step-attachment-preview class="large" [attachment]="att" [showDownload]="false" [withBorder]="false" />
           }
+          @case (AttachmentType.TEXT) {
+            <step-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
+          }
           @case (AttachmentType.SKIPPED) {
-            <div class="default-attachment-popover-view">
-              <p class="reason">{{ $any(att).reason }}</p>
-            </div>
+            <step-skipped-attachment-info [attachment]="att" />
           }
           @default {
             <div class="default-attachment-popover-view">

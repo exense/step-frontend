@@ -60,7 +60,9 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this._listSearch.searchName$.subscribe((name) => this.tableSearchUntracked?.onSearch?.('name', name));
+    this._listSearch.searchNameOrErrors$.subscribe((searchValue) =>
+      this.tableSearchUntracked?.onSearch?.('nameOrErrors', searchValue, false),
+    );
     this._listSearch.searchStatuses$.subscribe((status) => this.tableSearchUntracked?.onSearch?.('status', status));
     this._listSearch.searchReportNodeClass$.subscribe((reportNodeClass) =>
       this.tableSearchUntracked?.onSearch?.('_class', reportNodeClass),

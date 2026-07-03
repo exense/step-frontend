@@ -21,6 +21,7 @@ import {
   DialogParentService,
   dialogRoute,
   editScheduledTaskRoute,
+  EntityRefDirective,
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
@@ -39,7 +40,6 @@ import {
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  EntityRefDirective,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -124,6 +124,7 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
+import { AltExecutionNoticesComponent } from './components/alt-execution-notices/alt-execution-notices.component';
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
@@ -175,6 +176,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
 import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
 import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { NoticeBadgeLabelPipe } from './pipes/notice-badge-label.pipe';
 import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
 import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
 import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
@@ -203,6 +205,11 @@ import {
 import { DrilldownRootType } from './shared/drilldown-root-type';
 import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
 import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
+import { AltExecutionRefreshActivityService } from './services/alt-execution-refresh-activity.service';
+import {
+  ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+  AltExecutionRefreshActivity,
+} from './shared/alt-execution-refresh-activity.enum';
 
 @NgModule({
   declarations: [
@@ -239,6 +246,7 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
+    AltExecutionNoticesComponent,
     AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportSettingsComponent,
@@ -316,6 +324,7 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
     AltReportNodeHeaderComponent,
     AggregatedTreeNodeDrilldownComponent,
     DashletEmptyColumnComponent,
+    NoticeBadgeLabelPipe,
   ],
   imports: [
     StepCommonModule,
@@ -533,7 +542,7 @@ export class ExecutionModule {
                 checkEntityGuardFactory({
                   entityType: 'execution',
                   idExtractor: (route) => route.url[0].path,
-                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
                   isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                   getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
@@ -631,6 +640,7 @@ export class ExecutionModule {
         {
           path: '',
           redirectTo: 'list',
+          pathMatch: 'full',
         },
         {
           path: 'list',
@@ -646,6 +656,7 @@ export class ExecutionModule {
           path: ':id',
           component: AltExecutionProgressComponent,
           providers: [
+            AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
@@ -667,20 +678,26 @@ export class ExecutionModule {
             sequenceCanActivateGuards([
               checkEntityGuardFactory({
                 entityType: 'execution',
-                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
                 getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
                 isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
                 getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
               }),
               altExecutionGuard,
             ]),
+            () => {
+              const _ctx = inject(AggregatedReportViewTreeStateContextService);
+              const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+              _ctx.setState(_treeState);
+              return true;
+            },
           ],
           resolve: {
             setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
               inject(ActiveExecutionContextService).setupExecutionId(id);
               return true;
-            }
+            },
           },
           canDeactivate: [
             () => {
@@ -696,6 +713,7 @@ export class ExecutionModule {
             {
               path: '',
               redirectTo: 'report',
+              pathMatch: 'full',
             },
             {
               /**
@@ -733,6 +751,12 @@ export class ExecutionModule {
                     _ctx.setState(_treeState);
                     return true;
                   },
+                  () => {
+                    inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+                      ...ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+                    );
+                    return true;
+                  },
                 ],
                 children: [
                   {
@@ -761,6 +785,12 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionAnalyticsComponent,
+                  canActivate: [
+                    () => {
+                      inject(AltExecutionRefreshActivityService).setupRefreshActivity();
+                      return true;
+                    },
+                  ],
                 },
               ],
             },
@@ -836,7 +866,6 @@ export class ExecutionModule {
             }),
             {
               path: 'node-details',
-              outlet: 'nodeDetails',
               component: SimpleOutletComponent,
               children: [
                 {
@@ -851,10 +880,20 @@ export class ExecutionModule {
                     }
                     return null;
                   },
+                  canActivate: [
+                    () => {
+                      inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+                        AltExecutionRefreshActivity.TREE,
+                        AltExecutionRefreshActivity.KEYWORDS_TABLE,
+                        AltExecutionRefreshActivity.TEST_CASES_TABLE,
+                      );
+                      return true;
+                    },
+                  ],
                   resolve: {
                     drilldownState: (route: ActivatedRouteSnapshot) => {
                       const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
-                      const resolvedPartialPath = _aggregatedViewTreeStateContext.getState().resolvedPartialPath();
+                      const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
 
                       const url = route.url;
 
@@ -894,7 +933,7 @@ export class ExecutionModule {
                             nodeId,
                             searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
                             searchStatusCount,
-                            resolvedPartialPath,
+                            partialTreeRootNodeId,
                           });
                         }
                       }
