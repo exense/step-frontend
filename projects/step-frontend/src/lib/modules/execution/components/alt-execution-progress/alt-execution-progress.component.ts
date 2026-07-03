@@ -105,6 +105,7 @@ interface RefreshParams {
 }
 
 type ExecutionWithAgentProvisioning = Execution & {
+  agentProvisioningProbeOnly?: boolean;
   agentProvisioningStatus?: AgentProvisioningStatusInfo;
   provisioningStatus?: AgentProvisioningStatusInfo;
   tokenProvisioningStatus?: AgentProvisioningStatusInfo;
@@ -112,6 +113,7 @@ type ExecutionWithAgentProvisioning = Execution & {
 
 interface AgentProvisioningInfo {
   errorCount: number;
+  hasProvisioning: boolean;
   isActive: boolean;
 }
 
@@ -134,11 +136,13 @@ interface ControlledPopover {
 interface AgentProvisioningBadgeEvent {
   errorCount?: number;
   executionId: string;
+  hasProvisioning?: boolean;
   isActive: boolean;
 }
 
 interface AgentProvisioningEventState {
   errorCount: number;
+  hasProvisioning: boolean;
   isActive: boolean;
 }
 
@@ -257,6 +261,8 @@ export class AltExecutionProgressComponent
   private isTreeInitialized = false;
   private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
   private readonly agentProvisioningEvents = signal<Record<string, AgentProvisioningEventState>>({});
+  private agentProvisioningProbeContext?: ExecutionWithAgentProvisioning;
+  private agentProvisioningProbeContextKey?: string;
 
   selectFullRange(): void {
     this.updateTimeRangeSelection({ type: 'FULL' });
@@ -349,14 +355,24 @@ export class AltExecutionProgressComponent
       const isActive =
         execution.status === 'PROVISIONING' || eventIsActive || (!!status && !status.completed && !status.error);
       const errorCount = eventErrorCount || this.countProvisioningErrors(status);
+      const hasProvisioning =
+        execution.status === 'PROVISIONING' ||
+        !!status ||
+        eventState?.hasProvisioning ||
+        eventIsActive ||
+        eventErrorCount > 0;
 
       return {
         errorCount,
+        hasProvisioning: !!hasProvisioning,
         isActive,
       } as AgentProvisioningInfo;
     }),
     distinctUntilChanged(
-      (previous, current) => previous.errorCount === current.errorCount && previous.isActive === current.isActive,
+      (previous, current) =>
+        previous.errorCount === current.errorCount &&
+        previous.hasProvisioning === current.hasProvisioning &&
+        previous.isActive === current.isActive,
     ),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -623,6 +639,15 @@ export class AltExecutionProgressComponent
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(() => this.openAgentProvisioningPopover());
+
+    this.agentProvisioningInfo$
+      .pipe(
+        map(({ hasProvisioning }) => hasProvisioning),
+        distinctUntilChanged(),
+        filter((hasProvisioning) => !hasProvisioning),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.isAgentProvisioningVisible.set(false));
   }
 
   private setupAgentProvisioningBadgeEvents(): void {
@@ -637,6 +662,7 @@ export class AltExecutionProgressComponent
           ...events,
           [detail.executionId]: {
             errorCount: detail.errorCount ?? 0,
+            hasProvisioning: detail.hasProvisioning ?? true,
             isActive: detail.isActive,
           },
         }));
@@ -674,6 +700,18 @@ export class AltExecutionProgressComponent
       (execution.customFields?.['agentProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
       (execution.customFields?.['provisioningStatus'] as AgentProvisioningStatusInfo | undefined)
     );
+  }
+
+  protected getAgentProvisioningProbeContext(execution: Execution): Execution {
+    const contextKey = `${execution.id ?? ''}|${execution.status ?? ''}`;
+    if (this.agentProvisioningProbeContextKey !== contextKey) {
+      this.agentProvisioningProbeContextKey = contextKey;
+      this.agentProvisioningProbeContext = {
+        ...execution,
+        agentProvisioningProbeOnly: true,
+      };
+    }
+    return this.agentProvisioningProbeContext!;
   }
 
   private countProvisioningErrors(status: AgentProvisioningStatusInfo | undefined): number {

@@ -89,44 +89,52 @@
         </step-popover>
       }
       @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
-        <step-popover
-          #agentProvisioningPopover
-          yPosition="below"
-          [mode]="PopoverMode.CLICK"
-          (toggledEvent)="isAgentProvisioningVisible.set($event)"
-          [whiteBackground]="true"
-          [smallFont]="false"
-        >
-          <button
-            type="button"
-            mat-icon-button
-            class="header-icon-button agent-provisioning-button"
-            [class.has-provisioning-errors]="agentProvisioningInfo.errorCount"
-            [color]="isAgentProvisioningVisible() ? 'primary' : 'default'"
-            matTooltip="Show agent provisioning logs"
+        @if (agentProvisioningInfo.hasProvisioning) {
+          <step-popover
+            #agentProvisioningPopover
+            yPosition="below"
+            [mode]="PopoverMode.CLICK"
+            (toggledEvent)="isAgentProvisioningVisible.set($event)"
+            [whiteBackground]="true"
+            [smallFont]="false"
           >
-            <step-icon name="agent-provisioning" />
-            @if (agentProvisioningInfo.isActive) {
-              <span class="dot running-badge">
-                <step-icon name="refresh-cw" class="spin-animation provisioning-badge-icon" />
-              </span>
-            }
-            @if (agentProvisioningInfo.errorCount) {
-              <span class="dot error-badge">
-                <span class="unread-messages">
-                  {{ agentProvisioningInfo.errorCount }}
-                </span>
-              </span>
-            }
-          </button>
-          <step-popover-content>
-            <div class="execution-popover-table agent-provisioning-popover">
-              @for (message of _executionMessages; track message.id) {
-                <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
+            <button
+              type="button"
+              mat-icon-button
+              class="header-icon-button agent-provisioning-button"
+              [class.has-provisioning-errors]="agentProvisioningInfo.errorCount"
+              [class.is-provisioning-active]="agentProvisioningInfo.isActive"
+              [color]="isAgentProvisioningVisible() ? 'primary' : 'default'"
+              matTooltip="Show agent provisioning logs"
+            >
+              <step-icon name="agent-provisioning" />
+              @if (agentProvisioningInfo.isActive) {
+                <step-icon name="refresh-cw" class="provisioning-running-icon" />
               }
-            </div>
-          </step-popover-content>
-        </step-popover>
+              @if (agentProvisioningInfo.errorCount) {
+                <span class="dot error-badge">
+                  <span class="unread-messages">
+                    {{ agentProvisioningInfo.errorCount }}
+                  </span>
+                </span>
+              }
+            </button>
+            <step-popover-content>
+              <div class="execution-popover-table agent-provisioning-popover">
+                @for (message of _executionMessages; track message.id) {
+                  <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
+                }
+              </div>
+            </step-popover-content>
+          </step-popover>
+        }
+      }
+      @if (!isAgentProvisioningVisible()) {
+        <div class="agent-provisioning-probe" aria-hidden="true">
+          @for (message of _executionMessages; track message.id) {
+            <step-dashlet [itemKey]="message.template" [context]="getAgentProvisioningProbeContext(execution)" />
+          }
+        </div>
       }
       <step-popover
         yPosition="below"

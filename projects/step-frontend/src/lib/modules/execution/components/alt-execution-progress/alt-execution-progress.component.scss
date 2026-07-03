@@ -85,20 +85,31 @@ step-alt-execution-progress {
       }
 
       .agent-provisioning-button {
-        .running-badge {
-          right: 0.5rem;
-          bottom: 0.55rem;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
+        step-icon .agent-provisioning-status-shape {
+          transition: stroke 180ms ease;
+        }
+
+        &.is-provisioning-active step-icon .agent-provisioning-status-shape {
+          stroke: var(--status-RUNNING);
+        }
+
+        .provisioning-running-icon {
+          position: absolute;
+          right: 0.45rem;
+          bottom: 0.6rem;
           width: 1.2rem;
-          min-width: 1.2rem;
           height: 1.2rem;
+          min-width: 1.2rem;
           min-height: 1.2rem;
-          padding: 0;
-          border-radius: 50%;
-          line-height: 1.2rem;
-          background: var(--status-RUNNING);
+          color: var.$gray-800;
+          font-size: 1.2rem;
+          transform-origin: center;
+          animation: rotate-provisioning-icon 4s linear infinite;
+        }
+
+        &.has-provisioning-errors .provisioning-running-icon {
+          top: 0.2rem;
+          bottom: auto;
         }
 
         .error-badge {
@@ -109,22 +120,19 @@ step-alt-execution-progress {
           line-height: 1.3rem;
           background: var.$red-650;
         }
+      }
+    }
 
-        &.has-provisioning-errors .running-badge {
-          top: 0.15rem;
-          right: 0.5rem;
-          bottom: auto;
-        }
+    .agent-provisioning-probe {
+      display: none;
+    }
 
-        .provisioning-badge-icon {
-          width: 1rem;
-          height: 1rem;
-          min-width: 1rem;
-          min-height: 1rem;
-          font-size: 1rem;
-          margin-top: 0;
-          transform-origin: center;
-        }
+    @keyframes rotate-provisioning-icon {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
       }
     }
 
@@ -373,22 +381,6 @@ step-alt-execution-progress {
     color: var.$red-50;
   }
 
-  .spin-animation {
-    animation-name: spin;
-    animation-duration: 4000ms;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   step-autorefresh-toggle.warning {
     step-icon {
       color: var.$orange;
@@ -420,4 +412,10 @@ step-alt-execution-progress {
     min-height: 0;
     overflow: auto;
   }
+}
+
+.execution-popover-table.agent-provisioning-popover {
+  max-width: min(120rem, calc(100vw - 4rem));
+  overflow-x: hidden;
+  overflow-y: auto;
 }
