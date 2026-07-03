@@ -27,12 +27,12 @@
           <step-icon name="code" />
         </button>
       }
-      @if (canOpenRenderedAttachmentInSeparateTab) {
+      @if (canOpenAttachmentInSeparateTab()) {
         <button
           type="button"
           tabindex="-1"
           mat-icon-button
-          matTooltip="Open in separate tab"
+          matTooltip="Open attachment in separate tab"
           matTooltipPosition="below"
           (click)="openRenderedAttachmentInSeparateTab()"
         >
