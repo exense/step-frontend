@@ -24,7 +24,7 @@ export class AltExecutionErrorsWidgetComponent {
     return errors.reduce((res, error) => res + error.count, 0);
   });
 
-  protected findInTree(message: string) {
+  protected findInTree(message: string): void {
     this.searchFor.emit(message);
   }
 }

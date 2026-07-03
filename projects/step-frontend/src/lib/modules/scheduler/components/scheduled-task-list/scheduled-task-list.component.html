@@ -136,7 +136,7 @@
             status: true,
             'status-on': element.active,
             'status-off': !element.active,
-            'scheduler-disabled': isSchedulerDisabled()
+            'scheduler-disabled': isSchedulerDisabled(),
           }"
           [disabled]="!('task-toggle' | hasRight | async)"
           (click)="switchActive(element)"
