@@ -38,7 +38,11 @@
           }
         </div>
       } @else {
-        <div class="attachment-name-container">
+        <div
+          class="attachment-name-container"
+          stepUndraggedClick
+          (undraggedClick)="$event.preventDefault(); $event.stopImmediatePropagation()"
+        >
           <step-icon class="skipped" name="alert-circle" matTooltip="Skipped" matTooltipPosition="below" />
           <span class="highlight-inline-item">
             <step-long-inline-text [text]="att.name" />
