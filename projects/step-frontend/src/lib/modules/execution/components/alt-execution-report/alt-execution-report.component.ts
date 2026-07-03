@@ -129,8 +129,12 @@ export class AltExecutionReportComponent
       if (this._mode === ViewMode.PRINT) {
         return;
       }
-      requestAnimationFrame(() => this.renderReportContent.set(true));
+      this.scheduleAfterNextPaint(() => this.renderReportContent.set(true));
     });
+  }
+
+  private scheduleAfterNextPaint(callback: () => void): void {
+    requestAnimationFrame(callback);
   }
 
   ngOnInit(): void {
