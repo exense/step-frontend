@@ -136,7 +136,7 @@ export class ExecutionProgressComponent
   testCasesDataSource?: TableDataSource<ReportNode>;
   keywordSearch?: string;
 
-  readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
+  readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/legacy/messages');
 
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
