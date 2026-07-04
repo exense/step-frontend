@@ -425,10 +425,11 @@ export class AltExecutionProgressComponent
         );
       },
       ({ execution, timeRangeSelection }) => {
-        if (!this.canLoadTestCases(execution) || !timeRangeSelection) {
+        const executionId = execution?.id;
+        if (!this.canLoadTestCases(executionId) || !execution || !timeRangeSelection) {
           return of(undefined);
         }
-        return this._executionsApi.getFlatAggregatedReportView(execution.id, {
+        return this._executionsApi.getFlatAggregatedReportView(executionId, {
           range: convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId()),
           filterArtefactClasses: ['TestCase'],
           fetchCurrentOperations: true,
@@ -840,8 +841,7 @@ export class AltExecutionProgressComponent
     );
   }
 
-  private canLoadTestCases(execution?: Execution): execution is Execution {
-    const executionId = execution?.id;
+  private canLoadTestCases(executionId?: string): executionId is string {
     return (
       !!executionId && executionId === this._executionId() && this._activeExecutionsService.hasExecution(executionId)
     );
