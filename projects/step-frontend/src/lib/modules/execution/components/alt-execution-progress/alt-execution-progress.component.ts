@@ -425,7 +425,7 @@ export class AltExecutionProgressComponent
         );
       },
       ({ execution, timeRangeSelection }) => {
-        if (!execution?.id || !timeRangeSelection) {
+        if (!this.canLoadTestCases(execution) || !timeRangeSelection) {
           return of(undefined);
         }
         return this._executionsApi.getFlatAggregatedReportView(execution.id, {
@@ -837,6 +837,13 @@ export class AltExecutionProgressComponent
           return reportNode.executionTime >= from && reportNode.executionTime <= to;
         })
         .build(),
+    );
+  }
+
+  private canLoadTestCases(execution?: Execution): execution is Execution {
+    const executionId = execution?.id;
+    return (
+      !!executionId && executionId === this._executionId() && this._activeExecutionsService.hasExecution(executionId)
     );
   }
 
