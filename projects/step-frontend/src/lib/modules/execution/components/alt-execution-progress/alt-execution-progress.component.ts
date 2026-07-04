@@ -426,7 +426,7 @@ export class AltExecutionProgressComponent
       },
       ({ execution, timeRangeSelection }) => {
         const executionId = execution?.id;
-        if (!this.canLoadTestCases(executionId) || !execution || !timeRangeSelection) {
+        if (!this.canLoadExecutionData(executionId) || !execution || !timeRangeSelection) {
           return of(undefined);
         }
         return this._executionsApi.getFlatAggregatedReportView(executionId, {
@@ -743,6 +743,10 @@ export class AltExecutionProgressComponent
             );
           },
           ({ execution, timeRangeSelection }) => {
+            const executionId = execution?.id;
+            if (!this.canLoadExecutionData(executionId)) {
+              return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
+            }
             return this._treeLoader.load(execution, timeRangeSelection);
           },
           this._destroyRef,
@@ -841,7 +845,7 @@ export class AltExecutionProgressComponent
     );
   }
 
-  private canLoadTestCases(executionId?: string): executionId is string {
+  private canLoadExecutionData(executionId?: string): executionId is string {
     return (
       !!executionId && executionId === this._executionId() && this._activeExecutionsService.hasExecution(executionId)
     );
