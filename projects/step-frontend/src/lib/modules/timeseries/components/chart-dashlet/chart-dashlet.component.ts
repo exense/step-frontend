@@ -100,13 +100,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
-  readonly RATE_UNITS: RateUnit[] = [
+  protected readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per second', unitKey: 's' },
     { menuLabel: 'Per minute', unitKey: 'm' },
     { menuLabel: 'Per hour', unitKey: 'h' },
   ];
 
-  readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
+  protected readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
     s: 3600,
     m: 60,
     h: 1,
@@ -117,11 +117,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
-  readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
-  readonly chart = viewChild<TimeSeriesChartComponent>('chart');
+  protected readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
+  protected readonly chart = viewChild<TimeSeriesChartComponent>('chart');
 
-  readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
-  _attributesByIds: Record<string, MetricAttribute> = {};
+  protected readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
+  protected _attributesByIds: Record<string, MetricAttribute> = {};
 
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
@@ -136,21 +136,21 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   readonly zoomReset = output();
   readonly emptyStateChange = output<boolean>();
 
-  readonly isLoading = signal<boolean>(false);
+  protected readonly isLoading = signal<boolean>(false);
 
-  groupingSelection: MetricAttributeSelection[] = [];
-  selectedAggregate!: ChartAggregation;
-  selectedAggregatePcl?: number;
-  requestOql: string = '';
+  protected groupingSelection: MetricAttributeSelection[] = [];
+  protected selectedAggregate!: ChartAggregation;
+  protected selectedAggregatePcl?: number;
+  protected requestOql: string = '';
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
-  syncGroupSubscription?: Subscription;
-  cachedRequest?: FetchBucketsRequest;
-  cachedResponse?: TimeSeriesAPIResponse;
-  showHigherResolutionWarning = false;
-  collectionResolutionUsed: number = 0;
+  protected syncGroupSubscription?: Subscription;
+  protected cachedRequest?: FetchBucketsRequest;
+  protected cachedResponse?: TimeSeriesAPIResponse;
+  protected showHigherResolutionWarning = false;
+  protected collectionResolutionUsed: number = 0;
 
   private readonly _itemChangeSub = toObservable(this.item)
     .pipe(
@@ -301,11 +301,21 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     if (!hasGrouping) {
       return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
     }
-    const customSeriesColor = axes.renderingSettings?.seriesColors?.[colorKey];
+    const customSeriesColor = this.getCustomSeriesColor(colorKey, axes.renderingSettings?.seriesColors);
     if (customSeriesColor) {
       return { color: customSeriesColor, type: MarkerType.SQUARE };
     }
     return this.context().colorsPool.getSeriesColor(colorKey);
+  }
+
+  private getCustomSeriesColor(colorKey: string, seriesColors?: Record<string, string>): string | undefined {
+    const customSeriesColor = seriesColors?.[colorKey];
+    if (customSeriesColor || !seriesColors) {
+      return customSeriesColor;
+    }
+    const normalizedColorKey = colorKey.toLowerCase();
+    const matchingKey = Object.keys(seriesColors).find((key) => key.toLowerCase() === normalizedColorKey);
+    return matchingKey ? seriesColors[matchingKey] : undefined;
   }
 
   /**
@@ -739,7 +749,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     );
   }
 
-  handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
+  protected handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
     this.switchAggregate(change.aggregate!, change.params);
     this.settingsMenuTrigger()?.closeMenu();
   }
@@ -773,7 +783,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
               if (labelId) {
-                let newLabel;
+                let newLabel: string;
                 if (response[labelId]) {
                   newLabel = response[labelId];
                 } else {
@@ -933,15 +943,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     this.syncGroupSubscription?.unsubscribe();
   }
 
-  getType(): 'TABLE' | 'CHART' {
+  public getType(): 'TABLE' | 'CHART' {
     return 'CHART';
   }
 
-  getContext(): TimeSeriesContext {
+  public getContext(): TimeSeriesContext {
     return this.context();
   }
 
-  getItem(): DashboardItem {
+  public getItem(): DashboardItem {
     return this.item();
   }
 
