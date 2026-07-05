@@ -468,7 +468,6 @@ export abstract class CrossExecutionDashboardState {
                       executionEntry.statuses[status] = newCount;
                     }
                   });
-                  executionEntry.statuses['PASSED'] = 3;
                 });
                 let series = Array.from(allStatuses).map((status) => {
                   let color = this._statusColors[status as Status];
