@@ -63,9 +63,7 @@ export class DoughnutChartComponent implements OnDestroy {
       },
       plugins: [ChartDataLabels],
       options: {
-        animation: {
-          duration: settings.viewMode === 'print' ? 0 : 500,
-        },
+        animation: false,
         onClick: (event: ChartEvent, elements: ActiveElement[], chart: Chart) => {
           if (!elements.length) {
             return;

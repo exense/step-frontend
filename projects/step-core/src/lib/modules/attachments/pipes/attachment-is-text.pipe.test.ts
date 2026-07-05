@@ -8,12 +8,15 @@ describe('AttachmentIsTextPipe', () => {
     expect(isTextAttachment('report.xml')).toBe(true);
     expect(isTextAttachment('report.log')).toBe(true);
     expect(isTextAttachment('report.txt')).toBe(true);
+    expect(isTextAttachment('report.md')).toBe(true);
+    expect(isTextAttachment('report.markdown')).toBe(true);
   });
 
   it('matches extensions case-insensitively', () => {
     expect(isTextAttachment('report.HTML')).toBe(true);
     expect(isTextAttachment('report.HTM')).toBe(true);
     expect(isTextAttachment('report.XML')).toBe(true);
+    expect(isTextAttachment('report.MARKDOWN')).toBe(true);
   });
 
   it('rejects unsupported extensions', () => {

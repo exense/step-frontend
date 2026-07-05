@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   contentChild,
@@ -36,6 +37,7 @@ enum TreeNodeAction {
     },
   ],
   hostDirectives: [ElementSizeDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionTreeComponent implements TreeActionsService {
@@ -70,7 +72,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       actions.push({
         id: TreeNodeAction.FIND_ROOT_CAUSE,
         label: 'Find error cause',
-        disabled
+        disabled,
       });
     }
 

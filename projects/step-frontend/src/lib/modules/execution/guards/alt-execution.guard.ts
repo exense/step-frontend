@@ -19,7 +19,7 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  return _executionService.getExecutionByIdCached(executionId).pipe(
+  return _executionService.getExecutionViaOverviewCached(executionId).pipe(
     switchMap((execution) => _executionViewMode.getExecutionMode(execution)),
     map((mode) => {
       if (mode === ExecutionViewMode.NEW) {

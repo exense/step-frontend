@@ -16,6 +16,12 @@ import { HttpOverrideResponseInterceptorService } from './http-override-response
 import { downloadFile } from '../shared/download-file';
 import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
 
+export interface ResourcePreview {
+  resourceId: string;
+  success: boolean;
+  content: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService implements HttpOverrideResponseInterceptor {
   static readonly RESOURCES_TABLE_ID = 'resources';
@@ -127,7 +133,19 @@ export class AugmentedResourcesService extends ResourcesService implements HttpO
     );
   }
 
-  downloadResource(resourceId: string, fileName: string) {
+  getBulkPreviewContent(resourceIds: string[], numberOflines: number): Observable<ResourcePreview[]> {
+    return this._httpClient.post<ResourcePreview[]>(
+      'rest/resources/bulk-preview-content',
+      resourceIds,
+      this._requestContextHolder.decorateRequestOptions({
+        params: {
+          numberOflines,
+        },
+      }),
+    );
+  }
+
+  downloadResource(resourceId: string, fileName: string): void {
     const url = this.getDownloadResourceUrl(resourceId);
     downloadFile(url, fileName);
   }

@@ -1,8 +1,7 @@
-
 export enum SearchErrorType {
   TREE,
   TEST_CASE,
-  KEYWORD
+  KEYWORD,
 }
 
 export interface SearchError {

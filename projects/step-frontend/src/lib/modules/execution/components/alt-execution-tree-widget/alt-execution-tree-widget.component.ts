@@ -1,4 +1,4 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, viewChild } from '@angular/core';
 import { ElementSizeDirective, ReportNode } from '@exense/step-core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
@@ -13,6 +13,7 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
   templateUrl: './alt-execution-tree-widget.component.html',
   styleUrl: './alt-execution-tree-widget.component.scss',
   hostDirectives: [ElementSizeDirective, AltExecutionTreeWidgetDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionTreeWidgetComponent {
