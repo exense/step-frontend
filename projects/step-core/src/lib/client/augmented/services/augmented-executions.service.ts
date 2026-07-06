@@ -169,26 +169,26 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   }
 
   private createStartTimeRangeFilters(from?: number, to?: number): TableCollectionFilter[] {
-    return [
-      from != null
-        ? {
-            collectionFilter: {
-              type: CompareCondition.GREATER_THAN_OR_EQUAL,
-              field: 'startTime',
-              value: from,
-            },
-          }
-        : undefined,
-      to != null
-        ? {
-            collectionFilter: {
-              type: CompareCondition.LOWER_THAN,
-              field: 'startTime',
-              value: to,
-            },
-          }
-        : undefined,
-    ].filter((filter): filter is TableCollectionFilter => !!filter);
+    const filters: TableCollectionFilter[] = [];
+    if (from != null) {
+      filters.push({
+        collectionFilter: {
+          type: CompareCondition.GREATER_THAN_OR_EQUAL,
+          field: 'startTime',
+          value: from,
+        },
+      });
+    }
+    if (to != null) {
+      filters.push({
+        collectionFilter: {
+          type: CompareCondition.LOWER_THAN,
+          field: 'startTime',
+          value: to,
+        },
+      });
+    }
+    return filters;
   }
 
   countExecutionsByStatus(status: string): Observable<number> {
