@@ -21,7 +21,15 @@ export class AttachmentDownloadConfirmationDialogComponent {
 
   protected readonly _data = inject<AttachmentDownloadConfirmationDialogData>(MAT_DIALOG_DATA);
 
-  @HostListener('keydown.enter')
+  @HostListener('keydown.enter', ['$event'])
+  protected onEnter(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.tagName === 'BUTTON') {
+      return;
+    }
+    this.download();
+  }
+
   protected download(): void {
     this._dialogRef.close(true);
   }
