@@ -67,6 +67,7 @@ export class AttachmentDialogsService {
     if (mimeType === FILE_TYPES.PDF.mimeType) {
       return true;
     }
-    return data.name?.split('.').pop()?.toLowerCase() === FILE_TYPES.PDF.extension;
+    const name = data.name?.toLowerCase();
+    return !!name && name.endsWith(`.${FILE_TYPES.PDF.extension}`);
   }
 }

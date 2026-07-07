@@ -98,6 +98,19 @@ describe('AttachmentDialogsService', () => {
     });
   });
 
+  it('does not treat a file named pdf without an extension as a PDF attachment', () => {
+    const attachment = createAttachment({ name: 'pdf' });
+    attachmentUtils.determineAttachmentType.mockReturnValue(AttachmentType.DEFAULT);
+
+    service.showDetails(attachment);
+
+    expect(matDialog.open).toHaveBeenCalledWith(AttachmentDownloadConfirmationDialogComponent, {
+      data: {
+        fileName: 'pdf',
+      },
+    });
+  });
+
   it('keeps opening the viewer for text attachments', () => {
     const attachment = createAttachment({ name: 'log.txt', mimeType: 'text/plain' });
     attachmentUtils.determineAttachmentType.mockReturnValue(AttachmentType.TEXT);

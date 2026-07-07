@@ -40,8 +40,10 @@ describe('AttachmentDownloadConfirmationDialogComponent', () => {
     expect(dialogRef.close).not.toHaveBeenCalled();
   });
 
-  it('confirms the download when Enter is pressed outside an action button', () => {
-    fixture.nativeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  it('confirms the download from the primary action button', () => {
+    const downloadButton = fixture.debugElement.query(By.css('button[color="primary"]')).nativeElement as HTMLElement;
+
+    downloadButton.click();
 
     expect(dialogRef.close).toHaveBeenCalledWith(true);
   });
