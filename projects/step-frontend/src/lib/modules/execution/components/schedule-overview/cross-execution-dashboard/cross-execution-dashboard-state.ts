@@ -30,6 +30,7 @@ import { computed, inject, signal, Signal, WritableSignal } from '@angular/core'
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
 import {
+  createStackedBarPaths,
   FilterBarItem,
   FilterUtils,
   OQLBuilder,
@@ -39,11 +40,9 @@ import {
 } from '../../../../timeseries/modules/_common';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
-import { Axis, Band } from 'uplot';
-import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { Axis } from 'uplot';
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.85, Infinity], align: 1, radius: 0.1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -191,7 +190,7 @@ export abstract class CrossExecutionDashboardState {
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
-        numberOfBuckets: 30, // good amount of uplotBarsFn visually
+        numberOfBuckets: 30,
         oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
@@ -226,13 +225,13 @@ export abstract class CrossExecutionDashboardState {
                 this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
               stroke: fill,
               fill: fill,
-              paths: uplotBarsFn,
               points: { show: false },
               show: true,
             };
             return s;
           });
           this.cumulateSeriesData(series); // used for stacked bar
+          this.applyStackedBarPaths(series);
           const responseTimeSeries: TSChartSeries = {
             scale: 'y',
             labelItems: ['Execution duration (AVG)'],
@@ -298,7 +297,6 @@ export abstract class CrossExecutionDashboardState {
               enabled: true,
             },
             axes: axes,
-            bands: this.getDefaultBands(series.length, 0),
           } as TSChartSettings;
         }),
       );
@@ -386,13 +384,13 @@ export abstract class CrossExecutionDashboardState {
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
                   return s;
                 });
                 this.cumulateSeriesData(series);
+                this.applyStackedBarPaths(series);
                 let chartSettings = this.createKeywordsChart(chartExecutions, series);
                 this.keywordsCountChartLoading.set(false);
                 return chartSettings;
@@ -485,13 +483,13 @@ export abstract class CrossExecutionDashboardState {
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
                   return s;
                 });
                 this.cumulateSeriesData(series);
+                this.applyStackedBarPaths(series);
                 this.testCasesCountChartLoading.set(false);
                 return {
                   chart: this.createTestCasesChart(chartExecutions, series),
@@ -543,14 +541,6 @@ export abstract class CrossExecutionDashboardState {
     return [...Array.from({ length: paddingSize }, () => 0), ...displayedData];
   }
 
-  private getDefaultBands(count: number, skipSeries = 0): Band[] {
-    const bands: Band[] = [];
-    for (let i = count; i > 1; i--) {
-      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
-    }
-    return bands;
-  }
-
   private cumulateSeriesData(series: TSChartSeries[]): void {
     series.forEach((s, i) => {
       if (i == 0) {
@@ -577,6 +567,16 @@ export abstract class CrossExecutionDashboardState {
       return value;
     }
     return currentValue;
+  }
+
+  private applyStackedBarPaths(series: TSChartSeries[]): void {
+    const paths = createStackedBarPaths({
+      size: [0.85, Infinity],
+      align: 1,
+      radius: 0.1,
+      stackEndSeriesIdx: series.length,
+    });
+    series.forEach((item) => (item.paths = paths));
   }
 
   private createTestCasesChart(executions: ExecutionChartSlot[], series: TSChartSeries[]): TSChartSettings {
@@ -616,7 +616,6 @@ export abstract class CrossExecutionDashboardState {
         enabled: true,
       },
       axes: axes,
-      bands: this.getDefaultBands(series.length),
       zoomEnabled: false,
     };
   }
@@ -658,7 +657,6 @@ export abstract class CrossExecutionDashboardState {
         enabled: true,
       },
       axes: axes,
-      bands: this.getDefaultBands(series.length),
       zoomEnabled: false,
     };
   }
