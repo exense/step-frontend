@@ -27,6 +27,7 @@ import {
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
+  createStackedBarPaths,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -49,7 +50,7 @@ import {
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
-import { Axis, Band, Hooks } from 'uplot';
+import { Axis, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
@@ -339,7 +340,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
-    const stackedBarPaths = this.barsFunction({ size: [0.85, Infinity], align: 1, radius: 0.1 });
     const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
     const isRateOrCount = primaryAggregation.type === 'RATE' || primaryAggregation.type === 'COUNT';
     const useForwardFill = isGauge && !isRateOrCount;
@@ -487,7 +487,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
           }
         : undefined;
 
-    let bands: Band[] | undefined;
     if (primaryAxes.displayType === 'STACKED_BAR') {
       series.sort((a, b) => (a.id! < b.id! ? -1 : a.id! > b.id! ? 1 : 0));
       series.forEach((s) => (s.originalData = [...s.data]));
@@ -496,15 +495,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       });
       this.cumulateSeriesData(series);
       const skipSeries = hasSecondaryAxes ? 1 : 0;
+      const stackStartSeriesIdx = 1 + skipSeries;
+      const stackEndSeriesIdx = series.length + skipSeries;
       series.forEach((s) => {
-        s.paths = stackedBarPaths;
+        s.paths = createStackedBarPaths({
+          size: [0.85, Infinity],
+          align: 1,
+          radius: 0.1,
+          stackStartSeriesIdx,
+          stackEndSeriesIdx,
+        });
         s.fill = s.strokeConfig!.color + 'cc';
         s.value = (self: any, x: number, seriesIdx: number, idx: number) =>
           TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
             this.calculateStackedValue(self, x, seriesIdx, idx, skipSeries),
           );
       });
-      bands = this.getStackedBands(series.length, skipSeries);
     }
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
@@ -618,7 +624,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
           },
           showLegend: true,
           axes: axes,
-          bands: bands,
           hooks: edgeExtensionHook,
           scales:
             primaryAxes.displayType === 'STACKED_BAR'
@@ -929,14 +934,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       return currentValue - (self.data[seriesIdx - 1][idx] || 0);
     }
     return currentValue;
-  }
-
-  private getStackedBands(count: number, skipSeries = 0): Band[] {
-    const bands: Band[] = [];
-    for (let i = count; i > 1; i--) {
-      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
-    }
-    return bands;
   }
 
   ngOnDestroy(): void {
