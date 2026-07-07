@@ -1,6 +1,7 @@
 export { Activity } from './svg/activity';
 export { ActivityHeart } from './svg/activity-heart';
 export { Agent } from './svg/agent';
+export { AgentProvisioning } from './svg/agent-provisioning';
 export { AgentToken } from './svg/agent-token';
 export { AgentTokenGroup } from './svg/agent-token-group';
 export { Airplay } from './svg/airplay';

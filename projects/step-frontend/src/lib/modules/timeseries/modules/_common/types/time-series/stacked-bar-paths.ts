@@ -1,4 +1,4 @@
-import type uPlot = require('uplot');
+import type * as uPlot from 'uplot';
 
 interface StackedBarPathOptions {
   size: [number, number, number?];
@@ -22,12 +22,15 @@ export function createStackedBarPaths(options: StackedBarPathOptions): uPlot.Ser
 
   return (self: uPlot, seriesIdx: number, idx0: number, idx1: number): uPlot.Series.Paths => {
     const path = new Path2D();
-    const xData = self.data[0] as number[];
-    const yData = self.data[seriesIdx] as (number | null | undefined)[];
+    const xData = (self.data[0] as number[] | undefined) ?? [];
+    const yData = self.data[seriesIdx] as (number | null | undefined)[] | undefined;
+    if (!yData) {
+      return { stroke: path, fill: path };
+    }
     const series = self.series[seriesIdx];
-    const scaleKey = series.scale ?? 'y';
-    const strokeWidth = Math.round((series.width ?? 0) * devicePixelRatio);
-    const barWidth = getBarWidth(self, xData, yData, strokeWidth, options.size, gap);
+    const scaleKey = series?.scale ?? 'y';
+    const strokeWidth = Math.round((series?.width ?? 0) * getDevicePixelRatio());
+    const barWidth = getBarWidth(self, xData, strokeWidth, options.size, gap);
     const xShift = getXShift(barWidth, align, gap);
 
     for (let i = idx0; i <= idx1; i++) {
@@ -68,7 +71,9 @@ function getPreviousStackValue(self: uPlot, seriesIdx: number, dataIdx: number, 
   if (seriesIdx <= stackStartSeriesIdx) {
     return 0;
   }
-  return ((self.data[seriesIdx - 1] as (number | null | undefined)[])[dataIdx] as number | undefined) ?? 0;
+  return (
+    ((self.data[seriesIdx - 1] as (number | null | undefined)[] | undefined)?.[dataIdx] as number | undefined) ?? 0
+  );
 }
 
 function isTopStackSegment(
@@ -82,7 +87,8 @@ function isTopStackSegment(
     if (self.series[i]?.show === false) {
       continue;
     }
-    const currentValue = ((self.data[i] as (number | null | undefined)[])[dataIdx] as number | undefined) ?? 0;
+    const currentValue =
+      ((self.data[i] as (number | null | undefined)[] | undefined)?.[dataIdx] as number | undefined) ?? 0;
     const previousValue = getPreviousStackValue(self, i, dataIdx, stackStartSeriesIdx);
     if (currentValue > previousValue) {
       return i === seriesIdx;
@@ -94,12 +100,11 @@ function isTopStackSegment(
 function getBarWidth(
   self: uPlot,
   xData: number[],
-  yData: (number | null | undefined)[],
   strokeWidth: number,
   size: [number, number, number?],
   gap: number,
 ): number {
-  const pixelRatio = devicePixelRatio || 1;
+  const pixelRatio = getDevicePixelRatio();
   const maxWidth = size[1] * pixelRatio;
   const minWidth = (size[2] ?? DEFAULT_MIN_WIDTH) * pixelRatio;
   const extraGap = gap * pixelRatio;
@@ -107,9 +112,6 @@ function getBarWidth(
   let previousIdx: number | undefined;
 
   for (let i = 0; i < xData.length; i++) {
-    if (yData[i] === undefined) {
-      continue;
-    }
     if (previousIdx !== undefined) {
       const width = Math.abs(self.valToPos(xData[i], 'x', true) - self.valToPos(xData[previousIdx], 'x', true));
       columnWidth = Math.min(columnWidth, width);
@@ -121,8 +123,12 @@ function getBarWidth(
 }
 
 function getXShift(barWidth: number, align: -1 | 0 | 1, gap: number): number {
-  const extraGap = gap * (devicePixelRatio || 1);
+  const extraGap = gap * getDevicePixelRatio();
   return (align === 0 ? barWidth / 2 : align === 1 ? 0 : barWidth) - (align * extraGap) / 2;
+}
+
+function getDevicePixelRatio(): number {
+  return typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1;
 }
 
 function drawTopRoundedRect(path: Path2D, x: number, y: number, width: number, height: number, radius: number): void {
