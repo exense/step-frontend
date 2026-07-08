@@ -1,31 +1,73 @@
-step-chart-skeleton .chart-skeleton {
-  position: relative;
-  height: 100%;
+step-chart-skeleton {
+  display: block;
 
-  overflow: hidden;
-  background: transparent;
+  .chart-skeleton {
+    position: relative;
+    height: 100%;
 
-  &.with-padding {
-    padding: 90px 50px;
+    overflow: hidden;
+    background: transparent;
+
+    &.with-padding {
+      padding: 90px 50px;
+    }
+
+    &:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.2) 35%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.2) 65%,
+        rgba(255, 255, 255, 0)
+      );
+      animation: shimmer ease-in-out 1.5s infinite;
+      content: '';
+    }
   }
 
-  &:after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    transform: translateX(-100%);
-    background-image: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0.2) 35%,
-      rgba(255, 255, 255, 0.8) 50%,
-      rgba(255, 255, 255, 0.2) 65%,
-      rgba(255, 255, 255, 0)
-    );
-    animation: shimmer ease-in-out 1.5s infinite;
-    content: '';
+  .chart-skeleton-legend {
+    align-items: center;
+    background: #f9fafb;
+    border-radius: 0.2rem;
+    display: flex;
+    gap: 1.4rem;
+    min-height: 2.8rem;
+    padding: 0.4rem 1.6rem;
+
+    > span {
+      background: #efefef;
+      border-radius: 0.2rem;
+      height: 1.2rem;
+      overflow: hidden;
+      position: relative;
+      width: 9rem;
+
+      &:after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        background-image: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0,
+          rgba(255, 255, 255, 0.2) 35%,
+          rgba(255, 255, 255, 0.8) 50%,
+          rgba(255, 255, 255, 0.2) 65%,
+          rgba(255, 255, 255, 0)
+        );
+        animation: shimmer ease-in-out 1.5s infinite;
+        content: '';
+      }
+    }
   }
 
   @keyframes shimmer {

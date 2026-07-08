@@ -44,6 +44,139 @@ step-alt-report-node-summary {
     cursor: pointer;
   }
 
+  .summary-skeleton {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .summary-skeleton-chart {
+    aspect-ratio: 1;
+    background: #e2e5e8;
+    border-radius: 50%;
+    flex: none;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: min(26rem, 100%);
+
+    &::after {
+      animation: summary-skeleton-progress 1.5s infinite;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.65) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      background-size: 200% 100%;
+      border-radius: 50%;
+      bottom: 0;
+      content: '';
+      left: 0;
+      mask: radial-gradient(circle, transparent 0 43%, #000 44%);
+      position: absolute;
+      right: 0;
+      top: 0;
+      -webkit-mask: radial-gradient(circle, transparent 0 43%, #000 44%);
+    }
+
+    > span {
+      background: var(--mat-card-background-color, white);
+      border-radius: 50%;
+      height: 52%;
+      left: 24%;
+      position: absolute;
+      top: 24%;
+      width: 52%;
+      z-index: 1;
+
+      &::after {
+        animation: summary-skeleton-progress 1.5s infinite;
+        background: linear-gradient(
+          90deg,
+          rgba(216, 220, 223, 0) 0%,
+          rgba(216, 220, 223, 0.8) 50%,
+          rgba(216, 220, 223, 0) 100%
+        );
+        background-size: 200% 100%;
+        border-radius: 0.6rem;
+        content: '';
+        height: 2.8rem;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 3.8rem;
+      }
+    }
+  }
+
+  .summary-skeleton-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+    width: 100%;
+
+    > span {
+      align-items: center;
+      background: #eef0f2;
+      border-radius: 1.6rem;
+      display: flex;
+      gap: 0.7rem;
+      height: 3.2rem;
+      overflow: hidden;
+      padding: 0.3rem 1.4rem 0.3rem 0.3rem;
+      position: relative;
+      width: 7.4rem;
+
+      &::after {
+        animation: summary-skeleton-progress 1.5s infinite;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.7) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        background-size: 200% 100%;
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+
+      > span {
+        background: #d4d8dc;
+        border-radius: 1.3rem;
+        flex: none;
+        height: 2.6rem;
+        width: 2.6rem;
+
+        &::after {
+          background: #d4d8dc;
+          border-radius: 0.5rem;
+          content: '';
+          height: 1.2rem;
+          left: 4.2rem;
+          position: absolute;
+          top: 1rem;
+          width: 1.7rem;
+        }
+      }
+    }
+  }
+
+  @keyframes summary-skeleton-progress {
+    to {
+      background-position: -100% 50%;
+    }
+  }
+
   @container summary-node-widget (aspect-ratio > 1) {
     step-alt-report-widget-content {
       flex-direction: row;
@@ -63,6 +196,23 @@ step-alt-report-node-summary {
       width: auto;
       align-items: stretch; // makes all badges fill the same width
     }
+
+    .summary-skeleton {
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+
+    .summary-skeleton-chart {
+      flex: 0 1 26rem;
+      min-width: 0;
+      width: min(26rem, 100%);
+    }
+
+    .summary-skeleton-legend {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      width: auto;
+    }
   }
   &.summary-height-2 {
     step-doughnut-chart {
@@ -70,6 +220,11 @@ step-alt-report-node-summary {
         max-height: 20rem;
         width: min(20rem, 100%);
       }
+    }
+
+    .summary-skeleton-chart {
+      max-height: 20rem;
+      width: min(20rem, 100%);
     }
   }
 }

@@ -15,4 +15,5 @@ import { COMMON_IMPORTS } from '../../../_common';
 export class ChartSkeletonComponent {
   readonly height = input<number>(300);
   readonly noPadding = input<boolean>(false);
+  readonly showLegend = input<boolean>(false);
 }
