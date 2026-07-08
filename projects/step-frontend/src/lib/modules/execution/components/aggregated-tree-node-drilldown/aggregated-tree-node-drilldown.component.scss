@@ -15,7 +15,24 @@ step-aggregated-tree-node-drilldown {
       align-items: center;
       gap: 1rem;
     }
+  }
 
+  step-btn-group.report-filter-button {
+    .mat-mdc-button-base,
+    .mat-mdc-outlined-button {
+      width: 3.4rem !important;
+      min-width: 3.4rem !important;
+      height: 3.4rem !important;
+      min-height: 3.4rem !important;
+      padding: 0 !important;
+      line-height: 3.4rem !important;
+      --mdc-icon-button-state-layer-size: 3.4rem;
+    }
+
+    .mat-mdc-button-touch-target {
+      width: 3.4rem !important;
+      height: 3.4rem !important;
+    }
   }
 
   .root-content {

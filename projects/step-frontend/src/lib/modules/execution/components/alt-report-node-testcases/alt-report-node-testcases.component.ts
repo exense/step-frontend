@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import {
   AggregatedReportView,
+  Operation,
+  ReportNode,
   STORE_ALL,
   TableIndicatorMode,
   TableMemoryStorageService,
@@ -26,6 +28,11 @@ import { VIEW_MODE } from '../../shared/view-mode';
 import { Status } from '../../../_common/shared/status.enum';
 import { AltReportNodeListItemsPerPageDirective } from '../../directives/alt-report-node-list-items-per-page.directive';
 import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DrilldownRootType } from '../../shared/drilldown-root-type';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 
 @Component({
   selector: 'step-alt-report-node-testcases',
@@ -46,6 +53,8 @@ import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-deta
 export class AltReportNodeTestcasesComponent implements AfterViewInit {
   protected readonly _state = inject(AltReportNodesStateService);
   private _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+  private _executionState = inject(AltExecutionStateService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
   private _listSearch = inject(AltReportNodeListSearchDirective, { self: true });
   protected readonly _mode = inject(VIEW_MODE);
 
@@ -54,6 +63,10 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
   protected readonly tableSearch = viewChild('table', { read: TableSearch });
   readonly selectedId = input<string | undefined>(undefined);
   protected readonly detailsTooltip = OPEN_EXECUTION_DETAILS_TOOLTIP;
+  protected readonly testCasesDisplayMode = toSignal(this._executionState.testCasesDisplayMode$, {
+    initialValue: TestCasesDisplayMode.AGGREGATED,
+  });
+  protected readonly testCasesTableParameters$ = this._executionState.testCasesTableParameters$;
 
   private get tableSearchUntracked(): TableSearch | undefined {
     return untracked(() => this.tableSearch());
@@ -76,8 +89,28 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
     });
   }
 
-  onSearchFor(item: AggregatedReportView, message: string): void {
+  protected onSearchFor(item: AggregatedReportView, message: string): void {
     this.showIterations(item, { searchFor: message });
+  }
+
+  protected asAggregatedReportView(item: AggregatedReportView | ReportNode): AggregatedReportView {
+    return item as AggregatedReportView;
+  }
+
+  protected asReportNode(item: AggregatedReportView | ReportNode): ReportNode {
+    return item as ReportNode;
+  }
+
+  protected currentOperations(item: AggregatedReportView): Operation[] {
+    return item.currentOperations ?? [];
+  }
+
+  protected openIterationDetails(item: ReportNode): void {
+    this._executionDialogs.openIterationDetails(DrilldownRootType.TESTCASES, item);
+  }
+
+  protected iterationErrorMessage(item: ReportNode): string | undefined {
+    return item.error?.msg?.trim() || undefined;
   }
 
   protected showIterations(
@@ -112,4 +145,5 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly TestCasesDisplayMode = TestCasesDisplayMode;
 }

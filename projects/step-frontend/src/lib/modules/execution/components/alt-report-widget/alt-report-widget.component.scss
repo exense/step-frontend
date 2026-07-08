@@ -39,6 +39,24 @@ step-alt-report-widget {
     height: 3.4rem;
   }
 
+  step-btn-group.report-filter-button.with-borders {
+    .mat-mdc-button-base,
+    .mat-mdc-outlined-button {
+      width: 3.4rem !important;
+      min-width: 3.4rem !important;
+      height: 3.4rem !important;
+      min-height: 3.4rem !important;
+      padding: 0 !important;
+      line-height: 3.4rem !important;
+      --mdc-icon-button-state-layer-size: 3.4rem;
+    }
+
+    .mat-mdc-button-touch-target {
+      width: 3.4rem !important;
+      height: 3.4rem !important;
+    }
+  }
+
   mat-card-header > step-alt-report-widget-filter {
     flex: 0.5;
   }
