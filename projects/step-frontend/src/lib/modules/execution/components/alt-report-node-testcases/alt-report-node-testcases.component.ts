@@ -113,6 +113,11 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
     return item?.error?.msg?.trim() || undefined;
   }
 
+  protected isSelected(id: string | null | undefined): boolean {
+    const selectedId = this.selectedId();
+    return !!selectedId && id === selectedId;
+  }
+
   protected showIterations(
     item: AggregatedReportView,
     options?: { searchFor?: string; status?: Status; count?: number; event?: MouseEvent },

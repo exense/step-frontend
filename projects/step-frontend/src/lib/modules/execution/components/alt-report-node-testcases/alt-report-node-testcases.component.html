@@ -15,7 +15,7 @@
         aggregatedElement?.singleInstanceReportNode?.name ?? aggregatedElement?.artefact?.attributes?.['name'] ?? '';
       <section
         class="test-case-row"
-        [class.highlighted-item]="aggregatedElement?.singleInstanceReportNode?.id === selectedId()"
+        [class.highlighted-item]="isSelected(aggregatedElement?.singleInstanceReportNode?.id)"
         stepCalcElementWidthAggregator
         [recalcTrigger]="aggregatedElement"
         [class.has-operations]="hasOperations"
@@ -71,7 +71,7 @@
       @let errorMessage = iterationErrorMessage(reportNode);
       <section
         class="test-case-row"
-        [class.highlighted-item]="reportNode.id === selectedId()"
+        [class.highlighted-item]="isSelected(reportNode.id)"
         stepCalcElementWidthAggregator
         [recalcTrigger]="reportNode"
         [class.has-errors]="!!errorMessage"
