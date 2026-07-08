@@ -101,16 +101,16 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
     return item as ReportNode;
   }
 
-  protected currentOperations(item: AggregatedReportView): Operation[] {
-    return item.currentOperations ?? [];
+  protected currentOperations(item: AggregatedReportView | null | undefined): Operation[] {
+    return item?.currentOperations ?? [];
   }
 
   protected openIterationDetails(item: ReportNode): void {
     this._executionDialogs.openIterationDetails(DrilldownRootType.TESTCASES, item);
   }
 
-  protected iterationErrorMessage(item: ReportNode): string | undefined {
-    return item.error?.msg?.trim() || undefined;
+  protected iterationErrorMessage(item: ReportNode | null | undefined): string | undefined {
+    return item?.error?.msg?.trim() || undefined;
   }
 
   protected showIterations(

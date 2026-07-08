@@ -1,3 +1,5 @@
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
 step-alt-report-widget-content {
   height: 100%;
 }
@@ -40,21 +42,7 @@ step-alt-report-widget {
   }
 
   step-btn-group.report-filter-button.with-borders {
-    .mat-mdc-button-base,
-    .mat-mdc-outlined-button {
-      width: 3.4rem !important;
-      min-width: 3.4rem !important;
-      height: 3.4rem !important;
-      min-height: 3.4rem !important;
-      padding: 0 !important;
-      line-height: 3.4rem !important;
-      --mdc-icon-button-state-layer-size: 3.4rem;
-    }
-
-    .mat-mdc-button-touch-target {
-      width: 3.4rem !important;
-      height: 3.4rem !important;
-    }
+    @include common.report-filter-button-size;
   }
 
   mat-card-header > step-alt-report-widget-filter {
