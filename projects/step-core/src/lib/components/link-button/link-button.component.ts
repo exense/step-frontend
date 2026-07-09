@@ -18,7 +18,7 @@ export abstract class LinkButtonComponent implements OnInit {
   }
 
   @HostListener('click')
-  private handleClick(): void {
+  protected handleClick(): void {
     if (!this.url) {
       return;
     }

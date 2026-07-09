@@ -37,12 +37,54 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "ngx-build-plus:browser",
+          "builder": "@angular-architects/native-federation:build",
+          "options": {},
+          "configurations": {
+            "production": {
+              "target": "@exense/step-app:esbuild:production"
+            },
+            "development": {
+              "target": "@exense/step-app:esbuild:development",
+              "dev": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-architects/native-federation:build",
+          "configurations": {
+            "dev": {
+              "target": "@exense/step-app:serve-original:development"
+            },
+            "local": {
+              "target": "@exense/step-app:serve-original:local"
+            },
+            "prod": {
+              "target": "@exense/step-app:serve-original:production"
+            }
+          },
+          "defaultConfiguration": "dev",
           "options": {
-            "outputPath": "dist/step-app",
+            "rebuildDelay": 500,
+            "dev": true,
+            "cacheExternalArtifacts": false,
+            "port": 0
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/step-app/src/**/*.ts", "projects/step-app/src/**/*.html"]
+          }
+        },
+        "esbuild": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": {
+              "base": "dist/step-app"
+            },
             "index": "projects/step-app/src/index.html",
-            "main": "projects/step-app/src/main.ts",
-            "polyfills": "projects/step-app/src/polyfills.ts",
+            "polyfills": ["projects/step-app/src/polyfills.ts", "es-module-shims"],
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -70,13 +112,19 @@
                 "glob": "global-indicator.js",
                 "input": "dist/step-core/assets",
                 "output": "/"
+              },
+              {
+                "glob": "uPlot.iife.min.js",
+                "input": "node_modules/uplot/dist",
+                "output": "/"
               }
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
-            "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
-            "extraWebpackConfig": "projects/step-app/webpack.config.js",
-            "commonChunk": false,
-            "allowedCommonJsDependencies": ["@angular-architects/module-federation", "ace-builds", "luxon"]
+            "stylePreprocessorOptions": {
+              "includePaths": ["."]
+            },
+            "allowedCommonJsDependencies": ["ace-builds", "luxon"],
+            "browser": "projects/step-app/src/main.ts"
           },
           "configurations": {
             "local": {
@@ -102,13 +150,10 @@
                   "with": "projects/step-app/src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all",
-              "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
+              "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -116,40 +161,24 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
-          "builder": "ngx-build-plus:dev-server",
+        "serve-original": {
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "@exense/step-app:build:production",
-              "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
+              "buildTarget": "@exense/step-app:esbuild:production"
             },
             "development": {
-              "buildTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:esbuild:development",
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
             "local": {
-              "buildTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:esbuild:development",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 4201,
-            "publicHost": "http://localhost:4201",
-            "extraWebpackConfig": "projects/step-app/webpack.config.js"
-          }
-        },
-        "extract-i18n": {
-          "builder": "ngx-build-plus:extract-i18n",
-          "options": {
-            "buildTarget": "@exense/step-app:build",
-            "extraWebpackConfig": "projects/step-app/webpack.config.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": ["projects/step-app/src/**/*.ts", "projects/step-app/src/**/*.html"]
+            "port": 4201
           }
         }
       }
@@ -161,7 +190,7 @@
       "prefix": "step",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "project": "projects/step-core/ng-package.json"
           },
@@ -190,7 +219,7 @@
       "prefix": "step",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "project": "projects/step-frontend/ng-package.json"
           },

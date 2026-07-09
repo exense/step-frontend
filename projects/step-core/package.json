@@ -22,7 +22,9 @@
     }
   },
   "peerDependencies": {
-    "@angular-architects/module-federation": "19.0.3",
+    "@angular-architects/native-federation": "19.0.23",
+    "@softarc/native-federation-node": "^3.3.4",
+    "es-module-shims": "^1.5.12",
     "@angular/common": "19.2.14",
     "@angular/core": "19.2.14",
     "@angular/forms": "19.2.14",
@@ -36,14 +38,14 @@
     "@schematics/angular": "20.0.1",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
-    "rxjs": "7.4.0",
+    "rxjs": "7.8.2",
     "ace-builds": "1.43.2",
     "angular-split": "19.0.0",
     "ngx-build-plus": "19.0.0",
     "ngx-markdown": "19.1.1",
     "marked": "15.0.12",
     "luxon": "3.4.4",
-    "@angular-devkit/build-angular": "19.2.14"
+    "@angular-devkit/build-angular": "19.2.27"
   },
   "dependencies": {
     "tslib": "2.3.0"

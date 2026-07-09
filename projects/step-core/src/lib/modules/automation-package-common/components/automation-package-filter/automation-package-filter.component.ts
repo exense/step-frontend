@@ -20,8 +20,6 @@ import {
 } from '../../../basics/step-basics.module';
 import { AutomationPackageFilterPopoverComponent } from '../automation-package-filter-popover/automation-package-filter-popover.component';
 import { EntityAutomationPackageService } from '../../injectables/entity-automation-package.service';
-import _default from 'chart.js/dist/plugins/plugin.title';
-import id = _default.id;
 
 type PopoverOverlay = PopoverOverlayService<AutomationPackageFilterPopoverComponent>;
 
