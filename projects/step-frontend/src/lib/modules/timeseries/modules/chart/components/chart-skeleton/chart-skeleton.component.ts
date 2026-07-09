@@ -8,6 +8,9 @@ import { COMMON_IMPORTS } from '../../../_common';
   selector: 'step-chart-skeleton',
   templateUrl: './chart-skeleton.component.html',
   styleUrls: ['./chart-skeleton.component.scss'],
+  host: {
+    '[class.fill-container]': 'fillContainer()',
+  },
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [COMMON_IMPORTS],
@@ -16,4 +19,5 @@ export class ChartSkeletonComponent {
   readonly height = input<number>(300);
   readonly noPadding = input<boolean>(false);
   readonly showLegend = input<boolean>(false);
+  readonly fillContainer = input<boolean>(false);
 }

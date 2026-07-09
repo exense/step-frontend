@@ -3,6 +3,7 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
+  defer,
   filter,
   finalize,
   map,
@@ -121,17 +122,22 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
           );
         },
         ({ execution, range }) => {
+          if (!execution) {
+            return of(undefined);
+          }
           const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
           if (!timeRange) {
             return of(undefined);
           }
           const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
           const displayProgress = this.shouldDisplayProgress(execution, range);
-          this.summaryInProgressInternal$.next(true);
-          if (displayProgress) {
-            this.summaryDisplayInProgressInternal$.next(true);
-          }
-          return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
+          return defer(() => {
+            this.summaryInProgressInternal$.next(true);
+            if (displayProgress) {
+              this.summaryDisplayInProgressInternal$.next(true);
+            }
+            return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest);
+          }).pipe(
             catchError(() => of(undefined)),
             finalize(() => {
               this.summaryInProgressInternal$.next(false);
@@ -152,14 +158,14 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
     );
   }
 
-  private shouldDisplayProgress(execution: Execution, range: TimeRangeSelection): boolean {
+  private shouldDisplayProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
     const displayProgress =
       this.initialSummaryLoadPending ||
-      this.previousSummaryProgressExecutionId !== execution.id ||
+      this.previousSummaryProgressExecutionId !== execution?.id ||
       !this._dateUtils.areTimeRangeSelectionsEquals(this.previousSummaryProgressRange, range);
 
     this.initialSummaryLoadPending = false;
-    this.previousSummaryProgressExecutionId = execution.id;
+    this.previousSummaryProgressExecutionId = execution?.id;
     this.previousSummaryProgressRange = range;
 
     return displayProgress;

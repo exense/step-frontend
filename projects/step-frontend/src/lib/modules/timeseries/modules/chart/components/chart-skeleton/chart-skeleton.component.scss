@@ -1,6 +1,13 @@
 step-chart-skeleton {
   display: block;
 
+  &.fill-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
   .chart-skeleton {
     position: relative;
     height: 100%;
@@ -10,6 +17,11 @@ step-chart-skeleton {
 
     &.with-padding {
       padding: 90px 50px;
+    }
+
+    &.fill-container {
+      flex: 1 1 auto;
+      min-height: 0;
     }
 
     &:after {

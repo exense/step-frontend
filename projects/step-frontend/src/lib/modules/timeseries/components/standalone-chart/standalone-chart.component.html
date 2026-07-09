@@ -1,4 +1,10 @@
-@if (chartSettings) {
+@if (loading()) {
+  <step-chart-skeleton
+    [height]="config().height ?? 0"
+    [showLegend]="config().showLegend !== false"
+    [fillContainer]="!config().height"
+  />
+} @else if (chartSettings) {
   <step-timeseries-chart
     #chart
     (zoomChange)="handleZoomChange($event)"

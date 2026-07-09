@@ -16,6 +16,7 @@ import {
   catchError,
   combineLatest,
   debounceTime,
+  defer,
   distinctUntilChanged,
   filter,
   finalize,
@@ -754,20 +755,16 @@ export class AltExecutionProgressComponent
           },
           ({ execution, timeRangeSelection }) => {
             const executionId = execution?.id;
+            if (!this.canLoadExecutionData(executionId) || !execution) {
+              return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
+            }
             const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
-            if (displayProgress) {
-              this.treeInProgressInternal$.next(true);
-            }
-            if (!this.canLoadExecutionData(executionId)) {
-              return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined }).pipe(
-                finalize(() => {
-                  if (displayProgress) {
-                    this.treeInProgressInternal$.next(false);
-                  }
-                }),
-              );
-            }
-            return this._treeLoader.load(execution, timeRangeSelection).pipe(
+            return defer(() => {
+              if (displayProgress) {
+                this.treeInProgressInternal$.next(true);
+              }
+              return this._treeLoader.load(execution, timeRangeSelection);
+            }).pipe(
               finalize(() => {
                 if (displayProgress) {
                   this.treeInProgressInternal$.next(false);
@@ -803,14 +800,14 @@ export class AltExecutionProgressComponent
       });
   }
 
-  private shouldDisplayTreeProgress(execution: Execution, range: TimeRangeSelection): boolean {
+  private shouldDisplayTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
     const displayProgress =
       this.initialTreeLoadPending ||
-      this.previousTreeProgressExecutionId !== execution.id ||
+      this.previousTreeProgressExecutionId !== execution?.id ||
       !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range);
 
     this.initialTreeLoadPending = false;
-    this.previousTreeProgressExecutionId = execution.id;
+    this.previousTreeProgressExecutionId = execution?.id;
     this.previousTreeProgressRange = range;
 
     return displayProgress;
