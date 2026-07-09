@@ -49,7 +49,7 @@ import { ReportNodeExt } from '../../shared/report-node-ext';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
 enum UpdateSelection {
   ALL = 'all',
@@ -129,7 +129,7 @@ export class ExecutionProgressComponent
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
 
-  private executionInternal = signal<Execution | undefined>(undefined);
+  private readonly executionInternal = signal<Execution | undefined>(undefined);
   execution?: Execution;
   testCases?: ReportNode[];
   selectedTestCases?: ReportNode[];
@@ -510,9 +510,7 @@ export class ExecutionProgressComponent
   private scrollToPanel(panel: Panels): void {
     const panelId = this._executionPanels.getPanelId(panel);
     const element = this._document.querySelector(`#${panelId}`);
-    if (element) {
-      element.scrollIntoView();
-    }
+    element?.scrollIntoView?.();
   }
 
   private setupTestCasesDataSource(testCases?: ReportNode[]): void {
