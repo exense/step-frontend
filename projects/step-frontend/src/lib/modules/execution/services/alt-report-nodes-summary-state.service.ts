@@ -130,23 +130,21 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
             return of(undefined);
           }
           const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
-          let displayProgress = false;
           return defer(() => {
-            displayProgress = this.shouldDisplayProgress(execution, range);
+            const displayProgress = this.shouldDisplayProgress(execution, range);
             this.summaryInProgressInternal$.next(true);
             if (displayProgress) {
               this.summaryDisplayInProgressInternal$.next(true);
             }
-            return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest);
-          }).pipe(
-            catchError(() => of(undefined)),
-            finalize(() => {
-              this.summaryInProgressInternal$.next(false);
-              if (displayProgress) {
-                this.summaryDisplayInProgressInternal$.next(false);
-              }
-            }),
-          );
+            return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
+              finalize(() => {
+                this.summaryInProgressInternal$.next(false);
+                if (displayProgress) {
+                  this.summaryDisplayInProgressInternal$.next(false);
+                }
+              }),
+            );
+          }).pipe(catchError(() => of(undefined)));
         },
         this._destroyRef,
       ),

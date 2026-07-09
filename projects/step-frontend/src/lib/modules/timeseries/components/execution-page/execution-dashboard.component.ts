@@ -96,7 +96,10 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     this.executionRange = this.getExecutionRange(this.execution());
     this._timeSeriesService
       .checkTimeSeries(executionId!)
-      .pipe(finalize(() => (this.timeSeriesCheckInProgress = false)))
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.timeSeriesCheckInProgress = false)),
+      )
       .subscribe({
         next: (exists) => {
           if (exists) {

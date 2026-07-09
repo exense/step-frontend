@@ -573,21 +573,19 @@ export class AltExecutionProgressComponent
         if (!executionId || !timeRange) {
           return of([]);
         }
-        let displayProgress = false;
         return defer(() => {
-          displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
+          const displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
           if (displayProgress) {
             this.errorsDisplayInProgressInternal$.next(true);
           }
-          return this._timeSeriesService.findErrors({ executionId, timeRange });
-        }).pipe(
-          catchError(() => of([] as TimeSeriesErrorEntry[])),
-          finalize(() => {
-            if (displayProgress) {
-              this.errorsDisplayInProgressInternal$.next(false);
-            }
-          }),
-        );
+          return this._timeSeriesService.findErrors({ executionId, timeRange }).pipe(
+            finalize(() => {
+              if (displayProgress) {
+                this.errorsDisplayInProgressInternal$.next(false);
+              }
+            }),
+          );
+        }).pipe(catchError(() => of([] as TimeSeriesErrorEntry[])));
       },
       this._destroyRef,
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
@@ -777,21 +775,19 @@ export class AltExecutionProgressComponent
             if (!this.canLoadExecutionData(executionId) || !execution) {
               return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
             }
-            let displayProgress = false;
             return defer(() => {
-              displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
+              const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
               if (displayProgress) {
                 this.treeInProgressInternal$.next(true);
               }
-              return this._treeLoader.load(execution, timeRangeSelection);
-            }).pipe(
-              catchError(() => of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined })),
-              finalize(() => {
-                if (displayProgress) {
-                  this.treeInProgressInternal$.next(false);
-                }
-              }),
-            );
+              return this._treeLoader.load(execution, timeRangeSelection).pipe(
+                finalize(() => {
+                  if (displayProgress) {
+                    this.treeInProgressInternal$.next(false);
+                  }
+                }),
+              );
+            }).pipe(catchError(() => of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined })));
           },
           this._destroyRef,
           (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
