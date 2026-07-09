@@ -17,7 +17,7 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { defer, finalize, Observable, switchMap, tap } from 'rxjs';
+import { catchError, defer, finalize, Observable, of, switchMap, tap } from 'rxjs';
 import { Axis } from 'uplot';
 import { StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
@@ -81,7 +81,7 @@ export class StandaloneChartComponent {
     )
     .subscribe();
 
-  private loadDataAndCreateChart(range: TimeRange, loadingKey?: string): Observable<TimeSeriesAPIResponse> {
+  private loadDataAndCreateChart(range: TimeRange, loadingKey?: string): Observable<TimeSeriesAPIResponse | undefined> {
     const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
     const shouldDisplayLoading = !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
     if (loadingKey !== undefined) {
@@ -94,6 +94,7 @@ export class StandaloneChartComponent {
       }
       return this.fetchDataAndCreateChart(range);
     }).pipe(
+      catchError(() => of(undefined)),
       finalize(() => {
         if (shouldDisplayLoading) {
           this.loading.set(false);

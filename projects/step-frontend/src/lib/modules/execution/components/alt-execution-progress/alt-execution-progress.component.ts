@@ -783,6 +783,7 @@ export class AltExecutionProgressComponent
               }
               return this._treeLoader.load(execution, timeRangeSelection);
             }).pipe(
+              catchError(() => of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined })),
               finalize(() => {
                 if (displayProgress) {
                   this.treeInProgressInternal$.next(false);
