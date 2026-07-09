@@ -52,7 +52,7 @@
             <step-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
           }
           @case (AttachmentType.SKIPPED) {
-            <step-skipped-attachment-info [attachment]="att" />
+            <step-skipped-attachment-info class="attachment-inline-preview-skipped-popover" [attachment]="att" />
           }
           @default {
             <div class="default-attachment-popover-view">
