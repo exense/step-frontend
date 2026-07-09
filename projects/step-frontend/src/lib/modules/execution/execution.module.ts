@@ -140,6 +140,7 @@ import { ExecutionDurationSimpleComponent } from './components/execution-duratio
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 import { ReportNodeDurationPipe } from './pipes/report-node-duration.pipe';
+import { ReportNodeErrorMessagePipe } from './pipes/report-node-error-message.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
@@ -300,6 +301,7 @@ import {
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
     ReportNodeDurationPipe,
+    ReportNodeErrorMessagePipe,
     LegacyExecutionViewComponent,
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,

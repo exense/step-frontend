@@ -4,18 +4,21 @@
   [tableParams]="(testCasesTableParameters$ | async)!"
   [indicatorMode]="TableIndicatorMode.SPINNER"
 >
+  @let selectedTestCaseId = selectedId();
   <ng-container *stepDatasourceListItem="let element; let index = $index">
     @if (testCasesDisplayMode() === TestCasesDisplayMode.AGGREGATED) {
-      @let aggregatedElement = asAggregatedReportView(element);
-      @let operations = currentOperations(aggregatedElement);
-      @let hasOperations = !!operations.length;
+      @let aggregatedElement = $any(element);
+      @let operations = aggregatedElement?.currentOperations;
+      @let hasOperations = !!operations?.length;
       @let hasErrors = !!(aggregatedElement | aggregatedReportViewCountErrors);
       @let duration = aggregatedElement | aggregatedReportViewDurationValue;
       @let elementName =
         aggregatedElement?.singleInstanceReportNode?.name ?? aggregatedElement?.artefact?.attributes?.['name'] ?? '';
       <section
         class="test-case-row"
-        [class.highlighted-item]="isSelected(aggregatedElement?.singleInstanceReportNode?.id)"
+        [class.highlighted-item]="
+          !!selectedTestCaseId && aggregatedElement?.singleInstanceReportNode?.id === selectedTestCaseId
+        "
         stepCalcElementWidthAggregator
         [recalcTrigger]="aggregatedElement"
         [class.has-operations]="hasOperations"
@@ -61,17 +64,17 @@
               />
             }
             @if (hasOperations) {
-              <step-alt-current-operation-short style="z-index: 3" [currentOperations]="operations" />
+              <step-alt-current-operation-short style="z-index: 3" [currentOperations]="operations ?? []" />
             }
           </div>
         }
       </section>
     } @else {
-      @let reportNode = asReportNode(element);
-      @let errorMessage = iterationErrorMessage(reportNode);
+      @let reportNode = $any(element);
+      @let errorMessage = reportNode | reportNodeErrorMessage;
       <section
         class="test-case-row"
-        [class.highlighted-item]="isSelected(reportNode.id)"
+        [class.highlighted-item]="!!selectedTestCaseId && reportNode.id === selectedTestCaseId"
         stepCalcElementWidthAggregator
         [recalcTrigger]="reportNode"
         [class.has-errors]="!!errorMessage"

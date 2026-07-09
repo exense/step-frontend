@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import {
   AggregatedReportView,
-  Operation,
   ReportNode,
   STORE_ALL,
   TableIndicatorMode,
@@ -93,29 +92,8 @@ export class AltReportNodeTestcasesComponent implements AfterViewInit {
     this.showIterations(item, { searchFor: message });
   }
 
-  protected asAggregatedReportView(item: AggregatedReportView | ReportNode): AggregatedReportView {
-    return item as AggregatedReportView;
-  }
-
-  protected asReportNode(item: AggregatedReportView | ReportNode): ReportNode {
-    return item as ReportNode;
-  }
-
-  protected currentOperations(item: AggregatedReportView | null | undefined): Operation[] {
-    return item?.currentOperations ?? [];
-  }
-
   protected openIterationDetails(item: ReportNode): void {
     this._executionDialogs.openIterationDetails(DrilldownRootType.TESTCASES, item);
-  }
-
-  protected iterationErrorMessage(item: ReportNode | null | undefined): string | undefined {
-    return item?.error?.msg?.trim() || undefined;
-  }
-
-  protected isSelected(id: string | null | undefined): boolean {
-    const selectedId = this.selectedId();
-    return !!selectedId && id === selectedId;
   }
 
   protected showIterations(
