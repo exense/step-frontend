@@ -23,12 +23,6 @@ step-attachment-inline-preview {
     max-width: 35rem;
   }
 
-  step-skipped-attachment-info {
-    display: block;
-    box-sizing: border-box;
-    padding: 0.8rem 1rem;
-  }
-
   .skipped {
     color: var.$red-50;
   }
@@ -40,4 +34,10 @@ step-attachment-inline-preview {
   .disabled-inline-item {
     cursor: default;
   }
+}
+
+.attachment-inline-preview-skipped-popover {
+  display: block;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
 }

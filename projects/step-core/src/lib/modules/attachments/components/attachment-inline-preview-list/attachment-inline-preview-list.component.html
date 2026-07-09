@@ -5,7 +5,7 @@
     }
   </div>
   <div class="attachments-container">
-    <div #listPrefix>
+    <div #listPrefix (click)="$event.preventDefault(); $event.stopImmediatePropagation()">
       <step-icon name="paperclip" matTooltip="Attachments" />
     </div>
     @for (att of displayItems(); track att.id) {
