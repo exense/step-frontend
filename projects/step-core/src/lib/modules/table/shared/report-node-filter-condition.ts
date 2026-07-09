@@ -1,8 +1,5 @@
 import { FilterCondition } from './filter-condition';
-import {
-  TableRequestFilter,
-  Regex,
-} from '../../../client/step-client-module';
+import { TableRequestFilter, Regex } from '../../../client/step-client-module';
 import { CompareCondition } from '../../basics/types/compare-condition.enum';
 import { FilterConditionType } from './filter-condition-type.enum';
 

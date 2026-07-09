@@ -1,0 +1,46 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: block;
+  width: min(72rem, calc(100vw - 7rem));
+  font-size: 1.2rem;
+}
+
+.severity {
+  display: inline-flex;
+  align-items: center;
+  min-width: 5.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  font-weight: 600;
+  background: var.$blue-10;
+  color: var.$blue-625;
+
+  &.warning {
+    background: var.$orange-10;
+    color: var.$orange;
+  }
+
+  &.error {
+    background: var.$red-10;
+    color: var.$red-650;
+  }
+}
+
+.message-cell {
+  min-width: 34rem;
+  white-space: normal;
+  line-height: 1.4;
+
+  a {
+    color: var.$blue-600;
+  }
+}
+
+.timestamp-cell {
+  white-space: nowrap;
+  color: var.$gray-500;
+}

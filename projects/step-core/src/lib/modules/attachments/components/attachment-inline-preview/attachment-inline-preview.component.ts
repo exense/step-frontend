@@ -12,6 +12,7 @@ import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { StreamingAttachmentIndicatorComponent } from '../streaming-attachment-indicator/streaming-attachment-indicator.component';
 import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
 import { AuthService } from '../../../auth';
+import { SkippedAttachmentInfoComponent } from '../skipped-attachment-info/skipped-attachment-info.component';
 
 @Component({
   selector: 'step-attachment-inline-preview',
@@ -23,6 +24,7 @@ import { AuthService } from '../../../auth';
     StepBasicsModule,
     StepIconsModule,
     StreamingAttachmentIndicatorComponent,
+    SkippedAttachmentInfoComponent,
   ],
   host: {
     '[style.--style__value-max-width.px]': 'availableWidth()',
@@ -73,16 +75,13 @@ export class AttachmentInlinePreviewComponent {
     if (!this.hasResourceReadPermission()) {
       return;
     }
-    this._attachmentDialogs.showDetails(attachment);
-  }
-
-  protected downloadBinaryStream(attachment: StreamingAttachmentMeta, $event: MouseEvent): void {
-    if (!this.hasResourceReadPermission() || (attachment.status !== 'COMPLETED' && attachment.status !== 'FAILED')) {
-      return;
+    const attachmentType = this._attachmentUtils.determineAttachmentType(attachment);
+    if (attachmentType === AttachmentType.STREAMING_BINARY) {
+      const status = (attachment as StreamingAttachmentMeta).status;
+      if (status !== 'COMPLETED' && status !== 'FAILED') {
+        return;
+      }
     }
-    $event.preventDefault();
-    $event.stopPropagation();
-    $event.stopImmediatePropagation();
-    this._attachmentUtils.downloadAttachment(attachment);
+    this._attachmentDialogs.showDetails(attachment);
   }
 }

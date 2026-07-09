@@ -1,4 +1,4 @@
-import {Component, computed, inject, input, output} from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   AceMode,
   AugmentedTimeSeriesService,
@@ -10,9 +10,9 @@ import {
   TableRemoteDataSource,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
-import {EXECUTION_ENDED_STATUSES, Status} from '../../../_common/step-common.module';
-import {map, Observable} from 'rxjs';
-import {SearchError, SearchErrorType} from '../../shared/search-error';
+import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
+import { map, Observable } from 'rxjs';
+import { SearchError, SearchErrorType } from '../../shared/search-error';
 
 const ALL_COLUMNS = {
   errorMessage: 'errorMessage',
@@ -94,14 +94,14 @@ export class AltExecutionErrorsComponent {
   }
 
   protected findInTree(value: string): void {
-    this.searchFor.emit({type: SearchErrorType.TREE, value});
+    this.searchFor.emit({ type: SearchErrorType.TREE, value });
   }
 
   protected findInTestCases(value: string): void {
-    this.searchFor.emit({type: SearchErrorType.TEST_CASE, value});
+    this.searchFor.emit({ type: SearchErrorType.TEST_CASE, value });
   }
 
-  protected findInKeywords(value: string): void{
-    this.searchFor.emit({type: SearchErrorType.KEYWORD, value});
+  protected findInKeywords(value: string): void {
+    this.searchFor.emit({ type: SearchErrorType.KEYWORD, value });
   }
 }

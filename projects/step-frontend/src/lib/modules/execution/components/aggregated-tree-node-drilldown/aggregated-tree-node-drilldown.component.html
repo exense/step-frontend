@@ -34,10 +34,15 @@
                   <span>Steps</span>
                   @if (keywordsSort.showSort()) {
                     <step-alt-report-widget-sort>
-                      <step-icon
-                        [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+                      <button
+                        type="button"
+                        mat-icon-button
                         (click)="keywordsSort.toggleSort()"
-                      />
+                        matTooltip="Sort by start time"
+                        matTooltipPosition="below"
+                      >
+                        <step-icon [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+                      </button>
                     </step-alt-report-widget-sort>
                   }
                 </div>
@@ -150,7 +155,7 @@
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
-              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
               [initialStatus]="$any(item).searchStatus"
               (showDetails)="handleOpenDetails($event, item.id)"
             />

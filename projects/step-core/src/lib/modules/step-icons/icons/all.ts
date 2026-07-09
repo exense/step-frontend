@@ -1,6 +1,7 @@
 import { Activity } from './svg/activity';
 import { ActivityHeart } from './svg/activity-heart';
 import { Agent } from './svg/agent';
+import { AgentProvisioning } from './svg/agent-provisioning';
 import { AgentToken } from './svg/agent-token';
 import { AgentTokenGroup } from './svg/agent-token-group';
 import { Airplay } from './svg/airplay';
@@ -348,6 +349,7 @@ export const allIcons = {
   Activity,
   ActivityHeart,
   Agent,
+  AgentProvisioning,
   AgentToken,
   AgentTokenGroup,
   Airplay,
