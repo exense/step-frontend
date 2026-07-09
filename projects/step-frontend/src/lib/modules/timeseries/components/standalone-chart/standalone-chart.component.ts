@@ -24,6 +24,8 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 
 declare const uPlot: any;
 
+type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
+
 @Component({
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
@@ -51,6 +53,7 @@ export class StandaloneChartComponent {
 
   protected chartSettings?: TSChartSettings;
   protected readonly loading = signal(true);
+  private previousLoadingKey?: string;
 
   private readonly _fetchParams = computed(() => ({
     timeRange: this.timeRange(),
@@ -61,20 +64,42 @@ export class StandaloneChartComponent {
     grouping: this.grouping(),
     config: this.config(),
     colorsPool: this.colorsPool(),
+    loadingKey: JSON.stringify({
+      metricKey: this.metricKey(),
+      filters: this.filters(),
+      aggregation: this.aggregation(),
+      pclValue: this.pclValue(),
+      grouping: this.grouping(),
+      config: this.config(),
+    }),
   }));
 
   private readonly _fetchSub = toObservable(this._fetchParams)
     .pipe(
-      switchMap(({ timeRange }) => this.loadDataAndCreateChart(timeRange)),
+      switchMap(({ timeRange, loadingKey }) => this.loadDataAndCreateChart(timeRange, loadingKey)),
       takeUntilDestroyed(),
     )
     .subscribe();
 
-  private loadDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
+  private loadDataAndCreateChart(range: TimeRange, loadingKey?: string): Observable<TimeSeriesAPIResponse> {
+    const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
+    const shouldDisplayLoading = !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
+    if (loadingKey !== undefined) {
+      this.previousLoadingKey = loadingKey;
+    }
+
     return defer(() => {
-      this.loading.set(true);
+      if (shouldDisplayLoading) {
+        this.loading.set(true);
+      }
       return this.fetchDataAndCreateChart(range);
-    }).pipe(finalize(() => this.loading.set(false)));
+    }).pipe(
+      finalize(() => {
+        if (shouldDisplayLoading) {
+          this.loading.set(false);
+        }
+      }),
+    );
   }
 
   private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {

@@ -21,6 +21,7 @@ import {
   GridEditableService,
   IS_SMALL_SCREEN,
   ReportNode,
+  TableIndicatorMode,
   TimeRange,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
@@ -93,6 +94,7 @@ export class AltExecutionReportComponent
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
   protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly TableIndicatorMode = TableIndicatorMode;
   protected readonly renderReportContent = signal(this._mode === ViewMode.PRINT);
   protected readonly testCasesSummaryView$ = combineLatest([
     this._testCasesState.summary$.pipe(startWith(undefined)),

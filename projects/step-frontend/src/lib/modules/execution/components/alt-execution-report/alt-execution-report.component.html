@@ -69,6 +69,8 @@
         <step-alt-execution-errors
           [dataSource]="_state.errors$"
           [statusFilterItems]="_state.availableErrorTypes$ | async"
+          [indicatorMode]="TableIndicatorMode.SKELETON"
+          [inProgress]="(_state.errorsDisplayInProgress$ | async) ?? false"
           [showExecutionsMenu]="false"
           [hasTestCases]="!!(hasTestCases$ | async)"
           (searchFor)="searchError($event)"

@@ -268,6 +268,11 @@ export class AltExecutionProgressComponent
   private previousTreeProgressRange?: TimeRangeSelection;
   private readonly treeInProgressInternal$ = new BehaviorSubject(false);
   readonly treeInProgress$ = this.treeInProgressInternal$.asObservable();
+  private initialErrorsLoadPending = true;
+  private previousErrorsProgressExecutionId?: string;
+  private previousErrorsProgressRange?: TimeRangeSelection;
+  private readonly errorsDisplayInProgressInternal$ = new BehaviorSubject(false);
+  readonly errorsDisplayInProgress$ = this.errorsDisplayInProgressInternal$.asObservable();
 
   private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
   private readonly agentProvisioningEvents = signal<Record<string, AgentProvisioningEventState>>({});
@@ -568,12 +573,24 @@ export class AltExecutionProgressComponent
         if (!executionId || !timeRange) {
           return of([]);
         }
-        return this._timeSeriesService.findErrors({ executionId, timeRange });
+        const displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
+        return defer(() => {
+          if (displayProgress) {
+            this.errorsDisplayInProgressInternal$.next(true);
+          }
+          return this._timeSeriesService.findErrors({ executionId, timeRange });
+        }).pipe(
+          catchError(() => of([] as TimeSeriesErrorEntry[])),
+          finalize(() => {
+            if (displayProgress) {
+              this.errorsDisplayInProgressInternal$.next(false);
+            }
+          }),
+        );
       },
       this._destroyRef,
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
-    catchError(() => of([] as TimeSeriesErrorEntry[])),
     map((errors) => (!errors?.length ? undefined : errors)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -734,6 +751,7 @@ export class AltExecutionProgressComponent
     this.aggregatedTestCasesDataSource?.destroy();
     this.testCaseIterationsDataSource?.destroy();
     this.treeInProgressInternal$.complete();
+    this.errorsDisplayInProgressInternal$.complete();
   }
 
   private setupTreeRefresh(): void {
@@ -809,6 +827,19 @@ export class AltExecutionProgressComponent
     this.initialTreeLoadPending = false;
     this.previousTreeProgressExecutionId = execution?.id;
     this.previousTreeProgressRange = range;
+
+    return displayProgress;
+  }
+
+  private shouldDisplayErrorsProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+    const displayProgress =
+      this.initialErrorsLoadPending ||
+      this.previousErrorsProgressExecutionId !== execution?.id ||
+      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousErrorsProgressRange, range);
+
+    this.initialErrorsLoadPending = false;
+    this.previousErrorsProgressExecutionId = execution?.id;
+    this.previousErrorsProgressRange = range;
 
     return displayProgress;
   }

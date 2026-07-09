@@ -3,7 +3,7 @@
   [dataSource]="(_state.datasource$ | async)!"
   [tableParams]="(_state.tableParams$ | async)!"
   [calculateCounts]="calculateCounts()"
-  [indicatorMode]="TableIndicatorMode.SPINNER"
+  [indicatorMode]="TableIndicatorMode.SKELETON"
   [highlightedItem]="selectedReportId()"
   [highlightedItemExtractor]="extractReportId"
   class="paddingless no-border hide-header no-highlight"
