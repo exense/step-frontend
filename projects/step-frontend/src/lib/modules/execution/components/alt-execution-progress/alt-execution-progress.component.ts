@@ -573,8 +573,9 @@ export class AltExecutionProgressComponent
         if (!executionId || !timeRange) {
           return of([]);
         }
-        const displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
+        let displayProgress = false;
         return defer(() => {
+          displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
           if (displayProgress) {
             this.errorsDisplayInProgressInternal$.next(true);
           }
@@ -776,8 +777,9 @@ export class AltExecutionProgressComponent
             if (!this.canLoadExecutionData(executionId) || !execution) {
               return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
             }
-            const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
+            let displayProgress = false;
             return defer(() => {
+              displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
               if (displayProgress) {
                 this.treeInProgressInternal$.next(true);
               }

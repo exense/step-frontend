@@ -97,12 +97,18 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     this._timeSeriesService
       .checkTimeSeries(executionId!)
       .pipe(finalize(() => (this.timeSeriesCheckInProgress = false)))
-      .subscribe((exists) => {
-        if (exists) {
-          this.isInitialized = true;
-        } else {
+      .subscribe({
+        next: (exists) => {
+          if (exists) {
+            this.isInitialized = true;
+          } else {
+            this.executionHasToBeBuilt = true;
+          }
+        },
+        error: (error) => {
+          console.error('Error checking time series:', error);
           this.executionHasToBeBuilt = true;
-        }
+        },
       });
   }
 

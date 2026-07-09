@@ -130,8 +130,9 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
             return of(undefined);
           }
           const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
-          const displayProgress = this.shouldDisplayProgress(execution, range);
+          let displayProgress = false;
           return defer(() => {
+            displayProgress = this.shouldDisplayProgress(execution, range);
             this.summaryInProgressInternal$.next(true);
             if (displayProgress) {
               this.summaryDisplayInProgressInternal$.next(true);

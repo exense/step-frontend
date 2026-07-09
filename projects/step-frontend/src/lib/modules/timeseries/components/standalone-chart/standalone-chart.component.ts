@@ -83,12 +83,13 @@ export class StandaloneChartComponent {
 
   private loadDataAndCreateChart(range: TimeRange, loadingKey?: string): Observable<TimeSeriesAPIResponse | undefined> {
     const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
-    const shouldDisplayLoading = !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
-    if (loadingKey !== undefined) {
-      this.previousLoadingKey = loadingKey;
-    }
+    let shouldDisplayLoading = false;
 
     return defer(() => {
+      shouldDisplayLoading = !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
+      if (loadingKey !== undefined) {
+        this.previousLoadingKey = loadingKey;
+      }
       if (shouldDisplayLoading) {
         this.loading.set(true);
       }
