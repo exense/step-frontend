@@ -23,8 +23,25 @@
     }
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-stroked-button (click)="save(false)">Save</button>
-    <button type="button" mat-flat-button color="primary" (click)="save(true)">Save and edit</button>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button type="button" mat-stroked-button (click)="save(false)" [disabled]="isSaving" [attr.aria-busy]="isSaving">
+      @if (isSaving) {
+        <step-button-spinner label="Saving plan" />
+      }
+      Save
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="save(true)"
+      [disabled]="isSaving"
+      [attr.aria-busy]="isSaving"
+    >
+      @if (isSaving) {
+        <step-button-spinner label="Saving plan" />
+      }
+      Save and edit
+    </button>
   </div>
 </step-modal-window>

@@ -1,6 +1,6 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, of, switchMap, tap } from 'rxjs';
 import { ImportsService } from '../../../../client/step-client-module';
 import { ImportDialogData } from '../../types/import-dialog-data.interface';
 import { StepBasicsModule, AlertType, DialogsService, DialogRouteResult } from '../../../basics/step-basics.module';
@@ -24,34 +24,35 @@ export class ImportDialogComponent {
   protected importAll = this._data.importAll;
   protected overwrite = this._data.overwrite;
 
-  readonly title = this._data.title;
-  readonly entity = this._data.entity;
-  readonly AlertType = AlertType;
+  protected readonly title = this._data.title;
+  protected readonly entity = this._data.entity;
+  protected readonly AlertType = AlertType;
 
   @HostListener('keydown.enter')
-  save(): void {
+  protected save(): void {
+    if (this.isImporting) {
+      return;
+    }
+
     if (!this.resourcePath) {
       this._dialogs.showErrorMsg('Upload not completed.').subscribe();
       return;
     }
+
+    this.isImporting = true;
+    this._matDialogRef.disableClose = true;
+
     this.invokeImport()
       .pipe(
-        tap(() => {
-          this.isImporting = true;
+        tap(() => this._matDialogRef.close({ isSuccess: true })),
+        switchMap((response) => (!!response?.length ? this._dialogs.showListOfMsgs(response) : of(undefined))),
+        finalize(() => {
+          this.isImporting = false;
+          this._matDialogRef.disableClose = false;
         }),
       )
       .subscribe({
-        next: (response: string[]) => {
-          this._matDialogRef.close({ isSuccess: true });
-
-          if (!!response?.length) {
-            this._dialogs.showListOfMsgs(response).subscribe();
-          }
-        },
-        complete: () => {
-          this.isImporting = false;
-        },
-        error: (error: unknown) => console.error(error),
+        error: () => undefined,
       });
   }
 

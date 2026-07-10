@@ -38,6 +38,7 @@ import {
   distinctUntilChanged,
   finalize,
   map,
+  Observable,
   of,
   shareReplay,
   startWith,
@@ -74,6 +75,11 @@ export interface EditSchedulerTaskDialogData {
 
 const LOCAL_REPOSITORY_ID = 'local';
 
+type TestCases = {
+  testCasesWithIds?: KeyValue<string, string>[];
+  testCasesNamesOnly?: KeyValue<string, string>[];
+};
+
 @Component({
   selector: 'step-scheduled-task-edit-dialog',
   templateUrl: './edit-scheduler-task-dialog.component.html',
@@ -93,7 +99,7 @@ const LOCAL_REPOSITORY_ID = 'local';
   },
 })
 export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
-  readonly EXCLUSION_HELP_MESSAGE =
+  protected readonly EXCLUSION_HELP_MESSAGE =
     'Optionally provide CRON expression(s) for excluding time ranges. (Example: for a schedule set to run every 5 minutes, you can exclude the execution on weekends with “* * * ? * SAT-SUN” )';
 
   private _cron = inject(CronService);
@@ -107,41 +113,44 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA);
 
   private config = this._dialogData.taskAndConfig.config;
-  protected task = this._dialogData.taskAndConfig.task;
+  protected readonly task = this._dialogData.taskAndConfig.task;
   protected readonly isSchedulePlan = !!this._dialogData.isSchedulePlan;
 
-  private customForms = viewChild(CustomFormWrapperComponent);
+  private readonly customForms = viewChild(CustomFormWrapperComponent);
 
   protected hideUser = this.config?.hideUser;
 
-  protected showProgress = signal(false);
-  protected isNew = signal(true);
-  protected error = signal('');
+  protected readonly showProgress = signal(false);
+  protected readonly isSaving = signal(false);
+  protected readonly isNew = signal(true);
+  protected readonly error = signal('');
 
   protected readonly EXCLUSION_ID = EXCLUSION_ID;
   protected taskForm = taskFormCreate(this._fb);
   protected cronExclusions = this.taskForm.controls.cronExclusions;
 
-  private hasExclusions$ = this.cronExclusions.valueChanges.pipe(
+  private readonly hasExclusions$ = this.cronExclusions.valueChanges.pipe(
     startWith(this.cronExclusions.value),
     map((exclusions) => !!exclusions.length),
     takeUntilDestroyed(),
   );
 
-  protected showParameters = model(false);
-  protected paramsSchema = signal<JsonFieldsSchema | undefined>(undefined);
-  protected isLocal = signal(false);
-  protected hasExclusions = toSignal(this.hasExclusions$);
+  protected readonly showParameters = model(false);
+  protected readonly paramsSchema = signal<JsonFieldsSchema | undefined>(undefined);
+  protected readonly isLocal = signal(false);
+  protected readonly hasExclusions = toSignal(this.hasExclusions$);
   protected readonly planErrorsDictionary: Record<string, string> = {
     required: 'Please select a plan.',
     missingPlanReference: 'The previously selected plan no longer exists. Please select a new plan.',
   };
 
-  private testCases$ = this.createTestCasesStream();
+  private readonly testCases$ = this.createTestCasesStream();
 
-  protected testCasesWithIds = toSignal(this.testCases$.pipe(map((testCases) => testCases.testCasesWithIds)));
+  protected readonly testCasesWithIds = toSignal(this.testCases$.pipe(map((testCases) => testCases.testCasesWithIds)));
 
-  protected testCasesNamesOnly = toSignal(this.testCases$.pipe(map((testCases) => testCases.testCasesNamesOnly)));
+  protected readonly testCasesNamesOnly = toSignal(
+    this.testCases$.pipe(map((testCases) => testCases.testCasesNamesOnly)),
+  );
 
   ngOnInit(): void {
     this.initializeTask();
@@ -152,15 +161,28 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   }
 
   protected save(): void {
+    if (this.isSaving()) {
+      return;
+    }
+
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
       return;
     }
+
+    this.isSaving.set(true);
+    this._matDialogRef.disableClose = true;
     taskForm2Model(this.task, this.taskForm);
     this.error.set('');
     this.customForms()!
       .readyToProceed()
-      .pipe(switchMap(() => this._api.saveExecutionTask(this.task)))
+      .pipe(
+        switchMap(() => this._api.saveExecutionTask(this.task)),
+        finalize(() => {
+          this.isSaving.set(false);
+          this._matDialogRef.disableClose = false;
+        }),
+      )
       .subscribe({
         next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
         error: () => {
@@ -181,7 +203,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
     this.taskForm.controls.cronExclusions.push(taskCronExclusionFormCreate(this._fb));
   }
 
-  protected removeExclusion(index: number) {
+  protected removeExclusion(index: number): void {
     this.taskForm.controls.cronExclusions.removeAt(index);
   }
 
@@ -233,8 +255,9 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  private createTestCasesStream() {
-    const getChangeStream = <T>(control: FormControl<T>) => control.valueChanges.pipe(startWith(control.value));
+  private createTestCasesStream(): Observable<TestCases> {
+    const getChangeStream = <T>(control: FormControl<T>): Observable<T | null> =>
+      control.valueChanges.pipe(startWith(control.value));
 
     const repositoryID$ = getChangeStream(this.taskForm.controls.repositoryId);
     const repositoryParameters$ = getChangeStream(this.taskForm.controls.repositoryParameters).pipe(debounceTime(300));
