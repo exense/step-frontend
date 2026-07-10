@@ -14,7 +14,7 @@ const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
 // Should be ignored during the registration
 const DEFAULT_ENTRY_POINT = 'default';
 
-const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
+const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[] | undefined> => {
   let result: MicrofrontendPluginDefinition[] = [];
   try {
     const pluginsResponse = await fetch('rest/app/plugins');
@@ -34,6 +34,7 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
     }
   } catch (e) {
     console.log('Fetch plugin definitions failed', e);
+    return undefined;
   }
   return result;
 };
@@ -46,6 +47,11 @@ const registerPlugins = () => {
   globalIndicator.showMessage('Loading plugins...');
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
+    if (pluginDefinitions === undefined) {
+      globalIndicator.showErrorMessage('Plugins load failed. Reload the page or contact an administrator.');
+      throw new Error('Plugins load failed');
+    }
+
     if (pluginDefinitions.length === 0) {
       return;
     }

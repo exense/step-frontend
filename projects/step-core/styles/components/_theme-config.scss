@@ -17,6 +17,7 @@
 @use 'print';
 @use 'material-overrides' as mat-ov;
 @use 'step-skeleton' as skeleton;
+@use 'step-spin' as spin;
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -283,4 +284,5 @@ $light-primary-text: var.$white;
 
   @include print.print-overrides;
   @include skeleton.skeleton-animations;
+  @include spin.step-spin;
 }

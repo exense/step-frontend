@@ -1,51 +1,76 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
-  padding: .5rem 2.5rem;
+step-ide-header-bar {
+  padding: 1rem 5rem 1rem 2.5rem;
   gap: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
 
-.package {
-  color: var.$white;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  & > span {
+  .package {
+    color: var.$white;
     display: flex;
     align-items: center;
-    gap: .5rem;
-  }
-}
+    gap: 1rem;
 
-section > button {
-  step-icon,
-  span {
-    color: var.$white;
-  }
-  margin-left: 1rem;
-}
+    & > span {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
 
-.btn-recent-content {
-  display: grid;
-  grid-template-areas:
+    span.icon {
+      min-width: 2rem;
+    }
+  }
+
+  section > button {
+    margin-left: 1rem;
+
+    step-icon,
+    span {
+      color: var.$white;
+    }
+
+    &:disabled {
+      border-color: var.$muted !important;
+      step-icon, span {
+        color: var.$muted !important;
+      }
+    }
+
+  }
+
+  .btn-recent-content {
+    display: grid;
+    grid-template-areas:
           'icon name'
           'icon folder';
-  align-items: center;
-  column-gap: 1rem;
-  row-gap: 0.1rem;
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.1rem;
 
-  step-icon {
-    grid-area: icon;
+    step-icon {
+      grid-area: icon;
+    }
+
+    span:first-child {
+      grid-area: name;
+    }
+
+    span:last-child {
+      grid-area: folder;
+      font-size: 1.1rem;
+    }
   }
-  span:first-child {
-    grid-area: name;
+}
+
+step-sidebar {
+  #sidebar-home-and-settings {
+    margin-top: 6.5rem !important;
   }
-  span:last-child {
-    grid-area: folder;
-    font-size: 1.1rem;
+
+  #sidebar-categories {
+    margin-top: 12.8rem !important;
   }
 }
