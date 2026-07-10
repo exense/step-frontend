@@ -1,4 +1,4 @@
-<step-datasource-list #table [dataSource]="(_state.datasource$ | async)!" [indicatorMode]="TableIndicatorMode.SPINNER">
+<step-datasource-list #table [dataSource]="(_state.datasource$ | async)!" [indicatorMode]="TableIndicatorMode.SKELETON">
   <ng-container *stepDatasourceListItem="let element; let index = $index">
     @let hasOperations = !!element.currentOperations.length;
     @let hasErrors = !!(element | aggregatedReportViewCountErrors);

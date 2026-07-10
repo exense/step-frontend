@@ -21,6 +21,7 @@ import {
   GridEditableService,
   IS_SMALL_SCREEN,
   ReportNode,
+  TableIndicatorMode,
   TimeRange,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
@@ -30,7 +31,7 @@ import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nod
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, map, noop, Observable, scan, tap } from 'rxjs';
+import { combineLatest, first, map, noop, Observable, scan, startWith, tap } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../../_common/shared/status.enum';
@@ -93,7 +94,26 @@ export class AltExecutionReportComponent
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
   protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly TableIndicatorMode = TableIndicatorMode;
   protected readonly renderReportContent = signal(this._mode === ViewMode.PRINT);
+  protected readonly testCasesSummaryView$ = combineLatest([
+    this._testCasesState.summary$.pipe(startWith(undefined)),
+    this._testCasesState.summaryDisplayInProgress$,
+  ]).pipe(
+    map(([summary, loading]) => ({
+      summary: summary ?? this.emptyReportNodeSummary,
+      loading: loading || !summary,
+    })),
+  );
+  protected readonly keywordsSummaryView$ = combineLatest([
+    this._keywordsState.summary$.pipe(startWith(undefined)),
+    this._keywordsState.summaryDisplayInProgress$,
+  ]).pipe(
+    map(([summary, loading]) => ({
+      summary: summary ?? this.emptyReportNodeSummary,
+      loading: loading || !summary,
+    })),
+  );
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(
     map((testCases) => {
