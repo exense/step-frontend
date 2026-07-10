@@ -1,4 +1,14 @@
-import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  forwardRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewEncapsulation,
+  DOCUMENT,
+} from '@angular/core';
 import {
   AlertType,
   AugmentedExecutionsService,
@@ -40,7 +50,7 @@ import {
   EXECUTION_TREE_PAGING_SETTINGS,
   ExecutionTreePagingService,
 } from '../../services/execution-tree-paging.service';
-import { DOCUMENT } from '@angular/common';
+
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';

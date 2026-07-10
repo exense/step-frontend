@@ -1,5 +1,5 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { effect, inject, Injectable, signal, DOCUMENT } from '@angular/core';
+
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, first, Subject, switchMap, takeUntil, timer } from 'rxjs';
 

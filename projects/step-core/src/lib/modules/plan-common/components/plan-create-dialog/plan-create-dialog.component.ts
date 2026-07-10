@@ -1,4 +1,4 @@
-import { Component, inject, InjectionToken, viewChild } from '@angular/core';
+import { Component, inject, InjectionToken, viewChild, DOCUMENT } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -10,7 +10,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { Tab, TabsComponent } from '../../../tabs';
 import { AceMode, RichEditorComponent } from '../../../rich-editor';
-import { DOCUMENT } from '@angular/common';
 
 const TABS = new InjectionToken<Tab<string>[]>('Plan creation tabs', {
   providedIn: 'root',

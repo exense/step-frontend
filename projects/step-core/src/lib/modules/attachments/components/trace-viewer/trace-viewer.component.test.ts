@@ -1,8 +1,7 @@
 import { TraceViewerComponent } from './trace-viewer.component';
 import { TestBed } from '@angular/core/testing';
 import { APP_HOST } from '../../../../client/_common';
-import { ComponentRef } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { ComponentRef, DOCUMENT } from '@angular/core';
 
 describe('Trace Viewer', () => {
   let componentRef: ComponentRef<TraceViewerComponent>;

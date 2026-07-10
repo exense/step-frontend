@@ -1,4 +1,4 @@
-import { Directive, forwardRef, HostListener, inject } from '@angular/core';
+import { Directive, forwardRef, HostListener, inject, DOCUMENT } from '@angular/core';
 import {
   AuthService,
   PlanArtefactResolverService,
@@ -6,7 +6,6 @@ import {
   PlanInteractiveSessionService,
   TreeFocusStateService,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepPlanEditorKeyHandler]',

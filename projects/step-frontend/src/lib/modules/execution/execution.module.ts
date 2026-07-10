@@ -1,4 +1,4 @@
-import { inject, NgModule } from '@angular/core';
+import { inject, NgModule, DOCUMENT } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -167,7 +167,7 @@ import { GradientLegendComponent } from './components/schedule-overview/cross-ex
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
-import { DOCUMENT } from '@angular/common';
+
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
