@@ -1,14 +1,18 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { StepIconsModule } from '../../../step-icons/step-icons.module';
 
 @Component({
   selector: 'step-button-spinner',
-  imports: [MatProgressSpinner],
-  template: '<mat-spinner [diameter]="diameter()" [attr.aria-label]="label()" />',
+  imports: [StepIconsModule],
+  template: '<step-icon name="refresh-cw" [attr.aria-label]="label()" />',
   styleUrl: './button-spinner.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[style.width.px]': 'diameter()',
+    '[style.height.px]': 'diameter()',
+  },
 })
 export class ButtonSpinnerComponent {
-  readonly diameter = input(18);
+  readonly diameter = input(20);
   readonly label = input('Loading');
 }

@@ -1,5 +1,21 @@
 :host {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 1;
   vertical-align: middle;
-  --mdc-circular-progress-active-indicator-color: currentColor;
+}
+
+step-icon {
+  width: 100%;
+  height: 100%;
+  animation: step-button-spinner-rotate 4s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes step-button-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
