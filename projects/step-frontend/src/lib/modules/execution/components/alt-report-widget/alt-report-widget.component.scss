@@ -1,3 +1,5 @@
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
 step-alt-report-widget-content {
   height: 100%;
 }
@@ -37,6 +39,10 @@ step-alt-report-widget {
   step-btn-group.maximize-button.with-borders .mat-mdc-button-base {
     width: 3.6rem;
     height: 3.4rem;
+  }
+
+  step-btn-group.report-filter-button.with-borders {
+    @include common.report-filter-button-size;
   }
 
   mat-card-header > step-alt-report-widget-filter {
