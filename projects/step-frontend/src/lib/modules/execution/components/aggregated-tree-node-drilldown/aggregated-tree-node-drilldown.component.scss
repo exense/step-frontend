@@ -1,5 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-aggregated-tree-node-drilldown {
   background: var.$white;
@@ -15,6 +16,10 @@ step-aggregated-tree-node-drilldown {
       align-items: center;
       gap: 1rem;
     }
+  }
+
+  step-btn-group.report-filter-button {
+    @include common.report-filter-button-size;
   }
 
   .root-content {

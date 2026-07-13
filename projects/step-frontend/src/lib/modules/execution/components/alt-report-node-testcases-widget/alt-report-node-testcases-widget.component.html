@@ -1,6 +1,24 @@
 <step-alt-report-node-list-widget [mode]="_mode">
+  <step-alt-report-widget-filter class="filter-prefix">
+    <step-btn-group class="with-borders report-filter-button">
+      <button
+        type="button"
+        mat-icon-button
+        [color]="testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL ? 'primary' : undefined"
+        [matTooltip]="
+          testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL
+            ? 'Show aggregated test cases'
+            : 'Show individual iterations'
+        "
+        matTooltipPosition="below"
+        (click)="toggleTestCasesDisplayMode()"
+      >
+        <step-icon name="pocket" />
+      </button>
+    </step-btn-group>
+  </step-alt-report-widget-filter>
   <step-alt-report-widget-filter>
-    <step-btn-group class="with-borders maximize-button">
+    <step-btn-group class="with-borders maximize-button report-filter-button">
       <button
         type="button"
         mat-stroked-button
