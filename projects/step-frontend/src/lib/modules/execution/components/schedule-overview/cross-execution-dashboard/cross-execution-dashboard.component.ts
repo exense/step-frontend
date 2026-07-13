@@ -1,8 +1,9 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
+import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, Tab, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, map, of, Subject, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -18,11 +19,24 @@ import {
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected _state = inject(CrossExecutionDashboardState);
+  private _schedulerService = inject(SchedulerService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
+  protected readonly DateFormat = DateFormat;
+
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
+
+  protected readonly nextExecutionDate$ = toObservable(this._state.task).pipe(
+    map((task) => ({ id: task?.id, isActive: task?.active !== false })),
+    distinctUntilChanged((previous, current) => previous.id === current.id && previous.isActive === current.isActive),
+    switchMap(({ id, isActive }) =>
+      id && isActive
+        ? this._schedulerService.getNextExecutionDate(id).pipe(catchError(() => of(undefined)))
+        : of(undefined),
+    ),
+  );
 
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';

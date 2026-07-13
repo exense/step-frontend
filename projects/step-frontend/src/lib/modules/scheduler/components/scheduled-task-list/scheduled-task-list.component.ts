@@ -14,6 +14,7 @@ import {
   tableColumnsConfigProvider,
   AlertType,
   entitySelectionStateProvider,
+  DateFormat,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -62,11 +63,12 @@ export class ScheduledTaskListComponent implements DialogParentService {
   );
 
   readonly ActiveLabels = ActiveLabels;
+  readonly DateFormat = DateFormat;
 
   readonly dataSource = this._schedulerService.createDataSource();
   readonly returnParentUrl = '/scheduler';
 
-  protected isSchedulerDisabled = toSignal(
+  protected readonly isSchedulerDisabled = toSignal(
     this._schedulerService.isSchedulerEnabled().pipe(
       map((result) => !result),
       catchError(() => of(false)),
@@ -92,13 +94,13 @@ export class ScheduledTaskListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
-  executeTask(scheduledTask: ExecutiontTaskParameters) {
+  executeTask(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
       this._router.navigateByUrl(this._commonEntitiesUrls.executionUrl(executionId));
     });
   }
 
-  switchActive(scheduledTask: ExecutiontTaskParameters) {
+  switchActive(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(

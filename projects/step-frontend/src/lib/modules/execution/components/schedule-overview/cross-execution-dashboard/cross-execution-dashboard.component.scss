@@ -79,6 +79,26 @@ step-cross-exec-repository-page {
       background: var.$light-blue-gray;
       border-radius: 1.6rem;
       padding: 0.6rem 1rem;
+      font-size: 1.2rem;
+      font-weight: 500;
+
+      &.next-execution-label {
+        position: relative;
+        padding-top: 1rem;
+
+        .tag {
+          position: absolute;
+          top: -0.5rem;
+          left: -0.2rem;
+          background: var.$white;
+          border-radius: 0.8rem;
+          border: 1px solid var.$light-blue-gray;
+          padding: 0 0.4rem;
+          font-size: 1rem;
+          line-height: 1.2rem;
+          font-weight: normal;
+        }
+      }
     }
 
     .controls {
