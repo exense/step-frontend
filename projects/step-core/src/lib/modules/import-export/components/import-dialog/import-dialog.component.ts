@@ -1,6 +1,6 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { finalize, Observable, of, switchMap, tap } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 import { ImportsService } from '../../../../client/step-client-module';
 import { ImportDialogData } from '../../types/import-dialog-data.interface';
 import { StepBasicsModule, AlertType, DialogsService, DialogRouteResult } from '../../../basics/step-basics.module';
@@ -44,14 +44,18 @@ export class ImportDialogComponent {
 
     this.invokeImport()
       .pipe(
-        tap(() => this._matDialogRef.close({ isSuccess: true })),
-        switchMap((response) => (!!response?.length ? this._dialogs.showListOfMsgs(response) : of(undefined))),
         finalize(() => {
           this.isImporting = false;
           this._matDialogRef.disableClose = false;
         }),
       )
       .subscribe({
+        next: (response) => {
+          this._matDialogRef.close({ isSuccess: true });
+          if (response?.length) {
+            this._dialogs.showListOfMsgs(response);
+          }
+        },
         error: () => undefined,
       });
   }
