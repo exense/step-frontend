@@ -21,7 +21,19 @@
     </ng-container>
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="execute()">Execute</button>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="isExecuting">Cancel</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="execute()"
+      [disabled]="isExecuting"
+      [attr.aria-busy]="isExecuting"
+    >
+      @if (isExecuting) {
+        <step-button-spinner label="Executing automation package" />
+      }
+      Execute
+    </button>
   </div>
 </step-modal-window>

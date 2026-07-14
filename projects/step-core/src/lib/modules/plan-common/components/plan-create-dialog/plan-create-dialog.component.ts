@@ -1,5 +1,5 @@
 import { Component, inject, InjectionToken, viewChild } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { finalize, Observable, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CustomFormComponent } from '../../../custom-forms';
@@ -41,7 +41,7 @@ export class PlanCreateDialogComponent {
   private _router = inject(Router);
   private _doc = inject(DOCUMENT);
 
-  private customForm = viewChild(CustomFormComponent);
+  private readonly customForm = viewChild(CustomFormComponent);
 
   protected template: string = 'TestCase';
   protected plan: Partial<Plan> = { attributes: {} };
@@ -49,6 +49,7 @@ export class PlanCreateDialogComponent {
   protected readonly _planEditorTypes = inject(PlanTypeRegistryService).getItemInfos();
   protected planType = this._planEditorTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
   protected yamlPlan = '';
+  protected isSaving = false;
 
   protected readonly artefactTypes = toSignal(this._api.getArtefactTemplates(), { initialValue: [] });
 
@@ -61,18 +62,32 @@ export class PlanCreateDialogComponent {
     getValue: (item: ItemInfo) => item.type,
   };
 
-  save(editAfterSave?: boolean): void {
+  protected save(editAfterSave?: boolean): void {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.isSaving = true;
+    this._matDialogRef.disableClose = true;
+
     const createPlan$ = this.selectedTab === 'yaml' ? this.createAsYamlPlan$() : this.createNewPlan$();
 
     createPlan$
       .pipe(
         switchMap((createdPlan) => this._api.savePlan(createdPlan)), // Common save logic
+        finalize(() => {
+          this.isSaving = false;
+          this._matDialogRef.disableClose = false;
+        }),
       )
-      .subscribe((plan) => {
-        if (editAfterSave) {
-          this._router.navigate(['plans', 'editor', plan.id]);
-        }
-        this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
+      .subscribe({
+        next: (plan) => {
+          if (editAfterSave) {
+            this._router.navigate(['plans', 'editor', plan.id]);
+          }
+          this._matDialogRef.close({ isSuccess: !!plan, canNavigateBack: !editAfterSave });
+        },
+        error: () => undefined,
       });
   }
 

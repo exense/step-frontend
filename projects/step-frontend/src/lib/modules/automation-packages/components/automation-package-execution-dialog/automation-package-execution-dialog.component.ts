@@ -10,7 +10,7 @@ import {
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, Validators } from '@angular/forms';
-import { startWith } from 'rxjs';
+import { finalize, startWith } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
@@ -47,6 +47,7 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
 
   protected readonly hasParameters = signal(false);
   protected readonly executionParameters = model<Record<string, string>>({});
+  protected isExecuting = false;
 
   ngOnInit(): void {
     this._screenTemplates.getDefaultParametersByScreenId('executionParameters').subscribe((parameters) => {
@@ -58,21 +59,37 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
   }
 
   protected execute(): void {
+    if (this.isExecuting) {
+      return;
+    }
+
     if (this.executionConfigForm.invalid) {
       this.executionConfigForm.markAllAsTouched();
       return;
     }
+
+    this.isExecuting = true;
+    this._dialogRef.disableClose = true;
     const params = this.createPackageExecutionParameters();
     this._automationPackageApi
       .executeDeployedAutomationPackage(this._automationPackage.id!, params)
-      .subscribe((executionIds) => {
-        let navigateTo = '/executions';
-        if (executionIds.length === 1) {
-          const id = executionIds[0];
-          navigateTo = `/executions/${id}`;
-        }
-        this._router.navigateByUrl(navigateTo);
-        this._dialogRef.close(true);
+      .pipe(
+        finalize(() => {
+          this.isExecuting = false;
+          this._dialogRef.disableClose = false;
+        }),
+      )
+      .subscribe({
+        next: (executionIds) => {
+          let navigateTo = '/executions';
+          if (executionIds.length === 1) {
+            const id = executionIds[0];
+            navigateTo = `/executions/${id}`;
+          }
+          this._router.navigateByUrl(navigateTo);
+          this._dialogRef.close(true);
+        },
+        error: () => undefined,
       });
   }
 

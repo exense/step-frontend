@@ -34,7 +34,7 @@ import {
   ArrayItemLabelValueExtractor,
   ReloadableDirective,
 } from '@exense/step-core';
-import { map, of, switchMap, tap } from 'rxjs';
+import { finalize, map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -77,10 +77,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
   protected isLoading: boolean = false;
+  protected isSaving = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
-  private functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
-  private customForm = viewChild(CustomFormWrapperComponent);
+  private readonly functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
+  private readonly customForm = viewChild(CustomFormWrapperComponent);
 
   protected readonly itemInfoArrayItemExtractor: ArrayItemLabelValueExtractor<ItemInfo, string> = {
     getValue: (item: ItemInfo) => item.type,
@@ -123,10 +124,17 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   }
 
   protected save(edit?: boolean): void {
+    if (this.isSaving) {
+      return;
+    }
+
     if (this.formGroup!.invalid) {
       this.formGroup!.markAllAsTouched();
       return;
     }
+
+    this.isSaving = true;
+    this._matDialogRef.disableClose = true;
 
     this.customForm()!
       .readyToProceed()
@@ -145,19 +153,29 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
 
           return this._api.getFunctionEditor(keyword.id!).pipe(map((path) => ({ isSuccess, path })));
         }),
+        switchMap((result) =>
+          edit && !result.path
+            ? this._dialogsService.showErrorMsg('No editor configured for this function type').pipe(map(() => result))
+            : of(result),
+        ),
+        finalize(() => {
+          this.isSaving = false;
+          this._matDialogRef.disableClose = false;
+        }),
       )
-      .subscribe(({ isSuccess, path }) => {
-        if (!edit) {
-          this._matDialogRef.close({ isSuccess });
-          return;
-        }
+      .subscribe({
+        next: ({ isSuccess, path }) => {
+          if (!edit) {
+            this._matDialogRef.close({ isSuccess });
+            return;
+          }
 
-        if (path) {
-          this._router.navigateByUrl(path);
-        } else {
-          this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
-        }
-        this._matDialogRef.close({ isSuccess, canNavigateBack: !path });
+          if (path) {
+            this._router.navigateByUrl(path);
+          }
+          this._matDialogRef.close({ isSuccess, canNavigateBack: !path });
+        },
+        error: () => undefined,
       });
   }
 
