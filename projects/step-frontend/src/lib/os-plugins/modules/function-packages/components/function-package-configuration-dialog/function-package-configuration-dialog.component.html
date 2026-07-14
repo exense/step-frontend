@@ -1,4 +1,8 @@
-<step-modal-window [title]="modalTitle" [showSpinner]="isLoading || isScreenTemplateLoading">
+<step-modal-window
+  [title]="modalTitle"
+  [showSpinner]="isLoading || isScreenTemplateLoading"
+  [spinnerTooltip]="isScreenTemplateLoading ? 'Loading screen templates' : ''"
+>
   <div step-modal-window-body>
     @if (previewError; as error) {
       <step-alert [type]="AlertType.DANGER">Error while loading package file: {{ error }}</step-alert>

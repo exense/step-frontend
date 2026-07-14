@@ -1,4 +1,9 @@
-<step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
+<step-modal-window
+  [title]="modalTitle"
+  [showSpinner]="isLoading"
+  [spinnerTooltip]="isScreenTemplateLoading ? 'Loading screen templates' : ''"
+  [stepZIndex]="1000"
+>
   <div step-modal-window-body>
     @if (keyword?.managed) {
       <step-alert [type]="AlertType.WARNING">

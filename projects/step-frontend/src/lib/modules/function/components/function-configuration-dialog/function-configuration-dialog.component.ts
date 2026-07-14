@@ -81,7 +81,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
   private isFunctionTypeLoading = false;
-  private isScreenTemplateLoading = true;
+  protected isScreenTemplateLoading = true;
 
   private readonly functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
   private readonly customForm = viewChild(CustomFormWrapperComponent);

@@ -1,4 +1,8 @@
-<step-modal-window title="New Plan" [showSpinner]="selectedTab === 'general' && isScreenTemplateLoading">
+<step-modal-window
+  title="New Plan"
+  [showSpinner]="selectedTab === 'general' && isScreenTemplateLoading"
+  spinnerTooltip="Loading screen templates"
+>
   <div step-modal-window-body>
     <step-tabs [tabs]="_availableTabs" [(activeTabId)]="selectedTab" [compactTabs]="true"> </step-tabs>
     @if (selectedTab === 'general') {

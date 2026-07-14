@@ -59,9 +59,13 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
   }
 
   protected readonly executionParameters = model<Record<string, any>>({});
-  protected readonly screenTemplateLoading = signal(true);
+  private readonly defaultParametersLoading = signal(true);
+  private readonly customFormLoading = signal(false);
+  protected readonly screenTemplateLoading = computed(
+    () => this.defaultParametersLoading() || this.customFormLoading(),
+  );
 
-  protected executionParameters$ = toObservable(this.execution).pipe(
+  protected readonly executionParameters$ = toObservable(this.execution).pipe(
     switchMap((execution) => {
       if (!execution) {
         return this._screenTemplates.getDefaultParametersByScreenId('executionParameters');
@@ -119,11 +123,11 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
   protected setupExecutionParameters(): void {
     this.executionParameters$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((executionParameters) => {
       this.executionParameters.set(executionParameters ?? {});
-      this.screenTemplateLoading.set(false);
+      this.defaultParametersLoading.set(false);
     });
   }
 
   protected setScreenTemplateLoading(isLoading: boolean): void {
-    this.screenTemplateLoading.set(isLoading);
+    this.customFormLoading.set(isLoading);
   }
 }

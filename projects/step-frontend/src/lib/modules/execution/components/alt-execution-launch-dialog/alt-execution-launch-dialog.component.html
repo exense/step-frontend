@@ -1,4 +1,9 @@
-<step-modal-window [title]="title" [showSpinner]="loading() || screenTemplateLoading()" class="slim-actions">
+<step-modal-window
+  [title]="title"
+  [showSpinner]="loading() || screenTemplateLoading()"
+  [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
+  class="slim-actions"
+>
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger" role="alert">

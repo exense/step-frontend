@@ -51,17 +51,19 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
 
-  private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
-  private valueChangeDebounced$ = this.valueChange$.pipe(
+  private readonly valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
+  private readonly valueChangeDebounced$ = this.valueChange$.pipe(
     groupBy((value) => value?.inputId),
     mergeMap((group) => group.pipe(debounceTime(500))),
   );
 
-  private changeStart$ = this.valueChange$.pipe(map(() => true));
-  private changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
+  private readonly changeStart$ = this.valueChange$.pipe(map(() => true));
+  private readonly changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
 
-  readonly changeInProgress$ = merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged());
-  readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
+  private readonly changeInProgress = toSignal(merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged()), {
+    initialValue: false,
+  });
+  private readonly changeInProgress$ = toObservable(this.changeInProgress);
 
   readonly stEditableLabelMode = input(false);
   readonly stInline = input(false);

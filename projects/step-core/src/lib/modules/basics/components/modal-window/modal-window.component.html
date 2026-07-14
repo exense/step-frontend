@@ -1,5 +1,5 @@
 @if (showSpinner()) {
-  <div class="spinner-container" matTooltip="Loading screen templates">
+  <div class="spinner-container" [matTooltip]="spinnerTooltip()" [matTooltipDisabled]="!spinnerTooltip()">
     <mat-spinner [diameter]="20" />
   </div>
 }

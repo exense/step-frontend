@@ -1,6 +1,7 @@
 <step-modal-window
   [title]="isNew() ? 'New schedule' : 'Edit schedule'"
   [showSpinner]="showProgress() || isScreenTemplateLoading()"
+  [spinnerTooltip]="isScreenTemplateLoading() ? 'Loading screen templates' : ''"
 >
   <div step-modal-window-body>
     @if (error(); as error) {
