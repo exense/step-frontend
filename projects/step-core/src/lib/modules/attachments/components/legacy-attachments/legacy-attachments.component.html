@@ -7,7 +7,7 @@
     <step-icon name="paperclip" />
   </button>
   <mat-menu #menu="matMenu">
-    @for (attachment of attachments(); track attachment.id) {
+    @for (attachment of downloadableAttachments(); track attachment.id) {
       <button mat-menu-item [disabled]="!hasResourceReadPermission()" (click)="openAttachment(attachment)">
         {{ attachment!.name }}
       </button>
