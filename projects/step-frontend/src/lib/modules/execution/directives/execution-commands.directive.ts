@@ -58,7 +58,8 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
     return this.isExecutionIsolated();
   }
 
-  protected executionParameters = model<Record<string, any>>({});
+  protected readonly executionParameters = model<Record<string, any>>({});
+  protected readonly screenTemplateLoading = signal(true);
 
   protected executionParameters$ = toObservable(this.execution).pipe(
     switchMap((execution) => {
@@ -70,7 +71,7 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
     }),
   );
 
-  protected isExecutionIsolated = computed(() => {
+  protected readonly isExecutionIsolated = computed(() => {
     const isolateExecution = this.isolateExecution();
     const execution = this.execution();
     return isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
@@ -81,6 +82,10 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
   }
 
   execute(simulate: boolean): void {
+    if (this.screenTemplateLoading()) {
+      return;
+    }
+
     this._commands.execute(simulate);
     this.commandInvoke.emit();
   }
@@ -112,8 +117,13 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
   }
 
   protected setupExecutionParameters(): void {
-    this.executionParameters$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((executionParameters) => this.executionParameters.set(executionParameters ?? {}));
+    this.executionParameters$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((executionParameters) => {
+      this.executionParameters.set(executionParameters ?? {});
+      this.screenTemplateLoading.set(false);
+    });
+  }
+
+  protected setScreenTemplateLoading(isLoading: boolean): void {
+    this.screenTemplateLoading.set(isLoading);
   }
 }

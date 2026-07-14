@@ -122,6 +122,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
 
   protected readonly showProgress = signal(false);
   protected readonly isSaving = signal(false);
+  protected readonly isScreenTemplateLoading = signal(true);
   protected readonly isNew = signal(true);
   protected readonly error = signal('');
 
@@ -161,7 +162,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   }
 
   protected save(): void {
-    if (this.isSaving()) {
+    if (this.isScreenTemplateLoading() || this.isSaving()) {
       return;
     }
 
@@ -197,6 +198,10 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
         this.taskForm.controls.cron.setValue(expression);
       }
     });
+  }
+
+  protected onScreenTemplateLoading(isLoading: boolean): void {
+    this.isScreenTemplateLoading.set(isLoading);
   }
 
   protected addCronExclusion(): void {

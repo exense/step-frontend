@@ -1,4 +1,7 @@
-<step-modal-window [title]="isNew() ? 'New schedule' : 'Edit schedule'" [showSpinner]="showProgress()">
+<step-modal-window
+  [title]="isNew() ? 'New schedule' : 'Edit schedule'"
+  [showSpinner]="showProgress() || isScreenTemplateLoading()"
+>
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger">
@@ -115,7 +118,11 @@
       <section>
         <mat-slide-toggle color="primary" formControlName="active">Enable Schedule</mat-slide-toggle>
       </section>
-      <step-custom-form-wrapper formControlName="customExecutionsParameters" stScreen="executionParameters" />
+      <step-custom-form-wrapper
+        formControlName="customExecutionsParameters"
+        stScreen="executionParameters"
+        (loadingChange)="onScreenTemplateLoading($event)"
+      />
       @if (!hideUser) {
         <step-form-field alignLabelAddon="near">
           <step-label>User</step-label>
@@ -158,7 +165,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="isSaving() || (!isSchedulePlan && !('task-write' | hasRight | async))"
+      [disabled]="isScreenTemplateLoading() || isSaving() || (!isSchedulePlan && !('task-write' | hasRight | async))"
       [attr.aria-busy]="isSaving()"
     >
       @if (isSaving()) {
