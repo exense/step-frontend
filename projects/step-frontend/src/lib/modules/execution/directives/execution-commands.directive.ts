@@ -10,7 +10,7 @@ import {
 } from '@exense/step-core';
 import { ExecutionActionsTooltips } from '../components/execution-actions/execution-actions.component';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { of, switchMap } from 'rxjs';
+import { catchError, finalize, of, switchMap } from 'rxjs';
 import { ExecutionCommandsService } from '../services/execution-commands.service';
 
 @Directive({
@@ -67,11 +67,14 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
 
   protected readonly executionParameters$ = toObservable(this.execution).pipe(
     switchMap((execution) => {
-      if (!execution) {
-        return this._screenTemplates.getDefaultParametersByScreenId('executionParameters');
-      }
-      const parameters = execution.executionParameters?.customParameters || {};
-      return of({ ...parameters });
+      this.defaultParametersLoading.set(true);
+      const parameters$ = !execution
+        ? this._screenTemplates.getDefaultParametersByScreenId('executionParameters')
+        : of({ ...execution.executionParameters?.customParameters });
+      return parameters$.pipe(
+        catchError(() => of({})),
+        finalize(() => this.defaultParametersLoading.set(false)),
+      );
     }),
   );
 
@@ -123,7 +126,6 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
   protected setupExecutionParameters(): void {
     this.executionParameters$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((executionParameters) => {
       this.executionParameters.set(executionParameters ?? {});
-      this.defaultParametersLoading.set(false);
     });
   }
 
