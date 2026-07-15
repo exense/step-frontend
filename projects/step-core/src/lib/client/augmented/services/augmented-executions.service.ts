@@ -62,8 +62,8 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   }
 
   /** Like getExecutionOverviewCached, but exposes only the execution (for guards / entity checks). */
-  getExecutionViaOverviewCached(id: string): Observable<Execution> {
-    return this.getExecutionOverviewCached(id).pipe(map((overview) => this.getOverviewExecution(overview)));
+  getExecutionViaOverviewCached(id: string): Observable<Execution | undefined> {
+    return this.getExecutionOverviewCached(id).pipe(map((overview) => overview.execution));
   }
 
   cleanupCache(): void {
@@ -204,12 +204,5 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
         false,
       )
       .pipe(map((response) => response.data.length || 0));
-  }
-
-  private getOverviewExecution(overview: ExecutionOverview): Execution {
-    if (!overview.execution) {
-      throw new Error('Execution overview response does not include an execution.');
-    }
-    return overview.execution;
   }
 }
