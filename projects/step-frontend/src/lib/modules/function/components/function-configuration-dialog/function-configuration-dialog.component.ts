@@ -76,9 +76,12 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
 
   protected functionTypeItemInfos = this._functionTypeRegistryService.getItemInfos();
   protected modalTitle: string = !this._functionConfigurationDialogData.keyword ? 'New Keyword' : 'Edit Keyword';
-  protected isLoading: boolean = false;
+  protected isLoading: boolean = true;
   protected isSaving = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
+
+  private isFunctionTypeLoading = false;
+  protected isScreenTemplateLoading = true;
 
   private readonly functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
   private readonly customForm = viewChild(CustomFormWrapperComponent);
@@ -124,7 +127,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   }
 
   protected save(edit?: boolean): void {
-    if (this.isSaving) {
+    if (this.isLoading || this.isSaving) {
       return;
     }
 
@@ -204,6 +207,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   }
 
   protected fetchStepFunction(stepFunctionType: string): void {
+    this.isFunctionTypeLoading = true;
+    this.updateLoadingState();
     this._api
       .newFunctionTypeConf(stepFunctionType)
       .pipe(
@@ -222,10 +227,23 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
             keyword.schema = this.keyword.schema;
           }
         }),
+        finalize(() => {
+          this.isFunctionTypeLoading = false;
+          this.updateLoadingState();
+        }),
       )
       .subscribe((keyword) => {
         this.keyword = keyword;
         functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword, this._formBuilder);
       });
+  }
+
+  protected onScreenTemplateLoading(isLoading: boolean): void {
+    this.isScreenTemplateLoading = isLoading;
+    this.updateLoadingState();
+  }
+
+  private updateLoadingState(): void {
+    this.isLoading = this.isFunctionTypeLoading || this.isScreenTemplateLoading;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, model, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, model, OnInit, signal } from '@angular/core';
 import {
   AugmentedScreenService,
   AutomationPackage,
@@ -49,17 +49,24 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
   protected readonly executionParameters = model<Record<string, string>>({});
   protected isExecuting = false;
 
+  private readonly defaultParametersLoading = signal(true);
+  private readonly screenTemplateLoading = signal(false);
+  protected readonly isLoading = computed(() => this.defaultParametersLoading() || this.screenTemplateLoading());
+
   ngOnInit(): void {
-    this._screenTemplates.getDefaultParametersByScreenId('executionParameters').subscribe((parameters) => {
-      this.hasParameters.set(!!parameters);
-      this.executionParameters.set(parameters);
-    });
+    this._screenTemplates
+      .getDefaultParametersByScreenId('executionParameters')
+      .pipe(finalize(() => this.defaultParametersLoading.set(false)))
+      .subscribe((parameters) => {
+        this.hasParameters.set(!!parameters);
+        this.executionParameters.set(parameters);
+      });
 
     this.setupExecutionConfigFormBehavior();
   }
 
   protected execute(): void {
-    if (this.isExecuting) {
+    if (this.isLoading() || this.isExecuting) {
       return;
     }
 
@@ -114,6 +121,10 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
       numberOfThreads,
       customParameters,
     };
+  }
+
+  protected onScreenTemplateLoading(isLoading: boolean): void {
+    this.screenTemplateLoading.set(isLoading);
   }
 
   private setupExecutionConfigFormBehavior(): void {

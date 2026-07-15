@@ -50,6 +50,7 @@ export class PlanCreateDialogComponent {
   protected planType = this._planEditorTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
   protected yamlPlan = '';
   protected isSaving = false;
+  protected isScreenTemplateLoading = true;
 
   protected readonly artefactTypes = toSignal(this._api.getArtefactTemplates(), { initialValue: [] });
 
@@ -63,7 +64,7 @@ export class PlanCreateDialogComponent {
   };
 
   protected save(editAfterSave?: boolean): void {
-    if (this.isSaving) {
+    if (this.isSaving || (this.selectedTab === 'general' && this.isScreenTemplateLoading)) {
       return;
     }
 
@@ -120,6 +121,10 @@ export class PlanCreateDialogComponent {
     }
 
     this.save(true);
+  }
+
+  protected onScreenTemplateLoading(isLoading: boolean): void {
+    this.isScreenTemplateLoading = isLoading;
   }
 
   /**

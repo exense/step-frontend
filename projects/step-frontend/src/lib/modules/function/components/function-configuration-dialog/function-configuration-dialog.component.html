@@ -1,4 +1,9 @@
-<step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
+<step-modal-window
+  [title]="modalTitle"
+  [showSpinner]="isLoading"
+  [spinnerTooltip]="isScreenTemplateLoading ? 'Loading screen templates' : ''"
+  [stepZIndex]="1000"
+>
   <div step-modal-window-body>
     @if (keyword?.managed) {
       <step-alert [type]="AlertType.WARNING">
@@ -7,7 +12,12 @@
     }
 
     @if (keyword) {
-      <step-custom-form-wrapper [stScreen]="customScreenTable" [ngModel]="keyword" (ngModelChange)="keyword = $event" />
+      <step-custom-form-wrapper
+        [stScreen]="customScreenTable"
+        [ngModel]="keyword"
+        (ngModelChange)="keyword = $event"
+        (loadingChange)="onScreenTemplateLoading($event)"
+      />
     }
 
     <form [formGroup]="formGroup!">
@@ -82,7 +92,7 @@
       type="button"
       mat-stroked-button
       (click)="save(true)"
-      [disabled]="isSaving || !('kw-write' | hasRight | async)"
+      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
       [attr.aria-busy]="isSaving"
     >
       @if (isSaving) {
@@ -95,7 +105,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="isSaving || !('kw-write' | hasRight | async)"
+      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
       [attr.aria-busy]="isSaving"
     >
       @if (isSaving) {
