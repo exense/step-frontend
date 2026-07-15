@@ -4,7 +4,7 @@ import { StepIconsModule } from '../../../step-icons/step-icons.module';
 @Component({
   selector: 'step-button-spinner',
   imports: [StepIconsModule],
-  template: '<step-icon name="refresh-cw" [attr.aria-label]="label()" />',
+  template: '<step-icon name="step-refresh" [attr.aria-label]="label()" />',
   styleUrl: './button-spinner.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {

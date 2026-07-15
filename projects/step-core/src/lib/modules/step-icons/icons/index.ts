@@ -279,6 +279,7 @@ export { Smartphone } from './svg/smartphone';
 export { Smile } from './svg/smile';
 export { Speaker } from './svg/speaker';
 export { Square } from './svg/square';
+export { StepRefresh } from './svg/step-refresh';
 export { Star } from './svg/star';
 export { StopCircle } from './svg/stop-circle';
 export { Stopwatch } from './svg/stopwatch';
