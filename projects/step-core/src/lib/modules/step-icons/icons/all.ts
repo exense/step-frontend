@@ -279,8 +279,8 @@ import { Smartphone } from './svg/smartphone';
 import { Smile } from './svg/smile';
 import { Speaker } from './svg/speaker';
 import { Square } from './svg/square';
-import { StepRefresh } from './svg/step-refresh';
 import { Star } from './svg/star';
+import { StepRefresh } from './svg/step-refresh';
 import { StopCircle } from './svg/stop-circle';
 import { Stopwatch } from './svg/stopwatch';
 import { Sun } from './svg/sun';
@@ -628,8 +628,8 @@ export const allIcons = {
   Smile,
   Speaker,
   Square,
-  StepRefresh,
   Star,
+  StepRefresh,
   StopCircle,
   Stopwatch,
   Sun,

@@ -26,8 +26,8 @@ export class ExecutionResultComponent {
       return '';
     }
 
-    if (status !== 'ENDED') {
-      return status!;
+    if (status && status !== 'ENDED') {
+      return status;
     }
 
     return result || 'UNKNOW';
@@ -38,7 +38,7 @@ export class ExecutionResultComponent {
       return '';
     }
 
-    if (status !== 'ENDED') {
+    if (status && status !== 'ENDED') {
       return 'step-refresh';
     }
 
