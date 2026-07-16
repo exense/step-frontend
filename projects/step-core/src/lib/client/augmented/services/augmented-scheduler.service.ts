@@ -44,7 +44,7 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
       AugmentedSchedulerService.TASKS_TABLE_ID,
       {
         'attributes.name': 'attributes.name',
-        'attributes.nextExecutionTimestamp': 'attributes.nextExecutionTimestamp',
+        nextExecutionTimestamp: 'nextExecutionTimestamp',
         'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
         cronExpression: 'cronExpression',
         automationPackage: 'customFields.automationPackageId',

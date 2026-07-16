@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, inject } from '@angular/core';
 import {
   ExecutiontTaskParameters,
   tablePersistenceConfigProvider,
@@ -15,6 +15,7 @@ import {
   AlertType,
   entitySelectionStateProvider,
   DateFormat,
+  StepDataSource,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -22,6 +23,9 @@ import { catchError, map, of, pipe, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 type StatusItem = KeyValue<string, string>;
+type ScheduledTask = ExecutiontTaskParameters & {
+  nextExecutionTimestamp?: number;
+};
 
 enum ActiveLabels {
   ACTIVE = 'Active',
@@ -53,6 +57,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   private _schedulerService = inject(AugmentedSchedulerService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: DialogRouteResult) => {
@@ -65,7 +70,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   readonly ActiveLabels = ActiveLabels;
   readonly DateFormat = DateFormat;
 
-  readonly dataSource = this._schedulerService.createDataSource();
+  readonly dataSource = this._schedulerService.createDataSource() as StepDataSource<ScheduledTask>;
   readonly returnParentUrl = '/scheduler';
 
   protected readonly isSchedulerDisabled = toSignal(
@@ -100,7 +105,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
     });
   }
 
-  switchActive(scheduledTask: ExecutiontTaskParameters): void {
+  switchActive(scheduledTask: ScheduledTask): void {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
@@ -125,14 +130,15 @@ export class ScheduledTaskListComponent implements DialogParentService {
       .subscribe();
   }
 
-  private updateNextExecutionTimestamp(scheduledTask: ExecutiontTaskParameters, nextExecutionTimestamp?: number): void {
+  private updateNextExecutionTimestamp(scheduledTask: ScheduledTask, nextExecutionTimestamp?: number): void {
     if (nextExecutionTimestamp === undefined) {
-      delete scheduledTask.attributes?.['nextExecutionTimestamp'];
+      delete scheduledTask.nextExecutionTimestamp;
+      this._changeDetectorRef.markForCheck();
       return;
     }
 
-    scheduledTask.attributes = scheduledTask.attributes ?? {};
-    (scheduledTask.attributes as Record<string, string | number>)['nextExecutionTimestamp'] = nextExecutionTimestamp;
+    scheduledTask.nextExecutionTimestamp = nextExecutionTimestamp;
+    this._changeDetectorRef.markForCheck();
   }
 
   deleteTask(scheduledTask: ExecutiontTaskParameters): void {

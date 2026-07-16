@@ -119,7 +119,7 @@
     </ng-container>
     <ng-container
       data-step-testid="schedules-next-execution"
-      matColumnDef="attributes.nextExecutionTimestamp"
+      matColumnDef="nextExecutionTimestamp"
       stepActivityCol="Cron Next Trigger"
       stepSearchCol
     >
@@ -133,7 +133,7 @@
         <step-drag-column-caption>Cron Next Trigger</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element.attributes?.nextExecutionTimestamp | date: DateFormat.DATE }}
+        {{ element.nextExecutionTimestamp | date: DateFormat.DATE }}
       </td>
     </ng-container>
     <ng-container matColumnDef="active" stepActivityCol="Status" stepSearchCol>
