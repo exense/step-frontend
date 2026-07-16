@@ -1,6 +1,6 @@
 @if (!isVertical()) {
   <section class="list invisible-items">
-    @for (item of items(); track item.label) {
+    @for (item of measurableItems(); track item.label) {
       <step-artefact-inline-field #items [item]="item" />
     }
   </section>
@@ -14,7 +14,7 @@
   <div #listPrefix class="prefix-container">
     <ng-content select="step-artefact-inline-field-list-prefix"></ng-content>
   </div>
-  @for (item of displayItems(); track item.label) {
+  @for (item of renderedDisplayItems(); track item.label) {
     <step-artefact-inline-field [item]="item" [applyExplicitWidths]="true" />
   }
   @if (showMoreButton()) {

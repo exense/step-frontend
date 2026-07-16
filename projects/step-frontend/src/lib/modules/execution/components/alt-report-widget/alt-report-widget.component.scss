@@ -32,6 +32,14 @@ step-alt-report-widget {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+  }
+
+  step-btn-group.maximize-button.with-borders .mat-mdc-button-base {
+    width: 3.6rem;
+    height: 3.4rem;
+  }
+
+  mat-card-header > step-alt-report-widget-filter {
     flex: 0.5;
   }
 

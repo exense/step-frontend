@@ -11,4 +11,5 @@ export enum FilterConditionType {
   ARRAY,
   BOOLEAN_ARRAY,
   IN,
+  INCLUDES,
 }

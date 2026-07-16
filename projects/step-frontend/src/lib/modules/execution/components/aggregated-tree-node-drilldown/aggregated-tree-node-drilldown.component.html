@@ -1,21 +1,12 @@
-<step-stack-view [withOverflow]="true" (removeItem)="removeItem($event, true)">
+<step-stack-view
+  [withOverflow]="true"
+  [canClosePanels]="true"
+  rootCloseTooltip="Close drilldown"
+  (removeItem)="removeItem($event, true)"
+>
   <div *stepStackViewGroupTooltip>
     <strong>Minimized panels</strong><br />
     <div>When opening more panels than fit the screen, previous panels will automatically be minimized</div>
-  </div>
-  <div *stepStackViewCloseAll class="close-all">
-    <step-time-range-picker
-      [activeSelection]="(_executionState.timeRangeSelection$ | async)!"
-      [activeTimeRange]="(_executionState.timeRange$ | async)!"
-      [selectOptions]="_executionState.timeRangeOptions"
-      (selectionChange)="handleTimeRangeChange($event)"
-      [fullRangeLabel]="(fullTimeRangeLabel | async)!"
-    />
-    <step-btn-group class="with-borders shrink">
-      <button mat-icon-button matTooltip="Close drilldown view" matTooltipPosition="left" (click)="handleCloseAll()">
-        <step-icon name="x" />
-      </button>
-    </step-btn-group>
   </div>
   @for (item of stackItems(); track item.id) {
     @switch (item.type) {
@@ -43,10 +34,15 @@
                   <span>Steps</span>
                   @if (keywordsSort.showSort()) {
                     <step-alt-report-widget-sort>
-                      <step-icon
-                        [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+                      <button
+                        type="button"
+                        mat-icon-button
                         (click)="keywordsSort.toggleSort()"
-                      />
+                        matTooltip="Sort by start time"
+                        matTooltipPosition="below"
+                      >
+                        <step-icon [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+                      </button>
                     </step-alt-report-widget-sort>
                   }
                 </div>
@@ -125,7 +121,7 @@
                 <step-alt-execution-tree
                   stepAltExecutionTreeSearchFocus
                   stepTreeAutoChooseVirtualScroll="100%"
-                  [applyVirtualScrollFrom]="150"
+                  [applyVirtualScrollFrom]="100"
                   [showSpinnerWhileTreeInitialize]="true"
                   [details]="details()"
                   (openIterations)="handleOpenIteration($event.node, item.id, $event.restParams)"
@@ -159,7 +155,7 @@
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
-              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
               [initialStatus]="$any(item).searchStatus"
               (showDetails)="handleOpenDetails($event, item.id)"
             />

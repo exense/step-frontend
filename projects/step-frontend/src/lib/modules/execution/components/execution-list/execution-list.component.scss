@@ -19,7 +19,7 @@ step-execution-list {
 
   .description-cell {
     step-report-node-icon {
-      margin-right: .5rem;
+      margin-right: 0.5rem;
     }
 
     a {
@@ -36,7 +36,7 @@ step-execution-list {
     width: 0;
   }
 
-  .header-cell-container step-icon {
+  thead > tr:first-child .header-cell-container step-icon {
     margin-left: 0.5rem;
   }
 }

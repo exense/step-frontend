@@ -39,7 +39,7 @@ export class ReportNodeFilterCondition extends FilterCondition<{ searchValue?: s
 
   private createPredicate(field: string): Regex {
     const type = CompareCondition.REGEX;
-    const expression = this.sourceObject?.searchValue;
+    const expression = (this.sourceObject?.searchValue ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const caseSensitive = false;
     return { type, field, expression, caseSensitive };
   }

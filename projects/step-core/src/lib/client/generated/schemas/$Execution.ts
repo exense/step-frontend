@@ -41,6 +41,12 @@ export const $Execution = {
         type: 'Error',
       },
     },
+    notices: {
+      type: 'array',
+      contains: {
+        type: 'ExecutionNotice',
+      },
+    },
     planId: {
       type: 'string',
     },

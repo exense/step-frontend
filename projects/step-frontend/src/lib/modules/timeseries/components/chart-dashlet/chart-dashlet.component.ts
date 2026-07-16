@@ -25,6 +25,7 @@ import {
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
+  createStackedBarPaths,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -47,7 +48,7 @@ import {
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
-import { Axis, Band, Hooks } from 'uplot';
+import { Axis, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
@@ -97,13 +98,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
-  readonly RATE_UNITS: RateUnit[] = [
+  protected readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per second', unitKey: 's' },
     { menuLabel: 'Per minute', unitKey: 'm' },
     { menuLabel: 'Per hour', unitKey: 'h' },
   ];
 
-  readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
+  protected readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
     s: 3600,
     m: 60,
     h: 1,
@@ -114,11 +115,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
-  readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
-  readonly chart = viewChild<TimeSeriesChartComponent>('chart');
+  protected readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
+  protected readonly chart = viewChild<TimeSeriesChartComponent>('chart');
 
-  readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
-  _attributesByIds: Record<string, MetricAttribute> = {};
+  protected readonly _internalSettings = signal<TSChartSettings | undefined>(undefined);
+  protected _attributesByIds: Record<string, MetricAttribute> = {};
 
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
@@ -133,21 +134,21 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   readonly zoomReset = output();
   readonly emptyStateChange = output<boolean>();
 
-  readonly isLoading = signal<boolean>(false);
+  protected readonly isLoading = signal<boolean>(false);
 
-  groupingSelection: MetricAttributeSelection[] = [];
-  selectedAggregate!: ChartAggregation;
-  selectedAggregatePcl?: number;
-  requestOql: string = '';
+  protected groupingSelection: MetricAttributeSelection[] = [];
+  protected selectedAggregate!: ChartAggregation;
+  protected selectedAggregatePcl?: number;
+  protected requestOql: string = '';
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
-  syncGroupSubscription?: Subscription;
-  cachedRequest?: FetchBucketsRequest;
-  cachedResponse?: TimeSeriesAPIResponse;
-  showHigherResolutionWarning = false;
-  collectionResolutionUsed: number = 0;
+  protected syncGroupSubscription?: Subscription;
+  protected cachedRequest?: FetchBucketsRequest;
+  protected cachedResponse?: TimeSeriesAPIResponse;
+  protected showHigherResolutionWarning = false;
+  protected collectionResolutionUsed: number = 0;
 
   private readonly _itemChangeSub = toObservable(this.item)
     .pipe(
@@ -293,16 +294,26 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
   }
 
-  private getSeriesStroke(id: string, axes: AxesSettings): SeriesStroke {
+  private getSeriesStroke(colorKey: string, axes: AxesSettings): SeriesStroke {
     const hasGrouping = this.getGroupDimensions()?.length > 0;
     if (!hasGrouping) {
       return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
     }
-    const customSeriesColor = axes.renderingSettings?.seriesColors?.[id];
+    const customSeriesColor = this.getCustomSeriesColor(colorKey, axes.renderingSettings?.seriesColors);
     if (customSeriesColor) {
       return { color: customSeriesColor, type: MarkerType.SQUARE };
     }
-    return this.context().colorsPool.getSeriesColor(id);
+    return this.context().colorsPool.getSeriesColor(colorKey);
+  }
+
+  private getCustomSeriesColor(colorKey: string, seriesColors?: Record<string, string>): string | undefined {
+    const customSeriesColor = seriesColors?.[colorKey];
+    if (customSeriesColor || !seriesColors) {
+      return customSeriesColor;
+    }
+    const normalizedColorKey = colorKey.toLowerCase();
+    const matchingKey = Object.keys(seriesColors).find((key) => key.toLowerCase() === normalizedColorKey);
+    return matchingKey ? seriesColors[matchingKey] : undefined;
   }
 
   /**
@@ -326,7 +337,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
-    const stackedBarPaths = this.barsFunction({ size: [0.85, Infinity], align: 1, radius: 0.1 });
     const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
     const isRateOrCount = primaryAggregation.type === 'RATE' || primaryAggregation.type === 'COUNT';
     const useForwardFill = isGauge && !isRateOrCount;
@@ -345,7 +355,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
         labelItems = [this.context().getMetric(this.item().metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
+      const colorKey = this.composeColorKey(labelItems);
+      const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         let lastSecondaryValue: number | undefined;
@@ -473,7 +484,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
           }
         : undefined;
 
-    let bands: Band[] | undefined;
     if (primaryAxes.displayType === 'STACKED_BAR') {
       series.sort((a, b) => (a.id! < b.id! ? -1 : a.id! > b.id! ? 1 : 0));
       series.forEach((s) => (s.originalData = [...s.data]));
@@ -482,15 +492,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       });
       this.cumulateSeriesData(series);
       const skipSeries = hasSecondaryAxes ? 1 : 0;
+      const stackStartSeriesIdx = 1 + skipSeries;
+      const stackEndSeriesIdx = series.length + skipSeries;
       series.forEach((s) => {
-        s.paths = stackedBarPaths;
+        s.paths = createStackedBarPaths({
+          size: [0.85, Infinity],
+          align: 1,
+          radius: 0.1,
+          stackStartSeriesIdx,
+          stackEndSeriesIdx,
+        });
         s.fill = s.strokeConfig!.color + 'cc';
         s.value = (self: any, x: number, seriesIdx: number, idx: number) =>
           TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
             this.calculateStackedValue(self, x, seriesIdx, idx, skipSeries),
           );
       });
-      bands = this.getStackedBands(series.length, skipSeries);
     }
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
@@ -604,7 +621,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
           },
           showLegend: true,
           axes: axes,
-          bands: bands,
           hooks: edgeExtensionHook,
           scales:
             primaryAxes.displayType === 'STACKED_BAR'
@@ -634,6 +650,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private removeDataGaps(data: (number | undefined)[]): number[] {
     for (let i = 0; i < data.length; i++) {}
     return [];
+  }
+
+  private composeColorKey(items: (string | undefined)[]): string {
+    return items.map((item) => (item || '').trim().toLowerCase()).join('|');
   }
 
   private mergeLabelItems(items: (string | undefined)[]): string {
@@ -731,7 +751,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     );
   }
 
-  handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
+  protected handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
     this.switchAggregate(change.aggregate!, change.params);
     this.settingsMenuTrigger()?.closeMenu();
   }
@@ -765,7 +785,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
               if (labelId) {
-                let newLabel;
+                let newLabel: string;
                 if (response[labelId]) {
                   newLabel = response[labelId];
                 } else {
@@ -913,27 +933,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     return currentValue;
   }
 
-  private getStackedBands(count: number, skipSeries = 0): Band[] {
-    const bands: Band[] = [];
-    for (let i = count; i > 1; i--) {
-      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
-    }
-    return bands;
-  }
-
   ngOnDestroy(): void {
     this.syncGroupSubscription?.unsubscribe();
   }
 
-  getType(): 'TABLE' | 'CHART' {
+  public getType(): 'TABLE' | 'CHART' {
     return 'CHART';
   }
 
-  getContext(): TimeSeriesContext {
+  public getContext(): TimeSeriesContext {
     return this.context();
   }
 
-  getItem(): DashboardItem {
+  public getItem(): DashboardItem {
     return this.item();
   }
 

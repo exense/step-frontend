@@ -5,7 +5,7 @@
 step-alt-execution-progress {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.2rem;
   padding: 0 2.5rem;
   position: relative;
 
@@ -54,6 +54,64 @@ step-alt-execution-progress {
         margin-left: -0.5rem;
         margin-right: -0.5rem;
       }
+
+      .header-icon-button {
+        overflow: visible;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .dot {
+          position: absolute;
+          color: var.$white;
+          border-radius: 50%;
+          font-size: 0.9rem;
+          text-align: center;
+
+          .unread-messages {
+            display: block;
+          }
+        }
+      }
+
+      .execution-notices-button .dot {
+        right: 0.2rem;
+        bottom: 0.25rem;
+        height: 1.3rem;
+        width: 1.3rem;
+        line-height: 1.3rem;
+        background: var.$orange;
+      }
+
+      .agent-provisioning-button {
+        step-icon .agent-provisioning-status-shape {
+          transition: stroke 180ms ease;
+        }
+
+        &.is-provisioning-active step-icon .agent-provisioning-status-shape {
+          stroke: var(--status-RUNNING);
+        }
+
+        .provisioning-state-badge {
+          right: 0.6rem;
+          bottom: 0.65rem;
+          height: 0.9rem;
+          width: 0.9rem;
+        }
+
+        .error-badge {
+          background: var.$red-650;
+        }
+
+        .running-badge {
+          background: var(--status-RUNNING);
+        }
+      }
+    }
+
+    .agent-provisioning-probe {
+      display: none;
     }
 
     .title {
@@ -108,7 +166,7 @@ step-alt-execution-progress {
     }
 
     .controls {
-      min-width: 21rem;
+      min-width: 0;
       grid-area: controls;
       justify-self: flex-end;
       display: flex;
@@ -135,9 +193,11 @@ step-alt-execution-progress {
       step-btn-group {
         .mat-mdc-icon-button.mat-mdc-button-base {
           margin: 0;
+
           &:first-child {
             margin-left: 0.25rem;
           }
+
           &:last-child {
             margin-right: 0.25rem;
           }
@@ -158,10 +218,69 @@ step-alt-execution-progress {
 
     step-skeleton-placeholder {
       min-height: 3.7rem;
+
       & > div {
         margin: 0;
       }
     }
+  }
+
+  // reduces the surrounding 2rem flex gap to 1.2rem around the tab bar
+  > step-alt-execution-tabs {
+    margin-top: -0.8rem;
+    margin-bottom: -0.8rem;
+  }
+
+  .execution-lifecycle-errors {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 1.2rem 1.6rem;
+    border: 0.1rem solid var.$red-15;
+    border-left: 0.4rem solid var.$red-650;
+    border-radius: 0.8rem;
+    background: var.$red-10;
+    color: var.$gray-800;
+    margin-top: -0.8rem;
+    margin-bottom: 0.5rem;
+
+    .lifecycle-error-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 2.4rem;
+      height: 2.4rem;
+      color: var.$red-650;
+    }
+
+    .lifecycle-error-content {
+      min-width: 0;
+
+      strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: var.$gray-800;
+      }
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.6rem;
+      white-space: normal;
+    }
+
+    li:not(:last-child) {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .agent-provisioning-popover {
+    max-width: min(120rem, calc(100vw - 4rem));
+    transition:
+      width 180ms ease,
+      min-width 180ms ease,
+      max-width 180ms ease;
   }
 
   .main {
@@ -169,8 +288,35 @@ step-alt-execution-progress {
     flex-direction: column;
     gap: 1rem;
 
-    step-tabs .mat-mdc-tab-list {
-      margin-bottom: 0 !important;
+    .primary-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    &.has-drilldown > step-simple-outlet {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      padding-top: 1rem;
+
+      .primary-content {
+        display: none;
+      }
+
+      > step-simple-outlet {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+    }
+
+    &.is-layout-edit {
+      .primary-content {
+        padding-top: 1rem;
+      }
     }
   }
 
@@ -219,21 +365,10 @@ step-alt-execution-progress {
     }
   }
 
-  &.is-drilldown-opened {
-    $header-height: 6.4rem;
-    height: calc(100vh - $header-height);
-    overflow: hidden;
-  }
-
   .node-details-drilldown {
-    $z-index-drilldown: 12;
-    position: absolute;
-    padding: 0 1.5rem;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    z-index: $z-index-drilldown;
+    display: block;
+    min-height: 0;
+    flex: 1 1 auto;
   }
 }
 
@@ -249,9 +384,16 @@ step-alt-execution-progress {
   overflow: hidden;
 
   step-alt-execution-resolved-parameters,
+  step-alt-execution-notices,
   step-execution-agents-list {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
   }
+}
+
+.execution-popover-table.agent-provisioning-popover {
+  max-width: min(120rem, calc(100vw - 4rem));
+  overflow-x: hidden;
+  overflow-y: auto;
 }

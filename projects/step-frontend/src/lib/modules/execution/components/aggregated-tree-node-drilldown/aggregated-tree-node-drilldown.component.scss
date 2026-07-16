@@ -15,11 +15,6 @@ step-aggregated-tree-node-drilldown {
       align-items: center;
       gap: 1rem;
     }
-
-    step-alr-report-widget-sort {
-      display: flex;
-      height: 2.5rem;
-    }
   }
 
   .root-content {
@@ -55,17 +50,5 @@ step-aggregated-tree-node-drilldown {
     step-icon {
       @include core.step-icon-size(2.5rem, true);
     }
-  }
-
-  .close-all {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-
-  step-btn-group.shrink button.mat-mdc-icon-button.mat-mdc-button-base {
-    height: 3.4rem;
-    width: 3.6rem;
   }
 }

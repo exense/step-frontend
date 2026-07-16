@@ -35,3 +35,9 @@ step-attachment-inline-preview {
     cursor: default;
   }
 }
+
+.attachment-inline-preview-skipped-popover {
+  display: block;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+}

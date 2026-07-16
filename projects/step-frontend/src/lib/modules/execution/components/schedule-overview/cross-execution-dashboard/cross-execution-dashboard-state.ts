@@ -28,14 +28,17 @@ import {
 import { computed, inject, signal, Signal } from '@angular/core';
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
-import { OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../../timeseries/modules/_common';
+import {
+  OQLBuilder,
+  TimeSeriesConfig,
+  TimeSeriesUtils,
+  createStackedBarPaths,
+} from '../../../../timeseries/modules/_common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
-import { Axis, Band } from 'uplot';
-import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { Axis } from 'uplot';
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.85, Infinity], align: 1, radius: 0.1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -43,7 +46,8 @@ interface EntityWithKeywordsStats {
   statuses: Record<string, number>;
 }
 
-type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: Execution[] };
+type ExecutionChartSlot = Execution | undefined;
+type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: ExecutionChartSlot[] };
 
 export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 
@@ -246,7 +250,7 @@ export abstract class CrossExecutionDashboardState {
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
-        numberOfBuckets: 30, // good amount of uplotBarsFn visually
+        numberOfBuckets: 30,
         oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
@@ -290,13 +294,13 @@ export abstract class CrossExecutionDashboardState {
                 this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
               stroke: fill,
               fill: fill,
-              paths: uplotBarsFn,
               points: { show: false },
               show: true,
             };
             return s;
           });
           this.cumulateSeriesData(series); // used for stacked bar
+          this.applyStackedBarPaths(series);
           const responseTimeSeries: TSChartSeries = {
             scale: 'y',
             labelItems: ['Execution duration (AVG)'],
@@ -361,7 +365,6 @@ export abstract class CrossExecutionDashboardState {
               enabled: true,
             },
             axes: axes,
-            bands: this.getDefaultBands(series.length, 0),
           } as TSChartSettings;
         }),
         finalize(() => {
@@ -386,17 +389,19 @@ export abstract class CrossExecutionDashboardState {
 
   readonly keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
+      const displayedExecutions = this.getDisplayedExecutions(executions);
+      const chartExecutions = this.createExecutionChartSlots(displayedExecutions);
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
           const statusAttribute = 'status';
           const executionIdAttribute = 'executionId';
-          if (executions.length === 0) {
+          if (displayedExecutions.length === 0) {
             this.keywordsCountChartLoading.set(false);
-            return of(this.createKeywordsChart([], []));
+            return of(this.createKeywordsChart(chartExecutions, []));
           } else {
             const executionsIdsJoined =
-              executions.map((e) => `attributes.${executionIdAttribute} = ${e.id!}`).join(' or ') || '1 = 1';
+              displayedExecutions.map((e) => `attributes.${executionIdAttribute} = ${e.id!}`).join(' or ') || '1 = 1';
             const request: FetchBucketsRequest = {
               start: timeRange.from,
               end: timeRange.to,
@@ -443,19 +448,21 @@ export abstract class CrossExecutionDashboardState {
                     scale: 'y',
                     labelItems: [status],
                     legendName: status,
-                    data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+                    data: this.padExecutionChartData(
+                      displayedExecutions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+                    ),
                     // width: 1,
                     value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
                   return s;
                 });
                 this.cumulateSeriesData(series);
+                this.applyStackedBarPaths(series);
                 return this.createKeywordsChart(executions, series);
               }),
               finalize(() => {
@@ -464,7 +471,7 @@ export abstract class CrossExecutionDashboardState {
             );
           }
         }),
-        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
+        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: chartExecutions })),
       );
     }),
   );
@@ -472,17 +479,25 @@ export abstract class CrossExecutionDashboardState {
   readonly testCasesChartSettings$: Observable<{
     chart: TSChartSettings;
     hasData: boolean;
-    lastExecutions: Execution[];
+    lastExecutions: ExecutionChartSlot[];
   }> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
+      const displayedExecutions = this.getDisplayedExecutions(executions);
+      const chartExecutions = this.createExecutionChartSlots(displayedExecutions);
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
-          if (executions.length === 0) {
+          if (displayedExecutions.length === 0) {
             this.testCasesCountChartLoading.set(false);
-            return of({ chart: this.createTestCasesChart([], []), hasData: false, lastExecutions: [] });
+            return of({
+              chart: this.createTestCasesChart(chartExecutions, []),
+              hasData: false,
+              lastExecutions: chartExecutions,
+            });
           } else {
-            const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
+            const executionsIdsJoined = displayedExecutions
+              .map((e) => `attributes.executionId = ${e.id!}`)
+              .join(' or ');
             let oqlFilter = 'attributes.type = TestCase';
             if (executionsIdsJoined) {
               oqlFilter += ` and (${executionsIdsJoined})`;
@@ -534,19 +549,21 @@ export abstract class CrossExecutionDashboardState {
                     scale: 'y',
                     labelItems: [status],
                     legendName: status,
-                    data: executions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
+                    data: this.padExecutionChartData(
+                      displayedExecutions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
+                    ),
                     width: 1,
                     value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
                   return s;
                 });
                 this.cumulateSeriesData(series);
+                this.applyStackedBarPaths(series);
                 return {
                   chart: this.createTestCasesChart(executions, series),
                   lastExecutions: executions,
@@ -585,12 +602,19 @@ export abstract class CrossExecutionDashboardState {
     this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
   });
 
-  private getDefaultBands(count: number, skipSeries = 0): Band[] {
-    const bands: Band[] = [];
-    for (let i = count; i > 1; i--) {
-      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
-    }
-    return bands;
+  private getDisplayedExecutions(executions: Execution[]): Execution[] {
+    return executions.slice(-this.LAST_EXECUTIONS_TO_DISPLAY);
+  }
+
+  private createExecutionChartSlots(executions: Execution[]): ExecutionChartSlot[] {
+    const paddingSize = Math.max(this.LAST_EXECUTIONS_TO_DISPLAY - executions.length, 0);
+    return [...Array.from({ length: paddingSize }, () => undefined), ...executions];
+  }
+
+  private padExecutionChartData(data: (number | undefined | null)[]): (number | undefined | null)[] {
+    const displayedData = data.slice(-this.LAST_EXECUTIONS_TO_DISPLAY);
+    const paddingSize = Math.max(this.LAST_EXECUTIONS_TO_DISPLAY - displayedData.length, 0);
+    return [...Array.from({ length: paddingSize }, () => 0), ...displayedData];
   }
 
   private cumulateSeriesData(series: TSChartSeries[]): void {
@@ -621,7 +645,17 @@ export abstract class CrossExecutionDashboardState {
     return currentValue;
   }
 
-  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
+  private applyStackedBarPaths(series: TSChartSeries[]): void {
+    const paths = createStackedBarPaths({
+      size: [0.85, Infinity],
+      align: 1,
+      radius: 0.1,
+      stackEndSeriesIdx: series.length,
+    });
+    series.forEach((item) => (item.paths = paths));
+  }
+
+  private createTestCasesChart(executions: ExecutionChartSlot[], series: TSChartSeries[]): TSChartSettings {
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
@@ -640,7 +674,7 @@ export abstract class CrossExecutionDashboardState {
         show: false,
         values: executions.map((item, i) => i),
         valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-          return executions[idx].description!;
+          return executions[idx]?.description || 'Empty';
         },
       },
       cursor: {
@@ -658,12 +692,11 @@ export abstract class CrossExecutionDashboardState {
         enabled: true,
       },
       axes: axes,
-      bands: this.getDefaultBands(series.length),
       zoomEnabled: false,
     };
   }
 
-  private createKeywordsChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
+  private createKeywordsChart(executions: ExecutionChartSlot[], series: TSChartSeries[]): TSChartSettings {
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
@@ -682,7 +715,7 @@ export abstract class CrossExecutionDashboardState {
         show: false,
         values: executions.map((item, i) => i),
         valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-          return executions[idx].description!;
+          return executions[idx]?.description || 'Empty';
         },
       },
       cursor: {
@@ -700,7 +733,6 @@ export abstract class CrossExecutionDashboardState {
         enabled: true,
       },
       axes: axes,
-      bands: this.getDefaultBands(series.length),
       zoomEnabled: false,
     };
   }

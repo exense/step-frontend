@@ -1,0 +1,10 @@
+export enum AltExecutionRefreshActivity {
+  TREE = 'TREE',
+  ERRORS = 'ERRORS',
+  TEST_CASES_SUMMARY = 'TEST_CASES_SUMMARY',
+  TEST_CASES_TABLE = 'TEST_CASES_TABLE',
+  KEYWORDS_SUMMARY = 'KEYWORDS_SUMMARY',
+  KEYWORDS_TABLE = 'KEYWORDS_TABLE',
+}
+
+export const ALL_ALT_EXECUTION_REFRESH_ACTIVITY = Object.values(AltExecutionRefreshActivity);
