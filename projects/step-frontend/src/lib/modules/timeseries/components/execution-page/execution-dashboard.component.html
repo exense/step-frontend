@@ -10,6 +10,10 @@
     (contextSettingsChanged)="contextSettingsChanged.emit($event)"
     (fullRangeUpdateRequest)="fullRangeUpdateRequest.emit($event)"
   />
+} @else if (timeSeriesCheckInProgress) {
+  <div class="spinner-container">
+    <mat-spinner />
+  </div>
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">
     <div class="content">

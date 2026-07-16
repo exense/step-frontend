@@ -1,4 +1,9 @@
-<step-modal-window [title]="title" class="slim-actions">
+<step-modal-window
+  [title]="title"
+  [showSpinner]="loading() || screenTemplateLoading()"
+  [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
+  class="slim-actions"
+>
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger" role="alert">
@@ -8,7 +13,7 @@
       </step-alert>
     }
     @if (loading()) {
-      <step-icon name="refresh-cw" class="icon-refresh-animate" />
+      <step-icon name="step-refresh" class="icon-refresh-animate" />
     }
     @if (artefact(); as artefact) {
       <div class="artefact-info">
@@ -21,7 +26,11 @@
             <step-alt-execution-repository [repositoryParams]="repoRef" />
           }
         </section>
-        <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
+        <step-custom-forms
+          [(stModel)]="executionParameters"
+          stScreen="executionParameters"
+          (loadingChange)="setScreenTemplateLoading($event)"
+        />
       </div>
       @if (artefact.type === 'TestSet') {
         <hr />
@@ -43,6 +52,7 @@
     <step-execution-actions
       [tooltips]="tooltips()"
       [isExecutionIsolated]="executionIsolation"
+      [disabled]="loading() || screenTemplateLoading()"
       (execute)="execute($event)"
       (schedule)="schedule()"
       (copyLink)="copyExecutionServiceAsCurlToClipboard()"

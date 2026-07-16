@@ -7,6 +7,7 @@ import { AltExecutionTreeWidgetDirective } from '../../directives/alt-execution-
 import { AltExecutionDialogsService, OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 import { DrilldownRootType } from '../../shared/drilldown-root-type';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -18,6 +19,7 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  protected readonly _state = inject(AltExecutionStateService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
   private _executionDialogs = inject(AltExecutionDialogsService);
   private _reportSettings = inject(AltExecutionReportSettingsService);

@@ -31,6 +31,9 @@ export class ExecutionActionsComponent {
   readonly allowExecuteWithContent = input(false);
 
   /** @Input() **/
+  readonly disabled = input(false);
+
+  /** @Input() **/
   readonly externalTooltips = input<ExecutionActionsTooltips | undefined>(undefined, { alias: 'tooltips' });
 
   protected readonly tooltips = computed<typeof DEFAULT_TOOLTIPS>(() => {
