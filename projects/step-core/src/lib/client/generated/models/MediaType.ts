@@ -6,6 +6,6 @@ export type MediaType = {
   type?: string;
   subtype?: string;
   parameters?: Record<string, string>;
-  wildcardType?: boolean;
   wildcardSubtype?: boolean;
+  wildcardType?: boolean;
 };

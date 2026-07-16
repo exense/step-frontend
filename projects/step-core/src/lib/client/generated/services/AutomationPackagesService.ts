@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractOrganizableObject } from '../models/AbstractOrganizableObject';
+import type { AsyncTaskStatus } from '../models/AsyncTaskStatus';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { AutomationPackage } from '../models/AutomationPackage';
 import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
@@ -81,8 +82,9 @@ export class AutomationPackagesService {
   }
 
   /**
+   * Creates or updates an automation package. Current clients set 'asyncDeployment' to true and receive an AsyncTaskStatus to poll; clients from a previous minor version omit it and receive the AutomationPackageUpdateResult synchronously.
    * @param formData
-   * @returns any default response
+   * @returns any
    * @throws ApiError
    */
   public createOrUpdateAutomationPackage(formData?: {
@@ -101,7 +103,8 @@ export class AutomationPackagesService {
     functionsAttributes?: string;
     tokenSelectionCriteria?: string;
     executeFunctionsLocally?: boolean;
-  }): Observable<any> {
+    asyncDeployment?: boolean;
+  }): Observable<AsyncTaskStatus | AutomationPackageUpdateResult> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/automation-packages',

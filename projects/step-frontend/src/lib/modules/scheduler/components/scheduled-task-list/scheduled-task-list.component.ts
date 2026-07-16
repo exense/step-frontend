@@ -105,18 +105,34 @@ export class ScheduledTaskListComponent implements DialogParentService {
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
         tap((task) => {
-          // switching task status in GUI immediately, note that this will be overwritten by updateDataSourceAfterChange
+          // Switch task status in the GUI immediately while the row timestamp is refreshed.
           scheduledTask.active = !task.active;
           return task;
         }),
-        switchMap((task) =>
-          task.active
-            ? this._schedulerService.enableExecutionTask(task.id!, false)
-            : this._schedulerService.enableExecutionTask(task.id!, true),
+        switchMap((task) => {
+          const isActive = !task.active;
+          return this._schedulerService.enableExecutionTask(task.id!, isActive).pipe(map(() => isActive));
+        }),
+        switchMap((isActive) =>
+          isActive
+            ? this._schedulerService.getNextExecutionDate(scheduledTask.id!).pipe(catchError(() => of(undefined)))
+            : of(undefined),
         ),
-        this.updateDataSourceAfterChange,
+        tap((nextExecutionTimestamp) => {
+          this.updateNextExecutionTimestamp(scheduledTask, nextExecutionTimestamp);
+        }),
       )
       .subscribe();
+  }
+
+  private updateNextExecutionTimestamp(scheduledTask: ExecutiontTaskParameters, nextExecutionTimestamp?: number): void {
+    if (nextExecutionTimestamp === undefined) {
+      delete scheduledTask.attributes?.['nextExecutionTimestamp'];
+      return;
+    }
+
+    scheduledTask.attributes = scheduledTask.attributes ?? {};
+    (scheduledTask.attributes as Record<string, string | number>)['nextExecutionTimestamp'] = nextExecutionTimestamp;
   }
 
   deleteTask(scheduledTask: ExecutiontTaskParameters): void {
