@@ -67,6 +67,23 @@ step-alt-report-node-summary {
       width: auto;
       align-items: stretch; // makes all badges fill the same width
     }
+
+    .summary-skeleton {
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+
+    .summary-skeleton-chart {
+      flex: 0 1 26rem;
+      min-width: 0;
+      width: min(26rem, 100%);
+    }
+
+    .summary-skeleton-legend {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      width: auto;
+    }
   }
   &.summary-height-2 {
     step-doughnut-chart {
@@ -74,6 +91,11 @@ step-alt-report-node-summary {
         max-height: 20rem;
         width: min(20rem, 100%);
       }
+    }
+
+    .summary-skeleton-chart {
+      max-height: 20rem;
+      width: min(20rem, 100%);
     }
   }
 }

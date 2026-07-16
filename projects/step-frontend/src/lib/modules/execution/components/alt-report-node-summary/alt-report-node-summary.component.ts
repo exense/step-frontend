@@ -35,7 +35,9 @@ export class AltReportNodeSummaryComponent {
   readonly title = input('');
   readonly disableChartItemClick = input(false);
   readonly heightInCells = input<number | undefined>();
-  readonly inProgress = input(false);
+  readonly inProgress = input(false, {
+    transform: (value: boolean | null | undefined) => value ?? false,
+  });
   readonly summary = input<ReportNodeSummary | null | undefined>();
 
   protected readonly showProgressIndicator = computed(() => {

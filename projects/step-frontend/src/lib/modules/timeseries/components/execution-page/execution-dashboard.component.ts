@@ -8,7 +8,6 @@ import {
   output,
   SimpleChanges,
   viewChild,
-  ViewChild,
 } from '@angular/core';
 import {
   COMMON_IMPORTS,
@@ -29,7 +28,7 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
 @Component({
   selector: 'step-execution-dashboard',
@@ -39,17 +38,17 @@ import { Observable } from 'rxjs';
   standalone: true,
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
-  execution = input.required<Execution>();
-  initialTimeRange = input.required<TimeRange>();
+  readonly execution = input.required<Execution>();
+  readonly initialTimeRange = input.required<TimeRange>();
   readonly fullRangeUpdateRequest = output<TimeRange>();
 
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
 
-  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
+  private readonly dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
 
-  private _authService = inject(AuthService);
-  protected _executionViewModeService = inject(ExecutionViewModeService);
+  private readonly _authService = inject(AuthService);
+  protected readonly _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
 
   dashboardId!: string;
@@ -58,12 +57,13 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
 
   executionHasToBeBuilt = false;
   executionCreationInProgress = false;
+  timeSeriesCheckInProgress = true;
   isInitialized = false;
 
-  private timeSeriesService = inject(TimeSeriesService);
-  private _asyncTaskService = inject(AsyncTasksService);
+  private readonly _timeSeriesService = inject(TimeSeriesService);
+  private readonly _asyncTaskService = inject(AsyncTasksService);
 
-  private _destroyRef = inject(DestroyRef);
+  private readonly _destroyRef = inject(DestroyRef);
 
   public updateFullTimeRange(
     timeRange: TimeRange,
@@ -94,16 +94,28 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
       },
     ];
     this.executionRange = this.getExecutionRange(this.execution());
-    this.timeSeriesService.checkTimeSeries(executionId!).subscribe((exists) => {
-      if (exists) {
-        this.isInitialized = true;
-      } else {
-        this.executionHasToBeBuilt = true;
-      }
-    });
+    this._timeSeriesService
+      .checkTimeSeries(executionId!)
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        finalize(() => (this.timeSeriesCheckInProgress = false)),
+      )
+      .subscribe({
+        next: (exists) => {
+          if (exists) {
+            this.isInitialized = true;
+          } else {
+            this.executionHasToBeBuilt = true;
+          }
+        },
+        error: (error) => {
+          console.error('Error checking time series:', error);
+          this.executionHasToBeBuilt = true;
+        },
+      });
   }
 
-  public getSelectedTimeRange() {
+  public getSelectedTimeRange(): TimeRange {
     return this.dashboardComponent()!.getSelectedTimeRange();
   }
 
@@ -121,9 +133,9 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     }
   }
 
-  rebuildTimeSeries() {
+  rebuildTimeSeries(): void {
     this.executionCreationInProgress = true;
-    this.timeSeriesService
+    this._timeSeriesService
       .rebuildTimeSeries({ executionId: this.execution().id })
       .pipe(pollAsyncTask(this._asyncTaskService), takeUntilDestroyed(this._destroyRef))
       .subscribe({

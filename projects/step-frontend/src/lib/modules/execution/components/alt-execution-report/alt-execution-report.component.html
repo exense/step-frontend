@@ -26,7 +26,8 @@
         [heightInCells]="rowHeightInCells"
         totalTooltip="Total number of test cases"
         totalForecastTooltip="Forecast number of test cases"
-        [summary]="(_testCasesState.summary$ | async) ?? emptyReportNodeSummary"
+        [summary]="_testCasesState.summary$ | async"
+        [inProgress]="_testCasesState.summaryDisplayInProgress$ | async"
         [statusFilter]="_testCasesState.statusCtrlValue()"
         (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
       />
@@ -36,7 +37,8 @@
       [heightInCells]="rowHeightInCells"
       totalTooltip="Total number of keyword calls"
       totalForecastTooltip="Forecast number of keyword calls"
-      [summary]="(_keywordsState.summary$ | async) ?? emptyReportNodeSummary"
+      [summary]="_keywordsState.summary$ | async"
+      [inProgress]="_keywordsState.summaryDisplayInProgress$ | async"
       [statusFilter]="_keywordsState.statusCtrlValue()"
       (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
     />
@@ -63,6 +65,8 @@
         <step-alt-execution-errors
           [dataSource]="_state.errors$"
           [statusFilterItems]="_state.availableErrorTypes$ | async"
+          [indicatorMode]="TableIndicatorMode.SKELETON"
+          [inProgress]="_state.errorsDisplayInProgress$ | async"
           [showExecutionsMenu]="false"
           [hasTestCases]="!!(hasTestCases$ | async)"
           (searchFor)="searchError($event)"

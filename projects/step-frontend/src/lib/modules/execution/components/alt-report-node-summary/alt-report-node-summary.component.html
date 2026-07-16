@@ -7,8 +7,8 @@
     }
   </step-alt-report-widget-title>
   <step-alt-report-widget-content>
-    @if(showProgressIndicator()) {
-      <step-chart-skeleton/>
+    @if (showProgressIndicator()) {
+      <step-alt-report-node-summary-skeleton />
     } @else {
       @if (chartSettings(); as chartSettings) {
         <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
@@ -27,10 +27,10 @@
         <section class="summary">
           @for (item of legend; track item.status) {
             <step-status-count-badge
-                [status]="item.status"
-                [count]="item.value"
-                [isDisabled]="item.isDisabled"
-                (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
+              [status]="item.status"
+              [count]="item.value"
+              [isDisabled]="item.isDisabled"
+              (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
             />
           }
         </section>

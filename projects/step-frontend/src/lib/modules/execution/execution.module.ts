@@ -143,6 +143,7 @@ import { ExecutionDurationSimpleComponent } from './components/execution-duratio
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 import { ReportNodeDurationPipe } from './pipes/report-node-duration.pipe';
+import { ReportNodeErrorMessagePipe } from './pipes/report-node-error-message.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
@@ -217,6 +218,7 @@ import {
   ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
   AltExecutionRefreshActivity,
 } from './shared/alt-execution-refresh-activity.enum';
+import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
 
 @NgModule({
   declarations: [
@@ -307,6 +309,7 @@ import {
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
     ReportNodeDurationPipe,
+    ReportNodeErrorMessagePipe,
     LegacyExecutionViewComponent,
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,
@@ -380,6 +383,7 @@ import {
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
     EntityRefDirective,
+    AltReportNodeSummarySkeletonComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -414,6 +418,7 @@ import {
     AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,
     AltExecutionTreeControlPanelComponent,
+    AltReportNodeSummarySkeletonComponent,
   ],
   providers: [
     {
@@ -1156,3 +1161,4 @@ export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-n
 export { KeywordParameters } from './shared/keyword-parameters';
 export * from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 export * from './services/scheduler-invoker.service';
+export * from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';

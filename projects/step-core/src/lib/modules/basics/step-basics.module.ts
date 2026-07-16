@@ -82,7 +82,8 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 import { UndraggedClickDirective } from './directives/undragged-click.directive';
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
-import {ChartSkeletonComponent} from './components/chart-skeleton/chart-skeleton.component';
+import { ChartSkeletonComponent } from './components/chart-skeleton/chart-skeleton.component';
+import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
 
 @NgModule({
   imports: [
@@ -104,7 +105,8 @@ import {ChartSkeletonComponent} from './components/chart-skeleton/chart-skeleton
     NumberSeparateThousandsPipe,
     UndraggedClickDirective,
     SkeletonPlaceholderComponent,
-    ChartSkeletonComponent
+    ChartSkeletonComponent,
+    ButtonSpinnerComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -258,7 +260,8 @@ import {ChartSkeletonComponent} from './components/chart-skeleton/chart-skeleton
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
     SkeletonPlaceholderComponent,
-    ChartSkeletonComponent
+    ChartSkeletonComponent,
+    ButtonSpinnerComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -416,3 +419,4 @@ export * from './utils/fare-share-calculator';
 export * from './utils/combine-latest-with-track-changes';
 export * from './components/skeleton-placeholder/skeleton-placeholder.component';
 export * from './components/chart-skeleton/chart-skeleton.component';
+export * from './components/button-spinner/button-spinner.component';

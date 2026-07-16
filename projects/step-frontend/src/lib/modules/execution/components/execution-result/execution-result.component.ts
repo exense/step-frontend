@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { Execution } from '@exense/step-core';
 
 type Status = Execution['status'];
@@ -10,61 +10,36 @@ type Result = Execution['result'];
   styleUrls: ['./execution-result.component.scss'],
   standalone: false,
 })
-export class ExecutionResultComponent implements OnChanges {
-  @Input() status?: Status;
-  @Input() result?: Result;
+export class ExecutionResultComponent {
+  readonly status = input<Status>();
+  readonly result = input<Result>();
 
-  displayResult: string = '';
-  icon: string = '';
-  statusClass: string = '';
+  protected readonly displayResult = computed(() => this.retrieveResult(this.status(), this.result()));
+  protected readonly icon = computed(() => this.retrieveIcon(this.status(), this.result()));
+  protected readonly statusClass = computed(() => {
+    const result = this.result();
+    return result ? `step-icon-${result}` : '';
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    let status: Status | undefined;
-    let result: Result | undefined;
-
-    const cStatus = changes['status'];
-    const cResult = changes['result'];
-
-    if (cStatus?.previousValue !== cStatus?.currentValue || cStatus?.firstChange) {
-      status = cStatus?.currentValue;
-    }
-
-    if (cResult?.previousValue !== cResult?.currentValue || cResult?.firstChange) {
-      result = cResult?.currentValue;
-      this.statusClass = result ? `step-icon-${result}` : '';
-    }
-
-    if (result || status) {
-      this.icon = this.retrieveIcon(status, result);
-      this.displayResult = this.retrieveResult(status, result);
-    }
-  }
-
-  private retrieveResult(status?: Status, result?: Result): string {
-    status = status || this.status;
-    result = result || this.result;
-
+  private retrieveResult(status: Status | undefined, result: Result | undefined): string {
     if (!status && !result) {
       return '';
     }
 
-    if (status !== 'ENDED') {
-      return status!;
+    if (status && status !== 'ENDED') {
+      return status;
     }
 
     return result || 'UNKNOW';
   }
 
-  private retrieveIcon(status?: Status, result?: Result): string {
-    status = status || this.status;
-    result = result || this.result;
-
+  private retrieveIcon(status: Status | undefined, result: Result | undefined): string {
     if (!status && !result) {
       return '';
     }
 
-    if (status !== 'ENDED') {
-      return 'refresh-cw';
+    if (status && status !== 'ENDED') {
+      return 'step-refresh';
     }
 
     if (result === 'PASSED') {

@@ -1,7 +1,11 @@
-<step-modal-window [title]="title">
+<step-modal-window [title]="title" [showSpinner]="isLoading()" spinnerTooltip="Loading screen templates">
   <div step-modal-window-body>
     @if (hasParameters()) {
-      <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
+      <step-custom-forms
+        [(stModel)]="executionParameters"
+        stScreen="executionParameters"
+        (loadingChange)="onScreenTemplateLoading($event)"
+      />
     }
     <ng-container [formGroup]="executionConfigForm">
       <step-form-field alignLabelAddon="near">
@@ -21,7 +25,19 @@
     </ng-container>
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="execute()">Execute</button>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="isExecuting">Cancel</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="execute()"
+      [disabled]="isLoading() || isExecuting"
+      [attr.aria-busy]="isExecuting"
+    >
+      @if (isExecuting) {
+        <step-button-spinner label="Executing automation package" />
+      }
+      Execute
+    </button>
   </div>
 </step-modal-window>

@@ -82,6 +82,22 @@
               <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
                 <div>Test Cases</div>
                 <div>
+                  <step-btn-group class="with-borders report-filter-button">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [color]="testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL ? 'primary' : undefined"
+                      [matTooltip]="
+                        testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL
+                          ? 'Show aggregated test cases'
+                          : 'Show individual iterations'
+                      "
+                      matTooltipPosition="below"
+                      (click)="toggleTestCasesDisplayMode()"
+                    >
+                      <step-icon name="pocket" />
+                    </button>
+                  </step-btn-group>
                   <step-alt-report-node-status-filter />
                   <step-alt-report-node-search />
                 </div>
