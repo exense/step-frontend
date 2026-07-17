@@ -1,6 +1,6 @@
 <div>
   @if (!_internalSettings() || (isLoading() && showLoadingSpinnerWhileLoading())) {
-    <step-chart-skeleton [height]="height()" />
+    <step-chart-skeleton [height]="height()" [showLegend]="true" />
   } @else {
     <step-timeseries-chart
       #chart

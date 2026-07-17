@@ -11,6 +11,7 @@ import {
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
+  SortDirection,
   StepDataSource,
   TableApiWrapperService,
   TableCollectionFilter,
@@ -20,6 +21,12 @@ import { CompareCondition } from '../../../modules/basics/types/compare-conditio
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+
+interface SearchExecutionsByCanonicalPlanNameOptions {
+  limit?: number;
+  from?: number;
+  to?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService implements HttpOverrideResponseInterceptor {
@@ -55,8 +62,8 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   }
 
   /** Like getExecutionOverviewCached, but exposes only the execution (for guards / entity checks). */
-  getExecutionViaOverviewCached(id: string): Observable<Execution> {
-    return this.getExecutionOverviewCached(id).pipe(map((overview) => this.getOverviewExecution(overview)));
+  getExecutionViaOverviewCached(id: string): Observable<Execution | undefined> {
+    return this.getExecutionOverviewCached(id).pipe(map((overview) => overview.execution));
   }
 
   cleanupCache(): void {
@@ -137,15 +144,51 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       .pipe(map((response) => response.data));
   }
 
-  searchByCanonicalPlanName(canonicalPlanName: string): Observable<Execution[]> {
+  searchByCanonicalPlanName(
+    canonicalPlanName: string,
+    options: SearchExecutionsByCanonicalPlanNameOptions = {},
+  ): Observable<Execution[]> {
     const filter: FieldFilter = {
       field: 'importResult.canonicalPlanName',
       regex: false,
       value: canonicalPlanName,
     };
+    const filters = [filter, ...this.createStartTimeRangeFilters(options.from, options.to)];
     return this._tableApiWrapper
-      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [filter] })
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
+        filters,
+        limit: options.limit,
+        sort: [
+          {
+            field: 'startTime',
+            direction: SortDirection.DESCENDING,
+          },
+        ],
+      })
       .pipe(map((response) => response.data));
+  }
+
+  private createStartTimeRangeFilters(from?: number, to?: number): TableCollectionFilter[] {
+    const filters: TableCollectionFilter[] = [];
+    if (from != null) {
+      filters.push({
+        collectionFilter: {
+          type: CompareCondition.GREATER_THAN_OR_EQUAL,
+          field: 'startTime',
+          value: from,
+        },
+      });
+    }
+    if (to != null) {
+      filters.push({
+        collectionFilter: {
+          type: CompareCondition.LOWER_THAN,
+          field: 'startTime',
+          value: to,
+        },
+      });
+    }
+    return filters;
   }
 
   countExecutionsByStatus(status: string): Observable<number> {
@@ -161,12 +204,5 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
         false,
       )
       .pipe(map((response) => response.data.length || 0));
-  }
-
-  private getOverviewExecution(overview: ExecutionOverview): Execution {
-    if (!overview.execution) {
-      throw new Error('Execution overview response does not include an execution.');
-    }
-    return overview.execution;
   }
 }

@@ -70,6 +70,7 @@ export class AltExecutionErrorsComponent {
   readonly showActions = input(true);
   readonly hasTestCases = input(false);
   readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SPINNER);
+  readonly inProgress = input(false);
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],

@@ -46,13 +46,14 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   private readonly tree = viewChild('tree', { read: TreeComponent });
   readonly showSpinnerWhileTreeInitialize = input(false);
+  readonly showSkeletonWhileLoading = input(false);
   readonly details = input<readonly string[] | undefined>(undefined);
   readonly openIterations = output<OpenIterationsEvent>();
 
-  protected readonly showSpinner = computed(() => {
-    const showSpinnerForEmptyTree = this.showSpinnerWhileTreeInitialize();
+  protected readonly showSkeleton = computed(() => {
+    const showSkeletonForEmptyTree = this.showSpinnerWhileTreeInitialize();
     const isInitialized = this._treeSate.isInitialized();
-    return showSpinnerForEmptyTree && !isInitialized;
+    return this.showSkeletonWhileLoading() || (showSkeletonForEmptyTree && !isInitialized);
   });
 
   protected readonly treeNodeAddon = contentChild(AltExecutionTreeNodeAddonDirective);

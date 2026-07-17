@@ -1,28 +1,33 @@
-@if (showSpinner()) {
-  <div class="spinner-container">
-    <mat-spinner />
+@if (showSkeleton()) {
+  <div class="tree-skeletons" aria-hidden="true">
+    @for (row of [1, 2, 3, 4, 5, 6, 7, 8]; track row) {
+      <div class="tree-skeleton-row" [class.child-row]="row > 1">
+        <span></span>
+      </div>
+    }
   </div>
+} @else {
+  <step-tree
+    #tree
+    [dragDisabled]="true"
+    [forceFocus]="true"
+    (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
+  >
+    <ng-container *stepTreeNodeTemplate="let node">
+      <step-tree-node
+        [node]="node"
+        [stepTreeNodeVisualState]="node.id"
+        [class.context-menu-open]="node.id === tree.openedMenuNodeId"
+        (contextMenu)="tree.openContextMenu($event)"
+      />
+    </ng-container>
+    <div *stepTreeNodeNameTemplate="let node" class="node-name">
+      <step-aggregated-tree-node
+        [nodeId]="node.id"
+        [addonTemplate]="treeNodeAddon()?.templateRef"
+        [details]="details()"
+        (openIterations)="handleOpenIterations($event)"
+      />
+    </div>
+  </step-tree>
 }
-<step-tree
-  #tree
-  [dragDisabled]="true"
-  [forceFocus]="true"
-  (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
->
-  <ng-container *stepTreeNodeTemplate="let node">
-    <step-tree-node
-      [node]="node"
-      [stepTreeNodeVisualState]="node.id"
-      [class.context-menu-open]="node.id === tree.openedMenuNodeId"
-      (contextMenu)="tree.openContextMenu($event)"
-    />
-  </ng-container>
-  <div *stepTreeNodeNameTemplate="let node" class="node-name">
-    <step-aggregated-tree-node
-      [nodeId]="node.id"
-      [addonTemplate]="treeNodeAddon()?.templateRef"
-      [details]="details()"
-      (openIterations)="handleOpenIterations($event)"
-    />
-  </div>
-</step-tree>

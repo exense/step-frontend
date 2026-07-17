@@ -1,6 +1,7 @@
 export { Activity } from './svg/activity';
 export { ActivityHeart } from './svg/activity-heart';
 export { Agent } from './svg/agent';
+export { AgentProvisioning } from './svg/agent-provisioning';
 export { AgentToken } from './svg/agent-token';
 export { AgentTokenGroup } from './svg/agent-token-group';
 export { Airplay } from './svg/airplay';
@@ -279,6 +280,7 @@ export { Smile } from './svg/smile';
 export { Speaker } from './svg/speaker';
 export { Square } from './svg/square';
 export { Star } from './svg/star';
+export { StepRefresh } from './svg/step-refresh';
 export { StopCircle } from './svg/stop-circle';
 export { Stopwatch } from './svg/stopwatch';
 export { Sun } from './svg/sun';

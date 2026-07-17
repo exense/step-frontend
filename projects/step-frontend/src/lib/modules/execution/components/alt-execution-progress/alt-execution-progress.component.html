@@ -67,7 +67,7 @@
           <button
             type="button"
             mat-icon-button
-            class="execution-notices-button"
+            class="header-icon-button execution-notices-button"
             [color]="isExecutionNoticesVisible() ? 'primary' : 'default'"
             [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
           >
@@ -87,6 +87,48 @@
             </div>
           </step-popover-content>
         </step-popover>
+      }
+      @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
+        @if (agentProvisioningInfo.hasProvisioning) {
+          <step-popover
+            #agentProvisioningPopover
+            yPosition="below"
+            [mode]="PopoverMode.CLICK"
+            (toggledEvent)="isAgentProvisioningVisible.set($event)"
+            [whiteBackground]="true"
+            [smallFont]="false"
+          >
+            <button
+              type="button"
+              mat-icon-button
+              class="header-icon-button agent-provisioning-button"
+              [class.is-provisioning-active]="agentProvisioningInfo.isActive"
+              [color]="isAgentProvisioningVisible() ? 'primary' : 'default'"
+              matTooltip="Show agent provisioning logs"
+            >
+              <step-icon name="agent-provisioning" />
+              @if (agentProvisioningInfo.hasError) {
+                <span class="dot provisioning-state-badge error-badge"></span>
+              } @else if (agentProvisioningInfo.isActive) {
+                <span class="dot provisioning-state-badge running-badge"></span>
+              }
+            </button>
+            <step-popover-content>
+              <div class="execution-popover-table agent-provisioning-popover">
+                @for (message of _executionMessages; track message.id) {
+                  <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
+                }
+              </div>
+            </step-popover-content>
+          </step-popover>
+        }
+      }
+      @if (!isAgentProvisioningVisible()) {
+        <div class="agent-provisioning-probe" aria-hidden="true">
+          @for (message of _executionMessages; track message.id) {
+            <step-dashlet [itemKey]="message.template" [context]="getAgentProvisioningProbeContext(execution)" />
+          }
+        </div>
       }
       <step-popover
         yPosition="below"
@@ -216,6 +258,26 @@
   }
 </section>
 
+@if (execution$ | async; as execution) {
+  @if (execution.lifecycleErrors; as errors) {
+    @if (errors.length) {
+      <section class="execution-lifecycle-errors" aria-label="Fatal execution errors">
+        <div class="lifecycle-error-icon">
+          <step-icon name="alert-circle" />
+        </div>
+        <div class="lifecycle-error-content">
+          <strong>Fatal execution {{ errors.length === 1 ? 'error' : 'errors' }}</strong>
+          <ul>
+            @for (error of errors; track error.msg) {
+              <li>{{ error.msg }}</li>
+            }
+          </ul>
+        </div>
+      </section>
+    }
+  }
+}
+
 <step-alt-execution-tabs />
 
 <section class="no-gap">
@@ -231,17 +293,6 @@
           </ul>
         </step-alert>
       </section>
-    }
-    @if (execution.lifecycleErrors; as errors) {
-      @for (error of errors; track error.msg) {
-        <step-alert [type]="AlertType.DANGER">
-          {{ error.msg }}
-        </step-alert>
-      }
-    }
-
-    @for (message of _executionMessages; track message.id) {
-      <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
     }
   }
 </section>

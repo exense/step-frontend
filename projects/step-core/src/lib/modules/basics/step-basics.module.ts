@@ -82,6 +82,7 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 import { UndraggedClickDirective } from './directives/undragged-click.directive';
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
+import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
 
 @NgModule({
   imports: [
@@ -103,6 +104,7 @@ import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/
     NumberSeparateThousandsPipe,
     UndraggedClickDirective,
     SkeletonPlaceholderComponent,
+    ButtonSpinnerComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -256,6 +258,7 @@ import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
     SkeletonPlaceholderComponent,
+    ButtonSpinnerComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -412,3 +415,4 @@ export * from './utils/duration-switch-map';
 export * from './utils/fare-share-calculator';
 export * from './utils/combine-latest-with-track-changes';
 export * from './components/skeleton-placeholder/skeleton-placeholder.component';
+export * from './components/button-spinner/button-spinner.component';
