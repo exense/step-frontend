@@ -54,7 +54,7 @@ export class AltExecutionTabsComponent implements GridLayoutExternalTabsService<
 
   private readonly currentUrl = signal(this._router.url);
 
-  protected readonly isPerformanceActive = computed(() => {
+  private readonly isPerformanceActive = computed(() => {
     const currentUrl = this.currentUrl();
     const activeDrilldownTabId = this._tabsService.activeDrilldownTabId();
     return currentUrl.includes(`/${STATIC_TABS.ANALYTICS}`) && !activeDrilldownTabId;

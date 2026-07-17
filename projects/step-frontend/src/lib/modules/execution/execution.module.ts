@@ -210,8 +210,6 @@ import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/d
 import { SummaryCardComponent } from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
 import { CrossExecutionCallCountsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
 import { CrossExecutionStatusComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
-import { CrossExecutionReportControlsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-report-controls/cross-execution-report-controls.component';
-import { CrossExecutionPerformanceControlsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-performance-controls/cross-execution-performance-controls.component';
 import { AltExecutionRefreshActivityService } from './services/alt-execution-refresh-activity.service';
 import {
   ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
@@ -219,6 +217,7 @@ import {
 } from './shared/alt-execution-refresh-activity.enum';
 import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
+import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
 
 @NgModule({
   declarations: [
@@ -336,8 +335,6 @@ import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-e
     AggregatedTreeNodeDrilldownComponent,
     DashletEmptyColumnComponent,
     CrossExecutionStatusComponent,
-    CrossExecutionReportControlsComponent,
-    CrossExecutionPerformanceControlsComponent,
     NoticeBadgeLabelPipe,
   ],
   imports: [
@@ -384,6 +381,7 @@ import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-e
     StatusDistributionTooltipComponent,
     EntityRefDirective,
     AltReportNodeSummarySkeletonComponent,
+    CrossExecutionTabsComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -948,31 +946,11 @@ export class ExecutionModule {
       },
       {
         path: 'report',
-        children: [
-          {
-            path: '',
-            component: SchedulerReportViewComponent,
-          },
-          {
-            path: '',
-            component: CrossExecutionReportControlsComponent,
-            outlet: 'controls',
-          },
-        ],
+        component: SchedulerReportViewComponent,
       },
       {
         path: 'performance',
-        children: [
-          {
-            path: '',
-            component: SchedulerPerformanceViewComponent,
-          },
-          {
-            path: '',
-            component: CrossExecutionPerformanceControlsComponent,
-            outlet: 'controls',
-          },
-        ],
+        component: SchedulerPerformanceViewComponent,
       },
     ];
   }

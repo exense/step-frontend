@@ -1,12 +1,14 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, IS_SMALL_SCREEN, TimeUnit } from '@exense/step-core';
+import { ExecutionNamePipe, GridPersistenceStateService, IS_SMALL_SCREEN, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Subject } from 'rxjs';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { REPORT_TYPE } from '../../../services/report-type.token';
+import { ExecutionReportGridPersistenceStateService } from '../../../services/execution-report-grid-persistence-state.service';
 
 @Component({
   selector: 'step-cross-execution-dashboard',
@@ -14,6 +16,7 @@ import {
   styleUrls: ['./cross-execution-dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  providers: [],
 })
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);

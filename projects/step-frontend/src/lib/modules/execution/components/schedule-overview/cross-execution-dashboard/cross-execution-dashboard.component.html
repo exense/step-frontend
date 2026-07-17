@@ -59,7 +59,6 @@
     }
   </div>
   <div class="controls">
-    <router-outlet name="controls" />
     <step-autorefresh-toggle
       [interval]="_state.refreshInterval()"
       (refresh)="_state.triggerRefresh()"
@@ -77,6 +76,8 @@
     }
   </div>
 </section>
+
+<step-cross-execution-tabs />
 
 <section class="main">
   <router-outlet />

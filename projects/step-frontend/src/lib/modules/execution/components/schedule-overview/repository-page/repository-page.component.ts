@@ -6,12 +6,15 @@ import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
 import {
   AugmentedPlansService,
   ExecutionsService,
+  GridPersistenceStateService,
   provideGridLayoutConfig,
   REPOSITORY_REPORT_GRID,
 } from '@exense/step-core';
 import { RepositoryPageStateService } from './repository-page-state.service';
 import { EXECUTION_ID } from '../../../services/execution-id.token';
 import { switchMap, tap } from 'rxjs';
+import { REPORT_TYPE } from '../../../services/report-type.token';
+import { ExecutionReportGridPersistenceStateService } from '../../../services/execution-report-grid-persistence-state.service';
 
 @Component({
   selector: 'step-cross-exec-repository-page',
@@ -37,6 +40,14 @@ import { switchMap, tap } from 'rxjs';
     {
       provide: CrossExecutionDashboardState,
       useClass: RepositoryPageStateService,
+    },
+    {
+      provide: REPORT_TYPE,
+      useValue: 'CrossExecution',
+    },
+    {
+      provide: GridPersistenceStateService,
+      useClass: ExecutionReportGridPersistenceStateService,
     },
     ...provideGridLayoutConfig(REPOSITORY_REPORT_GRID),
   ],
