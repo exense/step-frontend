@@ -1,6 +1,10 @@
-import { Component, Directive, signal } from '@angular/core';
+import { Component, Directive, signal, viewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
-import { AutoShrinkItemValueComponent } from '@exense/step-core';
+import {
+  AutoShrinkEmptyValueTemplateDirective,
+  AutoShrinkItemActionTemplateDirective,
+  AutoShrinkItemValueComponent,
+} from '@exense/step-core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -22,22 +26,44 @@ class AutoShrinkItemValueWithoutTemplateComponent extends AutoShrinkItemValueBas
 
 @Component({
   selector: 'step-auto-shrink-item-value-with-template-test',
-  imports: [AutoShrinkItemValueComponent],
+  imports: [AutoShrinkEmptyValueTemplateDirective, AutoShrinkItemValueComponent],
   template: `
     @if (item(); as item) {
-      <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="test" />
+      <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
     }
-    <ng-template #test>
+    <ng-template stepAutoShrinkEmptyValueTemplate>
       <div class="test">EMPTY</div>
     </ng-template>
   `,
 })
-class AutoShrinkItemValueWithTemplateComponent extends AutoShrinkItemValueBaseComponent {}
+class AutoShrinkItemValueWithTemplateComponent extends AutoShrinkItemValueBaseComponent {
+  protected readonly emptyValue = viewChild(AutoShrinkEmptyValueTemplateDirective);
+}
+
+@Component({
+  selector: 'step-auto-shrink-item-value-with-action-template-test',
+  imports: [AutoShrinkItemActionTemplateDirective, AutoShrinkItemValueComponent],
+  template: `
+    @if (item(); as item) {
+      <step-auto-shrink-item-value [item]="item" [itemAction]="itemAction()" />
+    }
+    <ng-template stepAutoShrinkItemActionTemplate let-item>
+      <button type="button" class="test">Copy {{ item.value }}</button>
+    </ng-template>
+  `,
+})
+class AutoShrinkItemValueWithActionTemplateComponent extends AutoShrinkItemValueBaseComponent {
+  protected readonly itemAction = viewChild(AutoShrinkItemActionTemplateDirective);
+}
 
 describe('AutoShrinkItemValueComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AutoShrinkItemValueWithoutTemplateComponent, AutoShrinkItemValueWithTemplateComponent],
+      imports: [
+        AutoShrinkItemValueWithoutTemplateComponent,
+        AutoShrinkItemValueWithTemplateComponent,
+        AutoShrinkItemValueWithActionTemplateComponent,
+      ],
     }).compileComponents();
   });
 
@@ -70,5 +96,21 @@ describe('AutoShrinkItemValueComponent', () => {
     emptyContainer = fixture.debugElement.query(By.css('.test'));
     expect(emptyContainer).toBeNull();
     expect((fixture.nativeElement as HTMLElement).innerText.trim()).toBe('FOO');
+  });
+
+  it('With action template', async () => {
+    const fixture = TestBed.createComponent(AutoShrinkItemValueWithActionTemplateComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect((fixture.debugElement.query(By.css('.test')).nativeElement as HTMLElement).innerText.trim()).toBe('Copy');
+
+    fixture.componentInstance.item.set({ key: 'foo', value: 'FOO' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect((fixture.debugElement.query(By.css('.test')).nativeElement as HTMLElement).innerText.trim()).toBe(
+      'Copy FOO',
+    );
   });
 });

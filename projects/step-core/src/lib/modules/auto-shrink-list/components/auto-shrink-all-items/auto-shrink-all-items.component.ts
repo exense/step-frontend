@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableLocalDataSource, TableModule } from '../../../table/table.module';
 import { AutoShrinkItemValueComponent } from '../auto-shrink-item-value/auto-shrink-item-value.component';
+import { AutoShrinkItemActionTemplateDirective } from '../../directives/auto-shrink-item-action-template.directive';
+import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shrink-empty-value-template.directive';
 
 @Component({
   selector: 'step-auto-shrink-all-items',
@@ -13,7 +15,8 @@ import { AutoShrinkItemValueComponent } from '../auto-shrink-item-value/auto-shr
 })
 export class AutoShrinkAllItemsComponent {
   readonly items = input<KeyValue<string, string>[]>([]);
-  readonly emptyValueTemplate = input<TemplateRef<unknown>>();
+  readonly emptyValue = input<AutoShrinkEmptyValueTemplateDirective>();
+  readonly itemAction = input<AutoShrinkItemActionTemplateDirective>();
   readonly emptySearchPatterns = input('', {
     transform: (value?: string | string[]) => {
       const items: string[] = !value ? [] : !(value instanceof Array) ? [value] : value;

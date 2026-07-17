@@ -6,4 +6,15 @@
   emptySearchPatterns="empty"
 >
   <span class="empty" *stepAutoShrinkEmptyValueTemplate>&lt;empty&gt;</span>
+  <ng-template stepAutoShrinkItemActionTemplate let-item>
+    <button
+      type="button"
+      mat-icon-button
+      class="copy-parameter-value"
+      matTooltip="Copy the parameters value"
+      (click)="copyParameterValue(item.value, $event)"
+    >
+      <step-icon name="copy" />
+    </button>
+  </ng-template>
 </step-auto-shrink-list>

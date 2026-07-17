@@ -10,7 +10,7 @@ import {
   TableStorageService,
 } from '@exense/step-core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { KeyValue } from '@angular/common';
+import { DOCUMENT, KeyValue } from '@angular/common';
 
 @Component({
   selector: 'step-alt-execution-parameters',
@@ -30,6 +30,7 @@ import { KeyValue } from '@angular/common';
 export class AltExecutionParametersComponent {
   private _screensService = inject(AugmentedScreenService);
   private _multipleProjects = inject(MultipleProjectsService);
+  private _clipboard = inject(DOCUMENT).defaultView?.navigator.clipboard;
 
   private readonly executionParametersInfo = toSignal(
     this._screensService.getScreenInputsByScreenIdWithCache('executionParameters'),
@@ -38,6 +39,11 @@ export class AltExecutionParametersComponent {
 
   readonly executionParameters = input<Record<string, string> | undefined>(undefined);
   readonly executionProjectId = input<string | undefined>(undefined);
+
+  protected copyParameterValue(value: string, event: MouseEvent): void {
+    event.stopPropagation();
+    void this._clipboard?.writeText(value);
+  }
 
   protected readonly parametersList = computed(() => {
     const parameters = this.executionParameters() ?? {};

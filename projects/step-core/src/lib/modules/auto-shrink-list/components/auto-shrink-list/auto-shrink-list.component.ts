@@ -18,6 +18,7 @@ import { ItemWidthRegisterService } from '../../injectables/item-width-register.
 import { AutoShrinkItemDirective } from '../../directives/auto-shrink-item.directive';
 import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shrink-empty-value-template.directive';
+import { AutoShrinkItemActionTemplateDirective } from '../../directives/auto-shrink-item-action-template.directive';
 import { AutoShrinkItemValueComponent } from '../auto-shrink-item-value/auto-shrink-item-value.component';
 import { AutoShrinkAllItemsComponent } from '../auto-shrink-all-items/auto-shrink-all-items.component';
 
@@ -41,8 +42,10 @@ export class AutoShrinkListComponent implements ItemWidthRegisterService<KeyValu
   private observer?: ResizeObserver;
   private itemWidths = new Map<string, number>();
 
-  private autoShrinkEmptyValueTemplate = contentChild(AutoShrinkEmptyValueTemplateDirective);
-  protected readonly emptyValueTemplate = computed(() => this.autoShrinkEmptyValueTemplate()?.templateRef);
+  private readonly autoShrinkEmptyValueTemplate = contentChild(AutoShrinkEmptyValueTemplateDirective);
+  private readonly autoShrinkItemActionTemplate = contentChild(AutoShrinkItemActionTemplateDirective);
+  protected readonly emptyValue = computed(() => this.autoShrinkEmptyValueTemplate());
+  protected readonly itemAction = computed(() => this.autoShrinkItemActionTemplate());
 
   readonly items = input<KeyValue<string, string>[]>([]);
   readonly useShowAll = input(false);
@@ -50,25 +53,25 @@ export class AutoShrinkListComponent implements ItemWidthRegisterService<KeyValu
   readonly allTooltip = input('');
   readonly emptySearchPatterns = input<string | string[] | undefined>(undefined);
 
-  private itemWidthKeys = computed(() => this.items().map((item) => this.widthKey(item)));
+  private readonly itemWidthKeys = computed(() => this.items().map((item) => this.widthKey(item)));
 
-  protected itemsToDisplay = signal<number>(0);
+  protected readonly itemsToDisplay = signal<number>(0);
 
-  protected visibleItems = computed(() => {
+  protected readonly visibleItems = computed(() => {
     const items = this.items();
     const itemsToDisplay = this.itemsToDisplay();
     return items.slice(0, itemsToDisplay);
   });
 
-  protected hiddenItems = computed(() => {
+  protected readonly hiddenItems = computed(() => {
     const items = this.items();
     const itemsToDisplay = this.itemsToDisplay();
     return items.slice(itemsToDisplay);
   });
 
-  protected hasHiddenItems = computed(() => this.hiddenItems().length > 0);
-  protected isHiddenVisible = signal(false);
-  protected isAllVisible = signal(false);
+  protected readonly hasHiddenItems = computed(() => this.hiddenItems().length > 0);
+  protected readonly isHiddenVisible = signal(false);
+  protected readonly isAllVisible = signal(false);
 
   constructor() {
     // recalculate visible items, after rendering and items' change
@@ -86,6 +89,8 @@ export class AutoShrinkListComponent implements ItemWidthRegisterService<KeyValu
     this.observer?.disconnect();
   }
 
+  // Required by ItemWidthRegisterService.
+  // eslint-disable-next-line step-lint/component-public-fields
   registerWidth(item: KeyValue<string, string>, width: number): void {
     this.itemWidths.set(this.widthKey(item), width);
   }
