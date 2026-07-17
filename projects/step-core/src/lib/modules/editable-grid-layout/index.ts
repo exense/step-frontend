@@ -8,6 +8,8 @@ import { GridElementComponent } from './components/grid-element/grid-element.com
 import { GridElementHeaderActionsComponent } from './components/grid-element-header-actions/grid-element-header-actions.component';
 import { GridItemDirective } from './directives/grid-item.directive';
 import { GridControlToolComponent } from './components/grid-control-tool/grid-control-tool.component';
+import { GridLayoutTabsComponent } from './components/grid-layout-tabs/grid-layout-tabs.component';
+import { GridLayoutExternalTabDirective } from './components/grid-layout-tabs/grid-layout-external-tab.directive';
 
 export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridLayoutComponent,
@@ -20,6 +22,8 @@ export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridElementTitleComponent,
   GridControlToolComponent,
   GridItemDirective,
+  GridLayoutTabsComponent,
+  GridLayoutExternalTabDirective,
 ];
 
 export * from './components/grid-layout/grid-layout.component';
@@ -45,3 +49,7 @@ export * from './injectables/grid-editable.service';
 export * from './types/widget-state-preset';
 export * from './types/widget-state';
 export * from './types/grid-preset-list-item';
+export * from './types/grid-layout-tab';
+export * from './injectables/grid-layout-external-tabs.service';
+export * from './components/grid-layout-tabs/grid-layout-tabs.component';
+export * from './components/grid-layout-tabs/grid-layout-external-tab.directive';

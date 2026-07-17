@@ -83,7 +83,6 @@ import { AltReportNodeKeywordsWidgetComponent } from './components/alt-report-no
 import { AltReportNodeTestcasesWidgetComponent } from './components/alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportSettingsComponent } from './components/alt-execution-report-settings/alt-execution-report-settings.component';
 import { AltExecutionReportGridSettingsActionComponent } from './components/alt-execution-report-grid-settings-action/alt-execution-report-grid-settings-action.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -219,6 +218,7 @@ import {
   AltExecutionRefreshActivity,
 } from './shared/alt-execution-refresh-activity.enum';
 import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
+import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 
 @NgModule({
   declarations: [
@@ -1095,6 +1095,16 @@ export class ExecutionModule {
     this._gridSettingsRegistry.register(gridId, {
       widgetType: 'totalExecutions',
       title: 'Total executions',
+      widthInCells: 2,
+      heightInCells: 1,
+      minWidthInCells: 2,
+      minHeightInCells: 1,
+      weight: 1,
+      canResize: false,
+    });
+    this._gridSettingsRegistry.register(gridId, {
+      widgetType: 'failedExecutions',
+      title: 'Failed executions',
       widthInCells: 2,
       heightInCells: 1,
       minWidthInCells: 2,

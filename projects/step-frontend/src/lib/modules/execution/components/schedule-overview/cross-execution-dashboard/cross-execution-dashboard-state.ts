@@ -16,6 +16,7 @@ import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common
 import {
   AugmentedExecutionsService,
   AugmentedTimeSeriesService,
+  BucketAttributes,
   BucketResponse,
   Execution,
   ExecutiontTaskParameters,
@@ -35,7 +36,7 @@ import {
   createStackedBarPaths,
 } from '../../../../timeseries/modules/_common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Status } from '../../../../_common/shared/status.enum';
+import { ERROR_STATUSES, Status } from '../../../../_common/step-common.module';
 import { Axis } from 'uplot';
 
 declare const uPlot: any;
@@ -48,6 +49,8 @@ interface EntityWithKeywordsStats {
 
 type ExecutionChartSlot = Execution | undefined;
 type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: ExecutionChartSlot[] };
+
+const ERRORS_STATUS_SET = new Set(ERROR_STATUSES);
 
 export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 
@@ -193,6 +196,19 @@ export abstract class CrossExecutionDashboardState {
         return res + (bucket?.count ?? 0);
       }, 0),
     ),
+  );
+
+  readonly failedExecutionsCount$ = this.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      const matrixKeys = response.matrixKeys as BucketAttributes[];
+      const matrix = response.matrix as BucketResponse[][];
+
+      return matrixKeys
+        .map((item, index) => ({ status: item?.['result'] as Status, index }))
+        .filter((item) => ERRORS_STATUS_SET.has(item.status))
+        .map((item) => matrix?.[item.index]?.[0]?.count ?? 0)
+        .reduce((res, count) => res + count, 0);
+    }),
   );
 
   readonly averageExecutionDurationLabel$ = this.executionsDurationTimeSeriesData.pipe(

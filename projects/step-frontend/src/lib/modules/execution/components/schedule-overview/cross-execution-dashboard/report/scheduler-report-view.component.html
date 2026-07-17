@@ -19,6 +19,11 @@
     [value]="_state.totalExecutionsCount$ | async"
     [inProgress]="_state.timeSeriesInProgress()"
   />
+  <step-summary-card
+    *stepGridItem="'failedExecutions'; autoHeightOnFirstRow: true"
+    [value]="_state.failedExecutionsCount$ | async"
+    [inProgress]="_state.timeSeriesInProgress()"
+  />
   <step-alt-report-node-summary
     *stepGridItem="'summaryExecutions'"
     [summary]="_state.summaryData$ | async"

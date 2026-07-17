@@ -12,6 +12,9 @@ export const $ReportLayout = {
     visibility: {
       type: 'Enum',
     },
+    reportType: {
+      type: 'Enum',
+    },
     customFields: {
       type: 'dictionary',
       contains: {

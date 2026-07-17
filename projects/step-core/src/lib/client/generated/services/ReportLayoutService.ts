@@ -162,14 +162,18 @@ export class ReportLayoutService {
   }
 
   /**
-   * Returns all accessible report layouts.
+   * Returns all accessible report layouts for the given report type.
+   * @param reportType
    * @returns ReportLayout default response
    * @throws ApiError
    */
-  public getAllReportLayouts(): Observable<Array<ReportLayout>> {
+  public getAllReportLayouts(reportType?: 'SingleExecution' | 'CrossExecution'): Observable<Array<ReportLayout>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/report-layout/list',
+      query: {
+        reportType: reportType,
+      },
     });
   }
 
