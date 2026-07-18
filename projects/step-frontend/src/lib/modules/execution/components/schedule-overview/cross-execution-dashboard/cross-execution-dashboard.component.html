@@ -57,9 +57,9 @@
         {{ task.cronExpression }}
       </span>
       @if (nextExecutionDate$ | async; as nextExecutionDate) {
-        <span class="cron-label next-execution-label" matTooltip="Next execution">
-          <span class="tag">Next run</span>
-          {{ nextExecutionDate | date: DateFormat.DATE }}
+        <span class="next-execution-label" matTooltip="Next run">
+          <span class="label">Next run</span>
+          <span>{{ nextExecutionDate | date: DateFormat.DATE }}</span>
         </span>
       }
     }

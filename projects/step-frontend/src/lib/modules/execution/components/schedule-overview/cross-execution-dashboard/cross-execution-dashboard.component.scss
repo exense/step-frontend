@@ -81,23 +81,25 @@ step-cross-exec-repository-page {
       padding: 0.6rem 1rem;
       font-size: 1.2rem;
       font-weight: 500;
+    }
 
-      &.next-execution-label {
-        position: relative;
-        padding-top: 1rem;
+    .next-execution-label {
+      cursor: pointer;
+      background: var.$light-blue-gray;
+      border-radius: 1.6rem;
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 0.8rem;
+      padding: 0.4rem 1rem 0.4rem 0.4rem;
+      font-size: 1.2rem;
+      line-height: 1.8rem;
+      font-weight: 500;
 
-        .tag {
-          position: absolute;
-          top: -0.5rem;
-          left: -0.2rem;
-          background: var.$white;
-          border-radius: 0.8rem;
-          border: 1px solid var.$light-blue-gray;
-          padding: 0 0.4rem;
-          font-size: 1rem;
-          line-height: 1.2rem;
-          font-weight: normal;
-        }
+      .label {
+        background: var.$white;
+        border-radius: 1.6rem;
+        padding: 0.2rem 0.8rem;
       }
     }
 
