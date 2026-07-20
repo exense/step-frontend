@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AbstractOrganizableObject } from '../models/AbstractOrganizableObject';
-import type { AsyncTaskStatus } from '../models/AsyncTaskStatus';
+import type { AsyncTaskStatusAutomationPackageUpdateResult } from '../models/AsyncTaskStatusAutomationPackageUpdateResult';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { AutomationPackage } from '../models/AutomationPackage';
 import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
@@ -104,7 +104,7 @@ export class AutomationPackagesService {
     tokenSelectionCriteria?: string;
     executeFunctionsLocally?: boolean;
     asyncDeployment?: boolean;
-  }): Observable<AsyncTaskStatus | AutomationPackageUpdateResult> {
+  }): Observable<AsyncTaskStatusAutomationPackageUpdateResult | AutomationPackageUpdateResult> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/automation-packages',
