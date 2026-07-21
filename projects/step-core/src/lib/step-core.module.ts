@@ -364,5 +364,6 @@ export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';
 export * from './shared/no-access-entity-error';
 export * from './modules/editable-grid-layout';
+export * from './modules/csv';
 export * from './guards/can-leave-component.guard';
 export * from './types/can-leave-component.interface';
