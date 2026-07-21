@@ -1,14 +1,13 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, GridPersistenceStateService, IS_SMALL_SCREEN, TimeUnit } from '@exense/step-core';
+import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, map, merge, of, Subject, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { REPORT_TYPE } from '../../../services/report-type.token';
-import { ExecutionReportGridPersistenceStateService } from '../../../services/execution-report-grid-persistence-state.service';
 
 @Component({
   selector: 'step-cross-execution-dashboard',
@@ -16,15 +15,32 @@ import { ExecutionReportGridPersistenceStateService } from '../../../services/ex
   styleUrls: ['./cross-execution-dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
   standalone: false,
-  providers: [],
 })
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected _state = inject(CrossExecutionDashboardState);
+  private _schedulerService = inject(SchedulerService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
+  protected readonly DateFormat = DateFormat;
+
+  private readonly taskId$ = toObservable(this._state.task).pipe(
+    map((task) => task?.id),
+    distinctUntilChanged(),
+  );
+
+  protected readonly nextExecutionDate$ = merge(
+    this.taskId$,
+    this._state.onTimeSelectionChanged,
+    this._state.onRefreshTriggered,
+  ).pipe(
+    map(() => this._state.task()?.id),
+    switchMap((id) =>
+      id ? this._schedulerService.getNextExecutionDate(id).pipe(catchError(() => of(undefined))) : of(undefined),
+    ),
+  );
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';
     switch (this._state.viewType()) {
