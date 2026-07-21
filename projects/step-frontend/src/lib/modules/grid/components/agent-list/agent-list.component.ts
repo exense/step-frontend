@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   AgentListEntry,
   GridService,
@@ -7,7 +7,10 @@ import {
   TableIndicatorMode,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
+import { finalize, Observable } from 'rxjs';
 import { TokenTypeComponent } from '../token-type/token-type.component';
+
+type AgentAction = 'INTERRUPT' | 'RESUME' | 'REMOVE_ERRORS';
 
 @Component({
   selector: 'step-agent-list',
@@ -19,6 +22,8 @@ import { TokenTypeComponent } from '../token-type/token-type.component';
 export class AgentListComponent {
   private _gridService = inject(GridService);
 
+  protected readonly busyActionByAgentId = signal<Record<string, AgentAction>>({});
+
   readonly searchableAgent = new TableFetchLocalDataSource(
     () => this._gridService.getAgents(true.toString()),
     TableFetchLocalDataSource.configBuilder<AgentListEntry>()
@@ -29,26 +34,35 @@ export class AgentListComponent {
       .build(),
   );
 
-  loadTable(): void {
+  protected loadTable(): void {
     this.searchableAgent.reload();
   }
 
-  interrupt(id: string): void {
-    this._gridService.interruptAgent(id).subscribe(() => {
-      this.loadTable();
-    });
+  protected interrupt(id: string): void {
+    this.runAgentAction(id, 'INTERRUPT', this._gridService.interruptAgent(id));
   }
 
-  resume(id: string): void {
-    this._gridService.resumeAgent(id).subscribe(() => {
-      this.loadTable();
-    });
+  protected resume(id: string): void {
+    this.runAgentAction(id, 'RESUME', this._gridService.resumeAgent(id));
   }
 
-  removeTokenErrors(id: string): void {
-    this._gridService.removeAgentTokenErrors(id).subscribe(() => {
-      this.loadTable();
-    });
+  protected removeTokenErrors(id: string): void {
+    this.runAgentAction(id, 'REMOVE_ERRORS', this._gridService.removeAgentTokenErrors(id));
+  }
+
+  private runAgentAction(id: string, action: AgentAction, request$: Observable<unknown>): void {
+    if (this.busyActionByAgentId()[id]) {
+      return;
+    }
+
+    this.busyActionByAgentId.update((actions) => ({ ...actions, [id]: action }));
+    request$
+      .pipe(
+        finalize(() => {
+          this.busyActionByAgentId.update(({ [id]: _, ...actions }) => actions);
+        }),
+      )
+      .subscribe(() => this.loadTable());
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;

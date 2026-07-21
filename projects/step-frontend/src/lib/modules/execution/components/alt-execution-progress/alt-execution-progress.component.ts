@@ -12,11 +12,15 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {
+  BehaviorSubject,
   catchError,
   combineLatest,
   debounceTime,
+  defer,
   distinctUntilChanged,
   filter,
+  finalize,
+  fromEvent,
   map,
   Observable,
   of,
@@ -45,6 +49,7 @@ import {
   GridPersistenceStateService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
+  PopoverComponent,
   PopoverMode,
   provideGridLayoutConfig,
   ReloadableDirective,
@@ -55,6 +60,7 @@ import {
   TableLocalDataSource,
   TableRemoteDataSourceFactoryService,
   TimeSeriesErrorEntry,
+  TimeRangeSelection,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -100,6 +106,48 @@ enum UpdateSelection {
 interface RefreshParams {
   execution?: Execution;
   updateSelection?: UpdateSelection;
+}
+
+type ExecutionWithAgentProvisioning = Execution & {
+  agentProvisioningProbeOnly?: boolean;
+  agentProvisioningStatus?: AgentProvisioningStatusInfo;
+  provisioningStatus?: AgentProvisioningStatusInfo;
+  tokenProvisioningStatus?: AgentProvisioningStatusInfo;
+};
+
+interface AgentProvisioningInfo {
+  hasError: boolean;
+  hasProvisioning: boolean;
+  isActive: boolean;
+}
+
+interface AgentProvisioningStatusInfo {
+  completed?: boolean;
+  error?: unknown;
+  provisioningReport?: {
+    pools?: Array<{
+      completed?: boolean;
+      error?: unknown;
+    }>;
+  };
+}
+
+interface ControlledPopover {
+  toggled: boolean;
+  openPopover(): void;
+}
+
+interface AgentProvisioningBadgeEvent {
+  executionId: string;
+  hasError?: boolean;
+  hasProvisioning?: boolean;
+  isActive: boolean;
+}
+
+interface AgentProvisioningEventState {
+  hasError: boolean;
+  hasProvisioning: boolean;
+  isActive: boolean;
 }
 
 @Component({
@@ -215,6 +263,21 @@ export class AltExecutionProgressComponent
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
+  private initialTreeLoadPending = true;
+  private previousTreeProgressExecutionId?: string;
+  private previousTreeProgressRange?: TimeRangeSelection;
+  private readonly treeInProgressInternal$ = new BehaviorSubject(false);
+  readonly treeInProgress$ = this.treeInProgressInternal$.asObservable();
+  private initialErrorsLoadPending = true;
+  private previousErrorsProgressExecutionId?: string;
+  private previousErrorsProgressRange?: TimeRangeSelection;
+  private readonly errorsDisplayInProgressInternal$ = new BehaviorSubject(false);
+  readonly errorsDisplayInProgress$ = this.errorsDisplayInProgressInternal$.asObservable();
+
+  private readonly agentProvisioningPopover = viewChild<PopoverComponent>('agentProvisioningPopover');
+  private readonly agentProvisioningEvents = signal<Record<string, AgentProvisioningEventState>>({});
+  private agentProvisioningProbeContext?: ExecutionWithAgentProvisioning;
+  private agentProvisioningProbeContextKey?: string;
 
   selectFullRange(): void {
     this.updateTimeRangeSelection({ type: 'FULL' });
@@ -293,6 +356,42 @@ export class AltExecutionProgressComponent
   protected readonly isResolvedParametersVisible = signal(false);
   protected readonly isExecutionNoticesVisible = signal(false);
   protected readonly isAgentsVisible = signal(false);
+  protected readonly isAgentProvisioningVisible = signal(false);
+
+  protected readonly agentProvisioningInfo$ = combineLatest([
+    this.execution$,
+    toObservable(this.agentProvisioningEvents),
+  ]).pipe(
+    map(([execution, agentProvisioningEvents]) => {
+      const status = this.getAgentProvisioningStatus(execution);
+      const eventState = agentProvisioningEvents[execution.id ?? ''];
+      const eventIsActive = eventState?.isActive ?? false;
+      const eventHasError = eventState?.hasError ?? false;
+      const isActive =
+        execution.status === 'PROVISIONING' || eventIsActive || (!!status && !status.completed && !status.error);
+      const hasError = eventHasError || this.hasProvisioningError(status);
+      const hasProvisioning =
+        execution.status === 'PROVISIONING' ||
+        !!status ||
+        eventState?.hasProvisioning ||
+        eventIsActive ||
+        eventHasError;
+
+      return {
+        hasError,
+        hasProvisioning: !!hasProvisioning,
+        isActive,
+      } as AgentProvisioningInfo;
+    }),
+    distinctUntilChanged(
+      (previous, current) =>
+        previous.hasError === current.hasError &&
+        previous.hasProvisioning === current.hasProvisioning &&
+        previous.isActive === current.isActive,
+    ),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -341,10 +440,11 @@ export class AltExecutionProgressComponent
         );
       },
       ({ execution, timeRangeSelection }) => {
-        if (!execution?.id || !timeRangeSelection) {
+        const executionId = execution?.id;
+        if (!this.canLoadExecutionData(executionId) || !execution || !timeRangeSelection) {
           return of(undefined);
         }
-        return this._executionsApi.getFlatAggregatedReportView(execution.id, {
+        return this._executionsApi.getFlatAggregatedReportView(executionId, {
           range: convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId()),
           filterArtefactClasses: ['TestCase'],
           fetchCurrentOperations: true,
@@ -473,12 +573,23 @@ export class AltExecutionProgressComponent
         if (!executionId || !timeRange) {
           return of([]);
         }
-        return this._timeSeriesService.findErrors({ executionId, timeRange });
+        return defer(() => {
+          const displayProgress = this.shouldDisplayErrorsProgress(execution, timeRangeSelection);
+          if (displayProgress) {
+            this.errorsDisplayInProgressInternal$.next(true);
+          }
+          return this._timeSeriesService.findErrors({ executionId, timeRange }).pipe(
+            finalize(() => {
+              if (displayProgress) {
+                this.errorsDisplayInProgressInternal$.next(false);
+              }
+            }),
+          );
+        }).pipe(catchError(() => of([] as TimeSeriesErrorEntry[])));
       },
       this._destroyRef,
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
-    catchError(() => of([] as TimeSeriesErrorEntry[])),
     map((errors) => (!errors?.length ? undefined : errors)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -515,6 +626,8 @@ export class AltExecutionProgressComponent
     this.setupTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
+    this.setupAgentProvisioningPopover();
+    this.setupAgentProvisioningBadgeEvents();
   }
 
   readonly currentEntity = this.execution;
@@ -543,10 +656,101 @@ export class AltExecutionProgressComponent
       });
   }
 
+  private setupAgentProvisioningPopover(): void {
+    this.agentProvisioningInfo$
+      .pipe(
+        map(({ isActive }) => isActive),
+        startWith(false),
+        pairwise(),
+        filter(([wasActive, isActive]) => !wasActive && isActive),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.openAgentProvisioningPopover());
+
+    this.agentProvisioningInfo$
+      .pipe(
+        map(({ hasProvisioning }) => hasProvisioning),
+        distinctUntilChanged(),
+        filter((hasProvisioning) => !hasProvisioning),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.isAgentProvisioningVisible.set(false));
+  }
+
+  private setupAgentProvisioningBadgeEvents(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    fromEvent<CustomEvent<AgentProvisioningBadgeEvent>>(window, 'step-agent-provisioning-status')
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(({ detail }) => {
+        this.agentProvisioningEvents.update((events) => ({
+          ...events,
+          [detail.executionId]: {
+            hasError: detail.hasError ?? false,
+            hasProvisioning: detail.hasProvisioning ?? true,
+            isActive: detail.isActive,
+          },
+        }));
+      });
+  }
+
+  private openAgentProvisioningPopover(attempt = 0): void {
+    setTimeout(() => {
+      if (this.isAgentProvisioningVisible()) {
+        return;
+      }
+
+      const popover = this.agentProvisioningPopover();
+      if (popover) {
+        const controlledPopover = popover as unknown as ControlledPopover;
+        controlledPopover.toggled = true;
+        controlledPopover.openPopover();
+        this.isAgentProvisioningVisible.set(true);
+        return;
+      }
+
+      if (attempt < 40) {
+        this.openAgentProvisioningPopover(attempt + 1);
+      }
+    }, 100);
+  }
+
+  private getAgentProvisioningStatus(execution: Execution): AgentProvisioningStatusInfo | undefined {
+    const extension = execution as ExecutionWithAgentProvisioning;
+    return (
+      extension.tokenProvisioningStatus ??
+      extension.agentProvisioningStatus ??
+      extension.provisioningStatus ??
+      (execution.customFields?.['tokenProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['agentProvisioningStatus'] as AgentProvisioningStatusInfo | undefined) ??
+      (execution.customFields?.['provisioningStatus'] as AgentProvisioningStatusInfo | undefined)
+    );
+  }
+
+  protected getAgentProvisioningProbeContext(execution: Execution): Execution {
+    const contextKey = `${execution.id ?? ''}|${execution.status ?? ''}`;
+    if (this.agentProvisioningProbeContextKey !== contextKey) {
+      this.agentProvisioningProbeContextKey = contextKey;
+      this.agentProvisioningProbeContext = {
+        ...execution,
+        agentProvisioningProbeOnly: true,
+      };
+    }
+    return this.agentProvisioningProbeContext!;
+  }
+
+  private hasProvisioningError(status: AgentProvisioningStatusInfo | undefined): boolean {
+    return !!status?.error || !!status?.provisioningReport?.pools?.some((pool) => !!pool.error);
+  }
+
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.aggregatedTestCasesDataSource?.destroy();
     this.testCaseIterationsDataSource?.destroy();
+    this.treeInProgressInternal$.complete();
+    this.errorsDisplayInProgressInternal$.complete();
   }
 
   private setupTreeRefresh(): void {
@@ -567,7 +771,23 @@ export class AltExecutionProgressComponent
             );
           },
           ({ execution, timeRangeSelection }) => {
-            return this._treeLoader.load(execution, timeRangeSelection);
+            const executionId = execution?.id;
+            if (!this.canLoadExecutionData(executionId) || !execution) {
+              return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
+            }
+            return defer(() => {
+              const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
+              if (displayProgress) {
+                this.treeInProgressInternal$.next(true);
+              }
+              return this._treeLoader.load(execution, timeRangeSelection).pipe(
+                finalize(() => {
+                  if (displayProgress) {
+                    this.treeInProgressInternal$.next(false);
+                  }
+                }),
+              );
+            }).pipe(catchError(() => of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined })));
           },
           this._destroyRef,
           (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
@@ -595,6 +815,32 @@ export class AltExecutionProgressComponent
       .subscribe(() => {
         this._aggregatedTreeWidgetState.searchCtrl.setValue('');
       });
+  }
+
+  private shouldDisplayTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+    const displayProgress =
+      this.initialTreeLoadPending ||
+      this.previousTreeProgressExecutionId !== execution?.id ||
+      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range);
+
+    this.initialTreeLoadPending = false;
+    this.previousTreeProgressExecutionId = execution?.id;
+    this.previousTreeProgressRange = range;
+
+    return displayProgress;
+  }
+
+  private shouldDisplayErrorsProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+    const displayProgress =
+      this.initialErrorsLoadPending ||
+      this.previousErrorsProgressExecutionId !== execution?.id ||
+      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousErrorsProgressRange, range);
+
+    this.initialErrorsLoadPending = false;
+    this.previousErrorsProgressExecutionId = execution?.id;
+    this.previousErrorsProgressRange = range;
+
+    return displayProgress;
   }
 
   private setupToggleWarningReset(): void {
@@ -662,6 +908,12 @@ export class AltExecutionProgressComponent
           return reportNode.executionTime >= from && reportNode.executionTime <= to;
         })
         .build(),
+    );
+  }
+
+  private canLoadExecutionData(executionId?: string): executionId is string {
+    return (
+      !!executionId && executionId === this._executionId() && this._activeExecutionsService.hasExecution(executionId)
     );
   }
 

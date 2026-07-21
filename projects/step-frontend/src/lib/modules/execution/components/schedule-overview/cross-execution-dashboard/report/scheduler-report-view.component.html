@@ -63,14 +63,16 @@
               <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
                 <ng-template tooltipContent let-data>
                   <div class="ts-tooltip">
-                    <div
-                      class="link-item"
-                      (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
-                      title="See Execution"
-                    >
-                      <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                      <span class="link-icon"></span>
-                    </div>
+                    @if (settings.lastExecutions[data.idx!]; as execution) {
+                      <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                        <span>{{ execution.description || 'Unnamed' }}</span>
+                        <span class="link-icon"></span>
+                      </div>
+                    } @else {
+                      <div class="link-item" title="Empty">
+                        <span>Empty</span>
+                      </div>
+                    }
                   </div>
                 </ng-template>
               </step-timeseries-chart>
@@ -87,14 +89,16 @@
               <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
                 <ng-template tooltipContent let-data>
                   <div class="ts-tooltip">
-                    <div
-                      class="link-item"
-                      (click)="jumpToExecution(testCasesData.lastExecutions[data.idx!].id!)"
-                      title="See Execution"
-                    >
-                      <span>{{ testCasesData.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                      <span class="link-icon"></span>
-                    </div>
+                    @if (testCasesData.lastExecutions[data.idx!]; as execution) {
+                      <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                        <span>{{ execution.description || 'Unnamed' }}</span>
+                        <span class="link-icon"></span>
+                      </div>
+                    } @else {
+                      <div class="link-item" title="Empty">
+                        <span>Empty</span>
+                      </div>
+                    }
                   </div>
                 </ng-template>
               </step-timeseries-chart>

@@ -15,6 +15,7 @@ describe('IconProviderService', () => {
   it('Get icon success', () => {
     expect(iconProviderService.getIcon('pie-chart')).toBe(allIcons.PieChart);
     expect(iconProviderService.getIcon('plusCircle')).toBe(allIcons.PlusCircle);
+    expect(iconProviderService.getIcon('step-refresh')).toBe(allIcons.StepRefresh);
   });
 
   it('Get icon failed', () => {

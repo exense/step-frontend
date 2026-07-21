@@ -1,6 +1,7 @@
 import { Activity } from './svg/activity';
 import { ActivityHeart } from './svg/activity-heart';
 import { Agent } from './svg/agent';
+import { AgentProvisioning } from './svg/agent-provisioning';
 import { AgentToken } from './svg/agent-token';
 import { AgentTokenGroup } from './svg/agent-token-group';
 import { Airplay } from './svg/airplay';
@@ -279,6 +280,7 @@ import { Smile } from './svg/smile';
 import { Speaker } from './svg/speaker';
 import { Square } from './svg/square';
 import { Star } from './svg/star';
+import { StepRefresh } from './svg/step-refresh';
 import { StopCircle } from './svg/stop-circle';
 import { Stopwatch } from './svg/stopwatch';
 import { Sun } from './svg/sun';
@@ -348,6 +350,7 @@ export const allIcons = {
   Activity,
   ActivityHeart,
   Agent,
+  AgentProvisioning,
   AgentToken,
   AgentTokenGroup,
   Airplay,
@@ -626,6 +629,7 @@ export const allIcons = {
   Speaker,
   Square,
   Star,
+  StepRefresh,
   StopCircle,
   Stopwatch,
   Sun,

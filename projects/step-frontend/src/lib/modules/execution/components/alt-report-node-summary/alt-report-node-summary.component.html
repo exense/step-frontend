@@ -7,30 +7,42 @@
     }
   </step-alt-report-widget-title>
   <step-alt-report-widget-content>
-    @if (chartSettings(); as chartSettings) {
-      <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
-        <section class="summary-total" *stepDoughnutChartTotalTemplate>
-          <div class="total" [matTooltip]="totalTooltip()" matTooltipPosition="below">{{ total() | bigNumber }}</div>
-          @if (totalForecast() !== undefined) {
-            <div class="forecast" [matTooltip]="totalForecastTooltip()" matTooltipPosition="below">
-              / {{ totalForecast() | bigNumber }}
-            </div>
+    @if (loading()) {
+      <section class="summary-skeleton" aria-hidden="true">
+        <div class="summary-skeleton-chart">
+          <span></span>
+        </div>
+        <div class="summary-skeleton-legend">
+          @for (item of [1, 2, 3]; track item) {
+            <span><span></span></span>
           }
-        </section>
-      </step-doughnut-chart>
-    }
-
-    @if (legend(); as legend) {
-      <section class="summary">
-        @for (item of legend; track item.status) {
-          <step-status-count-badge
-            [status]="item.status"
-            [count]="item.value"
-            [isDisabled]="item.isDisabled"
-            (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
-          />
-        }
+        </div>
       </section>
+    } @else {
+      @if (chartSettings(); as chartSettings) {
+        <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
+          <section class="summary-total" *stepDoughnutChartTotalTemplate>
+            <div class="total" [matTooltip]="totalTooltip()" matTooltipPosition="below">{{ total() | bigNumber }}</div>
+            @if (totalForecast() !== undefined) {
+              <div class="forecast" [matTooltip]="totalForecastTooltip()" matTooltipPosition="below">
+                / {{ totalForecast() | bigNumber }}
+              </div>
+            }
+          </section>
+        </step-doughnut-chart>
+        @if (legend(); as legend) {
+          <section class="summary">
+            @for (item of legend; track item.status) {
+              <step-status-count-badge
+                [status]="item.status"
+                [count]="item.value"
+                [isDisabled]="item.isDisabled"
+                (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
+              />
+            }
+          </section>
+        }
+      }
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>

@@ -63,6 +63,9 @@ export const checkEntityGuardFactory =
       _multipleProjects.checkLoadErrors(loadErrorsConfig),
       map((entityOrUrl) => {
         if (!entityOrUrl) {
+          if (getListUrl) {
+            return _router.parseUrl(getListUrl());
+          }
           return false;
         }
 
