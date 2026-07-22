@@ -6,6 +6,7 @@ import { ReportNode, AttachmentMeta } from '../../../../client/step-client-modul
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AuthService } from '../../../auth';
+import { AttachmentType } from '../../types/attachment-type.enum';
 
 @Component({
   selector: 'step-legacy-attachments',
@@ -27,18 +28,27 @@ export class LegacyAttachmentsComponent {
 
   protected readonly attachments = computed(() => this.node()?.attachments ?? []);
 
+  protected readonly downloadableAttachments = computed(() =>
+    this.attachments().filter(
+      (attachment) => this._attachmentUtils.determineAttachmentType(attachment) !== AttachmentType.SKIPPED,
+    ),
+  );
+
   protected readonly singleAttachment = computed(() => {
-    const attachments = this.attachments();
+    const attachments = this.downloadableAttachments();
     if (attachments.length === 1) {
       return attachments[0];
     }
     return undefined;
   });
 
-  protected readonly hasAttachments = computed(() => this.attachments().length > 0);
+  protected readonly hasAttachments = computed(() => this.downloadableAttachments().length > 0);
 
   protected openAttachment(attachment: AttachmentMeta): void {
-    if (!this.hasResourceReadPermission()) {
+    if (
+      !this.hasResourceReadPermission() ||
+      this._attachmentUtils.determineAttachmentType(attachment) === AttachmentType.SKIPPED
+    ) {
       return;
     }
     const url = this._attachmentUtils.getDownloadAttachmentUrl(attachment!);
