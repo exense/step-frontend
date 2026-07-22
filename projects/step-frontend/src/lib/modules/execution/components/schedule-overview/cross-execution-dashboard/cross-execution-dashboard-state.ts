@@ -615,7 +615,10 @@ export abstract class CrossExecutionDashboardState {
         entityParams = { canonicalPlanName: execution!.importResult!.canonicalPlanName };
         break;
     }
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
+    this.errorsDataSource.reload({
+      isForce: true,
+      request: { timeRange: timeRange, ...entityParams },
+    });
   });
 
   private getDisplayedExecutions(executions: Execution[]): Execution[] {

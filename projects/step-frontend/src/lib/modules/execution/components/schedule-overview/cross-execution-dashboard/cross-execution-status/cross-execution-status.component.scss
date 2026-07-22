@@ -1,7 +1,21 @@
-step-alt-report-widget {
+:host {
+  display: flex;
   height: 100%;
+  min-height: 0;
+}
+
+step-alt-report-widget {
+  flex: 1;
+  min-height: 0;
+}
+
+step-alt-report-widget-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 .chart-container {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
