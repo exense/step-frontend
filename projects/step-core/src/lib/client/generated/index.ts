@@ -141,6 +141,7 @@ export type { ReportNode } from './models/ReportNode';
 export type { RepositoryObjectReference } from './models/RepositoryObjectReference';
 export type { ResolvedExecutionNotice } from './models/ResolvedExecutionNotice';
 export type { Resource } from './models/Resource';
+export type { ResourcePreview } from './models/ResourcePreview';
 export type { ResourceUploadResponse } from './models/ResourceUploadResponse';
 export type { ScreenInput } from './models/ScreenInput';
 export type { ScreenInputColumnSettings } from './models/ScreenInputColumnSettings';

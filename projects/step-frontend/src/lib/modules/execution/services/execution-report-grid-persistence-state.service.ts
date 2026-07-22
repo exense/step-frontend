@@ -9,6 +9,7 @@ import {
 } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, Observable, of, pipe, UnaryFunction } from 'rxjs';
+import { REPORT_TYPE } from './report-type.token';
 
 const DEFAULT_LAYOUT_ID_KEY = 'plugins.reporting.layouts.default.id';
 const SELECTED_LAYOUT_ID_STORAGE_KEY = 'executionReport.selectedLayoutId';
@@ -28,10 +29,12 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   private _api = inject(ReportLayoutService);
   private _appConfigContainer = inject(AppConfigContainerService);
   private _localStorage = inject(LOCAL_STORAGE);
+  private _reportType = inject(REPORT_TYPE);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
   save(gridId: string, preset: WidgetStatePreset): Observable<string> {
+    preset.reportType = this._reportType;
     return this._api.saveReportLayout(preset).pipe(
       logAndRethrow(),
       map((result) => result.id!),
@@ -46,7 +49,7 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   getGridPresets(gridId: string): Observable<GridPresetListItem[]> {
-    return this._api.getAllReportLayouts().pipe(
+    return this._api.getAllReportLayouts(this._reportType).pipe(
       logAndRethrow(),
       map((result) =>
         result.map((layout) => ({

@@ -9,9 +9,10 @@ import {
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
-import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
   BucketResponse,
+  ChartSkeletonComponent,
   FetchBucketsRequest,
   TimeRange,
   TimeSeriesAPIResponse,

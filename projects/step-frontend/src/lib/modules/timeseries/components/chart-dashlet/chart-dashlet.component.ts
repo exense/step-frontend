@@ -4,8 +4,6 @@ import {
   DestroyRef,
   inject,
   input,
-  Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   output,
@@ -34,7 +32,7 @@ import {
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
-import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
   catchError,
   defaultIfEmpty,
@@ -88,7 +86,6 @@ const resolutionLabels: Record<string, string> = {
   styleUrls: ['./chart-dashlet.component.scss'],
   imports: [
     COMMON_IMPORTS,
-    ChartSkeletonComponent,
     TimeSeriesChartComponent,
     TimeseriesAggregatePickerComponent,
     MatTooltip,

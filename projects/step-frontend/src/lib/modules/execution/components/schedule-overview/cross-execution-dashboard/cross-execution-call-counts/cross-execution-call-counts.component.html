@@ -1,0 +1,72 @@
+<step-alt-report-widget [title]="countChartTitle()">
+  <step-alt-report-widget-filter>
+    <div>
+      <step-tabs
+        [tabs]="primaryChartTypes"
+        [shrink]="true"
+        [activeTabId]="reportNodesChartType()"
+        (activeTabIdChange)="switchReportNodesChart($event)"
+      />
+    </div>
+  </step-alt-report-widget-filter>
+  <step-alt-report-widget-content class="widget-content">
+    @if (reportNodesChartType() === 'keywords') {
+      @let keywordsSettings = _state.keywordsChartSettings$ | async;
+      @let keywordsInProgress =
+        !keywordsSettings || (_state.keywordsCountChartLoading() && _state.isLastRefreshManual());
+      @if (keywordsSettings) {
+        @if (keywordsInProgress) {
+          <ng-container *ngTemplateOutlet="skeleton" />
+        }
+        <div class="count-container" [class.hidden]="keywordsInProgress">
+          <step-timeseries-chart class="auto-height" [settings]="keywordsSettings.chartSettings" [height]="0">
+            <ng-template tooltipContent let-data>
+              <div class="ts-tooltip">
+                @let execution = keywordsSettings.lastExecutions[data?.idx ?? -1];
+                @if (execution) {
+                  <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                    <span>{{ execution.description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </step-timeseries-chart>
+        </div>
+      } @else if (keywordsInProgress) {
+        <ng-container *ngTemplateOutlet="skeleton" />
+      }
+    } @else if (reportNodesChartType() === 'testcases') {
+      @let testCasesData = _state.testCasesChartSettings$ | async;
+      @let testCasesInProgress =
+        !testCasesData || (_state.testCasesCountChartLoading() && _state.isLastRefreshManual());
+      @if (testCasesData) {
+        @if (testCasesInProgress) {
+          <ng-container *ngTemplateOutlet="skeleton" />
+        }
+        <div class="counts-container" [class.hidden]="testCasesInProgress">
+          <step-timeseries-chart class="auto-height" [settings]="testCasesData.chart!" [height]="0">
+            <ng-template tooltipContent let-data>
+              <div class="ts-tooltip">
+                @let execution = testCasesData.lastExecutions[data?.idx ?? -1];
+                @if (execution) {
+                  <div class="link-item" (click)="jumpToExecution(execution.id!)" title="See Execution">
+                    <span>{{ execution.description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
+                }
+              </div>
+            </ng-template>
+          </step-timeseries-chart>
+        </div>
+      } @else if (testCasesInProgress) {
+        <ng-container *ngTemplateOutlet="skeleton" />
+      }
+    } @else {
+      <ng-container *ngTemplateOutlet="skeleton" />
+    }
+  </step-alt-report-widget-content>
+</step-alt-report-widget>
+<ng-template #skeleton>
+  <step-chart-skeleton />
+</ng-template>

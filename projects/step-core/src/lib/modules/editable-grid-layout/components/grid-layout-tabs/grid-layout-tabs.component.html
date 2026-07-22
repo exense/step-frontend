@@ -1,0 +1,115 @@
+@if (editState(); as state) {
+  <form class="layout-edit-bar" (ngSubmit)="saveEdit()">
+    <input
+      class="layout-name-input"
+      placeholder="Name"
+      name="layoutName"
+      required
+      autocomplete="off"
+      [ngModel]="state.name"
+      (ngModelChange)="updateEditName($event)"
+    />
+    <span class="layout-shared-control">
+      <mat-slide-toggle
+        name="layoutShared"
+        color="primary"
+        [ngModel]="state.isShared"
+        (ngModelChange)="updateEditShared($event)"
+      >
+        Shared
+      </mat-slide-toggle>
+      <step-icon
+        name="help-circle"
+        matTooltip="If selected, the layout will be displayed to all users"
+        matTooltipPosition="below"
+      />
+    </span>
+    <button type="submit" mat-flat-button color="primary" class="layout-edit-button" [disabled]="!canSaveEdit()">
+      Save Layout
+    </button>
+    <button type="button" mat-stroked-button class="layout-edit-button" (click)="cancelEdit()">Cancel</button>
+  </form>
+} @else {
+  <div class="execution-view-tabs">
+    @let externalTabTpl = externalTabTemplate();
+    <step-tabs tabMode="tabs" [tabs]="tabs()" [activeTabId]="activeTabId()" (activeTabIdChange)="selectTab($event)">
+      <div *stepTabTemplate="let tab" class="tab-content">
+        @if ((tab | isExternalTab) && externalTabTpl) {
+          <ng-container *ngTemplateOutlet="externalTabTpl; context: { $implicit: tab }" />
+        } @else {
+          <span class="tab-label">{{ tab.label }}</span>
+          <span class="tab-action-slot" (click)="$event.stopPropagation()">
+            <step-icon
+              name="more-horizontal"
+              class="tab-action"
+              matTooltip="Modify Layout"
+              matTooltipPosition="below"
+              [matMenuTriggerFor]="layoutMenu"
+              [matMenuTriggerData]="{ layout: tab.layout }"
+            />
+          </span>
+        }
+      </div>
+    </step-tabs>
+
+    <button
+      type="button"
+      mat-icon-button
+      class="add-layout-button"
+      matTooltip="Add layout"
+      matTooltipPosition="below"
+      [disabled]="!canCreateLayout()"
+      (click)="startCreate()"
+    >
+      <step-icon name="plus" />
+    </button>
+  </div>
+
+  <mat-menu #layoutMenu="matMenu" class="step-grid-tabs-layout-actions-menu">
+    <ng-container *matMenuContent="let layout = layout">
+      @if (layout?.visibility === 'Preset') {
+        <div
+          class="layout-readonly-info"
+          matTooltip="System layouts are read-only. Duplicate this layout to make your own modifications."
+          matTooltipPosition="left"
+        >
+          <div class="caption">
+            System Layout
+            <step-icon name="help-circle" />
+          </div>
+          <div class="sub-title">read-only</div>
+        </div>
+      } @else if (layout | isForeignSharedLayout) {
+        <div
+          class="layout-readonly-info"
+          matTooltip="This layout belongs to another user and can only be edited by that user."
+          matTooltipPosition="left"
+        >
+          <div class="caption">
+            Shared Layout
+            <step-icon name="help-circle" />
+          </div>
+          <div class="sub-title">read-only</div>
+        </div>
+      }
+      <button type="button" mat-menu-item (click)="startEdit(layout)" [disabled]="!(layout | canEditLayout)">
+        <step-icon name="edit-2" />
+        <span>Edit Layout</span>
+      </button>
+      <button type="button" mat-menu-item (click)="startDuplicate(layout)" [disabled]="!canCreateLayout()">
+        <step-icon name="copy" />
+        <span>Duplicate Layout</span>
+      </button>
+      @if (layout | canDownloadLayout) {
+        <button type="button" mat-menu-item (click)="downloadLayout(layout)">
+          <step-icon name="download" />
+          <span>Download layout</span>
+        </button>
+      }
+      <button type="button" mat-menu-item (click)="deleteLayout(layout)" [disabled]="!(layout | canDeleteLayout)">
+        <step-icon name="trash-2" />
+        <span>Delete Layout</span>
+      </button>
+    </ng-container>
+  </mat-menu>
+}

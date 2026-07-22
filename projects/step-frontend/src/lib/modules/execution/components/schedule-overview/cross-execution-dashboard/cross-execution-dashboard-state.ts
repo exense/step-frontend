@@ -1,11 +1,11 @@
 import {
-  combineLatest,
+  catchError,
   filter,
+  finalize,
   map,
   Observable,
   of,
   shareReplay,
-  skip,
   startWith,
   Subject,
   switchMap,
@@ -16,9 +16,9 @@ import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common
 import {
   AugmentedExecutionsService,
   AugmentedTimeSeriesService,
+  BucketAttributes,
   BucketResponse,
   Execution,
-  ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
@@ -26,20 +26,17 @@ import {
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
-import { computed, inject, signal, Signal, WritableSignal } from '@angular/core';
+import { computed, inject, signal, Signal } from '@angular/core';
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
 import {
-  createStackedBarPaths,
-  FilterBarItem,
-  FilterUtils,
   OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesUtils,
-  UPlotUtilsService,
+  createStackedBarPaths,
 } from '../../../../timeseries/modules/_common';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { Status } from '../../../../_common/shared/status.enum';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { ERROR_STATUSES, Status } from '../../../../_common/step-common.module';
 import { Axis } from 'uplot';
 
 declare const uPlot: any;
@@ -52,6 +49,8 @@ interface EntityWithKeywordsStats {
 
 type ExecutionChartSlot = Execution | undefined;
 type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: ExecutionChartSlot[] };
+
+const ERRORS_STATUS_SET = new Set(ERROR_STATUSES);
 
 export type CrossExecutionViewType = 'task' | 'plan' | 'repository';
 
@@ -70,26 +69,40 @@ export abstract class CrossExecutionDashboardState {
   readonly onRefreshTriggered = new Subject<TimeRange>();
   readonly onTimeSelectionChanged = new Subject<TimeRange>();
 
+  readonly isLastRefreshManual = computed(() => {
+    return this.lastRefreshTrigger() === 'manual';
+  });
+
   // view settings
   readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
   readonly refreshInterval = signal<number>(0);
 
   abstract fetchLastExecution(): Observable<Execution>;
+
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
+
   abstract getDashboardFilter(): string;
+
   abstract readonly viewType: Signal<CrossExecutionViewType>;
   abstract readonly executionsTableFilters: Signal<Record<string, SearchValue>>;
+
   abstract getViewType(): CrossExecutionViewType;
+
   abstract getEntityId(): string;
+
   abstract dashboardDisabledFilters: string[];
 
   readonly executionsChartLoading = signal<boolean>(false);
-  readonly summaryWidgetLoading = signal<boolean>(false);
+
+  private readonly timeSeriesLoading = signal<boolean>(false);
+  readonly timeSeriesInProgress = computed(() => {
+    const timeSeriesLoading = this.timeSeriesLoading();
+    const isLastRefreshManual = this.isLastRefreshManual();
+    return timeSeriesLoading && isLastRefreshManual;
+  });
+
   readonly testCasesCountChartLoading = signal<boolean>(false);
   readonly keywordsCountChartLoading = signal<boolean>(false);
-  readonly successRateValueLoading = signal<boolean>(false);
-  readonly averageDurationValueLoading = signal<boolean>(false);
-  readonly totalExecutionsValueLoading = signal<boolean>(false);
 
   public updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
     this.lastRefreshTrigger.set('manual');
@@ -101,7 +114,7 @@ export abstract class CrossExecutionDashboardState {
     this.refreshInterval.set(interval);
   }
 
-  timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
+  readonly timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
     filter((value): value is TimeRangePickerSelection => value != null),
   );
 
@@ -144,10 +157,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
-      this.summaryWidgetLoading.set(true);
-      this.successRateValueLoading.set(true);
-      this.totalExecutionsValueLoading.set(true);
-      this.averageDurationValueLoading.set(true);
+      this.timeSeriesLoading.set(true);
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
@@ -160,25 +170,91 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: ['result'],
       };
-      return this._timeSeriesService.fetchBuckets(request);
+      return this._timeSeriesService.fetchBuckets(request).pipe(
+        catchError(() =>
+          of({
+            start: timeRange.from,
+            end: timeRange.to,
+            interval: Math.max(timeRange.to - timeRange.from, 1),
+            matrixKeys: [],
+            matrix: [],
+          }),
+        ),
+        finalize(() => {
+          this.timeSeriesLoading.set(false);
+        }),
+      );
     }),
+    shareReplay(1),
+    takeUntilDestroyed(),
   );
 
-  readonly summaryData$: Observable<ReportNodeSummary> = this.executionsDurationTimeSeriesData.pipe(
+  readonly totalExecutionsCount$ = this.executionsDurationTimeSeriesData.pipe(
+    map((response) =>
+      response.matrixKeys.reduce((res, keyAttributes, i) => {
+        const bucket: BucketResponse = response.matrix[i]?.[0];
+        return res + (bucket?.count ?? 0);
+      }, 0),
+    ),
+  );
+
+  readonly failedExecutionsCount$ = this.executionsDurationTimeSeriesData.pipe(
     map((response) => {
-      let total = 0;
-      const items: Record<string, number> = {};
-      response.matrixKeys.forEach((keyAttributes, i) => {
-        let bucket: BucketResponse = response.matrix[i][0];
-        items[keyAttributes['result'] as string] = bucket.count;
-        total += bucket.count;
-      });
-      this.summaryWidgetLoading.set(false);
-      return { items: items, total: total };
+      const matrixKeys = response.matrixKeys as BucketAttributes[];
+      const matrix = response.matrix as BucketResponse[][];
+
+      return matrixKeys
+        .map((item, index) => ({ status: item?.['result'] as Status, index }))
+        .filter((item) => ERRORS_STATUS_SET.has(item.status))
+        .map((item) => matrix?.[item.index]?.[0]?.count ?? 0)
+        .reduce((res, count) => res + count, 0);
     }),
   );
 
-  executionsChartSettings$ = this.timeRange$.pipe(
+  readonly averageExecutionDurationLabel$ = this.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      // data is grouped by status
+      let totalCount = 0;
+      let totalDuration = 0;
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        const bucket: BucketResponse = response.matrix[i]?.[0];
+        totalCount += bucket?.count ?? 0;
+        totalDuration += bucket?.sum ?? 0;
+      });
+      if (totalCount === 0) {
+        return '-';
+      } else {
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(totalDuration / totalCount);
+      }
+    }),
+  );
+
+  readonly summaryData$ = this.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      const items: Record<string, number> = response.matrixKeys.reduce((res, keyAttributes, i) => {
+        const bucket: BucketResponse = response.matrix[i]?.[0];
+        const key: string = keyAttributes['result'];
+        res[key] = bucket?.count ?? 0;
+        return res;
+      }, {});
+
+      const total = Object.values(items).reduce((res, item) => res + item, 0);
+
+      return { total, items };
+    }),
+  );
+
+  readonly successRateValue$ = this.summaryData$.pipe(
+    map((summaryData: ReportNodeSummary) => {
+      const passed = summaryData.items['PASSED'] || 0;
+      if (summaryData.total === 0) {
+        return '-';
+      }
+      return ((passed / summaryData.total) * 100).toFixed(2) + '%';
+    }),
+  );
+
+  readonly executionsChartSettings$ = this.timeRange$.pipe(
     switchMap((timeRange) => {
       this.executionsChartLoading.set(true);
       const statusAttribute = 'result';
@@ -195,6 +271,15 @@ export abstract class CrossExecutionDashboardState {
         groupDimensions: [statusAttribute],
       };
       return this._timeSeriesService.fetchBuckets(request).pipe(
+        catchError(() =>
+          of({
+            start: timeRange.from,
+            end: timeRange.to,
+            interval: Math.max(timeRange.to - timeRange.from, 1),
+            matrixKeys: [],
+            matrix: [],
+          }),
+        ),
         map((response) => {
           const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
           const responseTimeData: (number | undefined | null)[] = [];
@@ -262,7 +347,6 @@ export abstract class CrossExecutionDashboardState {
               },
             },
           ];
-          this.executionsChartLoading.set(false);
           return {
             title: '',
             showLegend: false,
@@ -299,6 +383,9 @@ export abstract class CrossExecutionDashboardState {
             axes: axes,
           } as TSChartSettings;
         }),
+        finalize(() => {
+          this.executionsChartLoading.set(false);
+        }),
       );
     }),
   );
@@ -316,7 +403,7 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
-  keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
+  readonly keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
       const displayedExecutions = this.getDisplayedExecutions(executions);
       const chartExecutions = this.createExecutionChartSlots(displayedExecutions);
@@ -340,6 +427,7 @@ export abstract class CrossExecutionDashboardState {
             };
 
             return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              catchError(() => of({ matrixKeys: [], matrix: [] })),
               map((timeSeriesResponse) => {
                 let executionStats: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
@@ -391,9 +479,10 @@ export abstract class CrossExecutionDashboardState {
                 });
                 this.cumulateSeriesData(series);
                 this.applyStackedBarPaths(series);
-                let chartSettings = this.createKeywordsChart(chartExecutions, series);
+                return this.createKeywordsChart(executions, series);
+              }),
+              finalize(() => {
                 this.keywordsCountChartLoading.set(false);
-                return chartSettings;
               }),
             );
           }
@@ -403,7 +492,7 @@ export abstract class CrossExecutionDashboardState {
     }),
   );
 
-  testCasesChartSettings$: Observable<{
+  readonly testCasesChartSettings$: Observable<{
     chart: TSChartSettings;
     hasData: boolean;
     lastExecutions: ExecutionChartSlot[];
@@ -438,6 +527,7 @@ export abstract class CrossExecutionDashboardState {
             };
 
             return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              catchError(() => of({ matrixKeys: [], matrix: [] })),
               map((timeSeriesResponse) => {
                 let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
@@ -490,12 +580,14 @@ export abstract class CrossExecutionDashboardState {
                 });
                 this.cumulateSeriesData(series);
                 this.applyStackedBarPaths(series);
-                this.testCasesCountChartLoading.set(false);
                 return {
-                  chart: this.createTestCasesChart(chartExecutions, series),
-                  lastExecutions: chartExecutions,
+                  chart: this.createTestCasesChart(executions, series),
+                  lastExecutions: executions,
                   hasData: timeSeriesResponse.matrixKeys.length > 0,
                 };
+              }),
+              finalize(() => {
+                this.testCasesCountChartLoading.set(false);
               }),
             );
           }
@@ -506,7 +598,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly errorsDataSource = this._timeSeriesService.createErrorsFetchDataSource();
 
-  errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
+  private readonly errorTableRefreshSub = this.timeRange$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
     let entityParams = undefined;
     switch (this.getViewType()) {
       case 'task':
@@ -523,7 +615,10 @@ export abstract class CrossExecutionDashboardState {
         entityParams = { canonicalPlanName: execution!.importResult!.canonicalPlanName };
         break;
     }
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...entityParams } });
+    this.errorsDataSource.reload({
+      isForce: true,
+      request: { timeRange: timeRange, ...entityParams },
+    });
   });
 
   private getDisplayedExecutions(executions: Execution[]): Execution[] {
