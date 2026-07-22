@@ -1,8 +1,12 @@
-<step-modal-window title="New Plan">
+<step-modal-window
+  title="New Plan"
+  [showSpinner]="selectedTab === 'general' && isScreenTemplateLoading"
+  spinnerTooltip="Loading screen templates"
+>
   <div step-modal-window-body>
     <step-tabs [tabs]="_availableTabs" [(activeTabId)]="selectedTab" [compactTabs]="true"> </step-tabs>
     @if (selectedTab === 'general') {
-      <step-custom-forms [(stModel)]="plan" stScreen="plan" />
+      <step-custom-forms [(stModel)]="plan" stScreen="plan" (loadingChange)="onScreenTemplateLoading($event)" />
       <step-form-field>
         <step-label>Editor</step-label>
         <step-select
@@ -24,7 +28,13 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="isSaving">Cancel</button>
-    <button type="button" mat-stroked-button (click)="save(false)" [disabled]="isSaving" [attr.aria-busy]="isSaving">
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="save(false)"
+      [disabled]="isSaving || (selectedTab === 'general' && isScreenTemplateLoading)"
+      [attr.aria-busy]="isSaving"
+    >
       @if (isSaving) {
         <step-button-spinner label="Saving plan" />
       }
@@ -35,7 +45,7 @@
       mat-flat-button
       color="primary"
       (click)="save(true)"
-      [disabled]="isSaving"
+      [disabled]="isSaving || (selectedTab === 'general' && isScreenTemplateLoading)"
       [attr.aria-busy]="isSaving"
     >
       @if (isSaving) {

@@ -211,6 +211,22 @@ export class SchedulerService {
   }
 
   /**
+   * Returns the next execution date of the given scheduler task as a timestamp.
+   * @param id
+   * @returns number default response
+   * @throws ApiError
+   */
+  public getNextExecutionDate(id: string): Observable<number> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/scheduler/task/{id}/next-execution-date',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * Returns all the scheduled tasks.
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError

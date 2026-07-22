@@ -20,6 +20,9 @@
       </div>
     }
     @if (!editMode()) {
+      <button mat-icon-button matTooltip="Export as CSV" (click)="exportAsCSV()">
+        <step-icon name="download"></step-icon>
+      </button>
       <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
         <step-icon name="filter"></step-icon>
       </button>

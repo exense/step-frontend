@@ -22,7 +22,7 @@
           </a>
         }
       }
-      @if (_state.viewType() === 'repository' ) {
+      @if (_state.viewType() === 'repository') {
         @if (_state.execution(); as execution) {
           @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
             @if (repositoryParams.repositoryID !== 'local') {
@@ -56,6 +56,14 @@
       <span class="cron-label" matTooltip="Cron expression">
         {{ task.cronExpression }}
       </span>
+      @if (nextExecutionDate$ | async; as nextExecutionDate) {
+        <span class="next-execution-label" matTooltip="Next execution">
+          <span class="label">
+            <step-icon name="clock"></step-icon>
+          </span>
+          <span>{{ nextExecutionDate | date: DateFormat.DATE }}</span>
+        </span>
+      }
     }
   </div>
   <div class="controls">

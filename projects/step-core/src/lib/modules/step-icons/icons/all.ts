@@ -280,6 +280,7 @@ import { Smile } from './svg/smile';
 import { Speaker } from './svg/speaker';
 import { Square } from './svg/square';
 import { Star } from './svg/star';
+import { StepRefresh } from './svg/step-refresh';
 import { StopCircle } from './svg/stop-circle';
 import { Stopwatch } from './svg/stopwatch';
 import { Sun } from './svg/sun';
@@ -628,6 +629,7 @@ export const allIcons = {
   Speaker,
   Square,
   Star,
+  StepRefresh,
   StopCircle,
   Stopwatch,
   Sun,
