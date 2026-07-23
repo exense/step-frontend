@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
+import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -11,6 +11,11 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import {
+  AggregationPipeline,
+  PipelineAggregation,
+  PipelineAggregationUtils,
+} from '../../modules/_common/types/pipeline-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   AggregateParams,
@@ -20,6 +25,13 @@ import {
 export interface ChartDashletSettingsData {
   item: DashboardItem;
   context: TimeSeriesContext;
+}
+
+export type AggregationMode = 'STANDARD' | 'CUSTOM';
+
+interface PipelineAggregationOption {
+  value: PipelineAggregation;
+  label: string;
 }
 
 @Component({
@@ -44,12 +56,32 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   readonly FilterBarItemType = FilterBarItemType;
 
+  readonly PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
+    { value: PipelineAggregation.AVG, label: 'Average' },
+    { value: PipelineAggregation.SUM, label: 'Sum' },
+    { value: PipelineAggregation.COUNT, label: 'Count' },
+    { value: PipelineAggregation.MIN, label: 'Min' },
+    { value: PipelineAggregation.MAX, label: 'Max' },
+  ];
+
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
   allAttributes: MetricAttribute[] = [];
 
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
+
+  primaryAggregationMode: AggregationMode = 'STANDARD';
+  primaryPipeline: AggregationPipeline = {
+    timeAggregation: PipelineAggregation.AVG,
+    groupAggregation: PipelineAggregation.SUM,
+  };
+  secondaryAggregationMode: AggregationMode = 'STANDARD';
+  secondaryPipeline: AggregationPipeline = {
+    timeAggregation: PipelineAggregation.AVG,
+    groupAggregation: PipelineAggregation.SUM,
+  };
+  private standardSecondaryAxes?: AxesSettings;
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -64,6 +96,54 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.allAttributes = this._inputData.context
       .getAllAttributes()
       .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
+    this.initAggregationModes();
+  }
+
+  private initAggregationModes(): void {
+    const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
+      this.item.chartSettings!.primaryAxes.aggregation,
+    );
+    if (primaryPipeline) {
+      this.primaryAggregationMode = 'CUSTOM';
+      this.primaryPipeline = primaryPipeline;
+    }
+    const secondaryAxes = this.item.chartSettings!.secondaryAxes;
+    const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(secondaryAxes?.aggregation);
+    if (secondaryPipeline) {
+      this.secondaryAggregationMode = 'CUSTOM';
+      this.secondaryPipeline = secondaryPipeline;
+      this.standardSecondaryAxes = this.copySecondaryAxesForStandardMode(secondaryAxes);
+    }
+  }
+
+  handleSecondaryModeChange(mode: AggregationMode): void {
+    if (mode === this.secondaryAggregationMode) {
+      return;
+    }
+    this.secondaryAggregationMode = mode;
+    const secondaryAxes = this.item.chartSettings!.secondaryAxes;
+    if (mode === 'CUSTOM') {
+      this.standardSecondaryAxes = this.copySecondaryAxesForStandardMode(secondaryAxes);
+      if (!secondaryAxes) {
+        this.item.chartSettings!.secondaryAxes = {
+          aggregation: PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline),
+          displayType: 'BAR_CHART',
+          colorizationType: 'STROKE',
+          unit: '',
+        };
+      }
+    } else {
+      this.item.chartSettings!.secondaryAxes = this.standardSecondaryAxes;
+    }
+  }
+
+  private copySecondaryAxesForStandardMode(secondaryAxes?: AxesSettings): AxesSettings | undefined {
+    if (!secondaryAxes) {
+      return undefined;
+    }
+    const copy: AxesSettings = JSON.parse(JSON.stringify(secondaryAxes));
+    copy.aggregation = PipelineAggregationUtils.createStandardAggregation(copy.aggregation);
+    return copy;
   }
 
   addFilterItem(attribute: MetricAttribute) {
@@ -101,9 +181,31 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.formContainer.form.markAllAsTouched();
       return;
     }
+    this.applyAggregationModes();
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
+  }
+
+  private applyAggregationModes(): void {
+    const chartSettings = this.item.chartSettings!;
+    if (this.primaryAggregationMode === 'CUSTOM') {
+      chartSettings.primaryAxes.aggregation = PipelineAggregationUtils.createCustomPipelineAggregation(
+        this.primaryPipeline,
+      );
+    } else {
+      chartSettings.primaryAxes.aggregation = PipelineAggregationUtils.createStandardAggregation(
+        chartSettings.primaryAxes.aggregation,
+      );
+    }
+    const secondaryAxes = chartSettings.secondaryAxes;
+    if (secondaryAxes) {
+      if (this.secondaryAggregationMode === 'CUSTOM') {
+        secondaryAxes.aggregation = PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline);
+      } else {
+        secondaryAxes.aggregation = PipelineAggregationUtils.createStandardAggregation(secondaryAxes.aggregation);
+      }
+    }
   }
 
   handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {

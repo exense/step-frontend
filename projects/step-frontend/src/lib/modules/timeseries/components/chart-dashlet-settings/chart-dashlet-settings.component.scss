@@ -44,6 +44,18 @@ div[step-modal-window-body] > form {
   }
 }
 
+.aggregation-mode-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
+
+  mat-button-toggle-group {
+    height: 3.2rem;
+    align-items: center;
+  }
+}
+
 .filters-container {
   display: flex;
   flex-direction: row;

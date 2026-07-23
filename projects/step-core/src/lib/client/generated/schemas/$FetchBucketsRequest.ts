@@ -26,6 +26,12 @@ export const $FetchBucketsRequest = {
         type: 'string',
       },
     },
+    timeAggregation: {
+      type: 'Enum',
+    },
+    groupAggregation: {
+      type: 'Enum',
+    },
     numberOfBuckets: {
       type: 'number',
       format: 'int32',

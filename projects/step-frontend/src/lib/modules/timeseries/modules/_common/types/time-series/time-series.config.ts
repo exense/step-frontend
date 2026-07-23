@@ -14,6 +14,8 @@ export class TimeSeriesConfig {
 
   static readonly PCL_VALUE_PARAM = 'pclValue';
   static readonly RATE_UNIT_PARAM = 'rateUnit';
+  static readonly TIME_AGGREGATION_PARAM = 'timeAggregation';
+  static readonly GROUP_AGGREGATION_PARAM = 'groupAggregation';
 
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';

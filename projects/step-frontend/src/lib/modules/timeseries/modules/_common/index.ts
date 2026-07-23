@@ -13,6 +13,7 @@ export * from './types/time-series/stacked-bar-paths';
 export * from './types/time-series/time-series-context-params';
 export * from './types/time-series/time-series-context';
 export * from './types/oql-builder';
+export * from './types/pipeline-aggregation';
 export * from './types/common-imports.constant';
 export * from './types/throughput-metric-type.enum';
 export * from './types/filter/filter-bar-item';

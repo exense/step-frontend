@@ -52,6 +52,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { PipelineAggregationUtils } from '../../modules/_common/types/pipeline-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
@@ -150,6 +151,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   protected syncGroupSubscription?: Subscription;
   protected cachedRequest?: FetchBucketsRequest;
   protected cachedResponse?: TimeSeriesAPIResponse;
+  protected cachedSecondaryResponse?: TimeSeriesAPIResponse;
   protected showHigherResolutionWarning = false;
   protected collectionResolutionUsed: number = 0;
 
@@ -258,8 +260,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
 
     if (this.cachedResponse && this.cachedRequest) {
-      this.createChartSettings(this.cachedResponse, this.cachedRequest).subscribe((settings) =>
-        this._internalSettings.set(settings),
+      this.createChartSettings(this.cachedResponse, this.cachedRequest, this.cachedSecondaryResponse).subscribe(
+        (settings) => this._internalSettings.set(settings),
       );
     } else {
       this.createChart();
@@ -326,6 +328,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private createChartSettings(
     response: TimeSeriesAPIResponse,
     request: FetchBucketsRequest,
+    secondaryResponse?: TimeSeriesAPIResponse,
   ): Observable<TSChartSettings> {
     let syncGroup: TimeSeriesSyncGroup | undefined;
     if (this.item().masterChartId) {
@@ -351,6 +354,23 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       secondaryAxesAggregation?.type === 'RATE' || secondaryAxesAggregation?.type === 'COUNT';
     const useSecondaryForwardFill = isGauge && !isSecondaryRateOrCount;
     const secondaryAxesData: (number | undefined | null)[] = [];
+    const accumulateSecondarySeries = (buckets: BucketResponse[], interval: number): void => {
+      let lastSecondaryValue: number | undefined;
+      buckets.forEach((b: BucketResponse, j: number) => {
+        let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, interval);
+        if (bucketValue == null && useSecondaryForwardFill) {
+          bucketValue = lastSecondaryValue;
+        }
+        if (bucketValue != null) {
+          lastSecondaryValue = bucketValue;
+        }
+        if (secondaryAxesData[j] == null) {
+          secondaryAxesData[j] = bucketValue;
+        } else if (bucketValue != null) {
+          secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
+        }
+      });
+    };
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
@@ -362,24 +382,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
-        let lastSecondaryValue: number | undefined;
-        response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          metadata.push(b?.attributes);
-          if (hasSecondaryAxes) {
-            let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
-            if (bucketValue == null && useSecondaryForwardFill) {
-              bucketValue = lastSecondaryValue;
-            }
-            if (bucketValue != null) {
-              lastSecondaryValue = bucketValue;
-            }
-            if (secondaryAxesData[j] == null) {
-              secondaryAxesData[j] = bucketValue;
-            } else if (bucketValue != null) {
-              secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
-            }
-          }
-        });
+        response.matrix[i].forEach((b: BucketResponse) => metadata.push(b?.attributes));
+        if (hasSecondaryAxes && !secondaryResponse) {
+          accumulateSecondarySeries(response.matrix[i], response.interval);
+        }
       }
       const seriesData: (number | undefined | null)[] = [];
       let lastPrimaryValue: number | undefined;
@@ -439,6 +445,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       }
       return s;
     });
+
+    if (hasSecondaryAxes && secondaryResponse) {
+      // the secondary axes use their own aggregation pipeline, so their values come from a dedicated response
+      secondaryResponse.matrix.forEach((seriesBuckets: BucketResponse[]) =>
+        accumulateSecondarySeries(seriesBuckets, secondaryResponse.interval),
+      );
+    }
 
     const edgeExtensionHook: Hooks.Arrays | undefined =
       spanGaps && primaryAxes.displayType === 'LINE'
@@ -676,6 +689,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   private getSecondAxesLabel(): string | undefined {
     const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
+    const pipeline = PipelineAggregationUtils.getCustomPipeline(aggregation);
+    if (pipeline) {
+      return `Total (${PipelineAggregationUtils.getPipelineLabel(pipeline)})`;
+    }
     switch (aggregation?.type) {
       case ChartAggregation.RATE:
         return 'Total Hits/' + aggregation.params?.['rateUnit'];
@@ -693,6 +710,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private getChartTitle(): string {
     let title = this.item().name;
     let aggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
+    const pipeline = PipelineAggregationUtils.getCustomPipeline(aggregation);
+    if (pipeline) {
+      return `${title} (${PipelineAggregationUtils.getPipelineLabel(pipeline)})`;
+    }
     let aggregationLabel;
     switch (aggregation.type) {
       case ChartAggregation.PERCENTILE:
@@ -722,13 +743,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     if (start >= end) {
       throw new Error(`Invalid time range`);
     }
+    const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
+      this.item().chartSettings!.primaryAxes.aggregation,
+    );
+    const separateSecondaryRequest = this.needsSeparateSecondaryRequest();
     const request: FetchBucketsRequest = {
       start: start,
       end: end,
       metricType: this.item().metricKey,
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
-      percentiles: this.getRequiredPercentiles(),
+      percentiles: this.getRequiredPercentiles(!separateSecondaryRequest),
+      timeAggregation: primaryPipeline?.timeAggregation,
+      groupAggregation: primaryPipeline?.groupAggregation,
     };
     const customResolution = this.context().getChartsResolution();
     if (customResolution) {
@@ -741,16 +768,51 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
       request.collectAttributesValuesLimit = 10;
     }
-    return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
-      tap((response) => {
+    let secondaryRequest$: Observable<TimeSeriesAPIResponse | undefined> = of(undefined);
+    if (separateSecondaryRequest) {
+      const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(
+        this.item().chartSettings!.secondaryAxes!.aggregation,
+      );
+      const secondaryRequest: FetchBucketsRequest = {
+        ...request,
+        timeAggregation: secondaryPipeline?.timeAggregation,
+        groupAggregation: secondaryPipeline?.groupAggregation,
+        percentiles: this.getSecondaryPercentiles(),
+        collectAttributeKeys: undefined,
+        collectAttributesValuesLimit: undefined,
+      };
+      secondaryRequest$ = this._timeSeriesService.fetchBucketsWithFallback(secondaryRequest);
+    }
+    return forkJoin([this._timeSeriesService.fetchBucketsWithFallback(request), secondaryRequest$]).pipe(
+      tap(([response, secondaryResponse]) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
+        this.cachedSecondaryResponse = secondaryResponse;
         this.cachedRequest = request;
         this.emptyStateChange.emit(response.matrix.length === 0);
       }),
-      switchMap((response) => this.createChartSettings(response, request)),
+      switchMap(([response, secondaryResponse]) => this.createChartSettings(response, request, secondaryResponse)),
       takeUntilDestroyed(this._destroyRef),
+    );
+  }
+
+  /**
+   * The primary and secondary axes share one buckets request as long as they use the same aggregation pipeline.
+   * When their pipelines differ, the secondary axes values must be aggregated by a dedicated request.
+   */
+  private needsSeparateSecondaryRequest(): boolean {
+    const secondaryAxes = this.item().chartSettings!.secondaryAxes;
+    if (!secondaryAxes) {
+      return false;
+    }
+    const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
+      this.item().chartSettings!.primaryAxes.aggregation,
+    );
+    const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(secondaryAxes.aggregation);
+    return (
+      primaryPipeline?.timeAggregation !== secondaryPipeline?.timeAggregation ||
+      primaryPipeline?.groupAggregation !== secondaryPipeline?.groupAggregation
     );
   }
 
@@ -855,22 +917,35 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
   }
 
-  private getRequiredPercentiles(): number[] {
-    const aggregate: ChartAggregation = this.selectedAggregate;
-    const secondaryAggregate = this.item().chartSettings!.secondaryAxes?.aggregation.type;
+  private getRequiredPercentiles(includeSecondary: boolean): number[] {
+    const primaryAggregation = this.item().chartSettings!.primaryAxes.aggregation;
     const percentilesToRequest: number[] = [];
-    if (aggregate === ChartAggregation.MEDIAN || secondaryAggregate === ChartAggregation.MEDIAN) {
-      percentilesToRequest.push(50);
+    if (!PipelineAggregationUtils.getCustomPipeline(primaryAggregation)) {
+      if (primaryAggregation.type === ChartAggregation.MEDIAN) {
+        percentilesToRequest.push(50);
+      }
+      if (primaryAggregation.type === ChartAggregation.PERCENTILE) {
+        percentilesToRequest.push(this.getPrimaryPclValue() || 90);
+      }
     }
-    if (aggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(this.getPrimaryPclValue() || 90);
-    }
-    if (secondaryAggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(
-        this.item().chartSettings!.secondaryAxes?.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90,
-      );
+    if (includeSecondary) {
+      percentilesToRequest.push(...this.getSecondaryPercentiles());
     }
     return percentilesToRequest;
+  }
+
+  private getSecondaryPercentiles(): number[] {
+    const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
+    if (!secondaryAggregation || PipelineAggregationUtils.getCustomPipeline(secondaryAggregation)) {
+      return [];
+    }
+    if (secondaryAggregation.type === ChartAggregation.MEDIAN) {
+      return [50];
+    }
+    if (secondaryAggregation.type === ChartAggregation.PERCENTILE) {
+      return [secondaryAggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90];
+    }
+    return [];
   }
 
   private getBucketValue(
@@ -880,6 +955,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   ): number | undefined | null {
     if (!b) {
       return undefined;
+    }
+    if (PipelineAggregationUtils.getCustomPipeline(aggregation)) {
+      // scalar pipeline buckets report their value as their one single sample
+      return b.sum;
     }
     switch (aggregation.type) {
       case 'SUM':
