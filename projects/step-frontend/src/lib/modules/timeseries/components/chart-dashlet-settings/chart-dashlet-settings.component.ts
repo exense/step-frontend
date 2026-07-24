@@ -1,5 +1,11 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
+import {
+  AxesSettings,
+  DashboardItem,
+  ErrorMessageHandlerService,
+  MetricAggregation,
+  MetricAttribute,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -64,6 +70,17 @@ export class ChartDashletSettingsComponent implements OnInit {
     { value: PipelineAggregation.MAX, label: 'Max' },
   ];
 
+  readonly AGGREGATION_LABELS: Record<string, string> = {
+    SUM: 'Sum',
+    AVG: 'Average',
+    MAX: 'Max',
+    MIN: 'Min',
+    COUNT: 'Count',
+    RATE: 'Rate',
+    MEDIAN: 'Median',
+    PERCENTILE: 'Percentile',
+  };
+
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
   allAttributes: MetricAttribute[] = [];
@@ -81,7 +98,8 @@ export class ChartDashletSettingsComponent implements OnInit {
     timeAggregation: PipelineAggregation.AVG,
     groupAggregation: PipelineAggregation.SUM,
   };
-  private standardSecondaryAxes?: AxesSettings;
+  showSecondaryAxes = false;
+  private stashedSecondaryAxes?: AxesSettings;
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -108,42 +126,36 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.primaryPipeline = primaryPipeline;
     }
     const secondaryAxes = this.item.chartSettings!.secondaryAxes;
+    this.showSecondaryAxes = !!secondaryAxes;
     const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(secondaryAxes?.aggregation);
     if (secondaryPipeline) {
       this.secondaryAggregationMode = 'CUSTOM';
       this.secondaryPipeline = secondaryPipeline;
-      this.standardSecondaryAxes = this.copySecondaryAxesForStandardMode(secondaryAxes);
     }
   }
 
-  handleSecondaryModeChange(mode: AggregationMode): void {
-    if (mode === this.secondaryAggregationMode) {
-      return;
-    }
-    this.secondaryAggregationMode = mode;
-    const secondaryAxes = this.item.chartSettings!.secondaryAxes;
-    if (mode === 'CUSTOM') {
-      this.standardSecondaryAxes = this.copySecondaryAxesForStandardMode(secondaryAxes);
-      if (!secondaryAxes) {
-        this.item.chartSettings!.secondaryAxes = {
-          aggregation: PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline),
-          displayType: 'BAR_CHART',
-          colorizationType: 'STROKE',
-          unit: '',
-        };
-      }
+  handleShowSecondaryAxesChange(show: boolean): void {
+    this.showSecondaryAxes = show;
+    const chartSettings = this.item.chartSettings!;
+    if (show) {
+      chartSettings.secondaryAxes = this.stashedSecondaryAxes ?? this.createDefaultSecondaryAxes();
     } else {
-      this.item.chartSettings!.secondaryAxes = this.standardSecondaryAxes;
+      this.stashedSecondaryAxes = chartSettings.secondaryAxes;
+      chartSettings.secondaryAxes = undefined;
     }
   }
 
-  private copySecondaryAxesForStandardMode(secondaryAxes?: AxesSettings): AxesSettings | undefined {
-    if (!secondaryAxes) {
-      return undefined;
-    }
-    const copy: AxesSettings = JSON.parse(JSON.stringify(secondaryAxes));
-    copy.aggregation = PipelineAggregationUtils.createStandardAggregation(copy.aggregation);
-    return copy;
+  private createDefaultSecondaryAxes(): AxesSettings {
+    const aggregation: MetricAggregation =
+      this.secondaryAggregationMode === 'CUSTOM'
+        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline)
+        : { type: 'SUM' };
+    return {
+      aggregation,
+      displayType: 'BAR_CHART',
+      colorizationType: 'FILL',
+      unit: '',
+    };
   }
 
   addFilterItem(attribute: MetricAttribute) {
@@ -217,21 +229,10 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
-    const newAggregate = change.aggregate;
-    if (newAggregate) {
-      if (!this.item.chartSettings!.secondaryAxes) {
-        this.item.chartSettings!.secondaryAxes = {
-          aggregation: { type: newAggregate, params: change.params },
-          displayType: 'BAR_CHART',
-          colorizationType: 'STROKE',
-          unit: '',
-        };
-      } else {
-        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
-      }
-    } else {
-      this.item.chartSettings!.secondaryAxes = undefined;
+    if (!change.aggregate) {
+      return;
     }
+    this.item.chartSettings!.secondaryAxes!.aggregation = { type: change.aggregate, params: change.params };
     this.secondaryAggregateMenuTrigger?.closeMenu();
   }
 }

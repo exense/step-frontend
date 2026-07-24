@@ -44,16 +44,92 @@ div[step-modal-window-body] > form {
   }
 }
 
-.aggregation-mode-row {
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.section-description {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.section-header step-label,
+.axis-heading step-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var.$gray-800;
+}
+
+.add-filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  step-icon {
+    transform: scale(0.85);
+  }
+}
+
+.axis-heading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.axis-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  border: 1px solid var.$gray-200;
+  border-radius: 8px;
+  padding: 1.6rem;
+}
+
+.axis-subheader {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1.2rem;
+}
 
-  mat-button-toggle-group {
-    height: 3.2rem;
-    align-items: center;
-  }
+.axis-subheader-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-right: auto;
+}
+
+.axis-subheader-title {
+  font-weight: 600;
+}
+
+.axis-subheader-description {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.axis-subheader mat-button-toggle-group {
+  height: 3.2rem;
+  align-items: center;
+}
+
+.field-with-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-hint {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.form-row.half-width > * {
+  flex-grow: 0;
+  flex-basis: calc(50% - 0.6rem);
 }
 
 .filters-container {
