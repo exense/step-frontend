@@ -13,6 +13,7 @@ import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-ed
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
 import { WidthExpandersDirective } from './directives/width-expanders.directive';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
+import { DisplayAlertComponent } from './components/display-alert/display-alert.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
 import { LabelDirective } from './directives/label.directive';
 import { PrefixDirective } from './directives/prefix.directive';
@@ -118,6 +119,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    DisplayAlertComponent,
     FormFieldComponent,
     LabelDirective,
     DescriptionDirective,
@@ -190,6 +192,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    DisplayAlertComponent,
     FormFieldComponent,
     LabelDirective,
     DescriptionDirective,
@@ -274,6 +277,7 @@ export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 export * from './components/modal-window/modal-window.component';
+export * from './components/display-alert/display-alert.component';
 export * from './components/form-field/form-field.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
@@ -406,6 +410,7 @@ export * from './types/file-types';
 export * from './injectables/file-type-utils.service';
 export * from './components/long-inline-text/long-inline-text.component';
 export * from './injectables/dialog-route-open-state.service';
+export * from './injectables/project-scope-warning.service';
 export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';

@@ -4,6 +4,7 @@ import { DialogRouteComponent } from '../components/dialog-route/dialog-route.co
 import { Observable } from 'rxjs';
 import { MatDialogConfig } from '@angular/material/dialog';
 import { DialogRouteOpenStateService } from '../injectables/dialog-route-open-state.service';
+import { ProjectScopeWarningService } from '../injectables/project-scope-warning.service';
 
 type DialogRouteWithComponent = Omit<Route, 'component'> & {
   dialogComponent: Type<unknown>;
@@ -40,6 +41,7 @@ export const dialogRoute = (config: DialogRoute, dialogConfig?: MatDialogConfig)
   config.canDeactivate = [dialogRouteDeactivate, ...(config.canDeactivate ?? [])];
   return {
     ...config,
+    providers: [ProjectScopeWarningService, ...(config.providers ?? [])],
     component: DialogRouteComponent,
   };
 };
