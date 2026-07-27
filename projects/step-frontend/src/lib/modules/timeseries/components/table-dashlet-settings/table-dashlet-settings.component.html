@@ -1,7 +1,11 @@
-<step-modal-window title="Chart settings" [stepZIndex]="1000">
+<step-modal-window title="Table settings" [stepZIndex]="1000">
   <div step-modal-window-body>
     <form #formContainer="ngForm">
       @if (item) {
+        <div class="section-header">
+          <step-label>General</step-label>
+          <div class="section-description">Basic information about this table.</div>
+        </div>
         <div class="form-row">
           <step-form-field [showRequiredMarker]="true">
             <step-label>Name</step-label>
@@ -20,7 +24,10 @@
           </step-form-field>
         </div>
         <mat-divider />
-        <step-label>Filters</step-label>
+        <div class="section-header">
+          <step-label>Filters</step-label>
+          <div class="section-description">Define which data to include in this table.</div>
+        </div>
         @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
@@ -32,7 +39,10 @@
                 (filterChange)="handleFilterChange(i, $event)"
               />
             }
-            <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
+            <button class="add-filter-button" mat-stroked-button color="primary" [matMenuTriggerFor]="typesMenu">
+              <step-icon name="plus"></step-icon>
+              Add filter
+            </button>
           </div>
           <div class="form-row">
             <step-form-field>
@@ -89,8 +99,9 @@
           </mat-menu>
         }
         <mat-divider />
-        <div>
+        <div class="section-header">
           <step-label>Grouping</step-label>
+          <div class="section-description">Define how data is grouped before aggregation.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="form-row">
@@ -109,7 +120,7 @@
             <div>
               <step-form-field>
                 <mat-checkbox color="primary" [(ngModel)]="item.readonlyGrouping" name="readonlyGrouping">
-                  <span>Readonly grouping</span>
+                  <span>Read-only grouping</span>
                   <step-icon
                     class="help-icon"
                     matTooltip="The users will not be able to change the grouping of this dashlet"
@@ -121,8 +132,15 @@
           </div>
           @if (!item.inheritGlobalGrouping) {
             <step-form-field>
-              <step-label>Grouping Attributes</step-label>
-              <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+              <step-label
+                >Group series by
+                <step-icon
+                  class="help-icon"
+                  matTooltip="The metric is split into one series per distinct combination of the selected attributes"
+                  name="help-circle"
+                ></step-icon>
+              </step-label>
+              <mat-select placeholder="Select attributes" [(ngModel)]="item.grouping" multiple name="grouping">
                 @for (attr of item.attributes; track attr) {
                   <mat-option [value]="attr.name">{{ attr.displayName }} </mat-option>
                 }
@@ -134,45 +152,108 @@
         }
 
         <mat-divider />
-        <step-label>Columns</step-label>
-        <div class="columns-container">
-          @for (column of item.tableSettings!.columns; track column) {
-            @if (column.aggregation.params?.['pclValue']) {
-              <div class="pcl-column-container">
-                <mat-checkbox color="primary" [(ngModel)]="column.selected" [ngModelOptions]="{ standalone: true }">
-                </mat-checkbox>
-                <span>PCL</span>
-                <step-editable-label
-                  [ngModel]="column.aggregation.params?.['pclValue']"
-                  class="pcl-editable-label"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onColumnPclValueChange(column, $event)"
-                >
-                </step-editable-label>
-              </div>
-            } @else {
-              <mat-checkbox
-                color="primary"
-                [(ngModel)]="column.selected"
-                [ngModelOptions]="{ standalone: true }"
-                class="item"
-              >
-                <span>{{ column.column }}</span>
-              </mat-checkbox>
-            }
-          }
+        <div class="aggregation-header">
+          <div class="section-header">
+            <step-label>Aggregation</step-label>
+            <div class="section-description">Define how data is aggregated.</div>
+          </div>
+          <mat-button-toggle-group [(ngModel)]="aggregationMode" name="aggregationMode">
+            <mat-button-toggle value="STANDARD">Standard</mat-button-toggle>
+            <mat-button-toggle value="CUSTOM">Custom</mat-button-toggle>
+          </mat-button-toggle-group>
+          <step-icon
+            class="help-icon"
+            [matTooltip]="
+              'Standard: Combines all data points together over time and across series using a single aggregation function.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications).'
+            "
+            name="help-circle"
+          ></step-icon>
         </div>
+        @if (aggregationMode === 'STANDARD') {
+          <step-label>Columns</step-label>
+          <div class="columns-container">
+            @for (column of item.tableSettings!.columns; track column) {
+              @if (column.aggregation.params?.['pclValue']) {
+                <div class="pcl-column-container">
+                  <mat-checkbox color="primary" [(ngModel)]="column.selected" [ngModelOptions]="{ standalone: true }">
+                  </mat-checkbox>
+                  <span>PCL</span>
+                  <step-editable-label
+                    [ngModel]="column.aggregation.params?.['pclValue']"
+                    class="pcl-editable-label"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="onColumnPclValueChange(column, $event)"
+                  >
+                  </step-editable-label>
+                </div>
+              } @else {
+                <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="column.selected"
+                  [ngModelOptions]="{ standalone: true }"
+                  class="item"
+                >
+                  <span>{{ column.column }}</span>
+                </mat-checkbox>
+              }
+            }
+          </div>
+        } @else {
+          <div class="form-row">
+            <div class="field-with-hint">
+              <step-form-field>
+                <step-label
+                  >Time aggregation
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="Scalar function reducing the successive values of each series within the selected time range to a single value"
+                    name="help-circle"
+                  ></step-icon>
+                </step-label>
+                <mat-select [(ngModel)]="pipeline.timeAggregation" name="timeAggregation">
+                  @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                  }
+                </mat-select>
+              </step-form-field>
+              <div class="field-hint">How values are combined within each time interval.</div>
+            </div>
+            <div class="field-with-hint">
+              <step-form-field>
+                <step-label
+                  >Series aggregation
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="Scalar function combining the resampled values of the series of each group into a single value"
+                    name="help-circle"
+                  ></step-icon>
+                </step-label>
+                <mat-select [(ngModel)]="pipeline.groupAggregation" name="groupAggregation">
+                  @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                  }
+                </mat-select>
+              </step-form-field>
+              <div class="field-hint">How series are combined across the same group.</div>
+            </div>
+          </div>
+          <div class="info-txt">
+            The table displays one single value per row, resulting from the configured aggregations.
+          </div>
+        }
         <mat-divider />
-        <step-label>Visual settings</step-label>
-        <div class="form-row">
+        <div class="section-header">
+          <step-label>General visual settings</step-label>
+          <div class="section-description">Settings that apply to the whole table.</div>
+        </div>
+        <div class="form-row half-width">
           <step-form-field>
-            <step-label>Chart width</step-label>
+            <step-label>Table width</step-label>
             <mat-select [(ngModel)]="item.size" name="size">
               <mat-option [value]="1">50%</mat-option>
               <mat-option [value]="2">100%</mat-option>
             </mat-select>
           </step-form-field>
-          <div></div>
         </div>
         <step-form-field>
           <mat-checkbox color="primary" [(ngModel)]="item.omitWhenEmpty" name="omitWhenEmpty">

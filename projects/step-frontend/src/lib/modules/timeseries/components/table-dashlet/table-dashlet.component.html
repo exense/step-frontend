@@ -48,7 +48,17 @@
         <step-icon name="settings" />
       </button>
       <mat-menu #settingsMenu="matMenu">
-        <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+        @if (hasCustomAggregation) {
+          <!-- the tooltip is bound to a wrapper, as a disabled button doesn't emit the pointer events it needs -->
+          <span
+            class="disabled-columns-menu-item"
+            matTooltip="The table displays one single value per row, resulting from the custom aggregation configured in the table settings"
+          >
+            <button mat-menu-item disabled>Columns</button>
+          </span>
+        } @else {
+          <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+        }
       </mat-menu>
     }
     <mat-menu #columnsMenu="matMenu">

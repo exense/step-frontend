@@ -281,7 +281,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   protected openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
+      // the explicit width keeps the dialog from resizing when its content changes, e.g. on aggregation mode switch
+      .open(ChartDashletSettingsComponent, {
+        data: { item: this.item(), context: this.context() },
+        width: '96rem',
+      })
       .afterClosed()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((updatedItem) => {

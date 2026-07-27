@@ -36,6 +36,65 @@ div[step-modal-window-body] > form {
   }
 }
 
+.form-row.half-width > * {
+  flex-grow: 0;
+  flex-basis: calc(50% - 0.6rem);
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.section-description {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.section-header step-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var.$gray-800;
+}
+
+.aggregation-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
+
+  .section-header {
+    margin-right: auto;
+  }
+
+  mat-button-toggle-group {
+    height: 3.2rem;
+    align-items: center;
+  }
+}
+
+.field-with-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-hint {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.add-filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  step-icon {
+    transform: scale(0.85);
+  }
+}
+
 .filters-container {
   display: flex;
   flex-direction: row;

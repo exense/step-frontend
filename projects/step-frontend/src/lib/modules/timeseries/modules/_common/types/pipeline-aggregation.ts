@@ -18,6 +18,20 @@ export interface AggregationPipeline {
   groupAggregation: PipelineAggregation;
 }
 
+export interface PipelineAggregationOption {
+  value: PipelineAggregation;
+  label: string;
+}
+
+/** Options offered by the time and series aggregation pickers of the custom mode */
+export const PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
+  { value: PipelineAggregation.AVG, label: 'Average' },
+  { value: PipelineAggregation.SUM, label: 'Sum' },
+  { value: PipelineAggregation.COUNT, label: 'Count' },
+  { value: PipelineAggregation.MIN, label: 'Min' },
+  { value: PipelineAggregation.MAX, label: 'Max' },
+];
+
 export class PipelineAggregationUtils {
   /**
    * An axes uses a custom aggregation pipeline when both scalar aggregations are stored in the aggregation params.

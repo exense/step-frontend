@@ -18,11 +18,19 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  AggregationPipeline,
+  PIPELINE_AGGREGATION_OPTIONS,
+  PipelineAggregation,
+  PipelineAggregationUtils,
+} from '../../modules/_common/types/pipeline-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
   context: TimeSeriesContext;
 }
+
+export type AggregationMode = 'STANDARD' | 'CUSTOM';
 
 @Component({
   selector: 'step-table-dashlet-settings',
@@ -44,9 +52,17 @@ export class TableDashletSettingsComponent implements OnInit {
 
   readonly FilterBarItemType = FilterBarItemType;
 
+  readonly PIPELINE_AGGREGATION_OPTIONS = PIPELINE_AGGREGATION_OPTIONS;
+
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
+
+  aggregationMode: AggregationMode = 'STANDARD';
+  pipeline: AggregationPipeline = {
+    timeAggregation: PipelineAggregation.AVG,
+    groupAggregation: PipelineAggregation.SUM,
+  };
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -58,6 +74,15 @@ export class TableDashletSettingsComponent implements OnInit {
     this.allAttributes = this._inputData.context
       .getAllAttributes()
       .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
+    this.initAggregationMode();
+  }
+
+  private initAggregationMode(): void {
+    const pipeline = PipelineAggregationUtils.getCustomPipeline(this.item.tableSettings!.aggregation);
+    if (pipeline) {
+      this.aggregationMode = 'CUSTOM';
+      this.pipeline = pipeline;
+    }
   }
 
   private fetchMetricTypes() {
@@ -98,9 +123,18 @@ export class TableDashletSettingsComponent implements OnInit {
       this.formContainer.form.markAllAsTouched();
       return;
     }
+    this.applyAggregationMode();
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close(this.item);
+  }
+
+  private applyAggregationMode(): void {
+    // the column selection is left untouched in custom mode, so that it is restored when switching back to standard
+    this.item.tableSettings!.aggregation =
+      this.aggregationMode === 'CUSTOM'
+        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.pipeline)
+        : undefined;
   }
 
   handleFilterChange(index: number, item: FilterBarItem) {

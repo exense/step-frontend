@@ -19,6 +19,7 @@ import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import {
   AggregationPipeline,
+  PIPELINE_AGGREGATION_OPTIONS,
   PipelineAggregation,
   PipelineAggregationUtils,
 } from '../../modules/_common/types/pipeline-aggregation';
@@ -34,11 +35,6 @@ export interface ChartDashletSettingsData {
 }
 
 export type AggregationMode = 'STANDARD' | 'CUSTOM';
-
-interface PipelineAggregationOption {
-  value: PipelineAggregation;
-  label: string;
-}
 
 @Component({
   selector: 'step-chart-dashlet-settings',
@@ -62,13 +58,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   readonly FilterBarItemType = FilterBarItemType;
 
-  readonly PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
-    { value: PipelineAggregation.AVG, label: 'Average' },
-    { value: PipelineAggregation.SUM, label: 'Sum' },
-    { value: PipelineAggregation.COUNT, label: 'Count' },
-    { value: PipelineAggregation.MIN, label: 'Min' },
-    { value: PipelineAggregation.MAX, label: 'Max' },
-  ];
+  readonly PIPELINE_AGGREGATION_OPTIONS = PIPELINE_AGGREGATION_OPTIONS;
 
   readonly AGGREGATION_LABELS: Record<string, string> = {
     SUM: 'Sum',
