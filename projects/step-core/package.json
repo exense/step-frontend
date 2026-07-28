@@ -40,6 +40,8 @@
     "ace-builds": "1.43.2",
     "angular-split": "19.0.0",
     "ngx-build-plus": "19.0.0",
+    "ngx-markdown": "19.1.1",
+    "marked": "15.0.12",
     "luxon": "3.4.4",
     "@angular-devkit/build-angular": "19.2.14"
   },

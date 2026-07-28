@@ -14,11 +14,10 @@
 
 .spinner-container {
   position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 1rem;
+  right: 1.25rem;
   z-index: 2;
+  cursor: help;
 }
 
 .track-focus {

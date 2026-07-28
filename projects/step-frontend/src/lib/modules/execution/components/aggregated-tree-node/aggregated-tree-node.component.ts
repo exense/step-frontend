@@ -1,4 +1,13 @@
-import { Component, computed, forwardRef, inject, input, output, TemplateRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  inject,
+  input,
+  output,
+  TemplateRef,
+} from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
@@ -19,6 +28,7 @@ import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-deta
       useExisting: forwardRef(() => AggregatedTreeNodeComponent),
     },
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AggregatedTreeNodeComponent implements ElementSizeService {

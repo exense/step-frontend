@@ -53,7 +53,11 @@ export class RepositoryPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    return this._executionService.searchByCanonicalPlanName(this.getCanonicalPlanNameOrThrow());
+    return this._executionService.searchByCanonicalPlanName(this.getCanonicalPlanNameOrThrow(), {
+      limit: this.LAST_EXECUTIONS_TO_DISPLAY,
+      from: timeRange.from,
+      to: timeRange.to,
+    });
   }
 
   private getExecutionOrThrow(): Execution {

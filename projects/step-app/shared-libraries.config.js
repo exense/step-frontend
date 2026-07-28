@@ -54,7 +54,9 @@ module.exports = {
   '@angular/cdk/portal': libraryConfig(),
   '@angular/cdk/scrolling': libraryConfig(),
   'ngx-mat-select-search': libraryConfig(),
+  'ngx-markdown': libraryConfig({ requiredVersion: '19.1.1' }),
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
   luxon: libraryConfig({ requiredVersion: '3.4.4' }),
+  marked: libraryConfig({ requiredVersion: '15.0.12' }),
 };

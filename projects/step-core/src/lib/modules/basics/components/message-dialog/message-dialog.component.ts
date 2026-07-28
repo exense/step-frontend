@@ -8,6 +8,8 @@ export interface MessageDialogData {
   alertType?: AlertType;
   hideOkButton?: boolean;
   hideCancelButton?: boolean;
+  confirmButtonLabel?: string;
+  cancelButtonLabel?: string;
   title?: string;
 }
 

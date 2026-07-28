@@ -20,6 +20,7 @@ import { REQUEST_FILTERS_INTERCEPTORS } from './request-filter-interceptors.toke
 import { BooleanArrayFilterCondition } from '../shared/boolean-array-filter-condition';
 import { InFilterCondition } from '../shared/in-filter-condition';
 import { MatchAnyFilterCondition } from '../shared/match-any-filter-condition';
+import { IncludesFilterCondition } from '../shared/includes-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -54,6 +55,10 @@ export class FilterConditionFactoryService {
 
   inFilterCondition(items?: string[]): FilterCondition {
     return this.configureCondition(new InFilterCondition(items));
+  }
+
+  includesFilterCondition(item?: string): FilterCondition {
+    return this.configureCondition(new IncludesFilterCondition(item));
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -112,6 +117,8 @@ export class FilterConditionFactoryService {
         return this.booleanArrayFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.IN:
         return this.inFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.INCLUDES:
+        return this.includesFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }

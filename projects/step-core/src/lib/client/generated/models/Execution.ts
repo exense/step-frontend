@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { Error } from './Error';
+import type { ExecutionNotice } from './ExecutionNotice';
 import type { ExecutionParameters } from './ExecutionParameters';
 import type { ExecutionResultSnapshot } from './ExecutionResultSnapshot';
 import type { ExecutiontTaskParameters } from './ExecutiontTaskParameters';
@@ -39,6 +40,7 @@ export type Execution = {
     | 'NORUN'
     | 'RUNNING';
   lifecycleErrors?: Array<Error>;
+  notices?: Array<ExecutionNotice>;
   planId?: string;
   importResult?: ImportResult;
   reportExports?: Array<ReportExport>;

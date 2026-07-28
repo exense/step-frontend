@@ -35,6 +35,11 @@ export class PlanPageStateService extends CrossExecutionDashboardState {
   }
 
   fetchLastExecutions(timeRange: TimeRange): Observable<Execution[]> {
-    return this._executionService.getLastExecutionsByPlan(this._planIdFn(), 30, timeRange.from, timeRange.to);
+    return this._executionService.getLastExecutionsByPlan(
+      this._planIdFn(),
+      this.LAST_EXECUTIONS_TO_DISPLAY,
+      timeRange.from,
+      timeRange.to,
+    );
   }
 }

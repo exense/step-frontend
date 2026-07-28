@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, Output, inject, input, viewChild } from '@angular/core';
+import { Component, computed, EventEmitter, Output, inject, input, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   FilterBarItem,
@@ -9,7 +9,7 @@ import {
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
-import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
   BucketResponse,
   FetchBucketsRequest,
@@ -17,18 +17,20 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { catchError, defer, finalize, Observable, of, switchMap, tap } from 'rxjs';
 import { Axis } from 'uplot';
 import { StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 declare const uPlot: any;
 
+type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
+
 @Component({
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
   styleUrls: ['./standalone-chart.component.scss'],
-  imports: [TimeSeriesChartComponent],
+  imports: [ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class StandaloneChartComponent {
   private readonly barsFunction = uPlot.paths.bars;
@@ -50,6 +52,8 @@ export class StandaloneChartComponent {
   private readonly _uPlotUtils = inject(UPlotUtilsService);
 
   protected chartSettings?: TSChartSettings;
+  protected readonly loading = signal(true);
+  private previousLoadingKey?: string;
 
   private readonly _fetchParams = computed(() => ({
     timeRange: this.timeRange(),
@@ -60,14 +64,44 @@ export class StandaloneChartComponent {
     grouping: this.grouping(),
     config: this.config(),
     colorsPool: this.colorsPool(),
+    loadingKey: JSON.stringify({
+      metricKey: this.metricKey(),
+      filters: this.filters(),
+      aggregation: this.aggregation(),
+      pclValue: this.pclValue(),
+      grouping: this.grouping(),
+      config: this.config(),
+    }),
   }));
 
   private readonly _fetchSub = toObservable(this._fetchParams)
     .pipe(
-      switchMap(({ timeRange }) => this.fetchDataAndCreateChart(timeRange)),
+      switchMap(({ timeRange, loadingKey }) => this.loadDataAndCreateChart(timeRange, loadingKey)),
       takeUntilDestroyed(),
     )
     .subscribe();
+
+  private loadDataAndCreateChart(range: TimeRange, loadingKey?: string): Observable<TimeSeriesAPIResponse | undefined> {
+    const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
+
+    return defer(() => {
+      const shouldDisplayLoading =
+        !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
+      if (loadingKey !== undefined) {
+        this.previousLoadingKey = loadingKey;
+      }
+      if (shouldDisplayLoading) {
+        this.loading.set(true);
+      }
+      return defer(() => this.fetchDataAndCreateChart(range)).pipe(
+        finalize(() => {
+          if (shouldDisplayLoading) {
+            this.loading.set(false);
+          }
+        }),
+      );
+    }).pipe(catchError(() => of(undefined)));
+  }
 
   private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
     if (range.from >= range.to) {
@@ -262,12 +296,12 @@ export class StandaloneChartComponent {
 
   protected handleZoomReset(): void {
     this.zoomReset.emit();
-    this.fetchDataAndCreateChart(this.timeRange()).subscribe();
+    this.loadDataAndCreateChart(this.timeRange()).subscribe();
   }
 
   protected handleZoomChange(range: TimeRange): void {
     this.zoomChange.emit(range);
-    this.fetchDataAndCreateChart(range).subscribe();
+    this.loadDataAndCreateChart(range).subscribe();
   }
 
   private composeRequestFilter(): string {

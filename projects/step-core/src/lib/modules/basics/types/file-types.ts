@@ -17,7 +17,8 @@ export const FILE_TYPES = {
   // Text types
   TXT: createTypeInfo(TypeInfoCategory.TEXT, 'txt', 'text/plain'),
   LOG: createTypeInfo(TypeInfoCategory.TEXT, 'log', 'text/plain'),
-  MD: createTypeInfo(TypeInfoCategory.TEXT, 'md', 'text/plain'),
+  MD: createTypeInfo(TypeInfoCategory.TEXT, 'md', 'text/markdown'),
+  MARKDOWN: createTypeInfo(TypeInfoCategory.TEXT, 'markdown', 'text/markdown'),
   CSV: createTypeInfo(TypeInfoCategory.TEXT, 'csv', 'text/csv'),
   JSON: createTypeInfo(TypeInfoCategory.TEXT, 'json', 'application/json'),
   HTML: createTypeInfo(TypeInfoCategory.TEXT, 'html', 'text/html'),

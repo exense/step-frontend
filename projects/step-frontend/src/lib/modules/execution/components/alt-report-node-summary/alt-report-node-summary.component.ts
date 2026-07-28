@@ -35,6 +35,7 @@ export class AltReportNodeSummaryComponent {
   readonly title = input('');
   readonly disableChartItemClick = input(false);
   readonly heightInCells = input<number | undefined>();
+  readonly loading = input(false);
 
   readonly summary = input.required<ReportNodeSummary>();
 

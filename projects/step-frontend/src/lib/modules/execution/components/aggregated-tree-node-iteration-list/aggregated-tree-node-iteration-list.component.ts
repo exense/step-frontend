@@ -103,7 +103,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly initialStatus = input<Status | undefined>(undefined);
-  readonly resolvedPartialPath = input<string | undefined>(undefined);
+  readonly partialTreeRootNodeId = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
   private readonly artefactHash = computed(() => this.aggregatedNode().artefactHash);
@@ -115,8 +115,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
-    const resolvedPartialPath = this.resolvedPartialPath();
-    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath);
+    const partialTreeRootNodeId = this.partialTreeRootNodeId();
+    return this.getReportNodeDataSource(artefactHash, partialTreeRootNodeId);
   });
 
   private dataSource$ = toObservable(this.dataSource);
@@ -223,15 +223,15 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(statuses);
   }
 
-  private getReportNodeDataSource(artefactHash?: string, resolvedPartialPath?: string): TableDataSource<ReportNode> {
+  private getReportNodeDataSource(artefactHash?: string, partialTreeRootNodeId?: string): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
       filters = filters ?? {};
       filters['artefactHash'] = artefactHash;
     }
-    if (resolvedPartialPath) {
+    if (partialTreeRootNodeId) {
       filters = filters ?? {};
-      filters['path'] = { value: `^${resolvedPartialPath}`, regex: true };
+      filters['ancestorIds'] = this._filterConditionFactory.includesFilterCondition(partialTreeRootNodeId);
     }
     return this._dataSourceFactory.createDataSource(
       AugmentedExecutionsService.REPORTS_TABLE_ID,

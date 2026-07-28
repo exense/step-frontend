@@ -1,7 +1,7 @@
 <step-modal-window [title]="modalTitle">
   <div step-modal-window-body>
     @if (screenInput.input; as model) {
-      <step-form-field alignLabelAddon="near">
+      <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
         <step-label>ID</step-label>
         <step-label-addon>
           <step-icon
@@ -9,7 +9,12 @@
             matTooltip="Keys containing 'pwd' or 'password' will be automatically protected"
           />
         </step-label-addon>
-        <input type="text" [(ngModel)]="model.id" />
+        <input type="text" [(ngModel)]="model.id" required #attributeInput="ngModel" />
+        @if (attributeInput.touched && attributeInput.errors) {
+          <step-error>
+            <step-errors-list [errors]="attributeInput.errors" [keysDictionary]="errorsDictionary" />
+          </step-error>
+        }
       </step-form-field>
       <step-form-field>
         <step-label>Label</step-label>
@@ -23,8 +28,9 @@
         <step-label>Type</step-label>
         <step-select [(ngModel)]="model.type" [items]="ALLOWED_TYPES" [useClear]="false" />
       </step-form-field>
-      <step-screen-input-dropdown-options *ngIf="model.type === 'DROPDOWN'" [model]="model">
-      </step-screen-input-dropdown-options>
+      @if (model.type === 'DROPDOWN') {
+        <step-screen-input-dropdown-options [model]="model" />
+      }
       <step-form-field alignLabelAddon="near">
         <step-label>Default value</step-label>
         <step-label-addon>

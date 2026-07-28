@@ -40,7 +40,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
   }
 
   openDrilldownRoot(drilldownRootType: DrilldownRootType): void {
-    this._router.navigate([{ outlets: { nodeDetails: ['node-details', drilldownRootType] } }], {
+    this._router.navigate(['node-details', drilldownRootType], {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParamsHandling: 'merge',
     });
@@ -63,7 +63,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
     }
     const nodeDetails = ['node-details', drilldownRootType, type, detailsValueId];
     this._tabs.openDrilldownTab(nodeDetails, queryParams);
-    this._router.navigate([{ outlets: { nodeDetails } }], {
+    this._router.navigate(nodeDetails, {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParams,
       queryParamsHandling: 'merge',
@@ -105,7 +105,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
     }
     this._tabs.updateActiveDrilldownTab(path, queryParams);
 
-    const urlTree = this._router.createUrlTree([{ outlets: { nodeDetails: path } }], {
+    const urlTree = this._router.createUrlTree(path, {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParams,
       queryParamsHandling: 'merge',
@@ -120,14 +120,14 @@ export class AltExecutionDrilldownNavigationUtilsService {
       ? this._tabs.removeDrilldownTab(this._tabs.activeDrilldownTabId()!)
       : undefined;
     if (nextTab) {
-      this._router.navigate([{ outlets: { primary: STATIC_TABS.REPORT, nodeDetails: nextTab.nodeDetailsPath } }], {
+      this._router.navigate(nextTab.nodeDetailsPath, {
         relativeTo: this._nodeDetailsRelativeParent,
         queryParams: nextTab.queryParams,
         queryParamsHandling: 'merge',
       });
       return;
     }
-    this._router.navigate([{ outlets: { nodeDetails: null } }], {
+    this._router.navigate([STATIC_TABS.REPORT], {
       relativeTo: this._nodeDetailsRelativeParent,
       queryParamsHandling: 'merge',
     });

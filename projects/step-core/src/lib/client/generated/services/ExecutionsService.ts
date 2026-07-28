@@ -8,11 +8,13 @@ import type { AggregatedReport } from '../models/AggregatedReport';
 import type { AggregatedReportViewRequest } from '../models/AggregatedReportViewRequest';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Execution } from '../models/Execution';
+import type { ExecutionOverview } from '../models/ExecutionOverview';
 import type { ExecutionParameters } from '../models/ExecutionParameters';
 import type { FindByCriteraParam } from '../models/FindByCriteraParam';
 import type { FlatAggregatedReport } from '../models/FlatAggregatedReport';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
+import type { ResolvedExecutionNotice } from '../models/ResolvedExecutionNotice';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -253,6 +255,38 @@ export class ExecutionsService {
       url: '/executions/search',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the resolved execution notices for the given execution id.
+   * @param id
+   * @returns ResolvedExecutionNotice default response
+   * @throws ApiError
+   */
+  public getExecutionNotices(id: string): Observable<Array<ResolvedExecutionNotice>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/notices',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Returns the execution overview (the execution enriched with its resolved notices) for the given execution id.
+   * @param id
+   * @returns ExecutionOverview default response
+   * @throws ApiError
+   */
+  public getExecutionOverview(id: string): Observable<ExecutionOverview> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/overview',
+      path: {
+        id: id,
+      },
     });
   }
 

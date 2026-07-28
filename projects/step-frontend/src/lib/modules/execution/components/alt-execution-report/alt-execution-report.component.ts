@@ -1,10 +1,13 @@
 import {
+  afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
   inject,
   OnDestroy,
   OnInit,
+  signal,
   untracked,
   viewChild,
   ViewEncapsulation,
@@ -18,6 +21,7 @@ import {
   GridEditableService,
   IS_SMALL_SCREEN,
   ReportNode,
+  TableIndicatorMode,
   TimeRange,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
@@ -27,7 +31,7 @@ import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nod
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, map, noop, Observable, scan, tap } from 'rxjs';
+import { combineLatest, first, map, noop, Observable, scan, startWith, tap } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../../_common/shared/status.enum';
@@ -36,6 +40,9 @@ import {
   AggregatedTreeNodeDialogHooksStrategy,
 } from '../../services/aggregated-tree-node-dialog-hooks.service';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
+import { AltReportNodeTestcasesWidgetComponent } from '../alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
+import { AltReportNodeKeywordsWidgetComponent } from '../alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
+import { SearchError, SearchErrorType } from '../../shared/search-error';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -51,6 +58,7 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionReportComponent
@@ -73,6 +81,11 @@ export class AltExecutionReportComponent
 
   private readonly treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
   private readonly treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
+  private readonly testCasesWidget = viewChild('testCasesWidget', { read: AltReportNodeTestcasesWidgetComponent });
+  private readonly testCasesWidgetContainer = viewChild('testCasesWidget', { read: ElementRef });
+  private readonly keywordWidget = viewChild('keywordWidget', { read: AltReportNodeKeywordsWidgetComponent });
+  private readonly keywordWidgetContainer = viewChild('keywordWidget', { read: ElementRef });
+
   private readonly errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
@@ -81,6 +94,26 @@ export class AltExecutionReportComponent
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
   protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly TableIndicatorMode = TableIndicatorMode;
+  protected readonly renderReportContent = signal(this._mode === ViewMode.PRINT);
+  protected readonly testCasesSummaryView$ = combineLatest([
+    this._testCasesState.summary$.pipe(startWith(undefined)),
+    this._testCasesState.summaryDisplayInProgress$,
+  ]).pipe(
+    map(([summary, loading]) => ({
+      summary: summary ?? this.emptyReportNodeSummary,
+      loading: loading || !summary,
+    })),
+  );
+  protected readonly keywordsSummaryView$ = combineLatest([
+    this._keywordsState.summary$.pipe(startWith(undefined)),
+    this._keywordsState.summaryDisplayInProgress$,
+  ]).pipe(
+    map(([summary, loading]) => ({
+      summary: summary ?? this.emptyReportNodeSummary,
+      loading: loading || !summary,
+    })),
+  );
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(
     map((testCases) => {
@@ -110,6 +143,19 @@ export class AltExecutionReportComponent
     .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
       this._urlParamsService.patchUrlParams(range, undefined, isFirst);
     });
+
+  constructor() {
+    afterNextRender(() => {
+      if (this._mode === ViewMode.PRINT) {
+        return;
+      }
+      this.scheduleAfterNextPaint(() => this.renderReportContent.set(true));
+    });
+  }
+
+  private scheduleAfterNextPaint(callback: () => void): void {
+    requestAnimationFrame(callback);
+  }
 
   ngOnInit(): void {
     this._hooks.useStrategy(this);
@@ -177,13 +223,55 @@ export class AltExecutionReportComponent
 
   protected readonly ViewMode = ViewMode;
 
-  searchFor($event: string): void {
-    if (!this.treeWidget() || !this.treeWidgetContainer()) {
+  protected searchErrorInTree(error: string): void {
+    const treeWidget = untracked(() => this.treeWidget());
+    const treeWidgetContainer = untracked(() => this.treeWidgetContainer());
+
+    if (!treeWidget || !treeWidgetContainer) {
       return;
     }
 
-    this.treeWidgetContainer()!.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    treeWidgetContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    treeWidget.focusAndSearch(error);
+  }
 
-    this.treeWidget()!.focusAndSearch($event);
+  private searchErrorInTestCases(error: string): void {
+    const testCasesWidget = untracked(() => this.testCasesWidget());
+    const testCasesContainer = untracked(() => this.testCasesWidgetContainer());
+
+    if (!testCasesWidget || !testCasesContainer) {
+      return;
+    }
+
+    testCasesContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    testCasesWidget.search(error);
+  }
+
+  private searchErrorInKeywords(error: string): void {
+    const keywordsWidget = untracked(() => this.keywordWidget());
+    const keywordsContainer = untracked(() => this.keywordWidgetContainer());
+
+    if (!keywordsWidget || !keywordsContainer) {
+      return;
+    }
+
+    keywordsContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    keywordsWidget.search(error);
+  }
+
+  protected searchError({ type, value }: SearchError): void {
+    switch (type) {
+      case SearchErrorType.TREE:
+        this.searchErrorInTree(value);
+        break;
+      case SearchErrorType.KEYWORD:
+        this.searchErrorInKeywords(value);
+        break;
+      case SearchErrorType.TEST_CASE:
+        this.searchErrorInTestCases(value);
+        break;
+      default:
+        break;
+    }
   }
 }

@@ -37,7 +37,7 @@ export class FunctionPackageConfigurationDialogComponent {
   private _resourceInputUtils = inject(ResourceInputUtilsService);
   private _multipleProjects = inject(MultipleProjectsService);
 
-  private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
+  private readonly customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
   readonly modalTitle = this._data?.functionPackage ? 'Edit Keyword Package' : 'New Keyword Package';
 
@@ -96,11 +96,15 @@ export class FunctionPackageConfigurationDialogComponent {
   protected isFunctionPackageReady = false;
   protected showPreview = true;
   protected isLoading = false;
+  protected isScreenTemplateLoading = true;
   protected previewError?: string;
   protected addedFunctions?: Keyword[];
 
   protected save(): void {
-    if (!this._data?.functionPackage && (!this.functionPackage.packageLocation || !this.isFunctionPackageReady)) {
+    if (
+      this.isScreenTemplateLoading ||
+      (!this._data?.functionPackage && (!this.functionPackage.packageLocation || !this.isFunctionPackageReady))
+    ) {
       return;
     }
 
@@ -165,6 +169,10 @@ export class FunctionPackageConfigurationDialogComponent {
   protected handlePackageLibrariesLocationChange(packageLibrariesLocation?: string): void {
     this.functionPackage.packageLibrariesLocation = packageLibrariesLocation;
     this.loadPackagePreview();
+  }
+
+  protected onScreenTemplateLoading(isLoading: boolean): void {
+    this.isScreenTemplateLoading = isLoading;
   }
 
   private createEmptyPackage(): FunctionPackage {

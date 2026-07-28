@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   input,
@@ -20,6 +21,9 @@ import {
 } from '../../../basics/step-basics.module';
 import { AttachmentInlinePreviewComponent } from '../attachment-inline-preview/attachment-inline-preview.component';
 import { AttachmentMetaWithExplicitWidth } from '../../types/attachment-meta-with-explicit-width';
+import { AttachmentPreviewContentService } from '../../injectables/attachment-preview-content.service';
+import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
+import { AttachmentType } from '../../types/attachment-type.enum';
 
 const GAP = 5;
 const MIN_WIDTH = 100;
@@ -39,6 +43,8 @@ const OFFSET = 15;
 export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private _hostSize = inject(ElementSizeDirective, { self: true });
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
+  private _attachmentUtils = inject(AttachmentUtilsService);
+  private _attachmentPreviewContent = inject(AttachmentPreviewContentService);
 
   private readonly renderedElements = viewChildren('items', { read: AttachmentInlinePreviewComponent });
   private readonly listPrefix = viewChild('listPrefix', { read: ElementRef<HTMLElement> });
@@ -52,7 +58,48 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     },
   });
 
-  protected readonly attachments = linkedSignal(() => this.attachmentMetas());
+  readonly allowedTextPreviewAmount = input(10);
+
+  private readonly textPreviewIds = computed(() => {
+    const result: string[] = [];
+    const allowedAmount = this.allowedTextPreviewAmount();
+    for (const item of this.attachmentMetas() ?? []) {
+      if (result.length >= allowedAmount) {
+        break;
+      }
+      if (!item.id || this._attachmentUtils.determineAttachmentType(item) !== AttachmentType.TEXT) {
+        continue;
+      }
+      result.push(item.id);
+    }
+    return result;
+  });
+
+  private readonly textPreviewById = computed(() => {
+    const result: Record<string, string | undefined> = {};
+    for (const id of this.textPreviewIds()) {
+      result[id] = this._attachmentPreviewContent.getPreviewContent(id)();
+    }
+    return result;
+  });
+
+  private readonly attachmentMetasWithPreviews = computed(() => {
+    const items = this.attachmentMetas();
+    if (!items?.length) {
+      return items;
+    }
+    const textPreviewById = this.textPreviewById();
+    return items.map((item) => ({
+      ...item,
+      textPreview: item.id ? textPreviewById[item.id] : undefined,
+    }));
+  });
+
+  private readonly textPreviewRequestEffect = effect(() => {
+    this._attachmentPreviewContent.requestTextPreviews(this.textPreviewIds());
+  });
+
+  protected readonly attachments = linkedSignal(() => this.attachmentMetasWithPreviews());
 
   protected readonly displayItems = computed(() => {
     const items = this.attachments() ?? [];

@@ -17,15 +17,16 @@ import { BaseModalWindowComponent } from './base-modal-window.component';
   },
 })
 export class ModalWindowComponent extends BaseModalWindowComponent {
-  private trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
-  private dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
+  private readonly trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
+  private readonly dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
 
   readonly showSpinner = input<boolean | unknown>(false);
+  readonly spinnerTooltip = input<string>('');
   readonly title = input('');
   readonly hideButtonsSection = input(false);
   readonly hideHeaderSection = input(false);
 
-  override focusDialog() {
+  override focusDialog(): void {
     this.trackFocus()?.nativeElement?.focus();
   }
 

@@ -17,17 +17,39 @@
         </div>
       }
     }
+    @case (AttachmentType.TEXT) {
+      @if (hasTextPreview()) {
+        <pre class="text-preview">{{ textPreview() }}</pre>
+      } @else {
+        <div class="file-info">
+          <step-icon [name]="attachmentType | attachmentTypeIcon" />
+        </div>
+      }
+    }
     @default {
-      <div class="file-info">
-        <step-icon [name]="attachmentType | attachmentTypeIcon" />
-      </div>
+      @if (attachmentType === AttachmentType.SKIPPED) {
+        <step-popover class="skipped-popover" [whiteBackground]="true" [smallFont]="false">
+          <div class="file-info skipped">
+            <step-icon [name]="attachmentType | attachmentTypeIcon" />
+            <span>Skipped</span>
+          </div>
+          <step-popover-content>
+            <step-skipped-attachment-info [attachment]="attachment()!" />
+          </step-popover-content>
+        </step-popover>
+      } @else {
+        <div class="file-info">
+          <step-icon [name]="attachmentType | attachmentTypeIcon" />
+        </div>
+      }
     }
   }
 }
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT,
+    overlay:
+      attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT || hasTextPreview(),
   }"
 >
   <step-long-inline-text
@@ -42,10 +64,10 @@
     <mat-spinner [diameter]="15" />
   } @else if (attachmentType() !== AttachmentType.SKIPPED) {
     @if (showDownload()) {
-      <step-btn-group class="with-round-corners download">
+      <step-btn-group class="without-borders shrink download">
         <button
           type="button"
-          mat-flat-button
+          mat-icon-button
           matTooltip="Download"
           matTooltipPosition="below"
           [disabled]="!hasResourceReadPermission()"

@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, inject } from '@angular/core';
 import {
   ExecutiontTaskParameters,
   tablePersistenceConfigProvider,
@@ -15,6 +15,8 @@ import {
   AlertType,
   entitySelectionStateProvider,
   IDE_MODE,
+  DateFormat,
+  StepDataSource,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -22,6 +24,9 @@ import { catchError, map, of, pipe, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 type StatusItem = KeyValue<string, string>;
+type ScheduledTask = ExecutiontTaskParameters & {
+  nextExecutionTimestamp?: number;
+};
 
 enum ActiveLabels {
   ACTIVE = 'Active',
@@ -54,6 +59,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   protected readonly _isIdeMode = inject(IDE_MODE);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: DialogRouteResult) => {
@@ -64,11 +70,12 @@ export class ScheduledTaskListComponent implements DialogParentService {
   );
 
   readonly ActiveLabels = ActiveLabels;
+  readonly DateFormat = DateFormat;
 
-  readonly dataSource = this._schedulerService.createDataSource();
+  readonly dataSource = this._schedulerService.createDataSource() as StepDataSource<ScheduledTask>;
   readonly returnParentUrl = '/scheduler';
 
-  protected isSchedulerDisabled = toSignal(
+  protected readonly isSchedulerDisabled = toSignal(
     this._schedulerService.isSchedulerEnabled().pipe(
       map((result) => !result),
       catchError(() => of(false)),
@@ -94,29 +101,46 @@ export class ScheduledTaskListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
-  executeTask(scheduledTask: ExecutiontTaskParameters) {
+  executeTask(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
       this._router.navigateByUrl(this._commonEntitiesUrls.executionUrl(executionId));
     });
   }
 
-  switchActive(scheduledTask: ExecutiontTaskParameters) {
+  switchActive(scheduledTask: ScheduledTask): void {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
         tap((task) => {
-          // switching task status in GUI immediately, note that this will be overwritten by updateDataSourceAfterChange
+          // Switch task status in the GUI immediately while the row timestamp is refreshed.
           scheduledTask.active = !task.active;
           return task;
         }),
-        switchMap((task) =>
-          task.active
-            ? this._schedulerService.enableExecutionTask(task.id!, false)
-            : this._schedulerService.enableExecutionTask(task.id!, true),
+        switchMap((task) => {
+          const isActive = !task.active;
+          return this._schedulerService.enableExecutionTask(task.id!, isActive).pipe(map(() => isActive));
+        }),
+        switchMap((isActive) =>
+          isActive
+            ? this._schedulerService.getNextExecutionDate(scheduledTask.id!).pipe(catchError(() => of(undefined)))
+            : of(undefined),
         ),
-        this.updateDataSourceAfterChange,
+        tap((nextExecutionTimestamp) => {
+          this.updateNextExecutionTimestamp(scheduledTask, nextExecutionTimestamp);
+        }),
       )
       .subscribe();
+  }
+
+  private updateNextExecutionTimestamp(scheduledTask: ScheduledTask, nextExecutionTimestamp?: number): void {
+    if (nextExecutionTimestamp === undefined) {
+      delete scheduledTask.nextExecutionTimestamp;
+      this._changeDetectorRef.markForCheck();
+      return;
+    }
+
+    scheduledTask.nextExecutionTimestamp = nextExecutionTimestamp;
+    this._changeDetectorRef.markForCheck();
   }
 
   deleteTask(scheduledTask: ExecutiontTaskParameters): void {

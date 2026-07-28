@@ -1,6 +1,6 @@
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { inject } from '@angular/core';
-import { map, switchMap, tap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 import { AugmentedExecutionsService, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
 export const altExecutionGuard: CanActivateFn = (route, state) => {
@@ -19,9 +19,17 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  return _executionService.getExecutionByIdCached(executionId).pipe(
-    switchMap((execution) => _executionViewMode.getExecutionMode(execution)),
+  return _executionService.getExecutionViaOverviewCached(executionId).pipe(
+    switchMap((execution) => {
+      if (!execution) {
+        return of(_router.parseUrl('/executions/list'));
+      }
+      return _executionViewMode.getExecutionMode(execution);
+    }),
     map((mode) => {
+      if (mode instanceof UrlTree) {
+        return mode;
+      }
       if (mode === ExecutionViewMode.NEW) {
         return true;
       }

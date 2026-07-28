@@ -9,6 +9,7 @@ export * from './injectables/time-series-contexts-factory.service';
 export * from './types/time-series/time-series-utils';
 export * from './types/time-series/time-series.config';
 export * from './types/time-series/timeseries-colors-pool';
+export * from './types/time-series/stacked-bar-paths';
 export * from './types/time-series/time-series-context-params';
 export * from './types/time-series/time-series-context';
 export * from './types/oql-builder';

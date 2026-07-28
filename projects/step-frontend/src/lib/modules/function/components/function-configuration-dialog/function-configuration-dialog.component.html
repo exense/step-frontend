@@ -1,11 +1,23 @@
-<step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
+<step-modal-window
+  [title]="modalTitle"
+  [showSpinner]="isLoading"
+  [spinnerTooltip]="isScreenTemplateLoading ? 'Loading screen templates' : ''"
+  [stepZIndex]="1000"
+>
   <div step-modal-window-body>
-    <step-alert *ngIf="keyword?.managed" [type]="AlertType.WARNING">
-      This keyword is part of a keyword package. All changes made will be lost when the package is updated.
-    </step-alert>
+    @if (keyword?.managed) {
+      <step-alert [type]="AlertType.WARNING">
+        This keyword is part of a keyword package. All changes made will be lost when the package is updated.
+      </step-alert>
+    }
 
     @if (keyword) {
-      <step-custom-form-wrapper [stScreen]="customScreenTable" [ngModel]="keyword" (ngModelChange)="keyword = $event" />
+      <step-custom-form-wrapper
+        [stScreen]="customScreenTable"
+        [ngModel]="keyword"
+        (ngModelChange)="keyword = $event"
+        (loadingChange)="onScreenTemplateLoading($event)"
+      />
     }
 
     <form [formGroup]="formGroup!">
@@ -14,7 +26,7 @@
         <textarea rows="3" [formControl]="formGroup!.controls.description"></textarea>
       </step-form-field>
 
-      <ng-container *ngIf="!lightForm && schemaEnforced">
+      @if (!lightForm && schemaEnforced) {
         <step-json-raw-editor-formatted
           label="Schema"
           [showRequiredMarker]="true"
@@ -26,7 +38,7 @@
             <step-add-field-schema-button> </step-add-field-schema-button>
           </step-label-addon>
         </step-json-raw-editor-formatted>
-      </ng-container>
+      }
 
       <step-form-field>
         <step-label>Type</step-label>
@@ -42,7 +54,7 @@
 
       <step-function-type #functionTypeComponent [itemKey]="functionType"> </step-function-type>
 
-      <ng-container *ngIf="!lightForm">
+      @if (!lightForm) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title class="advanced-label">Advanced</mat-panel-title>
@@ -63,20 +75,29 @@
             </mat-slide-toggle>
           </section>
 
-          <ng-container *ngIf="!executeLocally">
+          @if (!executeLocally) {
             <step-agent-token-selection-criteria
               [tokenSelectionCriteria]="formGroup!.controls.tokenSelectionCriteria"
               tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"
             ></step-agent-token-selection-criteria>
-          </ng-container>
+          }
         </mat-expansion-panel>
-      </ng-container>
+      }
     </form>
   </div>
 
   <div step-modal-window-buttons [stepEntityRef]="$any(keyword)">
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-stroked-button (click)="save(true)" [disabled]="!('kw-write' | hasRight | async)">
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="save(true)"
+      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
+      [attr.aria-busy]="isSaving"
+    >
+      @if (isSaving) {
+        <step-button-spinner label="Saving keyword" />
+      }
       Save and edit
     </button>
     <button
@@ -84,8 +105,12 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="!('kw-write' | hasRight | async)"
+      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
+      [attr.aria-busy]="isSaving"
     >
+      @if (isSaving) {
+        <step-button-spinner label="Saving keyword" />
+      }
       Save
     </button>
   </div>

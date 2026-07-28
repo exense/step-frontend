@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { AttachmentMeta } from '../../../client/step-client-module';
 
-const TEXT_ATTACHMENT_EXTENSIONS = ['.htm', '.html', '.log', '.txt', '.xml'];
+const TEXT_ATTACHMENT_EXTENSIONS = ['.htm', '.html', '.log', '.markdown', '.md', '.txt', '.xml'];
 
 @Pipe({
   name: 'attachmentIsText',

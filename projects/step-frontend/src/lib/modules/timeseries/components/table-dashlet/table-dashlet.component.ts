@@ -18,6 +18,8 @@ import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesEntitySe
 import {
   BucketResponse,
   ColumnSelection,
+  CSVValue,
+  CSVWriter,
   DashboardItem,
   FetchBucketsRequest,
   MetricAttribute,
@@ -272,6 +274,33 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .flat();
     visibleColumns.unshift('name');
     this.visibleColumnsIds = visibleColumns;
+  }
+
+  protected exportAsCSV(): void {
+    const columns = this.columnsDefinition.filter((column) => column.isVisible);
+    const headers = ['Name', ...columns.flatMap((column) => this.getCSVHeaders(column))];
+    const writer = new CSVWriter(headers);
+
+    this.tableDataSource?.allFiltered$.pipe(take(1)).subscribe((entries) => {
+      entries.forEach((entry) => {
+        writer.add([entry.name, ...columns.flatMap((column) => this.getCSVValues(column, entry))]);
+      });
+      writer.export(this.item().name);
+    });
+  }
+
+  private getCSVHeaders(column: TableColumn): string[] {
+    if (!this.compareModeEnabled) {
+      return [column.label];
+    }
+    return [`${column.label} Base`, `${column.label} Compare`, `${column.label} Diff %`];
+  }
+
+  private getCSVValues(column: TableColumn, entry: TableEntry): CSVValue[] {
+    if (!this.compareModeEnabled) {
+      return [column.mapValue(entry.base!)];
+    }
+    return [column.mapValue(entry.base!), column.mapValue(entry.compare!), column.mapDiffValue(entry)];
   }
 
   protected onColumnVisibilityChange(column: TableColumn): void {

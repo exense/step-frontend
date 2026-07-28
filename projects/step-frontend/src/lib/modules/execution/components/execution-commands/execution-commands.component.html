@@ -1,9 +1,14 @@
 @if (displayParametersForm()) {
-  <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
+  <step-custom-forms
+    [(stModel)]="executionParameters"
+    stScreen="executionParameters"
+    (loadingChange)="setScreenTemplateLoading($event)"
+  />
   <step-execution-actions
     [execution]="execution()"
     [isExecutionIsolated]="isExecutionIsolated()"
     [tooltips]="tooltips()"
+    [disabled]="screenTemplateLoading()"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
@@ -16,6 +21,7 @@
     [isExecutionIsolated]="isExecutionIsolated()"
     [allowExecuteWithContent]="!!executionParameters()"
     [tooltips]="tooltips()"
+    [disabled]="screenTemplateLoading()"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
@@ -24,8 +30,20 @@
   >
     <step-execution-actions-execute-content>
       <section class="execution-params-popover">
-        <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
-        <button type="button" mat-flat-button color="primary" (click)="execute(false)">Execute</button>
+        <step-custom-forms
+          [(stModel)]="executionParameters"
+          stScreen="executionParameters"
+          (loadingChange)="setScreenTemplateLoading($event)"
+        />
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="execute(false)"
+          [disabled]="screenTemplateLoading()"
+        >
+          Execute
+        </button>
       </section>
     </step-execution-actions-execute-content>
   </step-execution-actions>

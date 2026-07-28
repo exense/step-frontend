@@ -16,3 +16,21 @@
   special-selection-item-hover, execution-report-node-inline-details, highlight-inline-item, error-count;
 @forward 'components/plan-editor-control-selections';
 @forward 'components/execution-shared-styles';
+
+@mixin report-filter-button-size($size: 3.4rem) {
+  .mat-mdc-button-base,
+  .mat-mdc-outlined-button {
+    width: $size !important;
+    min-width: $size !important;
+    height: $size !important;
+    min-height: $size !important;
+    padding: 0 !important;
+    line-height: $size !important;
+    --mdc-icon-button-state-layer-size: #{$size};
+  }
+
+  .mat-mdc-button-touch-target {
+    width: $size !important;
+    height: $size !important;
+  }
+}

@@ -1,8 +1,9 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
+import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, Tab, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, map, merge, of, Subject, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -18,11 +19,30 @@ import {
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected _state = inject(CrossExecutionDashboardState);
+  private _schedulerService = inject(SchedulerService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
+  protected readonly DateFormat = DateFormat;
+
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
+
+  private readonly taskId$ = toObservable(this._state.task).pipe(
+    map((task) => task?.id),
+    distinctUntilChanged(),
+  );
+
+  protected readonly nextExecutionDate$ = merge(
+    this.taskId$,
+    this._state.onTimeSelectionChanged,
+    this._state.onRefreshTriggered,
+  ).pipe(
+    map(() => this._state.task()?.id),
+    switchMap((id) =>
+      id ? this._schedulerService.getNextExecutionDate(id).pipe(catchError(() => of(undefined))) : of(undefined),
+    ),
+  );
 
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';
@@ -35,7 +55,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
         if (task == null) {
           return 'Deleted task';
         }
-        return task.attributes?.['name']
+        return task.attributes?.['name'];
       case 'plan':
         const plan = this._state.plan();
         if (plan === undefined) {
@@ -54,7 +74,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
           // TODO handle
         }
         return ExecutionNamePipe.transform(execution!);
-
     }
   });
 
@@ -88,7 +107,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     this.fetchLastExecutionTrigger$.next();
   }
 
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams): void {
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }
@@ -105,7 +124,7 @@ export class CrossExecutionDashboardComponent implements OnInit {
     return {
       id,
       label,
-      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
+      link: [{ outlets: { primary: link ?? id, modal: null } }],
     };
   }
 }

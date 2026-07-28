@@ -37,28 +37,43 @@
           stepTestId="pause-agent-btn"
           mat-icon-button
           matTooltip="Pause agent and enter maintenance mode"
-          [disabled]="!('token-manage' | hasRight | async)"
+          [disabled]="!!busyActionByAgentId()[element.agentRef!.agentId] || !('token-manage' | hasRight | async)"
+          [attr.aria-busy]="busyActionByAgentId()[element.agentRef!.agentId] === 'INTERRUPT'"
           (click)="interrupt(element.agentRef!.agentId)"
         >
-          <step-icon name="pause"></step-icon>
+          @if (busyActionByAgentId()[element.agentRef!.agentId] === 'INTERRUPT') {
+            <step-button-spinner label="Pausing agent" />
+          } @else {
+            <step-icon name="pause" />
+          }
         </button>
         <button
           stepTestId="resume-agent-btn"
           mat-icon-button
           matTooltip="Resume agent and exit maintenance mode"
-          [disabled]="!('token-manage' | hasRight | async)"
+          [disabled]="!!busyActionByAgentId()[element.agentRef!.agentId] || !('token-manage' | hasRight | async)"
+          [attr.aria-busy]="busyActionByAgentId()[element.agentRef!.agentId] === 'RESUME'"
           (click)="resume(element.agentRef!.agentId)"
         >
-          <step-icon name="play"></step-icon>
+          @if (busyActionByAgentId()[element.agentRef!.agentId] === 'RESUME') {
+            <step-button-spinner label="Resuming agent" />
+          } @else {
+            <step-icon name="play" />
+          }
         </button>
         <button
           stepTestId="remove-errors-btn"
           mat-icon-button
           matTooltip="Remove all token errors"
-          [disabled]="!('token-manage' | hasRight | async)"
+          [disabled]="!!busyActionByAgentId()[element.agentRef!.agentId] || !('token-manage' | hasRight | async)"
+          [attr.aria-busy]="busyActionByAgentId()[element.agentRef!.agentId] === 'REMOVE_ERRORS'"
           (click)="removeTokenErrors(element.agentRef!.agentId)"
         >
-          <step-icon name="check"></step-icon>
+          @if (busyActionByAgentId()[element.agentRef!.agentId] === 'REMOVE_ERRORS') {
+            <step-button-spinner label="Removing token errors" />
+          } @else {
+            <step-icon name="check" />
+          }
         </button>
       </step-btn-group>
     </td>

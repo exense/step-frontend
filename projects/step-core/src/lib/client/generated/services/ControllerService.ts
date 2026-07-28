@@ -178,6 +178,31 @@ export class ControllerService {
   }
 
   /**
+   * @param id
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodesWithContributingErrors(
+    id: string,
+    skip?: number,
+    limit?: number,
+  ): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/controller/reportnode/{id}/descendants-with-errors',
+      path: {
+        id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
+    });
+  }
+
+  /**
    * @returns Version default response
    * @throws ApiError
    */

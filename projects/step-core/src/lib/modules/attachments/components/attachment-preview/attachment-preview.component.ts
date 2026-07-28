@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncaps
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
-import { SkippedAttachmentMeta } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
@@ -12,10 +11,17 @@ import { StreamingAttachmentStatusDirective } from '../../directives/streaming-a
 import { PreviewAttachmentMeta } from '../../types/preview-attachment-meta';
 import { UndraggedClickDirective } from '../../../basics/directives/undragged-click.directive';
 import { AuthService } from '../../../auth';
+import { SkippedAttachmentInfoComponent } from '../skipped-attachment-info/skipped-attachment-info.component';
 
 @Component({
   selector: 'step-attachment-preview',
-  imports: [AttachmentUrlPipe, StepBasicsModule, AttachmentTypeIconPipe, StreamingTextComponent],
+  imports: [
+    AttachmentUrlPipe,
+    StepBasicsModule,
+    AttachmentTypeIconPipe,
+    StreamingTextComponent,
+    SkippedAttachmentInfoComponent,
+  ],
   templateUrl: './attachment-preview.component.html',
   styleUrl: './attachment-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,28 +70,37 @@ export class AttachmentPreviewComponent {
     return status === 'FAILED';
   });
 
+  protected readonly isStreamingFinished = computed(() => {
+    const status = this.streamingStatus();
+    return status === 'COMPLETED' || status === 'FAILED';
+  });
+
   protected readonly attachment = computed(() => this._streamingStatus.attachment());
   protected readonly canUseStreamPreview = computed(
     () => (this.attachment() as PreviewAttachmentMeta)?.canUseStreamPreview,
   );
+  protected readonly textPreview = computed(() => (this.attachment() as PreviewAttachmentMeta)?.textPreview);
+  protected readonly hasTextPreview = computed(() => this.textPreview() !== undefined);
 
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;
   protected readonly attachmentTooltip = computed(() => {
+    const attachmentType = this.attachmentType();
+    if (attachmentType === AttachmentType.SKIPPED) {
+      return undefined;
+    }
     if (!this.hasResourceReadPermission()) {
       return 'Missing resource-read permission';
     }
-    const attachmentType = this.attachmentType();
-    const attachment = this.attachment() as SkippedAttachmentMeta;
-    if (attachmentType !== AttachmentType.SKIPPED) {
-      return 'open attachment';
-    }
-    return attachment.reason;
+    return 'open attachment';
   });
 
   protected readonly canOpenDetails = computed(() => {
     const attachmentType = this.attachmentType()!;
-    return this.hasResourceReadPermission() && attachmentType !== AttachmentType.STREAMING_BINARY;
+    if (!this.hasResourceReadPermission() || attachmentType === AttachmentType.SKIPPED) {
+      return false;
+    }
+    return attachmentType !== AttachmentType.STREAMING_BINARY || this.isStreamingFinished();
   });
 
   protected open($event: MouseEvent): void {

@@ -8,6 +8,7 @@ import {
   ALT_REPORT_NODE_KEYWORDS_TABLE_ID,
   ALT_REPORT_NODE_LIST_DEFAULT_PAGE_SIZE,
 } from '../../shared/alt-report-node-keywords-list-config.tokens';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords-widget',
@@ -29,6 +30,7 @@ import {
 })
 export class AltReportNodeKeywordsWidgetComponent {
   protected readonly _mode = inject(VIEW_MODE);
+  private _filters = inject(AltReportNodesFilterService);
 
   private _dialogs = inject(AltExecutionDialogsService);
 
@@ -38,5 +40,10 @@ export class AltReportNodeKeywordsWidgetComponent {
 
   protected openMaximized(): void {
     this._dialogs.openDrilldownRoot(DrilldownRootType.KEYWORDS);
+  }
+
+  search(value: string): void {
+    this._filters.updateStatusCtrl([]);
+    this._filters.searchCtrl.setValue(value);
   }
 }

@@ -3,13 +3,18 @@ import { AltReportNodesSummaryStateService } from './alt-report-nodes-summary-st
 import { AltExecutionStateService } from './alt-execution-state.service';
 import { AggregatedReportView, Execution, FetchBucketsRequest, ReportNode, TimeRange } from '@exense/step-core';
 import { of } from 'rxjs';
+import { AltExecutionRefreshActivity } from '../shared/alt-execution-refresh-activity.enum';
 
 @Injectable()
 export class AltTestCasesNodesStateService extends AltReportNodesSummaryStateService<
   AggregatedReportView | ReportNode
 > {
   constructor() {
-    super(inject(AltExecutionStateService).testCasesDataSource$, 'testCases');
+    super(
+      inject(AltExecutionStateService).testCasesDataSource$,
+      'testCases',
+      AltExecutionRefreshActivity.TEST_CASES_SUMMARY,
+    );
   }
 
   protected readonly statusDistributionViewId = 'statusDistributionForTestcases';

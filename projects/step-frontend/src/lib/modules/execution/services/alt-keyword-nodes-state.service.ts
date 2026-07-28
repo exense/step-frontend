@@ -4,11 +4,16 @@ import { AltReportNodesSummaryStateService } from './alt-report-nodes-summary-st
 import { Execution, FetchBucketsRequest, ReportNode, TimeRange } from '@exense/step-core';
 import { Observable } from 'rxjs';
 import { KeywordParameters } from '../shared/keyword-parameters';
+import { AltExecutionRefreshActivity } from '../shared/alt-execution-refresh-activity.enum';
 
 @Injectable()
 export class AltKeywordNodesStateService extends AltReportNodesSummaryStateService<ReportNode> {
   constructor() {
-    super(inject(AltExecutionStateService).keywordsDataSource$, 'keywords');
+    super(
+      inject(AltExecutionStateService).keywordsDataSource$,
+      'keywords',
+      AltExecutionRefreshActivity.KEYWORDS_SUMMARY,
+    );
     this.tableParams$ = inject(AltExecutionStateService).keywordParameters$;
   }
 

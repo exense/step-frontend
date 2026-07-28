@@ -6,7 +6,7 @@ export const $AggregatedReport = {
     aggregatedReportView: {
       type: 'AggregatedReportView',
     },
-    resolvedPartialPath: {
+    partialTreeRootNodeId: {
       type: 'string',
     },
   },

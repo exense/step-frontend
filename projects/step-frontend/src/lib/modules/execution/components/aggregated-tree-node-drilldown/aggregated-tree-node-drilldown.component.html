@@ -34,10 +34,15 @@
                   <span>Steps</span>
                   @if (keywordsSort.showSort()) {
                     <step-alt-report-widget-sort>
-                      <step-icon
-                        [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'"
+                      <button
+                        type="button"
+                        mat-icon-button
                         (click)="keywordsSort.toggleSort()"
-                      />
+                        matTooltip="Sort by start time"
+                        matTooltipPosition="below"
+                      >
+                        <step-icon [name]="keywordsSort.sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+                      </button>
                     </step-alt-report-widget-sort>
                   }
                 </div>
@@ -77,6 +82,22 @@
               <section *stepStackViewItemTitle class="stack-view-title with-subtitle">
                 <div>Test Cases</div>
                 <div>
+                  <step-btn-group class="with-borders report-filter-button">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [color]="testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL ? 'primary' : undefined"
+                      [matTooltip]="
+                        testCasesDisplayMode() === TestCasesDisplayMode.INDIVIDUAL
+                          ? 'Show aggregated test cases'
+                          : 'Show individual iterations'
+                      "
+                      matTooltipPosition="below"
+                      (click)="toggleTestCasesDisplayMode()"
+                    >
+                      <step-icon name="pocket" />
+                    </button>
+                  </step-btn-group>
                   <step-alt-report-node-status-filter />
                   <step-alt-report-node-search />
                 </div>
@@ -150,7 +171,7 @@
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
-              [resolvedPartialPath]="$any(item).resolvedPartialPath"
+              [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
               [initialStatus]="$any(item).searchStatus"
               (showDetails)="handleOpenDetails($event, item.id)"
             />

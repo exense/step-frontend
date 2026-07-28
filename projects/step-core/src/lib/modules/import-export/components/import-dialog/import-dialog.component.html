@@ -32,7 +32,19 @@
     </mat-expansion-panel>
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Close</button>
-    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="isImporting">Close</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+      [disabled]="isImporting"
+      [attr.aria-busy]="isImporting"
+    >
+      @if (isImporting) {
+        <step-button-spinner label="Importing" />
+      }
+      Save
+    </button>
   </div>
 </step-modal-window>

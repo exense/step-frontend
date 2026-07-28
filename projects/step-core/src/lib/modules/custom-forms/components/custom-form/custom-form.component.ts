@@ -11,6 +11,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  finalize,
   groupBy,
   map,
   merge,
@@ -21,7 +22,7 @@ import {
   tap,
 } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 interface CustomFormInputsSchema {
   ids: string[];
@@ -50,17 +51,19 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
 
-  private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
-  private valueChangeDebounced$ = this.valueChange$.pipe(
+  private readonly valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
+  private readonly valueChangeDebounced$ = this.valueChange$.pipe(
     groupBy((value) => value?.inputId),
     mergeMap((group) => group.pipe(debounceTime(500))),
   );
 
-  private changeStart$ = this.valueChange$.pipe(map(() => true));
-  private changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
+  private readonly changeStart$ = this.valueChange$.pipe(map(() => true));
+  private readonly changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
 
-  readonly changeInProgress$ = merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged());
-  readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
+  private readonly changeInProgress = toSignal(merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged()), {
+    initialValue: false,
+  });
+  private readonly changeInProgress$ = toObservable(this.changeInProgress);
 
   readonly stEditableLabelMode = input(false);
   readonly stInline = input(false);
@@ -73,14 +76,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   readonly stModelChange = output<Record<string, unknown | string>>();
   readonly customInputTouch = output<void>();
+  readonly loadingChange = output<boolean>();
 
   private activeExpressionInputsKeys = new Set<string>();
-  private orderedIds = signal<string[]>([]);
-  private originalInputs = signal<Record<string, StInput>>({});
-  private visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
-  private visibilityFlagsJson = computed(() => JSON.stringify(this.visibilityFlags()));
+  private readonly orderedIds = signal<string[]>([]);
+  private readonly originalInputs = signal<Record<string, StInput>>({});
+  private readonly visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
+  private readonly visibilityFlagsJson = computed(() => JSON.stringify(this.visibilityFlags()));
+  private readonly screenTemplateLoading = signal(false);
+  private readonly screenTemplateLoading$ = toObservable(this.screenTemplateLoading);
 
-  private internalModel = linkedSignal(() => this.stModel());
+  private readonly internalModel = linkedSignal(() => this.stModel());
 
   readonly inputs = computed(() => {
     const orderedIds = this.orderedIds();
@@ -116,17 +122,22 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   }
 
   readyToProceed(): Observable<void> {
-    if (!this.changeInProgress()) {
+    if (!this.changeInProgress() && !this.screenTemplateLoading()) {
       return of(undefined);
     }
-    return this.changeInProgress$.pipe(
-      filter((inProgress) => !inProgress),
+
+    return merge(this.changeInProgress$, this.screenTemplateLoading$).pipe(
+      filter(() => !this.changeInProgress() && !this.screenTemplateLoading()),
       take(1),
       map(() => undefined),
     );
   }
 
   protected onInputValueChange(input: StInput, value: string): void {
+    if (this.activeExpressionInputsKeys.size) {
+      this.startScreenTemplateLoading();
+    }
+
     const inputId = input.id!;
     this.valueChange$.next({ inputId, value });
   }
@@ -183,6 +194,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   }
 
   private initializeFields(): void {
+    this.startScreenTemplateLoading();
     this._screensService
       .getScreenInputsByScreenIdWithCache(this.stScreen())
       .pipe(
@@ -190,19 +202,23 @@ export class CustomFormComponent implements OnInit, OnDestroy {
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
-      .subscribe((schema) => {
-        this.orderedIds.set(schema.ids);
-        this.originalInputs.set(schema.inputs);
-        this.activeExpressionInputsKeys = schema.activeExpressionInputsKeys;
-        if (!this.activeExpressionInputsKeys.size) {
-          this.visibilityFlags.set({});
-          this.setupValueChange();
-          return;
-        }
-        const visibilityFlags: Record<string, boolean> = {};
-        this.activeExpressionInputsKeys.forEach((key) => (visibilityFlags[key] = false));
-        this.visibilityFlags.set(visibilityFlags);
-        this.setupVisibilityUpdate();
+      .subscribe({
+        next: (schema) => {
+          this.orderedIds.set(schema.ids);
+          this.originalInputs.set(schema.inputs);
+          this.activeExpressionInputsKeys = schema.activeExpressionInputsKeys;
+          if (!this.activeExpressionInputsKeys.size) {
+            this.visibilityFlags.set({});
+            this.setupValueChange();
+            this.finishScreenTemplateLoading();
+            return;
+          }
+          const visibilityFlags: Record<string, boolean> = {};
+          this.activeExpressionInputsKeys.forEach((key) => (visibilityFlags[key] = false));
+          this.visibilityFlags.set(visibilityFlags);
+          this.setupVisibilityUpdate();
+        },
+        error: () => this.finishScreenTemplateLoading(),
       });
   }
 
@@ -234,9 +250,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           this.stModelChange.emit(changedModel);
           return changedModel;
         }),
-        switchMap((changedModel) =>
-          this._screensService.getScreenInputsForScreenPost(this.stScreen(), changedModel ?? this.internalModel()),
-        ),
+        switchMap((model) => {
+          this.startScreenTemplateLoading();
+          return this._screensService
+            .getScreenInputsForScreenPost(this.stScreen(), model ?? this.internalModel())
+            .pipe(finalize(() => this.finishScreenTemplateLoading()));
+        }),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
@@ -244,6 +263,20 @@ export class CustomFormComponent implements OnInit, OnDestroy {
         filter((visibilityFlags) => JSON.stringify(visibilityFlags) !== this.visibilityFlagsJson()),
       )
       .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
+  }
+
+  private startScreenTemplateLoading(): void {
+    if (!this.screenTemplateLoading()) {
+      this.screenTemplateLoading.set(true);
+      this.loadingChange.emit(true);
+    }
+  }
+
+  private finishScreenTemplateLoading(): void {
+    if (this.screenTemplateLoading()) {
+      this.screenTemplateLoading.set(false);
+      this.loadingChange.emit(false);
+    }
   }
 
   private setDefaultValues(screenInputs: ScreenInput[]): void {
@@ -256,7 +289,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     let valueHasBeenChanged = false;
     let model = this.internalModel();
     for (let item of inputs) {
-      const defaultValue = item.type === 'CHECKBOX' ? item.defaultValue ?? false : item.defaultValue;
+      const defaultValue = item.type === 'CHECKBOX' ? (item.defaultValue ?? false) : item.defaultValue;
       if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
         model = this._objectUtils.setObjectFieldValue(model, item.id!, defaultValue);
         valueHasBeenChanged = true;
