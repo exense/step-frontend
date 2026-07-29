@@ -16,7 +16,7 @@ export class ExecutionLegacySwitcherComponent {
 
   protected readonly _executionViewModeService = inject(ExecutionViewModeService);
 
-  protected readonly isDisabled = computed(() => {
+  protected readonly isNewModeUnsupported = computed(() => {
     const exec = this.execution();
     return !exec || !this._executionViewModeService.isNewExecutionAvailable(exec);
   });
@@ -47,11 +47,7 @@ export class ExecutionLegacySwitcherComponent {
       return;
     }
 
-    if (this.isDisabled()) {
-      this.toggleControl.disable({ emitEvent: false });
-    } else {
-      this.toggleControl.enable({ emitEvent: false });
-    }
+    this.toggleControl.enable({ emitEvent: false });
 
     this._executionViewModeService
       .getExecutionMode(exec)

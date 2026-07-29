@@ -26,11 +26,17 @@ export class ExecutionViewModeService {
 
   getExecutionMode(execution: Execution): Observable<ExecutionViewMode> {
     return this.checkForceLegacyReporting().pipe(
-      map((isForceLegacy) =>
-        this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution) || isForceLegacy
-          ? ExecutionViewMode.LEGACY
-          : ExecutionViewMode.NEW,
-      ),
+      map((isForceLegacy) => {
+        if (this.isLocalStorageForcingLegacy() || isForceLegacy) {
+          return ExecutionViewMode.LEGACY;
+        }
+
+        if (this.isLocalStorageForcingNew()) {
+          return ExecutionViewMode.NEW;
+        }
+
+        return this.isNewExecutionAvailable(execution) ? ExecutionViewMode.NEW : ExecutionViewMode.LEGACY;
+      }),
     );
   }
 
@@ -65,6 +71,10 @@ export class ExecutionViewModeService {
 
   isLocalStorageForcingLegacy(): boolean {
     return this._localStorage.getItem('executionViewMode') === 'legacyExecution';
+  }
+
+  isLocalStorageForcingNew(): boolean {
+    return this._localStorage.getItem('executionViewMode') === 'newExecution';
   }
 
   setForceLegacyView(forceLegacy: boolean): void {

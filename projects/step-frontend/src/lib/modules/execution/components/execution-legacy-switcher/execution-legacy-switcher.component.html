@@ -5,8 +5,9 @@
       color="primary"
       name="legacy-execution-report"
       [matTooltip]="
-        isDisabled()
-          ? _executionViewModeService.getNewExecutionDeactivatedReason(execution()!)
+        isNewModeUnsupported()
+          ? _executionViewModeService.getNewExecutionDeactivatedReason(execution()!) +
+            ' You can still select the new view for assessment.'
           : 'Select if you prefer the legacy or the new execution view. (saved for all executions)'
       "
     >
