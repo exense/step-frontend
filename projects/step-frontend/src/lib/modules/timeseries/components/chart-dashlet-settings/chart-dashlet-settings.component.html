@@ -41,7 +41,7 @@
         <mat-divider />
         <div class="section-header">
           <step-label>Filters</step-label>
-          <div class="section-description">Define which data to include in this chart.</div>
+          <div class="section-description">Define which series to include in this chart.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="filters-container">
@@ -70,7 +70,7 @@
                 <span>Inherit global filters</span>
                 <step-icon
                   class="help-icon"
-                  matTooltip="The chart filters will be combined with the dashboard filters"
+                  matTooltip="These filters will be combined with the dashboard filters"
                   name="help-circle"
                 ></step-icon>
               </mat-checkbox>
@@ -85,7 +85,7 @@
                   <span>Inherit specific filters only</span>
                   <step-icon
                     class="help-icon"
-                    matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
+                    matTooltip="Only the specified filters will be inherited, if present. Note that while using OQL, all the filters will be inherited"
                     name="help-circle"
                   ></step-icon>
                 </mat-checkbox>
@@ -116,7 +116,7 @@
         <mat-divider />
         <div class="section-header">
           <step-label>Grouping</step-label>
-          <div class="section-description">Define how data is grouped before aggregation.</div>
+          <div class="section-description">Define how the series are grouped together.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="form-row">
@@ -151,7 +151,7 @@
                 >Group series by
                 <step-icon
                   class="help-icon"
-                  matTooltip="The metric is split into one series per distinct combination of the selected attributes"
+                  matTooltip="The series sharing the same values for the selected attributes are grouped together, and each group is displayed as one series"
                   name="help-circle"
                 ></step-icon>
               </step-label>
@@ -173,7 +173,7 @@
           <div class="axis-subheader">
             <div class="axis-subheader-titles">
               <span class="axis-subheader-title">Aggregation</span>
-              <span class="axis-subheader-description">Define how data is aggregated.</span>
+              <span class="axis-subheader-description">Define how the data points of each series are aggregated.</span>
             </div>
             <step-tabs
               [tabs]="AGGREGATION_MODES"
@@ -197,7 +197,7 @@
                   >Aggregation
                   <step-icon
                     class="help-icon"
-                    matTooltip="Value extracted from the merged samples of each time bucket"
+                    matTooltip="Value extracted from the combined data points of each time interval"
                     name="help-circle"
                   ></step-icon>
                 </step-label>
@@ -232,7 +232,7 @@
                     >Time aggregation
                     <step-icon
                       class="help-icon"
-                      matTooltip="The calculation applied over time within each series (e.g., Average value per 1-minute bucket)."
+                      matTooltip="The calculation applied over time within each series (e.g., Average value per 1-minute interval)."
                       name="help-circle"
                     ></step-icon>
                   </step-label>
@@ -242,7 +242,7 @@
                     }
                   </mat-select>
                 </step-form-field>
-                <div class="field-hint">How values are combined within each time interval.</div>
+                <div class="field-hint">How the data points of each series are combined over time.</div>
               </div>
               <div class="field-with-hint">
                 <step-form-field>
@@ -250,7 +250,7 @@
                     >Series aggregation
                     <step-icon
                       class="help-icon"
-                      matTooltip="The calculation applied across different series in a group for each time bucket (e.g., Sum across all applications)."
+                      matTooltip="The calculation applied across the series of the same group, for each time interval (e.g., Sum across all applications)."
                       name="help-circle"
                     ></step-icon>
                   </step-label>
@@ -260,13 +260,13 @@
                     }
                   </mat-select>
                 </step-form-field>
-                <div class="field-hint">How series are combined across the same group.</div>
+                <div class="field-hint">How the series of the same group are combined.</div>
               </div>
             </div>
           }
           <step-form-field>
             <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
-              <span>Readonly aggregate</span>
+              <span>Read-only aggregation</span>
               <step-icon
                 class="help-icon"
                 matTooltip="The users will not be able to change the aggregation of this dashlet from the dashboard"
@@ -278,7 +278,7 @@
           <div class="axis-subheader">
             <div class="axis-subheader-titles">
               <span class="axis-subheader-title">Appearance</span>
-              <span class="axis-subheader-description">Define how the aggregated data is displayed.</span>
+              <span class="axis-subheader-description">Define how the resulting series are displayed.</span>
             </div>
           </div>
           <div class="form-row">
@@ -300,7 +300,7 @@
             <step-form-field>
               <step-label
                 >Plot type
-                <step-icon class="help-icon" matTooltip="How the series are drawn" name="help-circle"></step-icon>
+                <step-icon class="help-icon" matTooltip="How each series is drawn" name="help-circle"></step-icon>
               </step-label>
               <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
                 <mat-option [value]="'LINE'" class="option-with-icon">
@@ -334,7 +334,7 @@
                 >Color style
                 <step-icon
                   class="help-icon"
-                  matTooltip="Whether the series are drawn with a stroke only or with a filled area"
+                  matTooltip="Whether each series is drawn with a stroke only or with a filled area"
                   name="help-circle"
                 ></step-icon>
               </step-label>
@@ -351,7 +351,7 @@
             >Total axis
             <step-icon
               class="help-icon"
-              matTooltip="The total axis combines all the series of the primary axis into one single total series, drawn on its own axis on the right. It is computed out of the primary axis data, so it has no metric, grouping or filtering of its own."
+              matTooltip="The total axis combines all the series of the primary axis into one single total series, drawn on its own axis on the right. It is computed out of the primary axis series, so it has no metric, grouping or filtering of its own."
               name="help-circle"
             ></step-icon>
           </step-label>
@@ -367,13 +367,13 @@
           <div class="axis-card">
             @if (primaryAggregationMode === 'SINGLE') {
               <div class="section-description">
-                All the series of the primary axis are combined into one single total series. The value selected below
-                is computed for each series, then summed across all of them.
+                The value selected below is computed for each series of the primary axis, and the results are summed
+                into one single total series.
               </div>
             } @else {
               <div class="section-description">
-                All the series of the primary axis are combined into one single total series. It displays the sum of the
-                values produced by the two-stage aggregation, so there is nothing to configure here.
+                The value produced by the two-stage aggregation for each series of the primary axis is summed into one
+                single total series.
               </div>
             }
             <div class="form-row" [class.half-width]="primaryAggregationMode === 'TWO_STAGE'">

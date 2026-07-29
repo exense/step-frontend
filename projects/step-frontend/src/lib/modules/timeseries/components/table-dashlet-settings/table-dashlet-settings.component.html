@@ -19,7 +19,7 @@
         <mat-divider />
         <div class="section-header">
           <step-label>Filters</step-label>
-          <div class="section-description">Define which data to include in this table.</div>
+          <div class="section-description">Define which series to include in this table.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="filters-container">
@@ -48,7 +48,7 @@
                 <span>Inherit global filters</span>
                 <step-icon
                   class="help-icon"
-                  matTooltip="The chart filters will be combined with the dashboard filters"
+                  matTooltip="These filters will be combined with the dashboard filters"
                   name="help-circle"
                 ></step-icon>
               </mat-checkbox>
@@ -63,7 +63,7 @@
                   <span>Inherit specific filters only</span>
                   <step-icon
                     class="help-icon"
-                    matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
+                    matTooltip="Only the specified filters will be inherited, if present. Note that while using OQL, all the filters will be inherited"
                     name="help-circle"
                   ></step-icon>
                 </mat-checkbox>
@@ -94,7 +94,7 @@
         <mat-divider />
         <div class="section-header">
           <step-label>Grouping</step-label>
-          <div class="section-description">Define how data is grouped before aggregation.</div>
+          <div class="section-description">Define how the series are grouped together, one row per group.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="form-row">
@@ -129,7 +129,7 @@
                 >Group series by
                 <step-icon
                   class="help-icon"
-                  matTooltip="The metric is split into one series per distinct combination of the selected attributes"
+                  matTooltip="The series sharing the same values for the selected attributes are grouped together, and each group is displayed as one row"
                   name="help-circle"
                 ></step-icon>
               </step-label>
@@ -148,7 +148,7 @@
         <div class="aggregation-header">
           <div class="section-header">
             <step-label>Aggregation</step-label>
-            <div class="section-description">Define how data is aggregated.</div>
+            <div class="section-description">Define how the data points of each series are aggregated.</div>
           </div>
           <step-tabs
             [tabs]="AGGREGATION_MODES"
@@ -167,8 +167,7 @@
         </div>
         @if (aggregationMode === 'SINGLE') {
           <div class="section-description">
-            Each selected column displays one value, aggregated over the whole time range and across the series of each
-            row.
+            Each selected column displays one value, computed over all the data points of the series.
           </div>
           <step-label>Columns</step-label>
           <div class="columns-container">
@@ -200,7 +199,7 @@
           </div>
         } @else {
           <div class="section-description">
-            Both aggregations reduce each row to one single value, so individual columns cannot be selected in this
+            Both aggregations reduce each series to one single value, so individual columns cannot be selected in this
             mode. The table displays one result column instead.
           </div>
           <div class="form-row">
@@ -210,7 +209,7 @@
                   >Time aggregation
                   <step-icon
                     class="help-icon"
-                    matTooltip="Scalar function reducing the successive values of each series within the selected time range to a single value"
+                    matTooltip="The calculation applied over time within each series, over the whole selected time range (e.g., Average value per series)."
                     name="help-circle"
                   ></step-icon>
                 </step-label>
@@ -220,7 +219,7 @@
                   }
                 </mat-select>
               </step-form-field>
-              <div class="field-hint">How values are combined within each time interval.</div>
+              <div class="field-hint">How the data points of each series are combined over time.</div>
             </div>
             <div class="field-with-hint">
               <step-form-field>
@@ -228,7 +227,7 @@
                   >Series aggregation
                   <step-icon
                     class="help-icon"
-                    matTooltip="Scalar function combining the resampled values of the series of each group into a single value"
+                    matTooltip="The calculation applied across the series of the same group (e.g., Sum across all applications)."
                     name="help-circle"
                   ></step-icon>
                 </step-label>
@@ -238,7 +237,7 @@
                   }
                 </mat-select>
               </step-form-field>
-              <div class="field-hint">How series are combined across the same group.</div>
+              <div class="field-hint">How the series of the same group are combined.</div>
             </div>
           </div>
         }
