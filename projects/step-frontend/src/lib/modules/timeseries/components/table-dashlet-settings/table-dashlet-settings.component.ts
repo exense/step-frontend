@@ -84,7 +84,7 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   private initAggregationMode(): void {
-    const pipeline = PipelineAggregationUtils.getCustomPipeline(this.item.tableSettings!.aggregation);
+    const pipeline = PipelineAggregationUtils.getTwoStagePipeline(this.item.tableSettings!.aggregation);
     if (pipeline) {
       this.aggregationMode = 'TWO_STAGE';
       this.pipeline = pipeline;
@@ -139,7 +139,7 @@ export class TableDashletSettingsComponent implements OnInit {
     // the column selection is left untouched in two-stage mode, so that it is restored when switching back to single
     this.item.tableSettings!.aggregation =
       this.aggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.pipeline)
+        ? PipelineAggregationUtils.createTwoStageAggregation(this.pipeline)
         : undefined;
   }
 

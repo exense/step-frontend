@@ -2,8 +2,8 @@ import { MetricAggregation } from '@exense/step-core';
 import { TimeSeriesConfig } from './time-series/time-series.config';
 
 /**
- * Scalar aggregations supported by the custom aggregation pipeline. They match the BE Aggregation enum, MERGE
- * excluded: custom pipelines strictly reduce their inputs to scalar values.
+ * Scalar aggregations supported by the two-stage aggregation. They match the BE Aggregation enum, MERGE
+ * excluded: the two stages strictly reduce their inputs to scalar values.
  */
 export enum PipelineAggregation {
   AVG = 'AVG',
@@ -23,7 +23,7 @@ export interface PipelineAggregationOption {
   label: string;
 }
 
-/** Options offered by the time and series aggregation pickers of the custom mode */
+/** Options offered by the time and series aggregation pickers of the two-stage mode */
 export const PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
   { value: PipelineAggregation.AVG, label: 'Average' },
   { value: PipelineAggregation.SUM, label: 'Sum' },
@@ -34,10 +34,10 @@ export const PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
 
 export class PipelineAggregationUtils {
   /**
-   * An axes uses a custom aggregation pipeline when both scalar aggregations are stored in the aggregation params.
-   * Returns undefined for standard (merge based) aggregations.
+   * An axes uses a two-stage aggregation when both scalar aggregations are stored in the aggregation params.
+   * Returns undefined for single-stage (merge based) aggregations.
    */
-  static getCustomPipeline(aggregation?: MetricAggregation): AggregationPipeline | undefined {
+  static getTwoStagePipeline(aggregation?: MetricAggregation): AggregationPipeline | undefined {
     const timeAggregation = aggregation?.params?.[TimeSeriesConfig.TIME_AGGREGATION_PARAM];
     const groupAggregation = aggregation?.params?.[TimeSeriesConfig.GROUP_AGGREGATION_PARAM];
     if (!timeAggregation || !groupAggregation) {
@@ -46,7 +46,7 @@ export class PipelineAggregationUtils {
     return { timeAggregation, groupAggregation };
   }
 
-  static createCustomPipelineAggregation(pipeline: AggregationPipeline): MetricAggregation {
+  static createTwoStageAggregation(pipeline: AggregationPipeline): MetricAggregation {
     // the type mirrors the final scalar operation so that consumers unaware of pipelines degrade gracefully
     return {
       type: pipeline.groupAggregation,
@@ -57,7 +57,7 @@ export class PipelineAggregationUtils {
     };
   }
 
-  static createStandardAggregation(aggregation: MetricAggregation): MetricAggregation {
+  static createSingleStageAggregation(aggregation: MetricAggregation): MetricAggregation {
     const params = { ...aggregation.params };
     delete params[TimeSeriesConfig.TIME_AGGREGATION_PARAM];
     delete params[TimeSeriesConfig.GROUP_AGGREGATION_PARAM];

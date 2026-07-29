@@ -48,7 +48,7 @@
         <step-icon name="settings" />
       </button>
       <mat-menu #settingsMenu="matMenu">
-        @if (hasCustomAggregation) {
+        @if (hasTwoStageAggregation) {
           <!-- the tooltip is bound to a wrapper, as a disabled button doesn't emit the pointer events it needs -->
           <span
             class="disabled-columns-menu-item"

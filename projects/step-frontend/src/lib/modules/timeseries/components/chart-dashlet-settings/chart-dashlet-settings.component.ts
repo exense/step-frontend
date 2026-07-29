@@ -102,7 +102,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   private initAggregationModes(): void {
-    const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
+    const primaryPipeline = PipelineAggregationUtils.getTwoStagePipeline(
       this.item.chartSettings!.primaryAxes.aggregation,
     );
     if (primaryPipeline) {
@@ -174,12 +174,12 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   private applyAggregationMode(): void {
-    // only the primary axes support a custom pipeline: the secondary ones aggregate the primary series client side
+    // only the primary axes support a two-stage aggregation: the secondary ones aggregate the primary series client side
     const primaryAxes = this.item.chartSettings!.primaryAxes;
     primaryAxes.aggregation =
       this.primaryAggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.primaryPipeline)
-        : PipelineAggregationUtils.createStandardAggregation(primaryAxes.aggregation);
+        ? PipelineAggregationUtils.createTwoStageAggregation(this.primaryPipeline)
+        : PipelineAggregationUtils.createSingleStageAggregation(primaryAxes.aggregation);
   }
 
   handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {

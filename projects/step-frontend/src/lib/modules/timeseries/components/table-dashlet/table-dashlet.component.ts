@@ -98,10 +98,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   protected readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   protected readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
   /**
-   * Column displaying the scalar produced by a custom aggregation pipeline. The SUM column is used, because a scalar
+   * Column displaying the scalar produced by a two-stage aggregation. The SUM column is used, because a scalar
    * bucket reports its value as its one single sample: its value function, its sorting and its diff all read the sum
    */
-  private readonly CUSTOM_VALUE_COLUMN_ID = TableColumnType.SUM;
+  private readonly TWO_STAGE_VALUE_COLUMN_ID = TableColumnType.SUM;
 
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
@@ -125,7 +125,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   protected columnsDefinition: TableColumn[] = [];
   protected visibleColumnsIds: string[] = ['name'];
-  protected hasCustomAggregation = false;
+  protected hasTwoStageAggregation = false;
   private attributesByIds: Record<string, MetricAttribute> = {};
 
   protected allSeriesChecked: boolean = true;
@@ -178,17 +178,19 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState(): void {
     this.item().attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    const customPipeline = this.getCustomPipeline();
-    this.hasCustomAggregation = !!customPipeline;
+    const twoStagePipeline = this.getTwoStagePipeline();
+    this.hasTwoStageAggregation = !!twoStagePipeline;
     // The column definitions are kept stable across both modes, so that the columns registered by the table stay the
-    // same. A custom pipeline reduces each group to one scalar, so all the columns but the one displaying it are hidden
+    // same. A two-stage aggregation reduces each group to one scalar, so all the columns but the one displaying it are hidden
     this.columnsDefinition = this.item().tableSettings!.columns!.map((column: ColumnSelection) => {
-      const isScalarColumn = column.column === this.CUSTOM_VALUE_COLUMN_ID;
+      const isScalarColumn = column.column === this.TWO_STAGE_VALUE_COLUMN_ID;
       return {
         id: column.column!,
-        label: customPipeline ? PipelineAggregationUtils.getPipelineLabel(customPipeline) : this.getColumnLabel(column),
-        isVisible: customPipeline ? isScalarColumn : column.selected!,
-        pclValue: customPipeline ? undefined : column.aggregation.params?.['pclValue'],
+        label: twoStagePipeline
+          ? PipelineAggregationUtils.getPipelineLabel(twoStagePipeline)
+          : this.getColumnLabel(column),
+        isVisible: twoStagePipeline ? isScalarColumn : column.selected!,
+        pclValue: twoStagePipeline ? undefined : column.aggregation.params?.['pclValue'],
         mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
       };
@@ -196,8 +198,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.updateVisibleColumns();
   }
 
-  private getCustomPipeline(): AggregationPipeline | undefined {
-    return PipelineAggregationUtils.getCustomPipeline(this.item().tableSettings!.aggregation);
+  private getTwoStagePipeline(): AggregationPipeline | undefined {
+    return PipelineAggregationUtils.getTwoStagePipeline(this.item().tableSettings!.aggregation);
   }
 
   private getColumnLabel(column: ColumnSelection): string {
@@ -360,7 +362,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       this.baseRequestOql = oql;
     }
-    const customPipeline = this.getCustomPipeline();
+    const twoStagePipeline = this.getTwoStagePipeline();
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
@@ -369,8 +371,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
-      timeAggregation: customPipeline?.timeAggregation,
-      groupAggregation: customPipeline?.groupAggregation,
+      timeAggregation: twoStagePipeline?.timeAggregation,
+      groupAggregation: twoStagePipeline?.groupAggregation,
     };
     return this._timeSeriesService
       .fetchBucketsWithFallback(request)
