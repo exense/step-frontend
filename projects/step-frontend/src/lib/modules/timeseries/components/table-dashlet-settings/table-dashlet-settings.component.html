@@ -164,12 +164,16 @@
           <step-icon
             class="help-icon"
             [matTooltip]="
-              'Standard: Combines all data points together over time and across series using a single aggregation function.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications).'
+              'Standard: Combines all data points together over time and across series using a single aggregation function. Each value is displayed as a separate column.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications). The result is a single value, displayed as one column.'
             "
             name="help-circle"
           ></step-icon>
         </div>
         @if (aggregationMode === 'STANDARD') {
+          <div class="section-description">
+            Each selected column displays one value, aggregated over the whole time range and across the series of each
+            row.
+          </div>
           <step-label>Columns</step-label>
           <div class="columns-container">
             @for (column of item.tableSettings!.columns; track column) {
@@ -199,6 +203,10 @@
             }
           </div>
         } @else {
+          <div class="section-description">
+            Both aggregations reduce each row to one single value, so individual columns cannot be selected in this
+            mode. The table displays one result column instead.
+          </div>
           <div class="form-row">
             <div class="field-with-hint">
               <step-form-field>
@@ -236,9 +244,6 @@
               </step-form-field>
               <div class="field-hint">How series are combined across the same group.</div>
             </div>
-          </div>
-          <div class="info-txt">
-            The table displays one single value per row, resulting from the configured aggregations.
           </div>
         }
         <mat-divider />

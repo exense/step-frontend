@@ -151,7 +151,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   protected syncGroupSubscription?: Subscription;
   protected cachedRequest?: FetchBucketsRequest;
   protected cachedResponse?: TimeSeriesAPIResponse;
-  protected cachedSecondaryResponse?: TimeSeriesAPIResponse;
   protected showHigherResolutionWarning = false;
   protected collectionResolutionUsed: number = 0;
 
@@ -260,8 +259,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
 
     if (this.cachedResponse && this.cachedRequest) {
-      this.createChartSettings(this.cachedResponse, this.cachedRequest, this.cachedSecondaryResponse).subscribe(
-        (settings) => this._internalSettings.set(settings),
+      this.createChartSettings(this.cachedResponse, this.cachedRequest).subscribe((settings) =>
+        this._internalSettings.set(settings),
       );
     } else {
       this.createChart();
@@ -332,7 +331,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private createChartSettings(
     response: TimeSeriesAPIResponse,
     request: FetchBucketsRequest,
-    secondaryResponse?: TimeSeriesAPIResponse,
   ): Observable<TSChartSettings> {
     let syncGroup: TimeSeriesSyncGroup | undefined;
     if (this.item().masterChartId) {
@@ -340,6 +338,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
     const primaryAxes = this.item().chartSettings!.primaryAxes!;
     const primaryAggregation = primaryAxes.aggregation;
+    const primaryCustomPipeline = PipelineAggregationUtils.getCustomPipeline(primaryAggregation);
     const hasSteppedDisplay = primaryAxes.displayType === 'STEPPED';
     const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
@@ -354,14 +353,17 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       isRateOrCount ||
       (!isGauge && (primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'));
     const spanGaps = !isNullMeansZero && !useForwardFill;
+    // The total axis (called secondary axis in the code) sums one value per series. With a custom pipeline the series are already reduced to scalars, so
+    // it sums those directly and its own aggregation, which would be meaningless on a single sample, doesn't apply
+    const finalSecondaryAxesAggregation = primaryCustomPipeline ? primaryAggregation : secondaryAxesAggregation;
     const isSecondaryRateOrCount =
-      secondaryAxesAggregation?.type === 'RATE' || secondaryAxesAggregation?.type === 'COUNT';
+      finalSecondaryAxesAggregation?.type === 'RATE' || finalSecondaryAxesAggregation?.type === 'COUNT';
     const useSecondaryForwardFill = isGauge && !isSecondaryRateOrCount;
     const secondaryAxesData: (number | undefined | null)[] = [];
     const accumulateSecondarySeries = (buckets: BucketResponse[], interval: number): void => {
       let lastSecondaryValue: number | undefined;
       buckets.forEach((b: BucketResponse, j: number) => {
-        let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, interval);
+        let bucketValue = this.getBucketValue(b, finalSecondaryAxesAggregation!, interval);
         if (bucketValue == null && useSecondaryForwardFill) {
           bucketValue = lastSecondaryValue;
         }
@@ -387,7 +389,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse) => metadata.push(b?.attributes));
-        if (hasSecondaryAxes && !secondaryResponse) {
+        if (hasSecondaryAxes) {
           accumulateSecondarySeries(response.matrix[i], response.interval);
         }
       }
@@ -449,13 +451,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       }
       return s;
     });
-
-    if (hasSecondaryAxes && secondaryResponse) {
-      // the secondary axes use their own aggregation pipeline, so their values come from a dedicated response
-      secondaryResponse.matrix.forEach((seriesBuckets: BucketResponse[]) =>
-        accumulateSecondarySeries(seriesBuckets, secondaryResponse.interval),
-      );
-    }
 
     const edgeExtensionHook: Hooks.Arrays | undefined =
       spanGaps && primaryAxes.displayType === 'LINE'
@@ -692,11 +687,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   private getSecondAxesLabel(): string | undefined {
-    const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
-    const pipeline = PipelineAggregationUtils.getCustomPipeline(aggregation);
-    if (pipeline) {
-      return `Total (${PipelineAggregationUtils.getPipelineLabel(pipeline)})`;
+    if (PipelineAggregationUtils.getCustomPipeline(this.item().chartSettings!.primaryAxes.aggregation)) {
+      // the total axis sums the scalars produced by the custom pipeline, no aggregation of its own applies
+      return 'Total';
     }
+    const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
     switch (aggregation?.type) {
       case ChartAggregation.RATE:
         return 'Total Hits/' + aggregation.params?.['rateUnit'];
@@ -750,14 +745,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
       this.item().chartSettings!.primaryAxes.aggregation,
     );
-    const separateSecondaryRequest = this.needsSeparateSecondaryRequest();
     const request: FetchBucketsRequest = {
       start: start,
       end: end,
       metricType: this.item().metricKey,
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
-      percentiles: this.getRequiredPercentiles(!separateSecondaryRequest),
+      percentiles: this.getRequiredPercentiles(),
       timeAggregation: primaryPipeline?.timeAggregation,
       groupAggregation: primaryPipeline?.groupAggregation,
     };
@@ -772,51 +766,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
       request.collectAttributesValuesLimit = 10;
     }
-    let secondaryRequest$: Observable<TimeSeriesAPIResponse | undefined> = of(undefined);
-    if (separateSecondaryRequest) {
-      const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(
-        this.item().chartSettings!.secondaryAxes!.aggregation,
-      );
-      const secondaryRequest: FetchBucketsRequest = {
-        ...request,
-        timeAggregation: secondaryPipeline?.timeAggregation,
-        groupAggregation: secondaryPipeline?.groupAggregation,
-        percentiles: this.getSecondaryPercentiles(),
-        collectAttributeKeys: undefined,
-        collectAttributesValuesLimit: undefined,
-      };
-      secondaryRequest$ = this._timeSeriesService.fetchBucketsWithFallback(secondaryRequest);
-    }
-    return forkJoin([this._timeSeriesService.fetchBucketsWithFallback(request), secondaryRequest$]).pipe(
-      tap(([response, secondaryResponse]) => {
+    return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
+      tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
-        this.cachedSecondaryResponse = secondaryResponse;
         this.cachedRequest = request;
         this.emptyStateChange.emit(response.matrix.length === 0);
       }),
-      switchMap(([response, secondaryResponse]) => this.createChartSettings(response, request, secondaryResponse)),
+      switchMap((response) => this.createChartSettings(response, request)),
       takeUntilDestroyed(this._destroyRef),
-    );
-  }
-
-  /**
-   * The primary and secondary axes share one buckets request as long as they use the same aggregation pipeline.
-   * When their pipelines differ, the secondary axes values must be aggregated by a dedicated request.
-   */
-  private needsSeparateSecondaryRequest(): boolean {
-    const secondaryAxes = this.item().chartSettings!.secondaryAxes;
-    if (!secondaryAxes) {
-      return false;
-    }
-    const primaryPipeline = PipelineAggregationUtils.getCustomPipeline(
-      this.item().chartSettings!.primaryAxes.aggregation,
-    );
-    const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(secondaryAxes.aggregation);
-    return (
-      primaryPipeline?.timeAggregation !== secondaryPipeline?.timeAggregation ||
-      primaryPipeline?.groupAggregation !== secondaryPipeline?.groupAggregation
     );
   }
 
@@ -921,9 +880,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
   }
 
-  private getRequiredPercentiles(includeSecondary: boolean): number[] {
+  private getRequiredPercentiles(): number[] {
     const primaryAggregation = this.item().chartSettings!.primaryAxes.aggregation;
+    const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const percentilesToRequest: number[] = [];
+    // a custom pipeline yields scalars, out of which no percentile can be extracted
     if (!PipelineAggregationUtils.getCustomPipeline(primaryAggregation)) {
       if (primaryAggregation.type === ChartAggregation.MEDIAN) {
         percentilesToRequest.push(50);
@@ -931,25 +892,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       if (primaryAggregation.type === ChartAggregation.PERCENTILE) {
         percentilesToRequest.push(this.getPrimaryPclValue() || 90);
       }
-    }
-    if (includeSecondary) {
-      percentilesToRequest.push(...this.getSecondaryPercentiles());
+      if (secondaryAggregation?.type === ChartAggregation.MEDIAN) {
+        percentilesToRequest.push(50);
+      }
+      if (secondaryAggregation?.type === ChartAggregation.PERCENTILE) {
+        percentilesToRequest.push(secondaryAggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90);
+      }
     }
     return percentilesToRequest;
-  }
-
-  private getSecondaryPercentiles(): number[] {
-    const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
-    if (!secondaryAggregation || PipelineAggregationUtils.getCustomPipeline(secondaryAggregation)) {
-      return [];
-    }
-    if (secondaryAggregation.type === ChartAggregation.MEDIAN) {
-      return [50];
-    }
-    if (secondaryAggregation.type === ChartAggregation.PERCENTILE) {
-      return [secondaryAggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90];
-    }
-    return [];
   }
 
   private getBucketValue(

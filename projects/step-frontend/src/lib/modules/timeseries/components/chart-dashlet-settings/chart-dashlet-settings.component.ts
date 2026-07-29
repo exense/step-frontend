@@ -1,11 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import {
-  AxesSettings,
-  DashboardItem,
-  ErrorMessageHandlerService,
-  MetricAggregation,
-  MetricAttribute,
-} from '@exense/step-core';
+import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -83,11 +77,6 @@ export class ChartDashletSettingsComponent implements OnInit {
     timeAggregation: PipelineAggregation.AVG,
     groupAggregation: PipelineAggregation.SUM,
   };
-  secondaryAggregationMode: AggregationMode = 'STANDARD';
-  secondaryPipeline: AggregationPipeline = {
-    timeAggregation: PipelineAggregation.AVG,
-    groupAggregation: PipelineAggregation.SUM,
-  };
   showSecondaryAxes = false;
   private stashedSecondaryAxes?: AxesSettings;
 
@@ -115,13 +104,7 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.primaryAggregationMode = 'CUSTOM';
       this.primaryPipeline = primaryPipeline;
     }
-    const secondaryAxes = this.item.chartSettings!.secondaryAxes;
-    this.showSecondaryAxes = !!secondaryAxes;
-    const secondaryPipeline = PipelineAggregationUtils.getCustomPipeline(secondaryAxes?.aggregation);
-    if (secondaryPipeline) {
-      this.secondaryAggregationMode = 'CUSTOM';
-      this.secondaryPipeline = secondaryPipeline;
-    }
+    this.showSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
   }
 
   handleShowSecondaryAxesChange(show: boolean): void {
@@ -136,14 +119,10 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   private createDefaultSecondaryAxes(): AxesSettings {
-    const aggregation: MetricAggregation =
-      this.secondaryAggregationMode === 'CUSTOM'
-        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline)
-        : { type: 'SUM' };
     return {
-      aggregation,
+      aggregation: { type: 'SUM' },
       displayType: 'BAR_CHART',
-      colorizationType: 'FILL',
+      colorizationType: 'STROKE',
       unit: '',
     };
   }
@@ -183,31 +162,19 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.formContainer.form.markAllAsTouched();
       return;
     }
-    this.applyAggregationModes();
+    this.applyAggregationMode();
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }
 
-  private applyAggregationModes(): void {
-    const chartSettings = this.item.chartSettings!;
-    if (this.primaryAggregationMode === 'CUSTOM') {
-      chartSettings.primaryAxes.aggregation = PipelineAggregationUtils.createCustomPipelineAggregation(
-        this.primaryPipeline,
-      );
-    } else {
-      chartSettings.primaryAxes.aggregation = PipelineAggregationUtils.createStandardAggregation(
-        chartSettings.primaryAxes.aggregation,
-      );
-    }
-    const secondaryAxes = chartSettings.secondaryAxes;
-    if (secondaryAxes) {
-      if (this.secondaryAggregationMode === 'CUSTOM') {
-        secondaryAxes.aggregation = PipelineAggregationUtils.createCustomPipelineAggregation(this.secondaryPipeline);
-      } else {
-        secondaryAxes.aggregation = PipelineAggregationUtils.createStandardAggregation(secondaryAxes.aggregation);
-      }
-    }
+  private applyAggregationMode(): void {
+    // only the primary axes support a custom pipeline: the secondary ones aggregate the primary series client side
+    const primaryAxes = this.item.chartSettings!.primaryAxes;
+    primaryAxes.aggregation =
+      this.primaryAggregationMode === 'CUSTOM'
+        ? PipelineAggregationUtils.createCustomPipelineAggregation(this.primaryPipeline)
+        : PipelineAggregationUtils.createStandardAggregation(primaryAxes.aggregation);
   }
 
   handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {

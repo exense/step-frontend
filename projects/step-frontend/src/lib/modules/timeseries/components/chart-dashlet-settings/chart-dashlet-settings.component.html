@@ -351,10 +351,10 @@
         <mat-divider />
         <div class="axis-heading">
           <step-label
-            >Secondary axis
+            >Total axis
             <step-icon
               class="help-icon"
-              matTooltip="The secondary axis combines each group's aggregated value into a single combined series, thus showing the total aggregated values across series."
+              matTooltip="The total axis combines all the series of the primary axis into one single total series, drawn on its own axis on the right. It is computed out of the primary axis data, so it has no metric, grouping or filtering of its own."
               name="help-circle"
             ></step-icon>
           </step-label>
@@ -363,36 +363,30 @@
             [ngModel]="showSecondaryAxes"
             (ngModelChange)="handleShowSecondaryAxesChange($event)"
             name="showSecondaryAxes"
-            >Show secondary axis</mat-slide-toggle
+            >Show total axis</mat-slide-toggle
           >
         </div>
         @if (showSecondaryAxes && item.chartSettings!.secondaryAxes; as secondaryAxes) {
           <div class="axis-card">
-            <div class="axis-subheader">
-              <div class="axis-subheader-titles">
-                <span class="axis-subheader-title">Aggregation</span>
-                <span class="axis-subheader-description">Define how data is aggregated.</span>
+            @if (primaryAggregationMode === 'STANDARD') {
+              <div class="section-description">
+                All the series of the primary axis are combined into one single total series. The value selected below
+                is computed for each series, then summed across all of them.
               </div>
-              <mat-button-toggle-group [(ngModel)]="secondaryAggregationMode" name="secondaryAggregationMode">
-                <mat-button-toggle value="STANDARD">Standard</mat-button-toggle>
-                <mat-button-toggle value="CUSTOM">Custom</mat-button-toggle>
-              </mat-button-toggle-group>
-              <step-icon
-                class="help-icon"
-                [matTooltip]="
-                  'Standard: Combines all data points together over time and across series using a single aggregation function.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications).'
-                "
-                name="help-circle"
-              ></step-icon>
-            </div>
-            @if (secondaryAggregationMode === 'STANDARD') {
-              <div class="form-row half-width">
+            } @else {
+              <div class="section-description">
+                All the series of the primary axis are combined into one single total series. It displays the sum of the
+                values produced by the custom aggregation, so there is nothing to configure here.
+              </div>
+            }
+            <div class="form-row" [class.half-width]="primaryAggregationMode === 'CUSTOM'">
+              @if (primaryAggregationMode === 'STANDARD') {
                 <step-form-field>
                   <step-label
-                    >Aggregation
+                    >Sum of
                     <step-icon
                       class="help-icon"
-                      matTooltip="Value extracted from the merged samples of each time bucket"
+                      matTooltip="This value is extracted from each series of the primary axis, and the results are then summed into the total series. Selecting Average therefore displays the sum of the per-series averages, not the overall average."
                       name="help-circle"
                     ></step-icon>
                   </step-label>
@@ -411,81 +405,22 @@
                     }
                   </button>
                 </step-form-field>
-              </div>
-              <mat-menu #secondaryAggregateMenu="matMenu">
-                <step-timeseries-aggregate-picker
-                  [selectedAggregate]="secondaryAxes.aggregation"
-                  [pclValue]="secondaryAxes.aggregation.params?.['pclValue']"
-                  (aggregateChange)="handleSecondaryAggregationChange($event)"
-                />
-              </mat-menu>
-            } @else {
-              <div class="form-row">
-                <div class="field-with-hint">
-                  <step-form-field>
-                    <step-label
-                      >Time aggregation
-                      <step-icon
-                        class="help-icon"
-                        matTooltip="The calculation applied over time within each series (e.g., Average value per 1-minute bucket)."
-                        name="help-circle"
-                      ></step-icon>
-                    </step-label>
-                    <mat-select [(ngModel)]="secondaryPipeline.timeAggregation" name="secondaryTimeAggregation">
-                      @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
-                        <mat-option [value]="option.value">{{ option.label }}</mat-option>
-                      }
-                    </mat-select>
-                  </step-form-field>
-                  <div class="field-hint">How values are combined within each time interval.</div>
-                </div>
-                <div class="field-with-hint">
-                  <step-form-field>
-                    <step-label
-                      >Series aggregation
-                      <step-icon
-                        class="help-icon"
-                        matTooltip="The calculation applied across different series in a group for each time bucket (e.g., Sum across all applications)."
-                        name="help-circle"
-                      ></step-icon>
-                    </step-label>
-                    <mat-select [(ngModel)]="secondaryPipeline.groupAggregation" name="secondaryGroupAggregation">
-                      @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
-                        <mat-option [value]="option.value">{{ option.label }}</mat-option>
-                      }
-                    </mat-select>
-                  </step-form-field>
-                  <div class="field-hint">How series are combined across the same group.</div>
-                </div>
-              </div>
-            }
-            <mat-divider />
-            <div class="axis-subheader">
-              <div class="axis-subheader-titles">
-                <span class="axis-subheader-title">Appearance</span>
-                <span class="axis-subheader-description">Define how the aggregated data is displayed.</span>
-              </div>
-            </div>
-            <div class="form-row">
-              <step-form-field>
-                <step-label
-                  >Unit
-                  <step-icon
-                    class="help-icon"
-                    matTooltip="Unit appended to the axis values, like 'ms', 'hrs', '%'"
-                    name="help-circle"
-                  ></step-icon>
-                </step-label>
-                <input
-                  placeholder="Series units, like 'ms', 'hrs', '%'"
-                  name="secondaryUnit"
-                  [(ngModel)]="secondaryAxes.unit"
-                />
-              </step-form-field>
+                <mat-menu #secondaryAggregateMenu="matMenu">
+                  <step-timeseries-aggregate-picker
+                    [selectedAggregate]="secondaryAxes.aggregation"
+                    [pclValue]="secondaryAxes.aggregation.params?.['pclValue']"
+                    (aggregateChange)="handleSecondaryAggregationChange($event)"
+                  />
+                </mat-menu>
+              }
               <step-form-field>
                 <step-label
                   >Chart type
-                  <step-icon class="help-icon" matTooltip="How the series are drawn" name="help-circle"></step-icon>
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="How the total series is drawn"
+                    name="help-circle"
+                  ></step-icon>
                 </step-label>
                 <mat-select [(ngModel)]="secondaryAxes.displayType" name="secondaryDisplayType">
                   <mat-option [value]="'BAR_CHART'" class="option-with-icon">
@@ -500,20 +435,6 @@
                       <span>Line</span>
                     </div>
                   </mat-option>
-                </mat-select>
-              </step-form-field>
-              <step-form-field>
-                <step-label
-                  >Color style
-                  <step-icon
-                    class="help-icon"
-                    matTooltip="Whether the series are drawn with a stroke only or with a filled area"
-                    name="help-circle"
-                  ></step-icon>
-                </step-label>
-                <mat-select [(ngModel)]="secondaryAxes.colorizationType" name="secondaryColorizationType">
-                  <mat-option [value]="'STROKE'">Stroke only</mat-option>
-                  <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
                 </mat-select>
               </step-form-field>
             </div>
