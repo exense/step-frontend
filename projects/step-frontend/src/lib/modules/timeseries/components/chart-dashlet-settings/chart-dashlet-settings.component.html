@@ -28,21 +28,15 @@
             </mat-select>
           </step-form-field>
         </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Type</step-label>
-            <input disabled placeholder="Type" [value]="item.type" name="type" />
-          </step-form-field>
-
-          <step-form-field>
-            <step-label>Metric</step-label>
-            <input
-              disabled
-              placeholder="Metric"
-              [value]="item.masterChartId ? ' - inherited -' : item.metricKey"
-              name="metricKey"
-            />
-          </step-form-field>
+        <div class="readonly-field">
+          <div class="readonly-field-label">Metric</div>
+          <div class="readonly-field-value">
+            @if (item.masterChartId) {
+              Inherited from the master dashlet
+            } @else {
+              {{ item.metricKey }}
+            }
+          </div>
         </div>
         <mat-divider />
         <div class="section-header">
@@ -60,9 +54,9 @@
                 [updateTimeRangeOption]="false"
               />
             }
-            <button class="add-filter-button" mat-stroked-button color="primary" [matMenuTriggerFor]="typesMenu">
-              <step-icon name="plus"></step-icon>
-              Add filter
+            <button type="button" class="add-filter-button" mat-raised-button [matMenuTriggerFor]="typesMenu">
+              <step-icon name="plus" />
+              <span>Filter</span>
             </button>
           </div>
           <div class="form-row">
@@ -88,7 +82,7 @@
                   [(ngModel)]="item.inheritSpecificFiltersOnly"
                   name="inheritSpecificFiltersOnly"
                 >
-                  <span>Inherit specific fields only</span>
+                  <span>Inherit specific filters only</span>
                   <step-icon
                     class="help-icon"
                     matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
@@ -181,19 +175,22 @@
               <span class="axis-subheader-title">Aggregation</span>
               <span class="axis-subheader-description">Define how data is aggregated.</span>
             </div>
-            <mat-button-toggle-group [(ngModel)]="primaryAggregationMode" name="primaryAggregationMode">
-              <mat-button-toggle value="STANDARD">Standard</mat-button-toggle>
-              <mat-button-toggle value="CUSTOM">Custom</mat-button-toggle>
-            </mat-button-toggle-group>
+            <step-tabs
+              [tabs]="AGGREGATION_MODES"
+              [shrink]="true"
+              [compactTabs]="true"
+              [activeTabId]="primaryAggregationMode"
+              (activeTabIdChange)="primaryAggregationMode = $event"
+            />
             <step-icon
               class="help-icon"
               [matTooltip]="
-                'Standard: Combines all data points together over time and across series using a single aggregation function.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications).'
+                'Single: Combines all data points together over time and across series, then applies one single aggregation function.\n\nTwo-stage: Applies separate aggregation functions in two stages, first over time (e.g., Average per minute) and then across series (e.g., Sum across applications).'
               "
               name="help-circle"
             ></step-icon>
           </div>
-          @if (primaryAggregationMode === 'STANDARD') {
+          @if (primaryAggregationMode === 'SINGLE') {
             <div class="form-row half-width">
               <step-form-field>
                 <step-label
@@ -302,7 +299,7 @@
             </step-form-field>
             <step-form-field>
               <step-label
-                >Chart type
+                >Plot type
                 <step-icon class="help-icon" matTooltip="How the series are drawn" name="help-circle"></step-icon>
               </step-label>
               <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
@@ -368,7 +365,7 @@
         </div>
         @if (showSecondaryAxes && item.chartSettings!.secondaryAxes; as secondaryAxes) {
           <div class="axis-card">
-            @if (primaryAggregationMode === 'STANDARD') {
+            @if (primaryAggregationMode === 'SINGLE') {
               <div class="section-description">
                 All the series of the primary axis are combined into one single total series. The value selected below
                 is computed for each series, then summed across all of them.
@@ -376,11 +373,11 @@
             } @else {
               <div class="section-description">
                 All the series of the primary axis are combined into one single total series. It displays the sum of the
-                values produced by the custom aggregation, so there is nothing to configure here.
+                values produced by the two-stage aggregation, so there is nothing to configure here.
               </div>
             }
-            <div class="form-row" [class.half-width]="primaryAggregationMode === 'CUSTOM'">
-              @if (primaryAggregationMode === 'STANDARD') {
+            <div class="form-row" [class.half-width]="primaryAggregationMode === 'TWO_STAGE'">
+              @if (primaryAggregationMode === 'SINGLE') {
                 <step-form-field>
                   <step-label
                     >Sum of
@@ -415,7 +412,7 @@
               }
               <step-form-field>
                 <step-label
-                  >Chart type
+                  >Plot type
                   <step-icon
                     class="help-icon"
                     matTooltip="How the total series is drawn"

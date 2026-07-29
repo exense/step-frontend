@@ -41,6 +41,8 @@ div[step-modal-window-body] > form {
   & > * {
     flex-grow: 1;
     flex-basis: 0;
+    // without this, the items refuse to shrink below their content and widen the whole dialog
+    min-width: 0;
   }
 }
 
@@ -62,14 +64,27 @@ div[step-modal-window-body] > form {
   color: var.$gray-800;
 }
 
+// same design as the add filter button of the dashboard filter bar
 .add-filter-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
+  @include core.button-round;
+  min-width: 9rem;
+  border: 1px solid var.$gray-300 !important;
+}
 
-  step-icon {
-    transform: scale(0.85);
-  }
+.readonly-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.readonly-field-label {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.readonly-field-value {
+  font-weight: 500;
+  color: var.$gray-800;
 }
 
 .axis-heading {
@@ -93,6 +108,11 @@ div[step-modal-window-body] > form {
   flex-direction: row;
   align-items: center;
   gap: 1.2rem;
+
+  // step-tabs spans the full width by default, which would stretch it across the whole row
+  step-tabs {
+    width: auto;
+  }
 }
 
 .axis-subheader-titles {
@@ -109,11 +129,6 @@ div[step-modal-window-body] > form {
 .axis-subheader-description {
   color: var.$gray-500;
   font-size: 1.2rem;
-}
-
-.axis-subheader mat-button-toggle-group {
-  height: 3.2rem;
-  align-items: center;
 }
 
 .field-with-hint {
@@ -136,5 +151,4 @@ div[step-modal-window-body] > form {
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  background: var.$gray-50;
 }

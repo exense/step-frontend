@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
+import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute, Tab } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -28,7 +28,7 @@ export interface ChartDashletSettingsData {
   context: TimeSeriesContext;
 }
 
-export type AggregationMode = 'STANDARD' | 'CUSTOM';
+export type AggregationMode = 'SINGLE' | 'TWO_STAGE';
 
 @Component({
   selector: 'step-chart-dashlet-settings',
@@ -54,6 +54,11 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   readonly PIPELINE_AGGREGATION_OPTIONS = PIPELINE_AGGREGATION_OPTIONS;
 
+  readonly AGGREGATION_MODES: Tab<AggregationMode>[] = [
+    { id: 'SINGLE', label: 'Single' },
+    { id: 'TWO_STAGE', label: 'Two-stage' },
+  ];
+
   readonly AGGREGATION_LABELS: Record<string, string> = {
     SUM: 'Sum',
     AVG: 'Average',
@@ -72,7 +77,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
 
-  primaryAggregationMode: AggregationMode = 'STANDARD';
+  primaryAggregationMode: AggregationMode = 'SINGLE';
   primaryPipeline: AggregationPipeline = {
     timeAggregation: PipelineAggregation.AVG,
     groupAggregation: PipelineAggregation.SUM,
@@ -101,7 +106,7 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.item.chartSettings!.primaryAxes.aggregation,
     );
     if (primaryPipeline) {
-      this.primaryAggregationMode = 'CUSTOM';
+      this.primaryAggregationMode = 'TWO_STAGE';
       this.primaryPipeline = primaryPipeline;
     }
     this.showSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
@@ -172,7 +177,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     // only the primary axes support a custom pipeline: the secondary ones aggregate the primary series client side
     const primaryAxes = this.item.chartSettings!.primaryAxes;
     primaryAxes.aggregation =
-      this.primaryAggregationMode === 'CUSTOM'
+      this.primaryAggregationMode === 'TWO_STAGE'
         ? PipelineAggregationUtils.createCustomPipelineAggregation(this.primaryPipeline)
         : PipelineAggregationUtils.createStandardAggregation(primaryAxes.aggregation);
   }

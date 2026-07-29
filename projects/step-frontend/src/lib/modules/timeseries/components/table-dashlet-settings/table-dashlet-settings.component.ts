@@ -5,6 +5,7 @@ import {
   ErrorMessageHandlerService,
   MetricAttribute,
   MetricType,
+  Tab,
   TimeSeriesService,
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -30,7 +31,7 @@ export interface ChartDashletSettingsData {
   context: TimeSeriesContext;
 }
 
-export type AggregationMode = 'STANDARD' | 'CUSTOM';
+export type AggregationMode = 'SINGLE' | 'TWO_STAGE';
 
 @Component({
   selector: 'step-table-dashlet-settings',
@@ -54,11 +55,16 @@ export class TableDashletSettingsComponent implements OnInit {
 
   readonly PIPELINE_AGGREGATION_OPTIONS = PIPELINE_AGGREGATION_OPTIONS;
 
+  readonly AGGREGATION_MODES: Tab<AggregationMode>[] = [
+    { id: 'SINGLE', label: 'Single' },
+    { id: 'TWO_STAGE', label: 'Two-stage' },
+  ];
+
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
 
-  aggregationMode: AggregationMode = 'STANDARD';
+  aggregationMode: AggregationMode = 'SINGLE';
   pipeline: AggregationPipeline = {
     timeAggregation: PipelineAggregation.AVG,
     groupAggregation: PipelineAggregation.SUM,
@@ -80,7 +86,7 @@ export class TableDashletSettingsComponent implements OnInit {
   private initAggregationMode(): void {
     const pipeline = PipelineAggregationUtils.getCustomPipeline(this.item.tableSettings!.aggregation);
     if (pipeline) {
-      this.aggregationMode = 'CUSTOM';
+      this.aggregationMode = 'TWO_STAGE';
       this.pipeline = pipeline;
     }
   }
@@ -130,9 +136,9 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   private applyAggregationMode(): void {
-    // the column selection is left untouched in custom mode, so that it is restored when switching back to standard
+    // the column selection is left untouched in two-stage mode, so that it is restored when switching back to single
     this.item.tableSettings!.aggregation =
-      this.aggregationMode === 'CUSTOM'
+      this.aggregationMode === 'TWO_STAGE'
         ? PipelineAggregationUtils.createCustomPipelineAggregation(this.pipeline)
         : undefined;
   }

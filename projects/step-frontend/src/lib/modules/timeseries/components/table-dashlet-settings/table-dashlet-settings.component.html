@@ -12,16 +12,9 @@
             <input placeholder="Dashlet name" [(ngModel)]="item.name" name="name" required />
           </step-form-field>
         </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Type</step-label>
-            <input disabled placeholder="Type" [value]="item.type" name="type" />
-          </step-form-field>
-
-          <step-form-field>
-            <step-label>Metric</step-label>
-            <input disabled placeholder="Metric" [value]="item.metricKey" name="metricKey" />
-          </step-form-field>
+        <div class="readonly-field">
+          <div class="readonly-field-label">Metric</div>
+          <div class="readonly-field-value">{{ item.metricKey }}</div>
         </div>
         <mat-divider />
         <div class="section-header">
@@ -39,9 +32,9 @@
                 (filterChange)="handleFilterChange(i, $event)"
               />
             }
-            <button class="add-filter-button" mat-stroked-button color="primary" [matMenuTriggerFor]="typesMenu">
-              <step-icon name="plus"></step-icon>
-              Add filter
+            <button type="button" class="add-filter-button" mat-raised-button [matMenuTriggerFor]="typesMenu">
+              <step-icon name="plus" />
+              <span>Filter</span>
             </button>
           </div>
           <div class="form-row">
@@ -67,7 +60,7 @@
                   [(ngModel)]="item.inheritSpecificFiltersOnly"
                   name="inheritSpecificFiltersOnly"
                 >
-                  <span>Inherit specific fields only</span>
+                  <span>Inherit specific filters only</span>
                   <step-icon
                     class="help-icon"
                     matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
@@ -157,19 +150,22 @@
             <step-label>Aggregation</step-label>
             <div class="section-description">Define how data is aggregated.</div>
           </div>
-          <mat-button-toggle-group [(ngModel)]="aggregationMode" name="aggregationMode">
-            <mat-button-toggle value="STANDARD">Standard</mat-button-toggle>
-            <mat-button-toggle value="CUSTOM">Custom</mat-button-toggle>
-          </mat-button-toggle-group>
+          <step-tabs
+            [tabs]="AGGREGATION_MODES"
+            [shrink]="true"
+            [compactTabs]="true"
+            [activeTabId]="aggregationMode"
+            (activeTabIdChange)="aggregationMode = $event"
+          />
           <step-icon
             class="help-icon"
             [matTooltip]="
-              'Standard: Combines all data points together over time and across series using a single aggregation function. Each value is displayed as a separate column.\n\nCustom: Applies separate aggregation functions for time (e.g., Average per minute) and series (e.g., Sum across applications). The result is a single value, displayed as one column.'
+              'Single: Combines all data points together over time and across series, then applies one single aggregation function. Each value is displayed as a separate column.\n\nTwo-stage: Applies separate aggregation functions in two stages, first over time (e.g., Average per minute) and then across series (e.g., Sum across applications). The result is a single value, displayed as one column.'
             "
             name="help-circle"
           ></step-icon>
         </div>
-        @if (aggregationMode === 'STANDARD') {
+        @if (aggregationMode === 'SINGLE') {
           <div class="section-description">
             Each selected column displays one value, aggregated over the whole time range and across the series of each
             row.
