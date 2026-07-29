@@ -119,6 +119,7 @@
               ]
             },
             "prod-ide": {
+              "outputPath": "dist/step-ide",
               "fileReplacements": [
                 {
                   "replace": "projects/step-app/src/environments/environment.ts",
