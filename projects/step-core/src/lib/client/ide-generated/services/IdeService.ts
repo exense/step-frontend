@@ -43,7 +43,7 @@ export class IdeService {
   public initializeNewAp(existingEmptyDirectory?: string, apName?: string): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/ap/initializeNew',
+      url: '/local/ide/ap/initialize-new',
       query: {
         existingEmptyDirectory: existingEmptyDirectory,
         apName: apName,
@@ -59,7 +59,7 @@ export class IdeService {
   public useExistingAp(directory?: string): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/ap/useExisting',
+      url: '/local/ide/ap/use-existing',
       query: {
         directory: directory,
       },
