@@ -13,7 +13,7 @@
     "build:app": "ng build @exense/step-app",
     "build:app:ide": "ng build @exense/step-app --configuration=production,prod-ide",
     "build:app:local": "ng build @exense/step-app --configuration=local,production",
-    "build": "npm run build:core && npm run build:step-frontend && npm run build:app",
+    "build": "npm run build:core && npm run build:step-frontend && npm run build:app && npm run build:app:ide",
     "build:development:ide": "npm run build:core && npm run build:step-frontend && npm run build:app:ide",
     "build:ide": "npm run build:development:ide",
     "build:local": "npm run build:core && npm run build:step-frontend && npm run build:app:local",

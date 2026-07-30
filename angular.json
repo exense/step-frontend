@@ -72,17 +72,14 @@
                 "output": "/"
               }
             ],
-            "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
-            "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
+            "styles": ["projects/step-app/src/styles.scss", "uplot/dist/uPlot.min.css"],
+            "scripts": ["uplot/dist/uPlot.iife.min.js"],
             "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
             "allowedCommonJsDependencies": ["@angular-architects/module-federation", "ace-builds", "luxon"]
           },
           "configurations": {
-            "local": {
-              "styles": ["projects/step-app/src/styles.scss", "../node_modules/uplot/dist/uPlot.min.css"],
-              "scripts": ["../node_modules/uplot/dist/uPlot.iife.min.js"]
-            },
+            "local": {},
             "production": {
               "budgets": [
                 {
@@ -122,6 +119,7 @@
               ]
             },
             "prod-ide": {
+              "outputPath": "dist/step-ide",
               "fileReplacements": [
                 {
                   "replace": "projects/step-app/src/environments/environment.ts",
