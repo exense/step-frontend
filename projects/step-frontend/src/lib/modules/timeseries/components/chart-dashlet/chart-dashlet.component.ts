@@ -388,9 +388,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
-        response.matrix[i].forEach((b: BucketResponse) => metadata.push(b?.attributes));
+        seriesBuckets.forEach((b: BucketResponse) => metadata.push(b?.attributes));
         if (hasSecondaryAxes) {
-          accumulateSecondarySeries(response.matrix[i], response.interval);
+          accumulateSecondarySeries(seriesBuckets, response.interval);
         }
       }
       const seriesData: (number | undefined | null)[] = [];
