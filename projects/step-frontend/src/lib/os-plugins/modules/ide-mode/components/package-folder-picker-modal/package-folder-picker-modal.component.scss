@@ -5,6 +5,16 @@ div[step-modal-window-body] {
   gap: 1rem;
 }
 
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  step-form-field {
+    flex: 1;
+  }
+}
+
 .folder-list {
   display: flex;
   flex-direction: column;

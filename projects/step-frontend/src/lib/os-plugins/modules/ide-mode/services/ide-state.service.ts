@@ -1,16 +1,16 @@
-import {inject, Injectable, signal, untracked} from '@angular/core';
-import {AutomationPackageDescriptor, GlobalReloadService, IdeService} from '@exense/step-core';
-import {MatDialog} from '@angular/material/dialog';
-import {filter, finalize, map, Observable, switchMap, tap} from 'rxjs';
+import { inject, Injectable, signal, untracked } from '@angular/core';
+import { AutomationPackageDescriptor, GlobalReloadService, IdeService } from '@exense/step-core';
+import { MatDialog } from '@angular/material/dialog';
+import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
 import {
   PackageFolderPickerModalComponent,
   PackageFolderPickerModalData,
-  PackageFolderPickerModalResult
+  PackageFolderPickerModalResult,
 } from '../components/package-folder-picker-modal/package-folder-picker-modal.component';
-import {ApAccessHistoryService} from './ap-access-history.service';
+import { ApAccessHistoryService } from './ap-access-history.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IdeStateService {
   private _ideApi = inject(IdeService);
@@ -35,15 +35,15 @@ export class IdeStateService {
       const current = this.currentPackage();
       return !!current;
     });
-  };
+  }
 
   initialize(): void {
     this.inProgressInternal.set(true);
     this._ideApi
       .getCurrentAp()
       .pipe(
-        map((result) => !result?.directory ? undefined : result),
-        finalize(() => this.inProgressInternal.set(false))
+        map((result) => (!result?.directory ? undefined : result)),
+        finalize(() => this.inProgressInternal.set(false)),
       )
       .subscribe((currentAp) => this.setPackage(currentAp));
   }
@@ -52,24 +52,22 @@ export class IdeStateService {
     this.inProgressInternal.set(true);
     this._ideApi
       .closeAp()
-      .pipe(
-        finalize(() => this.inProgressInternal.set(false))
-      )
+      .pipe(finalize(() => this.inProgressInternal.set(false)))
       .subscribe(() => this.setPackage(undefined));
   }
 
   create(): void {
-    this.openPackageFolderDialog({title: 'Create package', withName: true})
+    this.openPackageFolderDialog({ title: 'Create package', withName: true })
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
-        switchMap(({directory, name}) => this._ideApi.initializeNewAp(directory, name)),
+        switchMap(({ directory, name }) => this._ideApi.initializeNewAp(directory, name)),
         switchMap(() => this._ideApi.getCurrentAp()),
-        map((result) => !result?.directory ? undefined : result),
-        finalize(() => this.inProgressInternal.set(false))
+        map((result) => (!result?.directory ? undefined : result)),
+        finalize(() => this.inProgressInternal.set(false)),
       )
       .subscribe((result) => {
-        this.setPackage(result)
+        this.setPackage(result);
         if (result) {
           this._accessHistory.addToHistory(result);
         }
@@ -77,17 +75,17 @@ export class IdeStateService {
   }
 
   openWithPicker(): void {
-    this.openPackageFolderDialog({title: 'Open package'})
+    this.openPackageFolderDialog({ title: 'Open package' })
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
-        switchMap(({directory}) => this._ideApi.useExistingAp(directory)),
+        switchMap(({ directory }) => this._ideApi.useExistingAp(directory)),
         switchMap(() => this._ideApi.getCurrentAp()),
-        map((result) => !result?.directory ? undefined : result),
-        finalize(() => this.inProgressInternal.set(false))
+        map((result) => (!result?.directory ? undefined : result)),
+        finalize(() => this.inProgressInternal.set(false)),
       )
       .subscribe((result) => {
-        this.setPackage(result)
+        this.setPackage(result);
         if (result) {
           this._accessHistory.addToHistory(result);
         }
@@ -96,25 +94,37 @@ export class IdeStateService {
 
   openFromPath(directory: string): void {
     this.inProgressInternal.set(true);
-    this._ideApi.useExistingAp(directory)
+    this._ideApi
+      .useExistingAp(directory)
       .pipe(
         switchMap(() => this._ideApi.getCurrentAp()),
-        map((result) => !result?.directory ? undefined : result),
-        finalize(() => this.inProgressInternal.set(false))
+        map((result) => (!result?.directory ? undefined : result)),
+        finalize(() => this.inProgressInternal.set(false)),
       )
       .subscribe((result) => {
-        this.setPackage(result)
+        this.setPackage(result);
         if (result) {
           this._accessHistory.addToHistory(result);
         }
       });
   }
 
-  private openPackageFolderDialog(data: PackageFolderPickerModalData): Observable<PackageFolderPickerModalResult | undefined>  {
-    return this._matDialog.open<PackageFolderPickerModalComponent, PackageFolderPickerModalData, PackageFolderPickerModalResult>(
-      PackageFolderPickerModalComponent,
-      {data}
-    ).afterClosed();
+  reload(): void {
+    const directory = this.currentPackage()?.directory;
+    if (directory && !this.inProgress()) {
+      this.openFromPath(directory);
+    }
   }
 
+  private openPackageFolderDialog(
+    data: PackageFolderPickerModalData,
+  ): Observable<PackageFolderPickerModalResult | undefined> {
+    return this._matDialog
+      .open<
+        PackageFolderPickerModalComponent,
+        PackageFolderPickerModalData,
+        PackageFolderPickerModalResult
+      >(PackageFolderPickerModalComponent, { data })
+      .afterClosed();
+  }
 }

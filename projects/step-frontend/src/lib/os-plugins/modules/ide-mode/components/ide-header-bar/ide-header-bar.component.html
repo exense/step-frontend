@@ -1,20 +1,34 @@
 <div class="package">
-  @if(_ideState.currentPackage(); as package) {
-    <span>
+  @if (_ideState.currentPackage(); as package) {
+    <span class="package-details">
       <span class="icon">
-        @if(_ideState.inProgress()) {
+        @if (_ideState.inProgress()) {
           <step-icon name="refresh-cw" class="spin-animation status-icon" />
         } @else {
-          <step-icon name="file"/>
+          <step-icon name="file" />
         }
       </span>
-      <span>{{package.name}}</span>
+      <span class="package-info">
+        <span class="package-name">
+          <span>{{ package.name }}</span>
+          <button
+            stepTestId="reload-package-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Reload package"
+            [disabled]="_ideState.inProgress()"
+            (click)="_ideState.reload()"
+          >
+            <step-icon name="refresh-cw" />
+          </button>
+        </span>
+        <span class="package-directory">{{ package.directory }}</span>
+      </span>
     </span>
-    <span>{{package.directory}}</span>
   } @else {
-    <span>
+    <span class="package-details">
       <span class="icon">
-        @if(_ideState.inProgress()) {
+        @if (_ideState.inProgress()) {
           <step-icon name="refresh-cw" class="spin-animation status-icon" />
         }
       </span>
@@ -24,30 +38,36 @@
 </div>
 <section>
   <button type="button" mat-button mat-stroked-button [matMenuTriggerFor]="openMenu">
-    <step-icon name="folder"/>
+    <step-icon name="folder" />
     <span>Open package</span>
   </button>
   <button type="button" mat-button mat-stroked-button (click)="_ideState.create()">
-    <step-icon name="plus"/>
+    <step-icon name="plus" />
     <span>New package</span>
   </button>
-  <button type="button" mat-button mat-stroked-button (click)="_ideState.close()" [disabled]="!_ideState.currentPackage()">
-    <step-icon name="x"/>
+  <button
+    type="button"
+    mat-button
+    mat-stroked-button
+    (click)="_ideState.close()"
+    [disabled]="!_ideState.currentPackage()"
+  >
+    <step-icon name="x" />
     <span>Close package</span>
   </button>
 </section>
 <mat-menu #openMenu>
   <button type="button" mat-menu-item (click)="_ideState.openWithPicker()">
-    <step-icon name="folder"/>
+    <step-icon name="folder" />
     <span>Open from filesystem</span>
   </button>
-  <mat-divider/>
-  @for(item of _apAccessHistory.history(); track item.directory) {
-    <button type="button" class="recent" mat-menu-item (click)="_ideState.openFromPath(item.directory!)">
-      <div class="btn-recent-content">
-        <step-icon name="file"/>
-        <span>{{item.name}}</span>
-        <span>{{item.directory}}</span>
+  <mat-divider />
+  <div class="step-ide-history-label">History</div>
+  @for (item of _apAccessHistory.history(); track item.directory) {
+    <button type="button" class="step-ide-history-item" mat-menu-item (click)="_ideState.openFromPath(item.directory!)">
+      <div class="step-ide-history-content">
+        <span>{{ item.name }}</span>
+        <span>{{ item.directory }}</span>
       </div>
     </button>
   }
