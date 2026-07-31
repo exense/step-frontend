@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 div[step-modal-window-body] {
   display: flex;
   flex-direction: column;
@@ -25,8 +27,9 @@ div[step-modal-window-body] {
   button {
     min-height: 3rem;
     justify-content: flex-start;
-    &:not(.selected) step-icon {
-      visibility: hidden;
+
+    &.selected {
+      background: var.$blue-15;
     }
   }
 }

@@ -15,7 +15,7 @@
         type="button"
         mat-icon-button
         matTooltip="Go to parent folder"
-        [disabled]="!parentPath()"
+        [disabled]="showingRoots() || !canNavigateUp()"
         (click)="loadParentDirectory()"
       >
         <step-icon name="corner-left-up" />
@@ -51,7 +51,6 @@
             (click)="onSelectFolder(item.absolutePath)"
             (dblclick)="onLoadSubfolder(item.absolutePath)"
           >
-            <step-icon name="check" />
             {{ item.name }}
           </button>
         }
@@ -60,7 +59,9 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="_dialogRef.close(undefined)">Cancel</button>
-    <button type="button" mat-stroked-button (click)="onCreateFolder()">Create Folder</button>
+    <button type="button" mat-stroked-button (click)="onCreateFolder()" [disabled]="!currentPath()">
+      Create Folder
+    </button>
     <button
       type="button"
       mat-flat-button

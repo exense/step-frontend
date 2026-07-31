@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogsService, DirectoryListing, FileDescriptor, FilesystemService, StepCoreModule } from '@exense/step-core';
 import { switchMap, map, filter } from 'rxjs';
@@ -30,9 +30,12 @@ export class PackageFolderPickerModalComponent implements OnInit {
 
   protected readonly currentPath = signal<string | null>(null);
   protected readonly parentPath = signal<string | null>(null);
+  protected readonly roots = signal<FileDescriptor[]>([]);
+  protected readonly showingRoots = signal(false);
   protected readonly items = signal<FileDescriptor[]>([]);
   protected readonly selectedFolder = signal<string | null>(null);
   protected readonly locationControl = this._fb.control('');
+  protected readonly canNavigateUp = computed(() => !!this.parentPath() || this.roots().length > 0);
 
   private _dialogService = inject(DialogsService);
 
@@ -42,6 +45,7 @@ export class PackageFolderPickerModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDirectory(this._data.initialDirectory ?? '');
+    this._filesystemService.getRoots().subscribe((roots) => this.roots.set(roots));
   }
 
   protected loadLocation(): void {
@@ -55,6 +59,8 @@ export class PackageFolderPickerModalComponent implements OnInit {
     const parentPath = this.parentPath();
     if (parentPath) {
       this.loadDirectory(parentPath);
+    } else if (this.roots().length > 0) {
+      this.showRoots();
     }
   }
 
@@ -118,8 +124,18 @@ export class PackageFolderPickerModalComponent implements OnInit {
   private loadDirectory(path: string): void {
     this.selectedFolder.set(null);
     this._filesystemService.listDirectory(path, false, false, true).subscribe((result) => {
+      this.showingRoots.set(false);
       this.updateStateFromResult(result, path);
     });
+  }
+
+  private showRoots(): void {
+    this.selectedFolder.set(null);
+    this.showingRoots.set(true);
+    this.currentPath.set(null);
+    this.parentPath.set(null);
+    this.locationControl.setValue('', { emitEvent: false });
+    this.items.set(this.roots());
   }
 
   private updateStateFromResult(result: DirectoryListing, basePath: string = '/'): void {
