@@ -902,11 +902,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   /**
-   * Sampled metrics are only emitted while their source is alive. When the source disappears, like an agent leaving
-   * the grid, the backend simply stops sending samples instead of reporting an explicit 0. Forward filling such a
-   * series without a limit would keep drawing the last known value forever, suggesting the source is still there,
-   * so the fill is bounded to a small multiple of the sampling interval, after which the series drops to 0.
-   * Event driven metrics report every change and are therefore filled without limit.
+   * Sampled metrics stop emitting when their source disappears, forward fill only cover the sampling interval with some
+   * headroom. Event driven metrics report every change and are therefore filled without limit.
    */
   private getMaxForwardFillBuckets(
     samplingMode: MetricType['samplingMode'] | undefined,
