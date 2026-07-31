@@ -179,8 +179,8 @@
               [tabs]="AGGREGATION_MODES"
               [shrink]="true"
               [compactTabs]="true"
-              [activeTabId]="primaryAggregationMode"
-              (activeTabIdChange)="primaryAggregationMode = $event"
+              [activeTabId]="aggregationMode"
+              (activeTabIdChange)="aggregationMode = $event"
             />
             <step-icon
               class="help-icon"
@@ -190,7 +190,7 @@
               name="help-circle"
             ></step-icon>
           </div>
-          @if (primaryAggregationMode === 'SINGLE') {
+          @if (aggregationMode === 'SINGLE') {
             <div class="form-row half-width">
               <step-form-field>
                 <step-label
@@ -207,20 +207,20 @@
                   [matMenuTriggerFor]="aggregateMenu"
                   mat-button
                 >
-                  {{ AGGREGATION_LABELS[item.chartSettings!.primaryAxes.aggregation.type] }}
-                  @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
-                    {{ item.chartSettings!.primaryAxes.aggregation.params?.['pclValue'] }}
+                  {{ AGGREGATION_LABELS[singleStageAggregation.type] }}
+                  @if (singleStageAggregation.type === ChartAggregation.PERCENTILE) {
+                    {{ singleStageAggregation.params?.['pclValue'] }}
                   }
-                  @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE) {
-                    (/{{ item.chartSettings!.primaryAxes.aggregation.params?.['rateUnit'] }})
+                  @if (singleStageAggregation.type === ChartAggregation.RATE) {
+                    (/{{ singleStageAggregation.params?.['rateUnit'] }})
                   }
                 </button>
               </step-form-field>
             </div>
             <mat-menu #aggregateMenu="matMenu">
               <step-timeseries-aggregate-picker
-                [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
-                [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+                [selectedAggregate]="singleStageAggregation"
+                [pclValue]="singleStageAggregation.params?.['pclValue']"
                 (aggregateChange)="handlePrimaryAggregationChange($event)"
               />
             </mat-menu>
@@ -236,7 +236,7 @@
                       name="help-circle"
                     ></step-icon>
                   </step-label>
-                  <mat-select [(ngModel)]="primaryPipeline.timeAggregation" name="primaryTimeAggregation">
+                  <mat-select [(ngModel)]="twoStageAggregation.timeAggregation" name="primaryTimeAggregation">
                     @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
                       <mat-option [value]="option.value">{{ option.label }}</mat-option>
                     }
@@ -254,7 +254,7 @@
                       name="help-circle"
                     ></step-icon>
                   </step-label>
-                  <mat-select [(ngModel)]="primaryPipeline.groupAggregation" name="primaryGroupAggregation">
+                  <mat-select [(ngModel)]="twoStageAggregation.groupAggregation" name="primaryGroupAggregation">
                     @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
                       <mat-option [value]="option.value">{{ option.label }}</mat-option>
                     }
@@ -365,7 +365,7 @@
         </div>
         @if (showSecondaryAxes && item.chartSettings!.secondaryAxes; as secondaryAxes) {
           <div class="axis-card">
-            @if (primaryAggregationMode === 'SINGLE') {
+            @if (aggregationMode === 'SINGLE') {
               <div class="section-description">
                 The value selected below is computed for each series of the primary axis, and the results are summed
                 into one single total series.
@@ -376,8 +376,8 @@
                 single total series.
               </div>
             }
-            <div class="form-row" [class.half-width]="primaryAggregationMode === 'TWO_STAGE'">
-              @if (primaryAggregationMode === 'SINGLE') {
+            <div class="form-row" [class.half-width]="aggregationMode === 'TWO_STAGE'">
+              @if (aggregationMode === 'SINGLE') {
                 <step-form-field>
                   <step-label
                     >Sum of

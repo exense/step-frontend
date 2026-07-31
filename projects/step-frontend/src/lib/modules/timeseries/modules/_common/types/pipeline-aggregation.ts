@@ -1,22 +1,10 @@
-import { MetricAggregation } from '@exense/step-core';
-import { TimeSeriesConfig } from './time-series/time-series.config';
+import { MetricAggregation, TwoStageAggregation } from '@exense/step-core';
 
 /**
- * Scalar aggregations supported by the two-stage aggregation. They match the BE Aggregation enum, MERGE
- * excluded: the two stages strictly reduce their inputs to scalar values.
+ * Scalar aggregations offered for each stage of a two-stage aggregation. Derived from the backend enum so that both
+ * cannot drift apart, MERGE excluded: the two stages strictly reduce their inputs to scalar values.
  */
-export enum PipelineAggregation {
-  AVG = 'AVG',
-  SUM = 'SUM',
-  COUNT = 'COUNT',
-  MIN = 'MIN',
-  MAX = 'MAX',
-}
-
-export interface AggregationPipeline {
-  timeAggregation: PipelineAggregation;
-  groupAggregation: PipelineAggregation;
-}
+export type PipelineAggregation = Exclude<TwoStageAggregation['timeAggregation'], 'MERGE'>;
 
 export interface PipelineAggregationOption {
   value: PipelineAggregation;
@@ -25,46 +13,39 @@ export interface PipelineAggregationOption {
 
 /** Options offered by the time and series aggregation pickers of the two-stage mode */
 export const PIPELINE_AGGREGATION_OPTIONS: PipelineAggregationOption[] = [
-  { value: PipelineAggregation.AVG, label: 'Average' },
-  { value: PipelineAggregation.SUM, label: 'Sum' },
-  { value: PipelineAggregation.COUNT, label: 'Count' },
-  { value: PipelineAggregation.MIN, label: 'Min' },
-  { value: PipelineAggregation.MAX, label: 'Max' },
+  { value: 'AVG', label: 'Average' },
+  { value: 'SUM', label: 'Sum' },
+  { value: 'COUNT', label: 'Count' },
+  { value: 'MIN', label: 'Min' },
+  { value: 'MAX', label: 'Max' },
 ];
 
 export class PipelineAggregationUtils {
   /**
-   * An axes uses a two-stage aggregation when both scalar aggregations are stored in the aggregation params.
-   * Returns undefined for single-stage (merge based) aggregations.
+   * An aggregation of type TWO_STAGE carries its two stages in its twoStageAggregation. Returns undefined for the
+   * single-stage aggregations, which extract their value out of the merged bucket instead.
    */
-  static getTwoStagePipeline(aggregation?: MetricAggregation): AggregationPipeline | undefined {
-    const timeAggregation = aggregation?.params?.[TimeSeriesConfig.TIME_AGGREGATION_PARAM];
-    const groupAggregation = aggregation?.params?.[TimeSeriesConfig.GROUP_AGGREGATION_PARAM];
-    if (!timeAggregation || !groupAggregation) {
+  static getTwoStageAggregation(aggregation?: MetricAggregation): TwoStageAggregation | undefined {
+    return aggregation?.type === 'TWO_STAGE' ? aggregation.twoStageAggregation : undefined;
+  }
+
+  static createTwoStageAggregation(twoStageAggregation: TwoStageAggregation): MetricAggregation {
+    return { type: 'TWO_STAGE', twoStageAggregation };
+  }
+
+  /**
+   * The value displayed by a two-stage aggregation is the scalar produced by its group stage. This mirrors that stage
+   * into a single-stage aggregation, so that the formatting and labelling helpers keep working on one common shape.
+   * Returns undefined when the group stage merges, which the pickers never produce.
+   */
+  static toDisplayAggregation(twoStageAggregation: TwoStageAggregation): MetricAggregation | undefined {
+    if (twoStageAggregation.groupAggregation === 'MERGE') {
       return undefined;
     }
-    return { timeAggregation, groupAggregation };
+    return { type: twoStageAggregation.groupAggregation };
   }
 
-  static createTwoStageAggregation(pipeline: AggregationPipeline): MetricAggregation {
-    // the type mirrors the final scalar operation so that consumers unaware of pipelines degrade gracefully
-    return {
-      type: pipeline.groupAggregation,
-      params: {
-        [TimeSeriesConfig.TIME_AGGREGATION_PARAM]: pipeline.timeAggregation,
-        [TimeSeriesConfig.GROUP_AGGREGATION_PARAM]: pipeline.groupAggregation,
-      },
-    };
-  }
-
-  static createSingleStageAggregation(aggregation: MetricAggregation): MetricAggregation {
-    const params = { ...aggregation.params };
-    delete params[TimeSeriesConfig.TIME_AGGREGATION_PARAM];
-    delete params[TimeSeriesConfig.GROUP_AGGREGATION_PARAM];
-    return { type: aggregation.type, params };
-  }
-
-  static getPipelineLabel(pipeline: AggregationPipeline): string {
-    return `${pipeline.timeAggregation} → ${pipeline.groupAggregation}`;
+  static getPipelineLabel(twoStageAggregation: TwoStageAggregation): string {
+    return `${twoStageAggregation.timeAggregation} → ${twoStageAggregation.groupAggregation}`;
   }
 }

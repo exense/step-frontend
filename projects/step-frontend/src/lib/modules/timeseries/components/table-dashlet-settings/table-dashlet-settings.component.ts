@@ -7,6 +7,7 @@ import {
   MetricType,
   Tab,
   TimeSeriesService,
+  TwoStageAggregation,
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
@@ -20,9 +21,7 @@ import {
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
-  AggregationPipeline,
   PIPELINE_AGGREGATION_OPTIONS,
-  PipelineAggregation,
   PipelineAggregationUtils,
 } from '../../modules/_common/types/pipeline-aggregation';
 
@@ -65,9 +64,9 @@ export class TableDashletSettingsComponent implements OnInit {
   metricTypes: MetricType[] = [];
 
   aggregationMode: AggregationMode = 'SINGLE';
-  pipeline: AggregationPipeline = {
-    timeAggregation: PipelineAggregation.AVG,
-    groupAggregation: PipelineAggregation.SUM,
+  twoStageAggregation: TwoStageAggregation = {
+    timeAggregation: 'AVG',
+    groupAggregation: 'SUM',
   };
 
   ngOnInit(): void {
@@ -84,10 +83,10 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   private initAggregationMode(): void {
-    const pipeline = PipelineAggregationUtils.getTwoStagePipeline(this.item.tableSettings!.aggregation);
-    if (pipeline) {
+    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item.tableSettings!.aggregation);
+    if (twoStageAggregation) {
       this.aggregationMode = 'TWO_STAGE';
-      this.pipeline = pipeline;
+      this.twoStageAggregation = { ...twoStageAggregation };
     }
   }
 
@@ -139,7 +138,7 @@ export class TableDashletSettingsComponent implements OnInit {
     // the column selection is left untouched in two-stage mode, so that it is restored when switching back to single
     this.item.tableSettings!.aggregation =
       this.aggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createTwoStageAggregation(this.pipeline)
+        ? PipelineAggregationUtils.createTwoStageAggregation(this.twoStageAggregation)
         : undefined;
   }
 

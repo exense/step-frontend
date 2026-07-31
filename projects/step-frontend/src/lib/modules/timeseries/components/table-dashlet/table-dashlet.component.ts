@@ -33,7 +33,7 @@ import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { BehaviorSubject, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
-import { AggregationPipeline, PipelineAggregationUtils } from '../../modules/_common/types/pipeline-aggregation';
+import { PipelineAggregationUtils } from '../../modules/_common/types/pipeline-aggregation';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
@@ -178,28 +178,24 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState(): void {
     this.item().attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    const twoStagePipeline = this.getTwoStagePipeline();
-    this.hasTwoStageAggregation = !!twoStagePipeline;
+    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item().tableSettings!.aggregation);
+    this.hasTwoStageAggregation = !!twoStageAggregation;
     // The column definitions are kept stable across both modes, so that the columns registered by the table stay the
     // same. A two-stage aggregation reduces each group to one scalar, so all the columns but the one displaying it are hidden
     this.columnsDefinition = this.item().tableSettings!.columns!.map((column: ColumnSelection) => {
       const isScalarColumn = column.column === this.TWO_STAGE_VALUE_COLUMN_ID;
       return {
         id: column.column!,
-        label: twoStagePipeline
-          ? PipelineAggregationUtils.getPipelineLabel(twoStagePipeline)
+        label: twoStageAggregation
+          ? PipelineAggregationUtils.getPipelineLabel(twoStageAggregation)
           : this.getColumnLabel(column),
-        isVisible: twoStagePipeline ? isScalarColumn : column.selected!,
-        pclValue: twoStagePipeline ? undefined : column.aggregation.params?.['pclValue'],
+        isVisible: twoStageAggregation ? isScalarColumn : column.selected!,
+        pclValue: twoStageAggregation ? undefined : column.aggregation.params?.['pclValue'],
         mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
       };
     });
     this.updateVisibleColumns();
-  }
-
-  private getTwoStagePipeline(): AggregationPipeline | undefined {
-    return PipelineAggregationUtils.getTwoStagePipeline(this.item().tableSettings!.aggregation);
   }
 
   private getColumnLabel(column: ColumnSelection): string {
@@ -362,7 +358,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       this.baseRequestOql = oql;
     }
-    const twoStagePipeline = this.getTwoStagePipeline();
+    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item().tableSettings!.aggregation);
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
@@ -371,8 +367,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
-      timeAggregation: twoStagePipeline?.timeAggregation,
-      groupAggregation: twoStagePipeline?.groupAggregation,
+      timeAggregation: twoStageAggregation?.timeAggregation,
+      groupAggregation: twoStageAggregation?.groupAggregation,
     };
     return this._timeSeriesService
       .fetchBucketsWithFallback(request)

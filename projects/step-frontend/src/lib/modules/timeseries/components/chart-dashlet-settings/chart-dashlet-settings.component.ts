@@ -1,5 +1,13 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { AxesSettings, DashboardItem, ErrorMessageHandlerService, MetricAttribute, Tab } from '@exense/step-core';
+import {
+  AxesSettings,
+  DashboardItem,
+  ErrorMessageHandlerService,
+  MetricAggregation,
+  MetricAttribute,
+  Tab,
+  TwoStageAggregation,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -12,9 +20,7 @@ import {
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import {
-  AggregationPipeline,
   PIPELINE_AGGREGATION_OPTIONS,
-  PipelineAggregation,
   PipelineAggregationUtils,
 } from '../../modules/_common/types/pipeline-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -77,10 +83,13 @@ export class ChartDashletSettingsComponent implements OnInit {
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
 
-  primaryAggregationMode: AggregationMode = 'SINGLE';
-  primaryPipeline: AggregationPipeline = {
-    timeAggregation: PipelineAggregation.AVG,
-    groupAggregation: PipelineAggregation.SUM,
+  aggregationMode: AggregationMode = 'SINGLE';
+  // Default value of the single stage aggregation
+  singleStageAggregation: MetricAggregation = { type: 'SUM' };
+  // Default value of the two-stage aggregation
+  twoStageAggregation: TwoStageAggregation = {
+    timeAggregation: 'AVG',
+    groupAggregation: 'SUM',
   };
   showSecondaryAxes = false;
   private stashedSecondaryAxes?: AxesSettings;
@@ -102,12 +111,13 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   private initAggregationModes(): void {
-    const primaryPipeline = PipelineAggregationUtils.getTwoStagePipeline(
-      this.item.chartSettings!.primaryAxes.aggregation,
-    );
-    if (primaryPipeline) {
-      this.primaryAggregationMode = 'TWO_STAGE';
-      this.primaryPipeline = primaryPipeline;
+    const aggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(aggregation);
+    if (twoStageAggregation) {
+      this.aggregationMode = 'TWO_STAGE';
+      this.twoStageAggregation = { ...twoStageAggregation };
+    } else {
+      this.singleStageAggregation = aggregation;
     }
     this.showSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
   }
@@ -175,15 +185,14 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   private applyAggregationMode(): void {
     // only the primary axes support a two-stage aggregation: the secondary ones aggregate the primary series client side
-    const primaryAxes = this.item.chartSettings!.primaryAxes;
-    primaryAxes.aggregation =
-      this.primaryAggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createTwoStageAggregation(this.primaryPipeline)
-        : PipelineAggregationUtils.createSingleStageAggregation(primaryAxes.aggregation);
+    this.item.chartSettings!.primaryAxes.aggregation =
+      this.aggregationMode === 'TWO_STAGE'
+        ? PipelineAggregationUtils.createTwoStageAggregation(this.twoStageAggregation)
+        : this.singleStageAggregation;
   }
 
   handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
-    this.item.chartSettings!.primaryAxes.aggregation = {
+    this.singleStageAggregation = {
       type: change.aggregate!,
       params: change.params,
     };

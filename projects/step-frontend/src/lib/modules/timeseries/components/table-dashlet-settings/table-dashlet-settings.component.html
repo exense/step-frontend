@@ -213,7 +213,7 @@
                     name="help-circle"
                   ></step-icon>
                 </step-label>
-                <mat-select [(ngModel)]="pipeline.timeAggregation" name="timeAggregation">
+                <mat-select [(ngModel)]="twoStageAggregation.timeAggregation" name="timeAggregation">
                   @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
                     <mat-option [value]="option.value">{{ option.label }}</mat-option>
                   }
@@ -231,7 +231,7 @@
                     name="help-circle"
                   ></step-icon>
                 </step-label>
-                <mat-select [(ngModel)]="pipeline.groupAggregation" name="groupAggregation">
+                <mat-select [(ngModel)]="twoStageAggregation.groupAggregation" name="groupAggregation">
                   @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
                     <mat-option [value]="option.value">{{ option.label }}</mat-option>
                   }
