@@ -9,6 +9,9 @@ export class TimeSeriesConfig {
   static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
   static readonly PARAM_KEY_EXECUTION_DASHBOARD_ID = 'plugins.timeseries.execution.dashboard.id';
   static readonly PARAM_KEY_ANALYTICS_DASHBOARD_ID = 'plugins.timeseries.analytics.dashboard.id';
+  static readonly PARAM_KEY_METRICS_SAMPLING_INTERVAL_MS = 'plugins.metrics.sampling.interval.ms';
+  static readonly DEFAULT_METRICS_SAMPLING_INTERVAL_MS = 15_000;
+  static readonly FORWARD_FILL_MAX_SAMPLING_INTERVALS = 2;
   static readonly SECONDARY_AXES_KEY = 'z';
   static readonly SERIES_DEFAULT_COLOR = '#138aff';
 
