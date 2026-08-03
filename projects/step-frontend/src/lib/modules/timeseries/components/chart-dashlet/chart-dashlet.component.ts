@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
+  AppConfigContainerService,
   AxesSettings,
   BucketResponse,
   DashboardItem,
@@ -22,6 +23,7 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
+  MetricType,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -117,6 +119,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private _uPlotUtils = inject(UPlotUtilsService);
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
+  private _appConfigContainer = inject(AppConfigContainerService);
+
+  private readonly samplingIntervalMs: number = this.resolveSamplingIntervalMs();
 
   protected readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
   protected readonly chart = viewChild<TimeSeriesChartComponent>('chart');
@@ -340,7 +345,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
-    const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
+    const metric = this.context().getMetric(this.item().metricKey);
+    const isGauge = metric?.instrumentType === 'gauge';
+    const maxForwardFillBuckets = this.getMaxForwardFillBuckets(metric?.samplingMode, response.interval);
     const isRateOrCount = primaryAggregation.type === 'RATE' || primaryAggregation.type === 'COUNT';
     const useForwardFill = isGauge && !isRateOrCount;
     const isNullMeansZero =
@@ -355,7 +362,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
       if (groupDimensions.length === 0) {
-        labelItems = [this.context().getMetric(this.item().metricKey).displayName];
+        labelItems = [metric.displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
       const colorKey = this.composeColorKey(labelItems);
@@ -363,14 +370,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         let lastSecondaryValue: number | undefined;
+        let emptySecondaryBucketsCount = 0;
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
           metadata.push(b?.attributes);
           if (hasSecondaryAxes) {
             let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
-            if (bucketValue == null && useSecondaryForwardFill) {
-              bucketValue = lastSecondaryValue;
-            }
-            if (bucketValue != null) {
+            if (bucketValue == null) {
+              emptySecondaryBucketsCount++;
+              if (useSecondaryForwardFill && lastSecondaryValue !== undefined) {
+                bucketValue = emptySecondaryBucketsCount <= maxForwardFillBuckets ? lastSecondaryValue : 0;
+              }
+            } else {
+              emptySecondaryBucketsCount = 0;
               lastSecondaryValue = bucketValue;
             }
             if (secondaryAxesData[j] == null) {
@@ -383,17 +394,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       }
       const seriesData: (number | undefined | null)[] = [];
       let lastPrimaryValue: number | undefined;
+      let emptyBucketsCount = 0;
       seriesBuckets.forEach((b, i) => {
         let value = this.getBucketValue(b, primaryAggregation!, response.interval);
         if (value === undefined) {
+          emptyBucketsCount++;
           if (isNullMeansZero) {
             value = 0;
-          } else if (useForwardFill) {
-            value = lastPrimaryValue;
+          } else if (useForwardFill && lastPrimaryValue !== undefined) {
+            value = emptyBucketsCount <= maxForwardFillBuckets ? lastPrimaryValue : 0;
           }
-        }
-        if (value != null) {
-          lastPrimaryValue = value;
+          // when no flag applies the value is left undefined, so that the chart renders a gap
+        } else {
+          emptyBucketsCount = 0;
+          if (value !== null) {
+            lastPrimaryValue = value;
+          }
         }
         seriesData[i] = value;
       });
@@ -542,10 +558,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       const secondaryNullMeansZero = isSecondaryRateOrCount || (!isGauge && secondaryDisplayType !== 'LINE');
       if (useSecondaryForwardFill) {
         let lastSecVal: number | undefined;
+        let emptyTotalBucketsCount = 0;
         for (let k = 0; k < secondaryAxesData.length; k++) {
           if (secondaryAxesData[k] == null) {
-            secondaryAxesData[k] = lastSecVal;
+            emptyTotalBucketsCount++;
+            if (lastSecVal !== undefined) {
+              secondaryAxesData[k] = emptyTotalBucketsCount <= maxForwardFillBuckets ? lastSecVal : 0;
+            }
           } else {
+            emptyTotalBucketsCount = 0;
             lastSecVal = secondaryAxesData[k] as number;
           }
         }
@@ -871,6 +892,28 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       );
     }
     return percentilesToRequest;
+  }
+
+  private resolveSamplingIntervalMs(): number {
+    const rawValue =
+      this._appConfigContainer.conf?.miscParams?.[TimeSeriesConfig.PARAM_KEY_METRICS_SAMPLING_INTERVAL_MS];
+    const samplingInterval = parseInt(rawValue ?? '', 10);
+    return samplingInterval > 0 ? samplingInterval : TimeSeriesConfig.DEFAULT_METRICS_SAMPLING_INTERVAL_MS;
+  }
+
+  /**
+   * Sampled metrics stop emitting when their source disappears, forward fill only cover the sampling interval with some
+   * headroom. Event driven metrics report every change and are therefore filled without limit.
+   */
+  private getMaxForwardFillBuckets(
+    samplingMode: MetricType['samplingMode'] | undefined,
+    bucketIntervalMs: number,
+  ): number {
+    if (samplingMode !== 'SAMPLED' || bucketIntervalMs <= 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    const maxForwardFillMs = TimeSeriesConfig.FORWARD_FILL_MAX_SAMPLING_INTERVALS * this.samplingIntervalMs;
+    return Math.floor(maxForwardFillMs / bucketIntervalMs);
   }
 
   private getBucketValue(
