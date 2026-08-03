@@ -1,0 +1,258 @@
+:host {
+  display: block;
+  height: calc(100vh - 10.8rem);
+  min-height: 48rem;
+}
+
+.generation-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--background-color, #fff);
+}
+
+.content-container {
+  width: min(100%, 112rem);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.view-header {
+  padding: 2rem 3rem 1.5rem;
+  border-bottom: 0.1rem solid var(--border-color, rgba(0, 0, 0, 0.12));
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  p {
+    margin-top: 0.9rem;
+    opacity: 0.72;
+  }
+}
+
+.view-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.package-context {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 24rem;
+  max-width: 40rem;
+
+  span,
+  small {
+    display: block;
+  }
+
+  small {
+    overflow: hidden;
+    opacity: 0.7;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .package-directory {
+    margin-top: 0.2rem;
+  }
+}
+
+.view-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2rem 3rem 3rem;
+
+  .content-container > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+.generation-form {
+  padding: 0;
+}
+
+.hint {
+  margin: 1.5rem 0 1rem;
+  opacity: 0.75;
+}
+
+.file-input {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+
+  .file-input-label,
+  .file-name {
+    font-size: 1.2rem;
+  }
+
+  .file-input-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .file-name {
+    opacity: 0.72;
+  }
+}
+
+.test-cases {
+  margin-top: 1.5rem;
+}
+
+.test-case-card {
+  margin-bottom: 1.25rem;
+  border: 0.1rem solid var(--border-color, rgba(0, 0, 0, 0.12));
+  box-shadow: none !important;
+
+  step-form-field {
+    display: block;
+
+    & + step-form-field {
+      margin-top: 1.5rem;
+    }
+  }
+
+  input[readonly] {
+    background: var(--light-background-color, rgba(0, 0, 0, 0.025));
+    cursor: default;
+  }
+
+  .test-case-status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    &.complete {
+      color: var(--status-success-color, #2e7d32);
+    }
+
+    &.incomplete {
+      color: var(--status-warning-color, #a15c00);
+    }
+  }
+
+  .remove-test-case {
+    margin: 0 1rem 0 0.75rem;
+    opacity: 0.48;
+    transition:
+      color 120ms ease-in-out,
+      opacity 120ms ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--status-error-color, #b3261e);
+      opacity: 1;
+    }
+  }
+
+  &:hover .remove-test-case,
+  &:focus-within .remove-test-case {
+    opacity: 0.78;
+  }
+}
+
+.add-test-case {
+  margin: 1.5rem 0;
+}
+
+.advanced-options {
+  margin-top: 1rem;
+  border: 0.1rem solid var(--border-color, rgba(0, 0, 0, 0.12));
+  box-shadow: none !important;
+
+  step-form-field {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+}
+
+step-hint {
+  display: block;
+  margin-top: 0.4rem;
+  line-height: 1.4;
+  opacity: 0.72;
+}
+
+.view-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 1.5rem 3rem;
+  border-top: 0.1rem solid var(--border-color, rgba(0, 0, 0, 0.12));
+  background: var(--background-color, #fff);
+  box-shadow: 0 -0.4rem 1.2rem rgba(0, 0, 0, 0.05);
+}
+
+.view-actions-content,
+.action-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.view-actions-content {
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.action-buttons {
+  gap: 1rem;
+}
+
+.validation-summary {
+  opacity: 0.72;
+
+  &.ready {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 72rem) {
+  .view-header {
+    padding-top: 1.5rem;
+  }
+
+  .view-header-content {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .package-context {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .view-header,
+  .view-content,
+  .view-actions {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .view-actions-content {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .action-buttons {
+    justify-content: flex-end;
+  }
+
+  .test-case-card mat-panel-description {
+    display: none;
+  }
+}

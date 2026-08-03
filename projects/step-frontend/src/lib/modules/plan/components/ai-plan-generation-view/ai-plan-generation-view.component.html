@@ -1,0 +1,210 @@
+<main class="generation-view">
+  <header class="view-header">
+    <div class="content-container view-header-content">
+      <div>
+        <h2>{{ isRegenerate ? 'Regenerate test case with AI' : 'Create test cases with AI' }}</h2>
+        @if (isRegenerate) {
+          <p>Regenerating replaces the existing automated test case with the newly generated version.</p>
+        } @else {
+          <p>Describe the behavior to automate and any instructions the AI agent should follow.</p>
+        }
+      </div>
+      <aside class="package-context" data-step-testid="ai-package-context">
+        <step-icon name="file" />
+        @if (currentPackage(); as package) {
+          <span>
+            <small>Generating into</small>
+            <strong>{{ package.name }}</strong>
+            <small class="package-directory" [matTooltip]="package.directory">{{ package.directory }}</small>
+          </span>
+        } @else {
+          <span>
+            <strong>No automation package is open</strong>
+            <small>Open a package before generating test cases.</small>
+          </span>
+        }
+      </aside>
+    </div>
+  </header>
+
+  <section class="view-content">
+    <div class="content-container">
+      @if (configuration(); as config) {
+        @if (!config.available) {
+          <step-alert type="warning">{{ config.message }}</step-alert>
+        } @else if (!config.apiKeyConfigured) {
+          <step-alert type="warning">
+            No Anthropic API key is configured in the IDE. The agent will fall back to the key of its own environment.
+          </step-alert>
+        }
+      }
+
+      @if (isSpecMissing()) {
+        <step-alert type="warning">
+          No test description is stored for "{{ testCaseName }}". Please describe the test case again.
+        </step-alert>
+      }
+
+      <form class="generation-form" [formGroup]="form" (ngSubmit)="generate()">
+        @if (!isRegenerate) {
+          <step-tabs [tabs]="availableTabs" [(activeTabId)]="selectedTab" [compactTabs]="true" />
+        }
+
+        @if (isTextMode) {
+          <section class="specification-mode">
+            <p class="hint">
+              Separate test cases with a <code>##&nbsp;&lt;test case name&gt;</code> heading, one per test case.
+            </p>
+            <step-form-field [showRequiredMarker]="true">
+              <step-label>Test description</step-label>
+              <step-hint>Describe the behavior, preconditions, actions, and expected outcomes.</step-hint>
+              <textarea
+                data-step-testid="ai-spec-text"
+                [rows]="18"
+                formControlName="specText"
+                placeholder="## Login with valid credentials&#10;Open the login page and ..."
+              ></textarea>
+            </step-form-field>
+            <div class="file-input">
+              <span class="file-input-label">Upload a Markdown or text file</span>
+              <div class="file-input-control">
+                <button type="button" mat-stroked-button (click)="specFileInput.click()">Choose file</button>
+                <span class="file-name">{{ uploadedFileName() || 'No file selected' }}</span>
+              </div>
+              <input
+                #specFileInput
+                hidden
+                data-step-testid="ai-spec-file"
+                type="file"
+                accept=".md,.markdown,.txt"
+                (change)="loadFromFile($event)"
+              />
+            </div>
+          </section>
+        } @else {
+          <section class="test-cases" formArrayName="testCases">
+            <mat-accordion>
+              @for (testCase of testCases.controls; track testCase; let index = $index) {
+                <mat-expansion-panel
+                  class="test-case-card"
+                  [formGroupName]="index"
+                  [expanded]="expandedTestCaseIndex() === index"
+                  (opened)="expandedTestCaseIndex.set(index)"
+                  (closed)="expandedTestCaseIndex() === index && expandedTestCaseIndex.set(undefined)"
+                >
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>{{ testCaseTitle(testCase) }}</mat-panel-title>
+                    <mat-panel-description
+                      class="test-case-status"
+                      [class.complete]="isTestCaseReady(testCase)"
+                      [class.incomplete]="!isTestCaseReady(testCase)"
+                    >
+                      <step-icon [name]="isTestCaseReady(testCase) ? 'check-circle' : 'alert-circle'" />
+                      {{ testCaseStatus(testCase) }}
+                    </mat-panel-description>
+                    @if (!isRegenerate && testCases.length > 1) {
+                      <button
+                        class="remove-test-case"
+                        type="button"
+                        mat-icon-button
+                        data-step-testid="ai-remove-test-case"
+                        matTooltip="Remove this test case"
+                        [attr.aria-label]="'Remove ' + testCaseTitle(testCase)"
+                        (click)="removeTestCase(index, $event)"
+                      >
+                        <step-icon name="trash-2" />
+                      </button>
+                    }
+                  </mat-expansion-panel-header>
+
+                  <step-form-field [showRequiredMarker]="!isRegenerate">
+                    <step-label>Test case name</step-label>
+                    @if (isRegenerate) {
+                      <step-hint>The test case name is read-only when regenerating.</step-hint>
+                    }
+                    <input
+                      type="text"
+                      data-step-testid="ai-test-case-name"
+                      formControlName="name"
+                      [readonly]="isRegenerate"
+                      [attr.aria-readonly]="isRegenerate"
+                    />
+                  </step-form-field>
+                  <step-form-field [showRequiredMarker]="true">
+                    <step-label>Test description</step-label>
+                    <step-hint>Describe the behavior, preconditions, actions, and expected outcome.</step-hint>
+                    <textarea [rows]="7" data-step-testid="ai-test-case-spec" formControlName="spec"></textarea>
+                  </step-form-field>
+                  <step-form-field>
+                    <step-label>Test-specific instructions (optional)</step-label>
+                    <step-hint>
+                      Add constraints for this test, such as preferred selectors or reusable automation keywords.
+                    </step-hint>
+                    <textarea
+                      [rows]="2"
+                      data-step-testid="ai-test-case-instructions"
+                      formControlName="hints"
+                    ></textarea>
+                  </step-form-field>
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
+
+            @if (!isRegenerate) {
+              <button
+                class="add-test-case"
+                type="button"
+                mat-stroked-button
+                data-step-testid="ai-add-test-case"
+                (click)="addTestCase()"
+              >
+                <step-icon name="plus" />
+                Add another test case
+              </button>
+            }
+          </section>
+        }
+
+        <mat-expansion-panel class="advanced-options">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Advanced options · Shared automation instructions</mat-panel-title>
+          </mat-expansion-panel-header>
+          <step-form-field>
+            <step-label>Shared automation instructions (optional)</step-label>
+            <step-hint>These instructions are sent with every test case in this generation.</step-hint>
+            <textarea [rows]="4" data-step-testid="ai-shared-instructions" formControlName="hints"></textarea>
+          </step-form-field>
+        </mat-expansion-panel>
+      </form>
+
+      @if (errorMessage()) {
+        <step-alert type="danger">{{ errorMessage() }}</step-alert>
+      }
+    </div>
+  </section>
+
+  <footer class="view-actions">
+    <div class="content-container view-actions-content">
+      <span class="validation-summary" [class.ready]="canGenerate" data-step-testid="ai-validation-summary">
+        {{ footerStatus }}
+      </span>
+      <div class="action-buttons">
+        <button type="button" mat-stroked-button [disabled]="isLaunching()" (click)="cancel()">Cancel</button>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          data-step-testid="ai-generate-btn"
+          [disabled]="!canGenerate"
+          [attr.aria-busy]="isLaunching()"
+          (click)="generate()"
+        >
+          @if (isLaunching()) {
+            <step-button-spinner label="Starting the AI agent" />
+          }
+          {{ generateButtonLabel }}
+        </button>
+      </div>
+    </div>
+  </footer>
+</main>

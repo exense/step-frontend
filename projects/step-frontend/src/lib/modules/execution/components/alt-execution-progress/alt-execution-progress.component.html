@@ -258,6 +258,37 @@
   }
 </section>
 
+@if (aiGenerationState$ | async; as aiGeneration) {
+  <section class="ai-generation-status" data-step-testid="ai-generation-status">
+    <step-alert [type]="aiGeneration.completed ? AlertType.SUCCESS : AlertType.INFO">
+      <div class="ai-generation-status-content">
+        @if (aiGeneration.completed) {
+          <span>
+            Test case generation has completed. Reload the automation package to make the generated plans available.
+          </span>
+          <button
+            type="button"
+            mat-stroked-button
+            data-step-testid="ai-reload-package-btn"
+            [disabled]="!canReloadAiPackage(aiGeneration.targetDirectory)"
+            [matTooltip]="
+              canReloadAiPackage(aiGeneration.targetDirectory)
+                ? 'Reload automation package'
+                : 'Open the automation package used for this generation before reloading it'
+            "
+            (click)="reloadAiPackage()"
+          >
+            <step-icon name="refresh-cw" />
+            Reload automation package
+          </button>
+        } @else {
+          <span>The AI agent is generating test cases for the open automation package.</span>
+        }
+      </div>
+    </step-alert>
+  </section>
+}
+
 @if (execution$ | async; as execution) {
   @if (execution.lifecycleErrors; as errors) {
     @if (errors.length) {

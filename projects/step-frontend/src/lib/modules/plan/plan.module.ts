@@ -18,6 +18,7 @@ import {
   PlanContextApiService,
   MultipleProjectsService,
   EntityRefDirective,
+  canLeaveComponent,
 } from '@exense/step-core';
 import { AltExecutionLaunchDialogComponent, ExecutionModule } from '../execution/execution.module';
 import { StepCommonModule } from '../_common/step-common.module';
@@ -30,6 +31,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
 import { PurePlanContextApiService } from './injectables/pure-plan-context-api.service';
 import { PlanRepoRefPipe } from './pipes/plan-repo-ref.pipe';
+import { AiPlanGenerationViewComponent } from './components/ai-plan-generation-view/ai-plan-generation-view.component';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -137,6 +139,22 @@ export class PlanModule {
               ],
             },
           ],
+        },
+        {
+          path: 'ai/new',
+          component: AiPlanGenerationViewComponent,
+          canDeactivate: [canLeaveComponent],
+        },
+        {
+          path: 'ai/regenerate/:id',
+          component: AiPlanGenerationViewComponent,
+          resolve: {
+            testCaseName: (route: ActivatedRouteSnapshot) =>
+              inject(AugmentedPlansService)
+                .getPlanById(route.params['id'])
+                .pipe(map((plan) => plan.attributes?.['name'])),
+          },
+          canDeactivate: [canLeaveComponent],
         },
         stepRouteAdditionalConfig(
           {

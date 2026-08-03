@@ -31,6 +31,19 @@
         </a>
       </step-btn-group>
       <step-btn-group class="create-button-group">
+        @if (_isIdeMode) {
+          <a
+            data-step-testid="ai-create-plans-btn"
+            mat-flat-button
+            color="primary"
+            class="header-btn"
+            matTooltip="Generate test cases from a plain text specification"
+            [disabled]="!('plan-write' | hasRight | async)"
+            routerLink="/plans/ai/new"
+          >
+            Create with AI
+          </a>
+        }
         <a
           stepTestId="upload-package-btn"
           mat-flat-button
@@ -91,6 +104,9 @@
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group [stepEntityRef]="element">
+          @if (_isIdeMode && isAiGenerated(element)) {
+            <step-icon class="ai-generated-marker" name="zap" matTooltip="Generated with AI" />
+          }
           <a
             data-step-testid="execute-plan-btn"
             mat-icon-button
@@ -144,6 +160,17 @@
       <step-icon name="edit-2" aria-hidden="true" />
       Edit plan
     </a>
+    @if (_isIdeMode && isAiGenerated(element)) {
+      <a
+        data-step-testid="ai-regenerate-plan-btn"
+        mat-menu-item
+        [disabled]="!('plan-write' | hasRight | async)"
+        [routerLink]="['/', 'plans', 'ai', 'regenerate', element.id]"
+      >
+        <step-icon name="refresh-cw" aria-hidden="true" />
+        Regenerate with AI
+      </a>
+    }
     <button mat-menu-item (click)="scheduleCommands.schedule()" [disabled]="!('task-write' | hasRight: true | async)">
       <ng-container
         stepExecutionCommands
