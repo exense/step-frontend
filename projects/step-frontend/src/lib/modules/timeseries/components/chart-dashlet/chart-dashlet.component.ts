@@ -28,6 +28,7 @@ import {
 import {
   COMMON_IMPORTS,
   createStackedBarPaths,
+  PipelineAggregationService,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -52,7 +53,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-import { PipelineAggregationUtils } from '../../modules/_common/types/pipeline-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
@@ -116,6 +116,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
@@ -242,7 +243,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   protected switchAggregate(aggregate: ChartAggregation, params?: AggregateParams): void {
     this.selectedAggregate = aggregate;
-    // replacing the whole aggregation leaves the two-stage mode, if it was active
     this.item().chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe(() => {
       this._cd.markForCheck();
@@ -281,7 +281,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   protected openChartSettings(): void {
     this._matDialog
-      // the explicit width keeps the dialog from resizing when its content changes, e.g. on aggregation mode switch
       .open(ChartDashletSettingsComponent, {
         data: { item: this.item(), context: this.context() },
         width: '96rem',
@@ -339,12 +338,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
     const primaryAxes = this.item().chartSettings!.primaryAxes!;
     const primaryAggregation = primaryAxes.aggregation;
-    const primaryTwoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(primaryAggregation);
-    // In two-stage mode the plotted value is the scalar produced by the group stage. Mirroring it into a single-stage
-    // aggregation keeps the type driven decisions below (rate/count handling, axes formatting) working on one shape
-    const primaryDisplayAggregation =
-      (primaryTwoStageAggregation && PipelineAggregationUtils.toDisplayAggregation(primaryTwoStageAggregation)) ??
-      primaryAggregation;
+    const primaryTwoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation);
+    const primaryDisplayAggregation = this._pipelineAggregationService.getDisplayAggregation(primaryAggregation);
     const hasSteppedDisplay = primaryAxes.displayType === 'STEPPED';
     const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
@@ -359,8 +354,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       isRateOrCount ||
       (!isGauge && (primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'));
     const spanGaps = !isNullMeansZero && !useForwardFill;
-    // The total axis (called secondary axis in the code) sums one value per series. With a two-stage aggregation the series are already reduced to scalars, so
-    // it sums those directly and its own aggregation, which would be meaningless on a single sample, doesn't apply
     const finalSecondaryAxesAggregation = primaryTwoStageAggregation ? primaryAggregation : secondaryAxesAggregation;
     const finalSecondaryDisplayAggregation = primaryTwoStageAggregation
       ? primaryDisplayAggregation
@@ -553,9 +546,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
         side: 1,
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
-          vals.map((v) =>
-            this.getAxesFormatFunction(this.item().chartSettings!.secondaryAxes!.aggregation, undefined)(v),
-          ),
+          vals.map((v) => this.getAxesFormatFunction(finalSecondaryDisplayAggregation!, undefined)(v)),
         grid: { show: false },
       });
       const secondaryAxesSettings = this.item().chartSettings!.secondaryAxes!;
@@ -696,8 +687,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   private getSecondAxesLabel(): string | undefined {
-    if (PipelineAggregationUtils.getTwoStageAggregation(this.item().chartSettings!.primaryAxes.aggregation)) {
-      // the total axis sums the scalars produced by the two-stage aggregation, no aggregation of its own applies
+    if (this._pipelineAggregationService.getTwoStageAggregation(this.item().chartSettings!.primaryAxes.aggregation)) {
       return 'Total';
     }
     const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
@@ -718,9 +708,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   private getChartTitle(): string {
     let title = this.item().name;
     const aggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
-    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(aggregation);
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(aggregation);
     if (twoStageAggregation) {
-      return `${title} (${PipelineAggregationUtils.getPipelineLabel(twoStageAggregation)})`;
+      return `${title} (${this._pipelineAggregationService.getPipelineLabel(twoStageAggregation)})`;
     } else {
       let aggregationLabel: string;
       switch (aggregation.type) {
@@ -752,7 +742,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     if (start >= end) {
       throw new Error(`Invalid time range`);
     }
-    const primaryTwoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(
+    const primaryTwoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
       this.item().chartSettings!.primaryAxes.aggregation,
     );
     const request: FetchBucketsRequest = {
@@ -894,8 +884,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const primaryAggregation = this.item().chartSettings!.primaryAxes.aggregation;
     const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const percentilesToRequest: number[] = [];
-    // a two-stage aggregation yields scalars, out of which no percentile can be extracted
-    if (!PipelineAggregationUtils.getTwoStageAggregation(primaryAggregation)) {
+    if (!this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation)) {
       if (primaryAggregation.type === ChartAggregation.MEDIAN) {
         percentilesToRequest.push(50);
       }
@@ -922,7 +911,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
     switch (aggregation.type) {
       case 'TWO_STAGE':
-        // the buckets of a two-stage aggregation are scalars, reporting their value as their one single sample
         return b.sum;
       case 'SUM':
         return b.sum;

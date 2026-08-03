@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import {
   AxesSettings,
   DashboardItem,
@@ -15,14 +15,12 @@ import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
+  PipelineAggregationService,
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-import {
-  PIPELINE_AGGREGATION_OPTIONS,
-  PipelineAggregationUtils,
-} from '../../modules/_common/types/pipeline-aggregation';
+import { PIPELINE_AGGREGATION_OPTIONS } from '../../modules/_common/types/pipeline-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   AggregateParams,
@@ -46,15 +44,15 @@ export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   readonly ChartAggregation = ChartAggregation;
 
   _attributesByKey: Record<string, MetricAttribute> = {};
 
-  @ViewChild('primaryAggregateMenuTrigger') primaryAggregateMenuTrigger?: MatMenuTrigger;
-  @ViewChild('secondaryAggregateMenuTrigger') secondaryAggregateMenuTrigger?: MatMenuTrigger;
-  @ViewChild('formContainer', { static: true })
-  private formContainer!: NgForm;
+  readonly primaryAggregateMenuTrigger = viewChild<MatMenuTrigger>('primaryAggregateMenuTrigger');
+  readonly secondaryAggregateMenuTrigger = viewChild<MatMenuTrigger>('secondaryAggregateMenuTrigger');
+  private readonly formContainer = viewChild.required<NgForm>('formContainer');
 
   readonly FilterBarItemType = FilterBarItemType;
 
@@ -84,9 +82,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   masterDashlet?: DashboardItem;
 
   aggregationMode: AggregationMode = 'SINGLE';
-  // Default value of the single stage aggregation
   singleStageAggregation: MetricAggregation = { type: 'SUM' };
-  // Default value of the two-stage aggregation
   twoStageAggregation: TwoStageAggregation = {
     timeAggregation: 'AVG',
     groupAggregation: 'SUM',
@@ -112,7 +108,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   private initAggregationModes(): void {
     const aggregation = this.item.chartSettings!.primaryAxes.aggregation;
-    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(aggregation);
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(aggregation);
     if (twoStageAggregation) {
       this.aggregationMode = 'TWO_STAGE';
       this.twoStageAggregation = { ...twoStageAggregation };
@@ -142,11 +138,11 @@ export class ChartDashletSettingsComponent implements OnInit {
     };
   }
 
-  addFilterItem(attribute: MetricAttribute) {
+  addFilterItem(attribute: MetricAttribute): void {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
-  handleFilterItemChange(index: number, item: FilterBarItem) {
+  handleFilterItemChange(index: number, item: FilterBarItem): void {
     this.filterItems[index] = item;
     if (!item.attributeName) {
       return;
@@ -160,7 +156,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     }
   }
 
-  addCustomFilter(type: FilterBarItemType) {
+  addCustomFilter(type: FilterBarItemType): void {
     this.filterItems.push({
       attributeName: '',
       type: type,
@@ -173,8 +169,8 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
-    if (this.formContainer.invalid) {
-      this.formContainer.form.markAllAsTouched();
+    if (this.formContainer().invalid) {
+      this.formContainer().form.markAllAsTouched();
       return;
     }
     this.applyAggregationMode();
@@ -184,26 +180,25 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   private applyAggregationMode(): void {
-    // only the primary axes support a two-stage aggregation: the secondary ones aggregate the primary series client side
     this.item.chartSettings!.primaryAxes.aggregation =
       this.aggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createTwoStageAggregation(this.twoStageAggregation)
+        ? this._pipelineAggregationService.createTwoStageAggregation(this.twoStageAggregation)
         : this.singleStageAggregation;
   }
 
-  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
     this.singleStageAggregation = {
       type: change.aggregate!,
       params: change.params,
     };
-    this.primaryAggregateMenuTrigger?.closeMenu();
+    this.primaryAggregateMenuTrigger()?.closeMenu();
   }
 
-  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
     if (!change.aggregate) {
       return;
     }
     this.item.chartSettings!.secondaryAxes!.aggregation = { type: change.aggregate, params: change.params };
-    this.secondaryAggregateMenuTrigger?.closeMenu();
+    this.secondaryAggregateMenuTrigger()?.closeMenu();
   }
 }

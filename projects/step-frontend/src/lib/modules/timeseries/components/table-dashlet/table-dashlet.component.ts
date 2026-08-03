@@ -14,7 +14,13 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesEntityService } from '../../modules/_common';
+import {
+  COMMON_IMPORTS,
+  PipelineAggregationService,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesEntityService,
+} from '../../modules/_common';
 import {
   BucketResponse,
   ColumnSelection,
@@ -33,7 +39,6 @@ import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { BehaviorSubject, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
-import { PipelineAggregationUtils } from '../../modules/_common/types/pipeline-aggregation';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
@@ -97,10 +102,6 @@ interface ProcessedBucketResponse {
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   protected readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   protected readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
-  /**
-   * Column displaying the scalar produced by a two-stage aggregation. The SUM column is used, because a scalar
-   * bucket reports its value as its one single sample: its value function, its sorting and its diff all read the sum
-   */
   private readonly TWO_STAGE_VALUE_COLUMN_ID = TableColumnType.SUM;
 
   readonly item = input.required<DashboardItem>();
@@ -119,6 +120,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _matDialog = inject(MatDialog);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _cd = inject(ChangeDetectorRef);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   private tableData$ = new Subject<TableEntry[]>();
   protected tableDataSource: TableLocalDataSource<TableEntry> | undefined;
@@ -178,16 +180,16 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState(): void {
     this.item().attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item().tableSettings!.aggregation);
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
+      this.item().tableSettings!.aggregation,
+    );
     this.hasTwoStageAggregation = !!twoStageAggregation;
-    // The column definitions are kept stable across both modes, so that the columns registered by the table stay the
-    // same. A two-stage aggregation reduces each group to one scalar, so all the columns but the one displaying it are hidden
     this.columnsDefinition = this.item().tableSettings!.columns!.map((column: ColumnSelection) => {
       const isScalarColumn = column.column === this.TWO_STAGE_VALUE_COLUMN_ID;
       return {
         id: column.column!,
         label: twoStageAggregation
-          ? PipelineAggregationUtils.getPipelineLabel(twoStageAggregation)
+          ? this._pipelineAggregationService.getPipelineLabel(twoStageAggregation)
           : this.getColumnLabel(column),
         isVisible: twoStageAggregation ? isScalarColumn : column.selected!,
         pclValue: twoStageAggregation ? undefined : column.aggregation.params?.['pclValue'],
@@ -358,7 +360,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       this.baseRequestOql = oql;
     }
-    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item().tableSettings!.aggregation);
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
+      this.item().tableSettings!.aggregation,
+    );
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
@@ -508,7 +512,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   protected openSettings(): void {
     this._matDialog
-      // the explicit width keeps the dialog from resizing when its content changes, e.g. on aggregation mode switch
       .open(TableDashletSettingsComponent, {
         data: { item: this.item(), context: this.context() },
         width: '96rem',

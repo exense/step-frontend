@@ -49,7 +49,6 @@
       </button>
       <mat-menu #settingsMenu="matMenu">
         @if (hasTwoStageAggregation) {
-          <!-- the tooltip is bound to a wrapper, as a disabled button doesn't emit the pointer events it needs -->
           <span
             class="disabled-columns-menu-item"
             matTooltip="The table displays one single value per row, resulting from the two-stage aggregation configured in the table settings"

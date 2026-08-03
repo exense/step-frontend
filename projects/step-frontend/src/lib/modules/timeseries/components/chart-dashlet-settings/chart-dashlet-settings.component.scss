@@ -41,7 +41,6 @@ div[step-modal-window-body] > form {
   & > * {
     flex-grow: 1;
     flex-basis: 0;
-    // without this, the items refuse to shrink below their content and widen the whole dialog
     min-width: 0;
   }
 }
@@ -64,7 +63,6 @@ div[step-modal-window-body] > form {
   color: var.$gray-800;
 }
 
-// same design as the add filter button of the dashboard filter bar
 .add-filter-button {
   @include core.button-round;
   min-width: 9rem;
@@ -109,7 +107,6 @@ div[step-modal-window-body] > form {
   align-items: center;
   gap: 1.2rem;
 
-  // step-tabs spans the full width by default, which would stretch it across the whole row
   step-tabs {
     width: auto;
   }

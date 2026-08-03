@@ -6,6 +6,7 @@ export * from './injectables/time-series-entity.service';
 export * from './injectables/uplot-utils.service';
 export * from './injectables/chart-url-params.service';
 export * from './injectables/time-series-contexts-factory.service';
+export * from './injectables/pipeline-aggregation.service';
 export * from './types/time-series/time-series-utils';
 export * from './types/time-series/time-series.config';
 export * from './types/time-series/timeseries-colors-pool';

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import {
   ColumnSelection,
   DashboardItem,
@@ -16,14 +16,12 @@ import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
+  PipelineAggregationService,
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  PIPELINE_AGGREGATION_OPTIONS,
-  PipelineAggregationUtils,
-} from '../../modules/_common/types/pipeline-aggregation';
+import { PIPELINE_AGGREGATION_OPTIONS } from '../../modules/_common/types/pipeline-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -43,12 +41,12 @@ export class TableDashletSettingsComponent implements OnInit {
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   allAttributes: MetricAttribute[] = [];
   _attributesByKey: Record<string, MetricAttribute> = {};
 
-  @ViewChild('formContainer', { static: true })
-  private formContainer!: NgForm;
+  private readonly formContainer = viewChild.required<NgForm>('formContainer');
 
   readonly FilterBarItemType = FilterBarItemType;
 
@@ -83,22 +81,24 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   private initAggregationMode(): void {
-    const twoStageAggregation = PipelineAggregationUtils.getTwoStageAggregation(this.item.tableSettings!.aggregation);
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
+      this.item.tableSettings!.aggregation,
+    );
     if (twoStageAggregation) {
       this.aggregationMode = 'TWO_STAGE';
       this.twoStageAggregation = { ...twoStageAggregation };
     }
   }
 
-  private fetchMetricTypes() {
+  private fetchMetricTypes(): void {
     this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
-  addFilterItem(attribute: MetricAttribute) {
+  addFilterItem(attribute: MetricAttribute): void {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
-  addCustomFilter(type: FilterBarItemType) {
+  addCustomFilter(type: FilterBarItemType): void {
     this.filterItems.push({
       attributeName: '',
       type: type,
@@ -109,7 +109,7 @@ export class TableDashletSettingsComponent implements OnInit {
     });
   }
 
-  onColumnPclValueChange(column: ColumnSelection, value: string) {
+  onColumnPclValueChange(column: ColumnSelection, value: string): void {
     const aggregateParams = column.aggregation.params || {};
     const oldValue = aggregateParams['pclValue'];
     let parsedNumber: number = parseFloat(value);
@@ -124,8 +124,8 @@ export class TableDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
-    if (this.formContainer.invalid) {
-      this.formContainer.form.markAllAsTouched();
+    if (this.formContainer().invalid) {
+      this.formContainer().form.markAllAsTouched();
       return;
     }
     this.applyAggregationMode();
@@ -135,14 +135,13 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   private applyAggregationMode(): void {
-    // the column selection is left untouched in two-stage mode, so that it is restored when switching back to single
     this.item.tableSettings!.aggregation =
       this.aggregationMode === 'TWO_STAGE'
-        ? PipelineAggregationUtils.createTwoStageAggregation(this.twoStageAggregation)
+        ? this._pipelineAggregationService.createTwoStageAggregation(this.twoStageAggregation)
         : undefined;
   }
 
-  handleFilterChange(index: number, item: FilterBarItem) {
+  handleFilterChange(index: number, item: FilterBarItem): void {
     this.filterItems[index] = item;
     if (!item.attributeName) {
       return;
