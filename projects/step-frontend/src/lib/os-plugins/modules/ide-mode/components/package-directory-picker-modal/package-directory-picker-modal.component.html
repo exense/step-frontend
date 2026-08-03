@@ -1,4 +1,17 @@
 <step-modal-window [title]="_data.title">
+  <step-popover step-modal-window-title class="instructions-popover" xPosition="before" yPosition="below">
+    <button type="button" mat-icon-button tabindex="-1" aria-label="Folder picker instructions">
+      <step-icon name="info" />
+    </button>
+    <step-popover-content>
+      <p class="instructions-intro">Select the automation package root folder on your computer:</p>
+      <ul class="instructions-list">
+        <li>Single click selects a folder.</li>
+        <li>Double click opens a folder.</li>
+        <li>Enter a path and press Enter to navigate directly.</li>
+      </ul>
+    </step-popover-content>
+  </step-popover>
   <div step-modal-window-body>
     @if (_data.withName) {
       <div [formGroup]="packageForm">
@@ -11,7 +24,7 @@
 
     <div class="location-bar">
       <button
-        stepTestId="folder-picker-up-btn"
+        stepTestId="directory-picker-up-btn"
         type="button"
         mat-icon-button
         matTooltip="Go to parent folder"
@@ -22,7 +35,7 @@
       </button>
       <step-form-field>
         <input
-          stepTestId="folder-picker-location-input"
+          stepTestId="directory-picker-location-input"
           type="text"
           aria-label="Location"
           placeholder="Paste a folder path"
@@ -31,7 +44,7 @@
         />
       </step-form-field>
       <button
-        stepTestId="folder-picker-go-btn"
+        stepTestId="directory-picker-go-btn"
         type="button"
         mat-icon-button
         matTooltip="Go to location"
@@ -42,14 +55,15 @@
       </button>
     </div>
 
-    <div class="folder-list">
-      @for (item of items(); track item.absolutePath) {
+    <div class="directory-list">
+      @for (item of directories(); track item.absolutePath) {
         @if (item.isDirectory && !item.isHidden) {
           <button
             mat-button
-            [class.selected]="selectedFolder() === item.absolutePath"
-            (click)="onSelectFolder(item.absolutePath)"
-            (dblclick)="onLoadSubfolder(item.absolutePath)"
+            [attr.data-directory]="item.absolutePath"
+            [class.selected]="selectedDirectory() === item.absolutePath"
+            (click)="onSelectDirectory(item.absolutePath)"
+            (dblclick)="onLoadDirectory(item.absolutePath)"
           >
             {{ item.name }}
           </button>
@@ -59,16 +73,10 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="_dialogRef.close(undefined)">Cancel</button>
-    <button type="button" mat-stroked-button (click)="onCreateFolder()" [disabled]="!currentPath()">
+    <button type="button" mat-stroked-button (click)="onCreateDirectory()" [disabled]="!currentDirectory()">
       Create Folder
     </button>
-    <button
-      type="button"
-      mat-flat-button
-      color="primary"
-      (click)="apply()"
-      [disabled]="!selectedFolder() && !currentPath()"
-    >
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!selectedDirectory()">
       Select
     </button>
   </div>
