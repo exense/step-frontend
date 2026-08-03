@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MetricAggregation, TwoStageAggregation } from '@exense/step-core';
+import { FetchBucketsRequest, MetricAggregation, TwoStageAggregation } from '@exense/step-core';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +16,18 @@ export class PipelineAggregationService {
   getDisplayAggregation(aggregation: MetricAggregation): MetricAggregation {
     const twoStageAggregation = this.getTwoStageAggregation(aggregation);
     return twoStageAggregation ? (this.toDisplayAggregation(twoStageAggregation) ?? aggregation) : aggregation;
+  }
+
+  getFetchBucketsAggregationOptions(
+    aggregation?: MetricAggregation,
+  ): Pick<FetchBucketsRequest, 'timeAggregation' | 'groupAggregation'> {
+    const twoStageAggregation = this.getTwoStageAggregation(aggregation);
+    return twoStageAggregation
+      ? {
+          timeAggregation: twoStageAggregation.timeAggregation,
+          groupAggregation: twoStageAggregation.groupAggregation,
+        }
+      : {};
   }
 
   getPipelineLabel(twoStageAggregation: TwoStageAggregation): string {

@@ -16,6 +16,19 @@ describe('PipelineAggregationService', () => {
     expect(service.getDisplayAggregation(aggregation)).toEqual({ type: 'COUNT' });
   });
 
+  it('maps a two-stage aggregation to bucket request fields', () => {
+    const aggregation = service.createTwoStageAggregation({ timeAggregation: 'AVG', groupAggregation: 'COUNT' });
+
+    expect(service.getFetchBucketsAggregationOptions(aggregation)).toEqual({
+      timeAggregation: 'AVG',
+      groupAggregation: 'COUNT',
+    });
+  });
+
+  it('omits bucket request aggregation fields for a single aggregation', () => {
+    expect(service.getFetchBucketsAggregationOptions({ type: 'SUM' })).toEqual({});
+  });
+
   it('preserves a two-stage aggregation with a MERGE group stage', () => {
     const aggregation = service.createTwoStageAggregation({ timeAggregation: 'AVG', groupAggregation: 'MERGE' });
 

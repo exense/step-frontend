@@ -360,9 +360,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       this.baseRequestOql = oql;
     }
-    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
-      this.item().tableSettings!.aggregation,
-    );
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
@@ -371,8 +368,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
-      timeAggregation: twoStageAggregation?.timeAggregation,
-      groupAggregation: twoStageAggregation?.groupAggregation,
+      ...this._pipelineAggregationService.getFetchBucketsAggregationOptions(this.item().tableSettings!.aggregation),
     };
     return this._timeSeriesService
       .fetchBucketsWithFallback(request)

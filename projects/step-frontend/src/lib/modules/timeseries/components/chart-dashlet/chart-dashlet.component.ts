@@ -742,9 +742,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     if (start >= end) {
       throw new Error(`Invalid time range`);
     }
-    const primaryTwoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
-      this.item().chartSettings!.primaryAxes.aggregation,
-    );
     const request: FetchBucketsRequest = {
       start: start,
       end: end,
@@ -752,8 +749,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
-      timeAggregation: primaryTwoStageAggregation?.timeAggregation,
-      groupAggregation: primaryTwoStageAggregation?.groupAggregation,
+      ...this._pipelineAggregationService.getFetchBucketsAggregationOptions(
+        this.item().chartSettings!.primaryAxes.aggregation,
+      ),
     };
     const customResolution = this.context().getChartsResolution();
     if (customResolution) {
