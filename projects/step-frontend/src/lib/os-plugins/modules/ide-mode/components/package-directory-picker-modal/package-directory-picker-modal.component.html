@@ -57,7 +57,7 @@
 
     <div class="directory-list">
       @for (item of directories(); track item.absolutePath) {
-        @if (item.isDirectory && !item.isHidden) {
+        @if (item.isDirectory && (showingRoots() || !item.isHidden)) {
           <button
             mat-button
             [attr.data-directory]="item.absolutePath"
@@ -65,6 +65,7 @@
             (click)="onSelectDirectory(item.absolutePath)"
             (dblclick)="onLoadDirectory(item.absolutePath)"
           >
+            <step-icon name="folder" />
             {{ item.name }}
           </button>
         }
