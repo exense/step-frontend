@@ -58,8 +58,12 @@ export class NewDashboardDialogComponent {
     });
   }
 
-  @HostListener('keydown.enter')
-  private handleSaveByEnter(): void {
+  @HostListener('keydown.enter', ['$event'])
+  private handleSaveByEnter(event: KeyboardEvent): void {
+    if ((event.target as Element | null)?.closest('button')) {
+      return;
+    }
+
     this.save(true);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -29,8 +29,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
 
   protected bookmark: Partial<Bookmark> = {};
 
-  @ViewChild('formContainer', { static: false })
-  private form!: NgForm;
+  private readonly form = viewChild.required<NgForm>('formContainer');
 
   ngOnInit(): void {
     this._userApi.getMyUser().subscribe((user) => {
@@ -49,10 +48,14 @@ export class BookmarkCreateDialogComponent implements OnInit {
     };
   }
 
-  @HostListener('keydown.enter')
-  save(): void {
-    if (this.form.control.invalid) {
-      this.form.control.markAllAsTouched();
+  @HostListener('keydown.enter', ['$event'])
+  save(event?: KeyboardEvent): void {
+    if (event?.target && (event.target as Element).closest('button')) {
+      return;
+    }
+
+    if (this.form().control.invalid) {
+      this.form().control.markAllAsTouched();
       return;
     }
     if (this._data) {
