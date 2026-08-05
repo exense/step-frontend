@@ -3,10 +3,10 @@ import { AutomationPackageDescriptor, GlobalReloadService, IdeService } from '@e
 import { MatDialog } from '@angular/material/dialog';
 import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
 import {
-  PackageFolderPickerModalComponent,
-  PackageFolderPickerModalData,
-  PackageFolderPickerModalResult,
-} from '../components/package-folder-picker-modal/package-folder-picker-modal.component';
+  PackageDirectoryPickerModalComponent,
+  PackageDirectoryPickerModalData,
+  PackageDirectoryPickerModalResult,
+} from '../components/package-directory-picker-modal/package-directory-picker-modal.component';
 import { ApAccessHistoryService } from './ap-access-history.service';
 
 @Injectable({
@@ -57,7 +57,7 @@ export class IdeStateService {
   }
 
   create(): void {
-    this.openPackageFolderDialog({ title: 'Create package', withName: true })
+    this.openPackageDirectoryDialog({ title: 'Create package', withName: true })
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
@@ -75,7 +75,7 @@ export class IdeStateService {
   }
 
   openWithPicker(): void {
-    this.openPackageFolderDialog({ title: 'Open package' })
+    this.openPackageDirectoryDialog({ title: 'Open package' })
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
@@ -116,15 +116,15 @@ export class IdeStateService {
     }
   }
 
-  private openPackageFolderDialog(
-    data: PackageFolderPickerModalData,
-  ): Observable<PackageFolderPickerModalResult | undefined> {
+  private openPackageDirectoryDialog(
+    data: PackageDirectoryPickerModalData,
+  ): Observable<PackageDirectoryPickerModalResult | undefined> {
     return this._matDialog
       .open<
-        PackageFolderPickerModalComponent,
-        PackageFolderPickerModalData,
-        PackageFolderPickerModalResult
-      >(PackageFolderPickerModalComponent, { data })
+        PackageDirectoryPickerModalComponent,
+        PackageDirectoryPickerModalData,
+        PackageDirectoryPickerModalResult
+      >(PackageDirectoryPickerModalComponent, { data })
       .afterClosed();
   }
 }
