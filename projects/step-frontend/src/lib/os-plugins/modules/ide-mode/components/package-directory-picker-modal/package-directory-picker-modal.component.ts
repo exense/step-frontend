@@ -1,7 +1,7 @@
 import { Component, computed, ElementRef, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogsService, DirectoryListing, FileDescriptor, FilesystemService, StepCoreModule } from '@exense/step-core';
-import { switchMap, map, filter } from 'rxjs';
+import { switchMap, map } from 'rxjs';
 import { FormBuilder, Validators } from '@angular/forms';
 
 export interface PackageDirectoryPickerModalData {
@@ -46,7 +46,10 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDirectory(this._data.initialDirectory ?? '');
-    this._filesystemService.getRoots().subscribe((roots) => this.roots.set(roots));
+    this._filesystemService.getRoots().subscribe({
+      next: (roots) => this.roots.set(roots),
+      error: () => this.roots.set([]),
+    });
   }
 
   protected loadLocation(): void {
@@ -108,7 +111,6 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
     this._dialogService
       .enterValue('Create Folder', '', { confirmButtonLabel: 'Create', subtitle: `in ${currentDirectory}` })
       .pipe(
-        filter((name) => !!name),
         switchMap((name) =>
           this._filesystemService
             .createDirectory({
@@ -124,21 +126,29 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
             ),
         ),
       )
-      .subscribe(({ result, directory }) => {
-        this.updateStateFromResult(result, currentDirectory);
-        const directoryPath = directory.absolutePath;
-        if (directoryPath) {
-          this.selectedDirectory.set(directoryPath);
-          this.scrollDirectoryIntoView(directoryPath);
-        }
+      .subscribe({
+        next: ({ result, directory }) => {
+          this.updateStateFromResult(result, currentDirectory);
+          const directoryPath = directory.absolutePath;
+          if (directoryPath) {
+            this.selectedDirectory.set(directoryPath);
+            this.scrollDirectoryIntoView(directoryPath);
+          }
+        },
+        error: () => undefined,
       });
   }
 
   private loadDirectory(directory: string): void {
     this.selectedDirectory.set(null);
-    this._filesystemService.listDirectory(directory, false, false, true).subscribe((result) => {
-      this.showingRoots.set(false);
-      this.updateStateFromResult(result, directory);
+    this._filesystemService.listDirectory(directory, false, false, true).subscribe({
+      next: (result) => {
+        this.showingRoots.set(false);
+        this.updateStateFromResult(result, directory);
+      },
+      error: () => {
+        this.locationControl.setValue(this.currentDirectory() ?? '', { emitEvent: false });
+      },
     });
   }
 
@@ -160,10 +170,11 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
   }
 
   private removeTrailingSlash(directory: string): string {
-    if (directory === '/' || /^[a-zA-Z]:\/$/.test(directory)) {
-      return directory;
+    const normalized = directory.replace(/\\/g, '/');
+    if (normalized === '/' || /^[a-zA-Z]:\/$/.test(normalized)) {
+      return normalized;
     }
-    return directory.replace(/\/+$/, '');
+    return normalized.replace(/\/+$/, '');
   }
 
   private scrollDirectoryIntoView(directory: string, attempt: number = 0): void {
