@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DashboardsService, DashboardView, DialogRouteResult } from '@exense/step-core';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -58,12 +58,9 @@ export class NewDashboardDialogComponent {
     });
   }
 
-  @HostListener('keydown.enter', ['$event'])
-  private handleSaveByEnter(event: KeyboardEvent): void {
-    if ((event.target as Element | null)?.closest('button')) {
-      return;
-    }
-
-    this.save(true);
+  protected handleSubmit(event: SubmitEvent): void {
+    const submitter = event.submitter;
+    const editAfterSave = submitter instanceof HTMLButtonElement ? submitter.value === 'save-and-edit' : true;
+    this.save(editAfterSave);
   }
 }

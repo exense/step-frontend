@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
+import { Component, inject, OnInit, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -48,12 +48,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
     };
   }
 
-  @HostListener('keydown.enter', ['$event'])
-  save(event?: KeyboardEvent): void {
-    if (event?.target && (event.target as Element).closest('button')) {
-      return;
-    }
-
+  save(): void {
     if (this.form().control.invalid) {
       this.form().control.markAllAsTouched();
       return;

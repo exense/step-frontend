@@ -1,6 +1,6 @@
-<step-modal-window title="New Dashboard">
-  <div step-modal-window-body>
-    <ng-container [formGroup]="form">
+<form [formGroup]="form" (ngSubmit)="handleSubmit($event)">
+  <step-modal-window title="New Dashboard">
+    <div step-modal-window-body>
       <step-form-field [showRequiredMarker]="true">
         <step-label>Name</step-label>
         <input type="text" formControlName="name" />
@@ -9,11 +9,11 @@
         <step-label>Description</step-label>
         <textarea [rows]="4" formControlName="description"> </textarea>
       </step-form-field>
-    </ng-container>
-  </div>
-  <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
-    <button type="button" mat-flat-button color="primary" (click)="save(true)">Save and edit</button>
-  </div>
-</step-modal-window>
+    </div>
+    <div step-modal-window-buttons>
+      <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+      <button type="submit" mat-flat-button color="primary" value="save">Save</button>
+      <button type="submit" mat-flat-button color="primary" value="save-and-edit">Save and edit</button>
+    </div>
+  </step-modal-window>
+</form>
