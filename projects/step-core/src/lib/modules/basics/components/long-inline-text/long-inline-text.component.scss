@@ -22,6 +22,9 @@
 }
 
 .value {
+  &.hidden {
+    visibility: hidden;
+  }
   width: 100%;
 }
 
