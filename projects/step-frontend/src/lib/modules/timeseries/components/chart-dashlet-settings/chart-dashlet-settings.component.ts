@@ -20,7 +20,10 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-import { PIPELINE_AGGREGATION_OPTIONS } from '../../modules/_common/types/pipeline-aggregation';
+import {
+  PIPELINE_GROUP_AGGREGATION_OPTIONS,
+  PIPELINE_TIME_AGGREGATION_OPTIONS,
+} from '../../modules/_common/types/pipeline-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   AggregateParams,
@@ -56,7 +59,8 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   readonly FilterBarItemType = FilterBarItemType;
 
-  readonly PIPELINE_AGGREGATION_OPTIONS = PIPELINE_AGGREGATION_OPTIONS;
+  readonly PIPELINE_TIME_AGGREGATION_OPTIONS = PIPELINE_TIME_AGGREGATION_OPTIONS;
+  readonly PIPELINE_GROUP_AGGREGATION_OPTIONS = PIPELINE_GROUP_AGGREGATION_OPTIONS;
 
   readonly AGGREGATION_MODES: Tab<AggregationMode>[] = [
     { id: 'SINGLE', label: 'Single' },

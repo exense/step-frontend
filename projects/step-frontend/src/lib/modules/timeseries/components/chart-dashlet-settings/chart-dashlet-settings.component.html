@@ -237,7 +237,7 @@
                     ></step-icon>
                   </step-label>
                   <mat-select [(ngModel)]="twoStageAggregation.timeAggregation" name="primaryTimeAggregation">
-                    @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
+                    @for (option of PIPELINE_TIME_AGGREGATION_OPTIONS; track option.value) {
                       <mat-option [value]="option.value">{{ option.label }}</mat-option>
                     }
                   </mat-select>
@@ -255,7 +255,7 @@
                     ></step-icon>
                   </step-label>
                   <mat-select [(ngModel)]="twoStageAggregation.groupAggregation" name="primaryGroupAggregation">
-                    @for (option of PIPELINE_AGGREGATION_OPTIONS; track option.value) {
+                    @for (option of PIPELINE_GROUP_AGGREGATION_OPTIONS; track option.value) {
                       <mat-option [value]="option.value">{{ option.label }}</mat-option>
                     }
                   </mat-select>

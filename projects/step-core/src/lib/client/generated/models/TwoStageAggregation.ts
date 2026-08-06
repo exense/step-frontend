@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export type TwoStageAggregation = {
-  timeAggregation: 'MERGE' | 'AVG' | 'SUM' | 'COUNT' | 'MIN' | 'MAX';
+  timeAggregation: 'MERGE' | 'AVG' | 'SAMPLED_AVG' | 'SUM' | 'COUNT' | 'MIN' | 'MAX';
   groupAggregation: 'MERGE' | 'AVG' | 'SUM' | 'COUNT' | 'MIN' | 'MAX';
 };
