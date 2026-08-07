@@ -68,7 +68,7 @@
     "es-module-shims": "^1.5.12",
     "feather-icons": "4.29.0",
     "luxon": "3.4.4",
-    "marked": "15.0.12",
+    "marked": "16.4.2",
     "ngx-markdown": "20.1.0",
     "ngx-mat-select-search": "^8.0.6",
     "normalize.css": "8.0.1",
