@@ -4,7 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export interface EnterTextValueDialogData {
   title: string;
   value: string;
+  confirmButtonLabel?: string;
   multiline?: boolean;
+  subtitle?: string;
 }
 
 export type EnterTextValueDialogResult = string | undefined;
@@ -18,15 +20,15 @@ export type EnterTextValueDialogResult = string | undefined;
 export class EnterTextValueDialogComponent implements OnInit {
   private _dialogRef = inject<MatDialogRef<EnterTextValueDialogComponent, EnterTextValueDialogResult>>(MatDialogRef);
 
-  readonly dialogData = inject<EnterTextValueDialogData>(MAT_DIALOG_DATA);
+  protected readonly _dialogData = inject<EnterTextValueDialogData>(MAT_DIALOG_DATA);
 
-  value: string = '';
+  protected value: string = '';
 
   ngOnInit(): void {
-    this.value = this.dialogData.value;
+    this.value = this._dialogData.value;
   }
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     this._dialogRef.close(this.value);
   }
 }

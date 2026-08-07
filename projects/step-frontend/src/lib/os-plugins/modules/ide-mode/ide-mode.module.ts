@@ -4,17 +4,17 @@ import {
   IDE_MODE,
   MenuItemsOverrideConfigService,
   StepCoreModule,
-  ViewRegistryService
+  ViewRegistryService,
 } from '@exense/step-core';
-import {inject, NgModule} from '@angular/core';
-import {of} from 'rxjs';
-import {IDE_MENU_ITEMS} from './shared/ide-menu-items';
-import {IdeHeaderBarComponent} from './components/ide-header-bar/ide-header-bar.component';
-import {PackageFolderPickerModalComponent} from './components/package-folder-picker-modal/package-folder-picker-modal.component';
-import {IdeStateService} from './services/ide-state.service';
+import { inject, NgModule } from '@angular/core';
+import { of } from 'rxjs';
+import { IDE_MENU_ITEMS } from './shared/ide-menu-items';
+import { IdeHeaderBarComponent } from './components/ide-header-bar/ide-header-bar.component';
+import { PackageDirectoryPickerModalComponent } from './components/package-directory-picker-modal/package-directory-picker-modal.component';
+import { IdeStateService } from './services/ide-state.service';
 
 @NgModule({
-  imports: [StepCoreModule, IdeHeaderBarComponent, PackageFolderPickerModalComponent],
+  imports: [StepCoreModule, IdeHeaderBarComponent, PackageDirectoryPickerModalComponent],
 })
 export class IdeModeModule {
   private _isIdeMode = inject(IDE_MODE);
@@ -24,8 +24,7 @@ export class IdeModeModule {
   private _ideState = inject(IdeStateService);
   private _additionalRightRules = inject(AdditionalRightRuleService);
 
-  constructor(
-  ) {
+  constructor() {
     if (this._isIdeMode) {
       this.setupMenuItems();
       this.registerDashlets();
@@ -39,7 +38,7 @@ export class IdeModeModule {
   }
 
   private registerDashlets(): void {
-    this._dashletRegistry.registerDashlet('IdeHeaderBar', IdeHeaderBarComponent)
+    this._dashletRegistry.registerDashlet('IdeHeaderBar', IdeHeaderBarComponent);
     this._viewRegistry.registerDashlet('ide/bar', '', 'IdeHeaderBar', 'IdeHeaderBar');
   }
 
@@ -49,9 +48,7 @@ export class IdeModeModule {
         return true;
       }
 
-      return !(right.endsWith('-write') ||
-        right.endsWith('-delete') ||
-        right.endsWith('-execute'));
+      return !(right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'));
     });
   }
 }
