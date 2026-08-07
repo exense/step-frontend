@@ -74,10 +74,7 @@ export class FunctionPackagesModule {
   }
 
   private registerViews(): void {
-    const functionPackageEditor = (
-      mainPath: string,
-      projectGuardConfig: CheckProjectGuardConfig /* editorUrl: string*/,
-    ): Route => ({
+    const functionPackageEditor = (mainPath: string, projectGuardConfig: CheckProjectGuardConfig): Route => ({
       path: mainPath,
       component: SimpleOutletComponent,
       children: [

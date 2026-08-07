@@ -7,6 +7,7 @@ import {
   MultipleProjectsService,
   ProjectScopeWarningService,
 } from '../modules/basics/step-basics.module';
+import { EntityRegistry } from '../modules/entity/injectables/entity-registry';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
 
@@ -26,6 +27,7 @@ export const checkEntityGuardFactory =
   (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const _auth = inject(AuthService);
     const _multipleProjects = inject(MultipleProjectsService);
+    const _entityRegistry = inject(EntityRegistry);
     const _injector = inject(Injector);
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
@@ -101,7 +103,10 @@ export const checkEntityGuardFactory =
           );
         }
         const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
-        const message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
+        const entityLabel = (
+          _entityRegistry.getEntities().find((entity) => entity.type === config.entityType)?.label ?? config.entityType
+        ).toLowerCase();
+        const message = `This ${entityLabel} doesn't belong to the currently selected project${writableEntityText}.`;
         const action = openUrl
           ? {
               url: `#${openUrl}`,
