@@ -15,7 +15,6 @@ const libraryConfig = (conf = {}, disableSecondaries = true) => {
 
 module.exports = {
   '@angular/core': libraryConfig(),
-  '@angular/animations': libraryConfig(),
   '@angular/common': libraryConfig(),
   '@angular/common/http': libraryConfig(),
   '@angular/router': libraryConfig(),

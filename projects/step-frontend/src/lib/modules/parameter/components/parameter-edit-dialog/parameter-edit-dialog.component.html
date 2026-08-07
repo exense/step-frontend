@@ -1,5 +1,5 @@
 <form #parameterForm="ngForm">
-  <step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
+  <step-modal-window [title]="modalTitle">
     <div step-modal-window-body>
       @if (error) {
         <step-alert type="danger">{{ error }}</step-alert>

@@ -13,9 +13,16 @@ const libraryConfig = (conf = {}, disableSecondaries = false) => {
   return res;
 };
 
+const skip = ['@exense/step-core/step-lint', '@exense/step-frontend'];
+
 const config = {
-  '@angular/core': libraryConfig(),
+  '@angular/core': libraryConfig({
+    includeSecondaries: {
+      keepAll: true,
+    },
+  }),
   '@angular/animations': libraryConfig(),
+  '@angular/platform-browser': libraryConfig(),
   '@angular/common': libraryConfig(),
   '@angular/common/http': libraryConfig(),
   '@angular/router': libraryConfig(),
@@ -28,10 +35,10 @@ const config = {
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
   luxon: libraryConfig({ requiredVersion: '3.4.4' }),
   marked: libraryConfig({ requiredVersion: '15.0.12' }),
-  '@angular/platform-browser': libraryConfig(),
 };
 
 module.exports = {
+  skip,
   config,
   libraryConfig,
 };
