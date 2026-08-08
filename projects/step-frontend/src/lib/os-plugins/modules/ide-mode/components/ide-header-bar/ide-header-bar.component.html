@@ -61,14 +61,21 @@
     <step-icon name="folder" />
     <span>Open from filesystem</span>
   </button>
-  <mat-divider />
-  <div class="step-ide-history-label">History</div>
-  @for (item of _apAccessHistory.history(); track item.directory) {
-    <button type="button" class="step-ide-history-item" mat-menu-item (click)="_ideState.openFromPath(item.directory!)">
-      <div class="step-ide-history-content">
-        <span>{{ item.name }}</span>
-        <span>{{ item.directory }}</span>
-      </div>
-    </button>
+  @if (_apAccessHistory.history().length > 0) {
+    <mat-divider />
+    <div class="step-ide-history-label">History</div>
+    @for (item of _apAccessHistory.history(); track item.directory) {
+      <button
+        type="button"
+        class="step-ide-history-item"
+        mat-menu-item
+        (click)="_ideState.openFromPath(item.directory!)"
+      >
+        <div class="step-ide-history-content">
+          <span>{{ item.name }}</span>
+          <span>{{ item.directory }}</span>
+        </div>
+      </button>
+    }
   }
 </mat-menu>

@@ -1,14 +1,13 @@
-import {effect, inject, Injectable, signal} from '@angular/core';
-import {ApStorageService} from './ap-storage.service';
-import {AutomationPackageDescriptor} from '@exense/step-core';
+import { effect, inject, Injectable, signal } from '@angular/core';
+import { ApStorageService } from './ap-storage.service';
+import { AutomationPackageDescriptor } from '@exense/step-core';
 
 const LIMIT = 10;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApAccessHistoryService {
-
   private _apStorage = inject(ApStorageService);
 
   private readonly historyInternal = signal(this.getHistory());
@@ -21,9 +20,9 @@ export class ApAccessHistoryService {
 
   addToHistory(automationPackage: AutomationPackageDescriptor): void {
     this.historyInternal.update((history) => {
-      const sameFolderIndex = history.findIndex((item) => item.directory === automationPackage.directory);
-      if (sameFolderIndex !== -1) {
-        history.splice(sameFolderIndex, 1);
+      const sameDirectoryIndex = history.findIndex((item) => item.directory === automationPackage.directory);
+      if (sameDirectoryIndex !== -1) {
+        history.splice(sameDirectoryIndex, 1);
       }
       history = [automationPackage, ...history];
       if (history.length > LIMIT) {
@@ -34,7 +33,7 @@ export class ApAccessHistoryService {
   }
 
   private saveHistory(history: AutomationPackageDescriptor[]): void {
-    const json  = JSON.stringify(history);
+    const json = JSON.stringify(history);
     this._apStorage.setItem('history', json);
   }
 
