@@ -277,6 +277,7 @@ import { Sleep } from './svg/sleep';
 import { Sliders } from './svg/sliders';
 import { Smartphone } from './svg/smartphone';
 import { Smile } from './svg/smile';
+import { Sparkles } from './svg/sparkles';
 import { Speaker } from './svg/speaker';
 import { Square } from './svg/square';
 import { Star } from './svg/star';
@@ -626,6 +627,7 @@ export const allIcons = {
   Sliders,
   Smartphone,
   Smile,
+  Sparkles,
   Speaker,
   Square,
   Star,
