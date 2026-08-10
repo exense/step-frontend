@@ -104,9 +104,6 @@
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group [stepEntityRef]="element">
-          @if (_isIdeMode && isAiGenerated(element)) {
-            <step-icon class="ai-generated-marker" name="zap" matTooltip="Generated with AI" />
-          }
           <a
             data-step-testid="execute-plan-btn"
             mat-icon-button
@@ -167,8 +164,8 @@
         [disabled]="!('plan-write' | hasRight | async)"
         [routerLink]="['/', 'plans', 'ai', 'regenerate', element.id]"
       >
-        <step-icon name="refresh-cw" aria-hidden="true" />
-        Regenerate with AI
+        <step-icon name="sparkles" aria-hidden="true" />
+        Regenerate with AI…
       </a>
     }
     <button mat-menu-item (click)="scheduleCommands.schedule()" [disabled]="!('task-write' | hasRight: true | async)">
