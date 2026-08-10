@@ -129,7 +129,7 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
       .subscribe({
         next: ({ result, directory }) => {
           this.updateStateFromResult(result, currentDirectory);
-          const directoryPath = directory.absolutePath;
+          const directoryPath = directory.path;
           if (directoryPath) {
             this.selectedDirectory.set(directoryPath);
             this.scrollDirectoryIntoView(directoryPath);
@@ -162,11 +162,11 @@ export class PackageDirectoryPickerModalComponent implements OnInit {
   }
 
   private updateStateFromResult(result: DirectoryListing, baseDirectory: string = '/'): void {
-    const currentDirectory = result.currentPath ?? baseDirectory;
+    const currentDirectory = result.path ?? baseDirectory;
     this.currentDirectory.set(currentDirectory);
     this.locationControl.setValue(currentDirectory, { emitEvent: false });
     this.parentDirectory.set(result.parentPath || null);
-    this.directories.set(result.items || []);
+    this.directories.set(result.entries || []);
   }
 
   private removeTrailingSlash(directory: string): string {

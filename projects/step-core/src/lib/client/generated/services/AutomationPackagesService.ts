@@ -10,6 +10,7 @@ import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTas
 import type { AutomationPackage } from '../models/AutomationPackage';
 import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
 import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
+import type { DirectoryListing } from '../models/DirectoryListing';
 import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 import type { RefreshResourceResult } from '../models/RefreshResourceResult';
@@ -20,6 +21,35 @@ import { BaseHttpRequest } from '../core/BaseHttpRequest';
 @Injectable({ providedIn: 'root' })
 export class AutomationPackagesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * @param reference
+   * @param apId
+   * @param path
+   * @param filesOnly
+   * @param dirsOnly
+   * @returns DirectoryListing default response
+   * @throws ApiError
+   */
+  public browseApResources(
+    reference?: string,
+    apId?: string,
+    path?: string,
+    filesOnly: boolean = false,
+    dirsOnly: boolean = false,
+  ): Observable<DirectoryListing> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/ap-resources/browse',
+      query: {
+        reference: reference,
+        apId: apId,
+        path: path,
+        filesOnly: filesOnly,
+        dirsOnly: dirsOnly,
+      },
+    });
+  }
 
   /**
    * @param requestBody
@@ -327,6 +357,44 @@ export class AutomationPackagesService {
       },
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param reference
+   * @param apId
+   * @param path
+   * @param inline
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getApResourceContent(reference?: string, apId?: string, path?: string, inline?: boolean): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/ap-resources/content',
+      query: {
+        reference: reference,
+        apId: apId,
+        path: path,
+        inline: inline,
+      },
+    });
+  }
+
+  /**
+   * @param apId
+   * @param path
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getApResourceReference(apId?: string, path?: string): Observable<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/ap-resources/reference',
+      query: {
+        apId: apId,
+        path: path,
+      },
     });
   }
 

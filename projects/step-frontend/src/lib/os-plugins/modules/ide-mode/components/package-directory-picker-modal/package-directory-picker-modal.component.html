@@ -56,14 +56,14 @@
     </div>
 
     <div class="directory-list">
-      @for (item of directories(); track item.absolutePath) {
-        @if (item.isDirectory && (showingRoots() || !item.isHidden)) {
+      @for (item of directories(); track item.path) {
+        @if (item.directory && (showingRoots() || !item.hidden)) {
           <button
             mat-button
-            [attr.data-directory]="item.absolutePath"
-            [class.selected]="selectedDirectory() === item.absolutePath"
-            (click)="onSelectDirectory(item.absolutePath)"
-            (dblclick)="onLoadDirectory(item.absolutePath)"
+            [attr.data-directory]="item.path"
+            [class.selected]="selectedDirectory() === item.path"
+            (click)="onSelectDirectory(item.path)"
+            (dblclick)="onLoadDirectory(item.path)"
           >
             <step-icon name="folder" />
             {{ item.name }}

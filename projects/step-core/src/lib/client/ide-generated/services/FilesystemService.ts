@@ -5,8 +5,8 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { CreateDirectoryRequest } from '../models/CreateDirectoryRequest';
-import type { DirectoryListing } from '../models/DirectoryListing';
-import type { FileDescriptor } from '../models/FileDescriptor';
+import type { DirectoryListing } from '../../generated/models/DirectoryListing';
+import type { FileDescriptor } from '../../generated/models/FileDescriptor';
 
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
