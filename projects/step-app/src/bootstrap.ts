@@ -3,7 +3,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { environment } from './environments/environment';
 import { AppModule } from '@exense/step-frontend';
-import {GlobalIndicator, STEP_IDE_MODE} from '@exense/step-core';
+import { GlobalIndicator, STEP_IDE_MODE } from '@exense/step-core';
 
 if (environment.production) {
   enableProdMode();
@@ -13,6 +13,7 @@ const globalWindow = window as any;
 const globalIndicator: GlobalIndicator | undefined = globalWindow.globalIndicator;
 globalIndicator?.showMessage?.('Initializing application...');
 globalWindow[STEP_IDE_MODE] = environment.ideMode;
+globalWindow.STEP_ENTERPRISE_MODE = environment.enterpriseMode;
 
 platformBrowserDynamic()
   .bootstrapModule(AppModule)

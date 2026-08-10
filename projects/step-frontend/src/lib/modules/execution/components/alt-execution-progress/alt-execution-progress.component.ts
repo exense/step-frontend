@@ -96,7 +96,6 @@ import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 import { AltExecutionRefreshActivityService } from '../../services/alt-execution-refresh-activity.service';
 import { AltExecutionRefreshActivity } from '../../shared/alt-execution-refresh-activity.enum';
-import { IdeStateService } from '../../../../os-plugins/modules/ide-mode/services/ide-state.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -248,7 +247,6 @@ export class AltExecutionProgressComponent
   private _dateUtils = inject(DateUtilsService);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
-  private _ideState = inject(IdeStateService);
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
   protected readonly activeDrilldownTabId = inject(AltExecutionTabsService).activeDrilldownTabId;
@@ -295,44 +293,7 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
-  protected readonly aiGenerationState$ = this.execution$.pipe(
-    map((execution) => {
-      const parameters = execution.executionParameters?.customParameters;
-      if (parameters?.['ai_execution_source'] !== 'step-ide') {
-        return undefined;
-      }
-      return {
-        completed: execution.status === 'ENDED',
-        targetDirectory: parameters['ai_target_directory'],
-      };
-    }),
-    distinctUntilChanged(
-      (previous, current) =>
-        previous?.completed === current?.completed && previous?.targetDirectory === current?.targetDirectory,
-    ),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
-
-  protected canReloadAiPackage(targetDirectory?: string): boolean {
-    const currentDirectory = this._ideState.currentPackage()?.directory;
-    return (
-      !!targetDirectory &&
-      !!currentDirectory &&
-      !this._ideState.inProgress() &&
-      this.normalizeDirectory(targetDirectory) === this.normalizeDirectory(currentDirectory)
-    );
-  }
-
-  protected reloadAiPackage(): void {
-    this._ideState.reload();
-  }
-
-  private normalizeDirectory(directory: string): string {
-    return directory.replaceAll('\\', '/').replace(/\/$/, '').toLowerCase();
-  }
 
   protected readonly notices$ = this.activeExecution$.pipe(
     switchMap((active) => active.resolvedNotices$),
