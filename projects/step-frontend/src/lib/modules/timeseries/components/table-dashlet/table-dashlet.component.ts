@@ -14,7 +14,13 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesEntityService } from '../../modules/_common';
+import {
+  COMMON_IMPORTS,
+  PipelineAggregationService,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesEntityService,
+} from '../../modules/_common';
 import {
   BucketResponse,
   ColumnSelection,
@@ -96,6 +102,7 @@ interface ProcessedBucketResponse {
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   protected readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
   protected readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
+  private readonly TWO_STAGE_VALUE_COLUMN_ID = TableColumnType.SUM;
 
   readonly item = input.required<DashboardItem>();
   readonly context = input.required<TimeSeriesContext>();
@@ -113,12 +120,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _matDialog = inject(MatDialog);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _cd = inject(ChangeDetectorRef);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   private tableData$ = new Subject<TableEntry[]>();
   protected tableDataSource: TableLocalDataSource<TableEntry> | undefined;
 
   protected columnsDefinition: TableColumn[] = [];
   protected visibleColumnsIds: string[] = ['name'];
+  protected hasTwoStageAggregation = false;
   private attributesByIds: Record<string, MetricAttribute> = {};
 
   protected allSeriesChecked: boolean = true;
@@ -171,12 +180,19 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState(): void {
     this.item().attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(
+      this.item().tableSettings!.aggregation,
+    );
+    this.hasTwoStageAggregation = !!twoStageAggregation;
     this.columnsDefinition = this.item().tableSettings!.columns!.map((column: ColumnSelection) => {
+      const isScalarColumn = column.column === this.TWO_STAGE_VALUE_COLUMN_ID;
       return {
         id: column.column!,
-        label: this.getColumnLabel(column),
-        isVisible: column.selected!,
-        pclValue: column.aggregation.params?.['pclValue'],
+        label: twoStageAggregation
+          ? this._pipelineAggregationService.getPipelineLabel(twoStageAggregation)
+          : this.getColumnLabel(column),
+        isVisible: twoStageAggregation ? isScalarColumn : column.selected!,
+        pclValue: twoStageAggregation ? undefined : column.aggregation.params?.['pclValue'],
         mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
       };
@@ -352,6 +368,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
+      ...this._pipelineAggregationService.getFetchBucketsAggregationOptions(this.item().tableSettings!.aggregation),
     };
     return this._timeSeriesService
       .fetchBucketsWithFallback(request)
@@ -491,7 +508,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   protected openSettings(): void {
     this._matDialog
-      .open(TableDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
+      .open(TableDashletSettingsComponent, {
+        data: { item: this.item(), context: this.context() },
+        width: '96rem',
+      })
       .afterClosed()
       // eslint-disable-next-line step-lint/rx-nested-subscription
       .subscribe((updatedItem: DashboardItem) => {
