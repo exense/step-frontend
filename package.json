@@ -90,7 +90,7 @@
     "@angular/build": "20.3.32",
     "@angular/cli": "20.3.32",
     "@angular/compiler-cli": "20.3.26",
-    "@happy-dom/jest-environment": "19.0.2",
+    "@happy-dom/jest-environment": "20.11.2",
     "@schematics/angular": "20.0.1",
     "@types/jest": "29.5.14",
     "@types/luxon": "3.4.2",

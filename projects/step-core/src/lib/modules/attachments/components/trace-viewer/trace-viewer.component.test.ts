@@ -35,7 +35,7 @@ describe('Trace Viewer', () => {
     componentRef.setInput('reportUrl', 'https://step.ch/reports/1');
 
     const doc = TestBed.inject(DOCUMENT);
-    const spyWindowOpen = jest.spyOn(doc.defaultView!, 'open').mockImplementation(() => {});
+    const spyWindowOpen = jest.spyOn(doc.defaultView!, 'open').mockImplementation(() => null);
 
     expect(spyWindowOpen).not.toHaveBeenCalled();
     componentRef.instance.openInSeparateTab();
