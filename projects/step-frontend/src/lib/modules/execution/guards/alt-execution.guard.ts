@@ -4,6 +4,7 @@ import { map, of, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
   ExecutionReportStaticLayoutRegistryService,
   ExecutionViewMode,
   ExecutionViewModeService,
@@ -15,7 +16,12 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
   const _executionViewMode = inject(ExecutionViewModeService);
   const _staticLayouts = inject(ExecutionReportStaticLayoutRegistryService);
 
-  if (_staticLayouts.has(route.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined)) {
+  if (
+    _staticLayouts.has(
+      (route.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
+        (route.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined),
+    )
+  ) {
     return true;
   }
 

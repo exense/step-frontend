@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { WidgetState } from '../../editable-grid-layout/types/widget-state';
 
 export const EXECUTION_REPORT_LAYOUT_QUERY_PARAM = 'reportLayout';
+export const EXECUTION_REPORT_LAYOUT_ROUTE_DATA = 'reportLayout';
 
 export interface ExecutionReportStaticLayout {
   id: string;

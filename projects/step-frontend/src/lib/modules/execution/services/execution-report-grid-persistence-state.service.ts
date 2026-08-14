@@ -3,6 +3,7 @@ import {
   LOCAL_STORAGE,
   AppConfigContainerService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
   ExecutionReportStaticLayout,
   ExecutionReportStaticLayoutRegistryService,
   GridPersistenceStateService,
@@ -147,9 +148,9 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   private getStaticLayout(): ExecutionReportStaticLayout | undefined {
-    const layoutId = this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as
-      | string
-      | undefined;
+    const layoutId =
+      (this._activatedRoute.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
+      (this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined);
     return this._staticLayouts.get(layoutId);
   }
 

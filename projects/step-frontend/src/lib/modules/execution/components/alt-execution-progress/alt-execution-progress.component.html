@@ -168,6 +168,30 @@
         }
       }
     </div>
+    @if (isCompactReport && execution.status === 'RUNNING') {
+      <div class="compact-controls">
+        <ng-container
+          stepExecutionCommands
+          #commands="StepExecutionCommands"
+          [description]="execution.description"
+          [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+          [execution]="execution"
+          [includedTestcases]="testCasesForRelaunch()"
+          (refresh)="manualRefresh()"
+        >
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Stop execution"
+            matTooltipPosition="below"
+            [disabled]="!('plan-execute' | hasRight | async)"
+            (click)="commands.stop()"
+          >
+            <step-icon name="stop-circle" aria-hidden="true" />
+          </button>
+        </ng-container>
+      </div>
+    }
     @if (!isCompactReport) {
       <div class="controls">
         <step-execution-legacy-switcher [execution]="execution" />

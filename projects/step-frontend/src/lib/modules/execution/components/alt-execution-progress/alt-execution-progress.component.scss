@@ -29,11 +29,16 @@ step-alt-execution-progress {
     min-height: 8.3rem;
 
     &.compact-report {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       grid-template-areas:
-        'title'
-        'sub-title';
+        'title compact-controls'
+        'sub-title sub-title';
       min-height: 0;
+    }
+
+    .compact-controls {
+      grid-area: compact-controls;
+      justify-self: flex-end;
     }
 
     &.small-screen {

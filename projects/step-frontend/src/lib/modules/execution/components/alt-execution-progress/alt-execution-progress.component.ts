@@ -45,6 +45,7 @@ import {
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
   ExecutionReportStaticLayoutRegistryService,
   GRID_ELEMENT_HEADER_ACTIONS,
   GridEditableService,
@@ -257,7 +258,8 @@ export class AltExecutionProgressComponent
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
   protected readonly isCompactReport = !!this._staticLayouts.get(
-    this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined,
+    (this._activatedRoute.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
+      (this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined),
   )?.compactHeader;
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
