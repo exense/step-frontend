@@ -28,6 +28,14 @@ step-alt-execution-progress {
     align-items: flex-start;
     min-height: 8.3rem;
 
+    &.compact-report {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'title'
+        'sub-title';
+      min-height: 0;
+    }
+
     &.small-screen {
       grid-template-columns: 1fr 1fr;
       grid-template-areas:

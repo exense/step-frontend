@@ -1,12 +1,23 @@
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { inject } from '@angular/core';
 import { map, of, switchMap } from 'rxjs';
-import { AugmentedExecutionsService, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
+import {
+  AugmentedExecutionsService,
+  EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  ExecutionReportStaticLayoutRegistryService,
+  ExecutionViewMode,
+  ExecutionViewModeService,
+} from '@exense/step-core';
 
 export const altExecutionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
   const _executionService = inject(AugmentedExecutionsService);
   const _executionViewMode = inject(ExecutionViewModeService);
+  const _staticLayouts = inject(ExecutionReportStaticLayoutRegistryService);
+
+  if (_staticLayouts.has(route.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined)) {
+    return true;
+  }
 
   let executionId: string;
   const urlSegments = state.url.split('/');
