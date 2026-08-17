@@ -170,9 +170,9 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
-import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA } from '@exense/step-core';
+import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
 
-export const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
+const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
   path,
   component: AltExecutionProgressComponent,
   data: { [EXECUTION_REPORT_LAYOUT_ROUTE_DATA]: layoutId },
@@ -490,6 +490,7 @@ export class ExecutionModule {
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _gridSettingsRegistry: GridSettingsRegistryService,
+    _staticLayouts: ExecutionReportStaticLayoutRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -497,6 +498,9 @@ export class ExecutionModule {
       this.registerEntities();
       this.registerDashlets();
       this.registerRoutes();
+      _staticLayouts.setRouteRegistrar((route) =>
+        this._viewRegistry.registerRoute(staticAltExecutionReportRoute(route.path, route.layoutId)),
+      );
       this.registerInfoBanners();
       this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;
