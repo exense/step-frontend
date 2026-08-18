@@ -7,7 +7,9 @@
       <step-grid-element [elementId]="item.widgetId">
         <ng-container *ngTemplateOutlet="templateRef; context: { heightInCells: item.heightInCells }" />
         <step-grid-drag-handle />
-        <step-grid-resizer />
+        @if (item.canResize) {
+          <step-grid-resizer />
+        }
       </step-grid-element>
     } @else {
       <step-grid-element [elementId]="item.widgetId" class="hidden-placeholder">
@@ -26,7 +28,9 @@
             <span>Widget is not supported: {{ item.widgetType }}</span>
           }
         </div>
-        <step-grid-resizer />
+        @if (item.canResize) {
+          <step-grid-resizer />
+        }
       </step-grid-element>
     }
   }
