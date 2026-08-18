@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import {
   BucketResponse,
   DateFormat,
@@ -53,6 +53,7 @@ const HEATMAP_MAX_SERIES_COUNT = 10000;
   templateUrl: './cross-execution-heatmap.component.html',
   styleUrls: ['./cross-execution-heatmap.component.scss'],
   providers: [heatmapPersistenceConfigProvider('crossExecutionHeatmap', HEATMAP_STORE_ALL)],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {

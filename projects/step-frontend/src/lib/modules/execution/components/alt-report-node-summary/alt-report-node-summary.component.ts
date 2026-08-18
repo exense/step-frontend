@@ -35,9 +35,16 @@ export class AltReportNodeSummaryComponent {
   readonly title = input('');
   readonly disableChartItemClick = input(false);
   readonly heightInCells = input<number | undefined>();
-  readonly loading = input(false);
+  readonly inProgress = input(false, {
+    transform: (value: boolean | null | undefined) => value ?? false,
+  });
+  readonly summary = input<ReportNodeSummary | null | undefined>();
 
-  readonly summary = input.required<ReportNodeSummary>();
+  protected readonly showProgressIndicator = computed(() => {
+    const inProgress = this.inProgress();
+    const summary = this.summary();
+    return !summary || inProgress;
+  });
 
   readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
 
@@ -48,6 +55,9 @@ export class AltReportNodeSummaryComponent {
 
   private readonly availableStatuses = computed(() => {
     const summary = this.summary();
+    if (!summary) {
+      return [];
+    }
     const keysSet = new Set(Object.keys(summary.items));
     keysSet.add(Status.TECHNICAL_ERROR);
     keysSet.add(Status.FAILED);
@@ -58,6 +68,11 @@ export class AltReportNodeSummaryComponent {
     const summary = this.summary();
     const availableStatuses = this.availableStatuses();
     const statusFilter = this.statusFilter();
+
+    if (!summary) {
+      return [];
+    }
+
     const isFilterEmpty = !statusFilter.size;
 
     const items = availableStatuses.map((status) => {
@@ -186,7 +201,7 @@ export class AltReportNodeSummaryComponent {
     return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);
   }
 
-  private areSummariesEqual(a?: ReportNodeSummary, b?: ReportNodeSummary): boolean {
+  private areSummariesEqual(a?: ReportNodeSummary | null, b?: ReportNodeSummary | null): boolean {
     if (a === b) {
       return true;
     }

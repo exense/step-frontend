@@ -1,0 +1,64 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: block;
+}
+
+.display-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: 1.2rem 1.6rem;
+  border: 0.1rem solid;
+  border-left-width: 0.4rem;
+  border-radius: 0.8rem;
+  color: var.$gray-800;
+
+  &.success {
+    border-color: var.$green-15;
+    border-left-color: var.$green-650;
+    background: var.$green-10;
+
+    .display-alert-icon {
+      color: var.$green-650;
+    }
+  }
+
+  &.warning {
+    border-color: var.$orange-15;
+    border-left-color: var.$orange-100;
+    background: var.$orange-10;
+
+    .display-alert-icon {
+      color: var.$orange-100;
+    }
+  }
+
+  &.error {
+    border-color: var.$red-15;
+    border-left-color: var.$red-650;
+    background: var.$red-10;
+
+    .display-alert-icon {
+      color: var.$red-650;
+    }
+  }
+}
+
+.display-alert-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.display-alert-content {
+  min-width: 0;
+
+  strong {
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+}

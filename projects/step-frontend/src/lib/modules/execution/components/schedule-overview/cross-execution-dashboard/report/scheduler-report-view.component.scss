@@ -8,121 +8,13 @@
   display: none;
 }
 
-.header {
+.no-layout-message {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  max-width: 100%;
-  padding: 1em;
-
-  .title {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    align-items: center;
-
-    .last-execution-container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 0.6rem;
-      margin-left: 3rem;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 3rem;
-      line-height: 3.8rem;
-    }
-  }
-}
-
-.chart-actions-container {
-  position: absolute;
-  right: 2rem;
-  top: 1rem;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 1.4rem;
-  align-items: center;
-}
-
-.piechart-container {
-  width: 44rem;
-  min-width: 44rem;
-  position: relative;
-}
-
-.row {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  gap: 1rem;
-  margin-top: 1rem;
-  white-space: nowrap;
-}
-
-.flex-grow-1 {
-  flex-grow: 1;
-  min-width: 0;
-}
-
-.widget {
-  position: relative;
-  margin: 2px;
+  justify-content: center;
   height: 100%;
 
-  .icons {
-    position: absolute;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.8rem;
-    right: 1rem;
-    top: 1rem;
-    z-index: 99999;
-
-    .icon {
-      cursor: pointer;
-    }
+  h3 {
+    text-align: center;
   }
-}
-
-.types-column {
-  display: flex;
-  flex-direction: row;
-  gap: 0.6rem;
-}
-
-.link-item {
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  gap: 0.6rem;
-  padding: 2px 0;
-  white-space: nowrap;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.error-name {
-  gap: 0.4rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  .icon {
-    cursor: pointer;
-    transform: scale(0.8);
-    padding: 2px;
-  }
-}
-
-.wide-menu {
-  max-width: 400px;
 }

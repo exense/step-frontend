@@ -5,7 +5,14 @@ import { DashboardUrlParamsService } from '../../../../timeseries/modules/_commo
 import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
-import { AugmentedSchedulerService } from '@exense/step-core';
+import {
+  AugmentedSchedulerService,
+  GridPersistenceStateService,
+  provideGridLayoutConfig,
+  SCHEDULER_EXECUTION_REPORT_GRID,
+} from '@exense/step-core';
+import { REPORT_TYPE } from '../../../services/report-type.token';
+import { ExecutionReportGridPersistenceStateService } from '../../../services/execution-report-grid-persistence-state.service';
 
 declare const uPlot: any;
 
@@ -41,6 +48,15 @@ interface EntityWithKeywordsStats {
       provide: CrossExecutionDashboardState,
       useClass: SchedulerPageStateService,
     },
+    {
+      provide: REPORT_TYPE,
+      useValue: 'CrossExecution',
+    },
+    {
+      provide: GridPersistenceStateService,
+      useClass: ExecutionReportGridPersistenceStateService,
+    },
+    ...provideGridLayoutConfig(SCHEDULER_EXECUTION_REPORT_GRID),
   ],
 })
 export class SchedulerPageComponent implements OnInit {

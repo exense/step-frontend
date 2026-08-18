@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, Tab, TimeUnit } from '@exense/step-core';
+import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { catchError, distinctUntilChanged, map, merge, of, Subject, switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -26,8 +26,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
 
   protected readonly DateFormat = DateFormat;
 
-  protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
-
   private readonly taskId$ = toObservable(this._state.task).pipe(
     map((task) => task?.id),
     distinctUntilChanged(),
@@ -43,7 +41,6 @@ export class CrossExecutionDashboardComponent implements OnInit {
       id ? this._schedulerService.getNextExecutionDate(id).pipe(catchError(() => of(undefined))) : of(undefined),
     ),
   );
-
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';
     switch (this._state.viewType()) {
@@ -118,13 +115,5 @@ export class CrossExecutionDashboardComponent implements OnInit {
     } else {
       this._state.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
-  }
-
-  private createTab(id: string, label: string, link?: string): Tab<string> {
-    return {
-      id,
-      label,
-      link: [{ outlets: { primary: link ?? id, modal: null } }],
-    };
   }
 }

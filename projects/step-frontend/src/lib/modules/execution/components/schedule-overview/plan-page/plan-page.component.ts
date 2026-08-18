@@ -5,8 +5,17 @@ import { DashboardUrlParamsService } from '../../../../timeseries/modules/_commo
 import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
-import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '@exense/step-core';
+import {
+  AugmentedPlansService,
+  AugmentedSchedulerService,
+  GridPersistenceStateService,
+  PLAN_EXECUTION_REPORT_GRID,
+  PlansService,
+  provideGridLayoutConfig,
+} from '@exense/step-core';
 import { PLAN_ID } from '../../../services/plan-id.token';
+import { REPORT_TYPE } from '../../../services/report-type.token';
+import { ExecutionReportGridPersistenceStateService } from '../../../services/execution-report-grid-persistence-state.service';
 
 @Component({
   selector: 'step-cross-exec-plan-page',
@@ -33,6 +42,15 @@ import { PLAN_ID } from '../../../services/plan-id.token';
       provide: CrossExecutionDashboardState,
       useClass: PlanPageStateService,
     },
+    {
+      provide: REPORT_TYPE,
+      useValue: 'CrossExecution',
+    },
+    {
+      provide: GridPersistenceStateService,
+      useClass: ExecutionReportGridPersistenceStateService,
+    },
+    ...provideGridLayoutConfig(PLAN_EXECUTION_REPORT_GRID),
   ],
   standalone: false,
 })

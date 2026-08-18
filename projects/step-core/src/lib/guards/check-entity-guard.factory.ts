@@ -1,7 +1,13 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { CheckLoadErrorsConfig, EntityEditLink, MultipleProjectsService } from '../modules/basics/step-basics.module';
+import {
+  CheckLoadErrorsConfig,
+  EntityEditLink,
+  MultipleProjectsService,
+  ProjectScopeWarningService,
+} from '../modules/basics/step-basics.module';
+import { EntityRegistry } from '../modules/entity/injectables/entity-registry';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
 
@@ -21,9 +27,11 @@ export const checkEntityGuardFactory =
   (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const _auth = inject(AuthService);
     const _multipleProjects = inject(MultipleProjectsService);
+    const _entityRegistry = inject(EntityRegistry);
     const _injector = inject(Injector);
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
+    const _projectScopeWarning = inject(ProjectScopeWarningService, { optional: true });
 
     const idParameterName = config.idParameterName ?? 'id';
     const id = config.idExtractor ? config.idExtractor(route, state) : route.params[idParameterName];
@@ -95,15 +103,29 @@ export const checkEntityGuardFactory =
           );
         }
         const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
-        let message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
-        if (openUrl) {
-          message += ` <a href="#${openUrl}">Open in "${targetProject!.name!}".</a>`;
-        }
+        const entityLabel = (
+          _entityRegistry.getEntities().find((entity) => entity.type === config.entityType)?.label ?? config.entityType
+        ).toLowerCase();
+        const message = `This ${entityLabel} doesn't belong to the currently selected project${writableEntityText}.`;
+        const action = openUrl
+          ? {
+              url: `#${openUrl}`,
+              label: `Open in "${targetProject!.name!}".`,
+            }
+          : undefined;
 
-        _multipleProjects.showProjectMessage({
-          icon: 'alert-triangle',
-          message,
-        });
+        if (_projectScopeWarning) {
+          _projectScopeWarning.show({
+            icon: 'alert-triangle',
+            message,
+            action,
+          });
+        } else {
+          _multipleProjects.showProjectMessage({
+            icon: 'alert-triangle',
+            message: action ? `${message} <a href="${action.url}">${action.label}</a>` : message,
+          });
+        }
 
         return true;
       }),
