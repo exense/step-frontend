@@ -1,0 +1,11 @@
+<section class="display-alert" [class]="'display-alert ' + type()" role="alert" [attr.aria-label]="title() || null">
+  <div class="display-alert-icon">
+    <step-icon [name]="iconByType[type()]" />
+  </div>
+  <div class="display-alert-content">
+    @if (title(); as title) {
+      <strong>{{ title }}</strong>
+    }
+    <ng-content />
+  </div>
+</section>

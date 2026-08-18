@@ -19,6 +19,16 @@
 }
 
 <div mat-dialog-content #dialogContent class="dialog-content">
+  @if (projectScopeWarning(); as warning) {
+    <step-display-alert type="warning" title="Read-only" class="project-scope-warning">
+      <span>
+        {{ warning.message }}
+        @if (warning.action; as action) {
+          <a [href]="action.url">{{ action.label }}</a>
+        }
+      </span>
+    </step-display-alert>
+  }
   <input type="text" class="track-focus" #trackFocus />
   <ng-content select="[step-modal-window-body]" />
 </div>
