@@ -1,4 +1,8 @@
 <div class="skipped-attachment-info">
-  <p>The Step controller limits the number of attachments per execution to prevent performance bottlenecks.</p>
+  @if (skippedReason()) {
+    <p>{{ skippedReason() }}</p>
+  } @else {
+    <p>The Step controller limits the number of attachments per execution to prevent performance bottlenecks.</p>
+  }
   <a [href]="documentationUrl()" target="_blank" rel="noopener noreferrer">Learn more</a>
 </div>
