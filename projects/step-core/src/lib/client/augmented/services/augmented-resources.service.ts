@@ -4,6 +4,7 @@ import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import {
   AsyncTaskStatusTableBulkOperationReport,
   Resource,
+  ResourcePreview,
   ResourcesService,
   ResourceUploadResponse,
   TableBulkOperationRequest,
@@ -15,12 +16,6 @@ import { HttpRequestContextHolderService } from './http-request-context-holder.s
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { downloadFile } from '../shared/download-file';
 import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
-
-export interface ResourcePreview {
-  resourceId: string;
-  success: boolean;
-  content: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService implements HttpOverrideResponseInterceptor {

@@ -12,6 +12,7 @@ export type MetricType = {
   displayName: string;
   description?: string;
   instrumentType: string;
+  samplingMode: 'EVENT_DRIVEN' | 'SAMPLED';
   attributes: Array<MetricAttribute>;
   unit?: string;
   defaultAggregation: MetricAggregation;

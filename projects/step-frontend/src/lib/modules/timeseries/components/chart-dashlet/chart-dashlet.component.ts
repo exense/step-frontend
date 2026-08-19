@@ -4,8 +4,6 @@ import {
   DestroyRef,
   inject,
   input,
-  Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   output,
@@ -15,6 +13,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
+  AppConfigContainerService,
   AxesSettings,
   BucketResponse,
   DashboardItem,
@@ -22,19 +21,21 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
+  MetricType,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
   createStackedBarPaths,
+  PipelineAggregationService,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
-import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
   catchError,
   defaultIfEmpty,
@@ -88,7 +89,6 @@ const resolutionLabels: Record<string, string> = {
   styleUrls: ['./chart-dashlet.component.scss'],
   imports: [
     COMMON_IMPORTS,
-    ChartSkeletonComponent,
     TimeSeriesChartComponent,
     TimeseriesAggregatePickerComponent,
     MatTooltip,
@@ -115,8 +115,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
+  private _appConfigContainer = inject(AppConfigContainerService);
+
+  private readonly samplingIntervalMs: number = this.resolveSamplingIntervalMs();
 
   protected readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
   protected readonly chart = viewChild<TimeSeriesChartComponent>('chart');
@@ -279,7 +283,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   protected openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item(), context: this.context() } })
+      .open(ChartDashletSettingsComponent, {
+        data: { item: this.item(), context: this.context() },
+        width: '96rem',
+      })
       .afterClosed()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((updatedItem) => {
@@ -333,6 +340,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
     const primaryAxes = this.item().chartSettings!.primaryAxes!;
     const primaryAggregation = primaryAxes.aggregation;
+    const primaryTwoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation);
+    const primaryDisplayAggregation = this._pipelineAggregationService.getDisplayAggregation(primaryAggregation);
     const hasSteppedDisplay = primaryAxes.displayType === 'STEPPED';
     const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
@@ -340,60 +349,78 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
+    const metric = this.context().getMetric(this.item().metricKey);
     const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
-    const isRateOrCount = primaryAggregation.type === 'RATE' || primaryAggregation.type === 'COUNT';
+    const maxForwardFillBuckets = this.getMaxForwardFillBuckets(metric?.samplingMode, response.interval);
+    const isRateOrCount = primaryDisplayAggregation.type === 'RATE' || primaryDisplayAggregation.type === 'COUNT';
     const useForwardFill = isGauge && !isRateOrCount;
     const isNullMeansZero =
       isRateOrCount ||
       (!isGauge && (primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'));
     const spanGaps = !isNullMeansZero && !useForwardFill;
+    const finalSecondaryAxesAggregation = primaryTwoStageAggregation ? primaryAggregation : secondaryAxesAggregation;
+    const finalSecondaryDisplayAggregation = primaryTwoStageAggregation
+      ? primaryDisplayAggregation
+      : secondaryAxesAggregation;
     const isSecondaryRateOrCount =
-      secondaryAxesAggregation?.type === 'RATE' || secondaryAxesAggregation?.type === 'COUNT';
+      finalSecondaryDisplayAggregation?.type === 'RATE' || finalSecondaryDisplayAggregation?.type === 'COUNT';
     const useSecondaryForwardFill = isGauge && !isSecondaryRateOrCount;
     const secondaryAxesData: (number | undefined | null)[] = [];
+    const accumulateSecondarySeries = (buckets: BucketResponse[], interval: number): void => {
+      let lastSecondaryValue: number | undefined;
+      let emptySecondaryBucketsCount = 0;
+      buckets.forEach((b: BucketResponse, j: number) => {
+        let bucketValue = this.getBucketValue(b, finalSecondaryAxesAggregation!, interval);
+        if (bucketValue == null) {
+          emptySecondaryBucketsCount++;
+          if (useSecondaryForwardFill && lastSecondaryValue !== undefined) {
+            bucketValue = emptySecondaryBucketsCount <= maxForwardFillBuckets ? lastSecondaryValue : 0;
+          }
+        } else {
+          emptySecondaryBucketsCount = 0;
+          lastSecondaryValue = bucketValue;
+        }
+        if (secondaryAxesData[j] == null) {
+          secondaryAxesData[j] = bucketValue;
+        } else if (bucketValue != null) {
+          secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
+        }
+      });
+    };
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
       if (groupDimensions.length === 0) {
-        labelItems = [this.context().getMetric(this.item().metricKey).displayName];
+        labelItems = [metric.displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
       const colorKey = this.composeColorKey(labelItems);
       const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
-        let lastSecondaryValue: number | undefined;
-        response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          metadata.push(b?.attributes);
-          if (hasSecondaryAxes) {
-            let bucketValue = this.getBucketValue(b, secondaryAxesAggregation!, response.interval);
-            if (bucketValue == null && useSecondaryForwardFill) {
-              bucketValue = lastSecondaryValue;
-            }
-            if (bucketValue != null) {
-              lastSecondaryValue = bucketValue;
-            }
-            if (secondaryAxesData[j] == null) {
-              secondaryAxesData[j] = bucketValue;
-            } else if (bucketValue != null) {
-              secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
-            }
-          }
-        });
+        seriesBuckets.forEach((b: BucketResponse) => metadata.push(b?.attributes));
+        if (hasSecondaryAxes) {
+          accumulateSecondarySeries(seriesBuckets, response.interval);
+        }
       }
       const seriesData: (number | undefined | null)[] = [];
       let lastPrimaryValue: number | undefined;
+      let emptyBucketsCount = 0;
       seriesBuckets.forEach((b, i) => {
         let value = this.getBucketValue(b, primaryAggregation!, response.interval);
         if (value === undefined) {
+          emptyBucketsCount++;
           if (isNullMeansZero) {
             value = 0;
-          } else if (useForwardFill) {
-            value = lastPrimaryValue;
+          } else if (useForwardFill && lastPrimaryValue !== undefined) {
+            value = emptyBucketsCount <= maxForwardFillBuckets ? lastPrimaryValue : 0;
           }
-        }
-        if (value != null) {
-          lastPrimaryValue = value;
+          // when no flag applies the value is left undefined, so that the chart renders a gap
+        } else {
+          emptyBucketsCount = 0;
+          if (value !== null) {
+            lastPrimaryValue = value;
+          }
         }
         seriesData[i] = value;
       });
@@ -513,14 +540,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       });
     }
     const primaryUnit = primaryAxes.unit!;
-    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
+    const yAxesUnit = this.getUnitLabel(primaryDisplayAggregation, primaryUnit);
 
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
         values: (u, vals) => {
-          return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+          return vals.map((v: any) => this.getAxesFormatFunction(primaryDisplayAggregation, primaryUnit)(v));
         },
       },
     ];
@@ -532,9 +559,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
         side: 1,
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
-          vals.map((v) =>
-            this.getAxesFormatFunction(this.item().chartSettings!.secondaryAxes!.aggregation, undefined)(v),
-          ),
+          vals.map((v) => this.getAxesFormatFunction(finalSecondaryDisplayAggregation!, undefined)(v)),
         grid: { show: false },
       });
       const secondaryAxesSettings = this.item().chartSettings!.secondaryAxes!;
@@ -542,10 +567,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       const secondaryNullMeansZero = isSecondaryRateOrCount || (!isGauge && secondaryDisplayType !== 'LINE');
       if (useSecondaryForwardFill) {
         let lastSecVal: number | undefined;
+        let emptyTotalBucketsCount = 0;
         for (let k = 0; k < secondaryAxesData.length; k++) {
           if (secondaryAxesData[k] == null) {
-            secondaryAxesData[k] = lastSecVal;
+            emptyTotalBucketsCount++;
+            if (lastSecVal !== undefined) {
+              secondaryAxesData[k] = emptyTotalBucketsCount <= maxForwardFillBuckets ? lastSecVal : 0;
+            }
           } else {
+            emptyTotalBucketsCount = 0;
             lastSecVal = secondaryAxesData[k] as number;
           }
         }
@@ -675,6 +705,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   private getSecondAxesLabel(): string | undefined {
+    if (this._pipelineAggregationService.getTwoStageAggregation(this.item().chartSettings!.primaryAxes.aggregation)) {
+      return 'Total';
+    }
     const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
     switch (aggregation?.type) {
       case ChartAggregation.RATE:
@@ -692,20 +725,25 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
 
   private getChartTitle(): string {
     let title = this.item().name;
-    let aggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
-    let aggregationLabel;
-    switch (aggregation.type) {
-      case ChartAggregation.PERCENTILE:
-        aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
-        break;
-      case ChartAggregation.RATE:
-        aggregationLabel = 'RATE/' + this.getRateUnit(aggregation);
-        break;
-      default:
-        aggregationLabel = aggregation.type;
-        break;
+    const aggregation: MetricAggregation = this.item().chartSettings!.primaryAxes.aggregation;
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(aggregation);
+    if (twoStageAggregation) {
+      return `${title} (${this._pipelineAggregationService.getPipelineLabel(twoStageAggregation)})`;
+    } else {
+      let aggregationLabel: string;
+      switch (aggregation.type) {
+        case ChartAggregation.PERCENTILE:
+          aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
+          break;
+        case ChartAggregation.RATE:
+          aggregationLabel = 'RATE/' + this.getRateUnit(aggregation);
+          break;
+        default:
+          aggregationLabel = aggregation.type;
+          break;
+      }
+      return `${title} (${aggregationLabel})`;
     }
-    return `${title} (${aggregationLabel})`;
   }
 
   private getRateUnit(aggregation: MetricAggregation): string {
@@ -729,6 +767,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
+      ...this._pipelineAggregationService.getFetchBucketsAggregationOptions(
+        this.item().chartSettings!.primaryAxes.aggregation,
+      ),
     };
     const customResolution = this.context().getChartsResolution();
     if (customResolution) {
@@ -856,21 +897,46 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
   }
 
   private getRequiredPercentiles(): number[] {
-    const aggregate: ChartAggregation = this.selectedAggregate;
-    const secondaryAggregate = this.item().chartSettings!.secondaryAxes?.aggregation.type;
+    const primaryAggregation = this.item().chartSettings!.primaryAxes.aggregation;
+    const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
     const percentilesToRequest: number[] = [];
-    if (aggregate === ChartAggregation.MEDIAN || secondaryAggregate === ChartAggregation.MEDIAN) {
-      percentilesToRequest.push(50);
-    }
-    if (aggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(this.getPrimaryPclValue() || 90);
-    }
-    if (secondaryAggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(
-        this.item().chartSettings!.secondaryAxes?.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90,
-      );
+    if (!this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation)) {
+      if (primaryAggregation.type === ChartAggregation.MEDIAN) {
+        percentilesToRequest.push(50);
+      }
+      if (primaryAggregation.type === ChartAggregation.PERCENTILE) {
+        percentilesToRequest.push(this.getPrimaryPclValue() || 90);
+      }
+      if (secondaryAggregation?.type === ChartAggregation.MEDIAN) {
+        percentilesToRequest.push(50);
+      }
+      if (secondaryAggregation?.type === ChartAggregation.PERCENTILE) {
+        percentilesToRequest.push(secondaryAggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90);
+      }
     }
     return percentilesToRequest;
+  }
+
+  private resolveSamplingIntervalMs(): number {
+    const rawValue =
+      this._appConfigContainer.conf?.miscParams?.[TimeSeriesConfig.PARAM_KEY_METRICS_SAMPLING_INTERVAL_MS];
+    const samplingInterval = parseInt(rawValue ?? '', 10);
+    return samplingInterval > 0 ? samplingInterval : TimeSeriesConfig.DEFAULT_METRICS_SAMPLING_INTERVAL_MS;
+  }
+
+  /**
+   * Sampled metrics stop emitting when their source disappears, forward fill only cover the sampling interval with some
+   * headroom. Event driven metrics report every change and are therefore filled without limit.
+   */
+  private getMaxForwardFillBuckets(
+    samplingMode: MetricType['samplingMode'] | undefined,
+    bucketIntervalMs: number,
+  ): number {
+    if (samplingMode !== 'SAMPLED' || bucketIntervalMs <= 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    const maxForwardFillMs = TimeSeriesConfig.FORWARD_FILL_MAX_SAMPLING_INTERVALS * this.samplingIntervalMs;
+    return Math.floor(maxForwardFillMs / bucketIntervalMs);
   }
 
   private getBucketValue(
@@ -882,6 +948,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       return undefined;
     }
     switch (aggregation.type) {
+      case 'TWO_STAGE':
+        return b.sum;
       case 'SUM':
         return b.sum;
       case 'AVG':

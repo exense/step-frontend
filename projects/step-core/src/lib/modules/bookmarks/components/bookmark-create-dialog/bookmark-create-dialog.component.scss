@@ -1,5 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
-div[step-modal-window-body] form {
+div[step-modal-window-body] {
   @include core.common-dialog-content;
 }
