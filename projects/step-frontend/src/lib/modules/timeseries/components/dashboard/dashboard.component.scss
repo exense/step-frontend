@@ -39,8 +39,9 @@
   $size: calc(50% - 1.2rem);
   display: grid;
   grid-template-columns: $size $size;
-  column-gap: 2.4rem;
+  column-gap: 1.6rem;
   row-gap: 1.6rem;
+  margin-top: 1.6rem;
   padding-bottom: 1.6rem;
 
   .size-full {
@@ -50,7 +51,13 @@
 
 .dashlet {
   position: relative;
+  min-width: 0;
+  padding: 1.6rem;
+  background: var.$white;
   border: 1px solid var.$gray-200;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.1rem 0.2rem rgba(16, 24, 40, 0.08);
+  overflow: hidden;
   transition: width 400ms ease-in-out;
 }
 
@@ -164,6 +171,8 @@ step-time-range-picker {
   max-width: 100%;
   overflow: hidden;
   gap: 2rem;
+  border-top: 1px solid var.$gray-200;
+  padding-top: 1.2rem;
 }
 
 .align-with-ranger {
@@ -176,8 +185,25 @@ step-time-range-picker {
   gap: 1rem;
 }
 
-.full-width-grow {
+.full-width-grow,
+.dual-columns-container {
   flex-grow: 1;
   flex-basis: 0;
   min-width: 0;
+  padding: 1.6rem;
+  background: var.$white;
+  border: 1px solid var.$gray-200;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.1rem 0.2rem rgba(16, 24, 40, 0.08);
+}
+
+.ranger-section {
+  margin: 0;
+}
+
+step-execution-time-selection {
+  .ranger-container {
+    left: 0;
+    right: 0;
+  }
 }

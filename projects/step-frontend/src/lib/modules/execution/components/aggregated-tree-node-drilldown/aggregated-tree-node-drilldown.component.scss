@@ -3,7 +3,38 @@
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-aggregated-tree-node-drilldown {
-  background: var.$white;
+  background: #f8f9fa;
+
+  step-stack-view {
+    background: #f8f9fa;
+  }
+
+  step-split-gutter {
+    background: #f8f9fa;
+  }
+
+  step-split-area {
+    > section > step-view-item > section,
+    > section > step-view-group > section {
+      background: var.$white;
+    }
+
+    &:first-of-type {
+      > section > step-view-item > section,
+      > section > step-view-group > section {
+        border-top-left-radius: 1rem;
+        border-bottom-left-radius: 1rem;
+      }
+    }
+
+    &:last-of-type {
+      > section > step-view-item > section,
+      > section > step-view-group > section {
+        border-top-right-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+      }
+    }
+  }
 
   .stack-view-title {
     display: flex;

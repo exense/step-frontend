@@ -8,9 +8,21 @@ step-grid-layout-tabs {
     display: flex;
     align-items: flex-end;
     min-width: 0;
+    width: 100%;
     height: 3.6rem;
     box-sizing: border-box;
-    border-bottom: 0.1rem solid var.$gray-300;
+    position: relative;
+
+    &::after {
+      position: absolute;
+      right: calc(-1 * var(--execution-progress-horizontal-padding, 0rem));
+      bottom: 0;
+      left: calc(-1 * var(--execution-progress-horizontal-padding, 0rem));
+      height: 0.1rem;
+      background-color: var.$gray-300;
+      content: '';
+      pointer-events: none;
+    }
   }
 
   step-tabs.tab-mode-tabs {
@@ -29,15 +41,34 @@ step-grid-layout-tabs {
     .mat-mdc-tab-list,
     .mat-mdc-tab-links {
       height: 3.6rem;
+      width: 100%;
       overflow: visible;
     }
 
     .mat-mdc-tab-links {
       align-items: flex-end;
       margin-left: 0;
+
+      > .tab-divider {
+        display: block;
+        flex: 0 0 0.2rem;
+        align-self: center;
+        height: 1.6rem;
+        margin-inline: -0.1rem;
+        background-color: var.$gray-300;
+        pointer-events: none;
+      }
+
+      > a.mdc-tab--active + .tab-divider,
+      > .tab-divider:has(+ a.mdc-tab--active),
+      > a:hover + .tab-divider,
+      > .tab-divider:has(+ a:hover) {
+        display: none;
+      }
     }
 
     a.mdc-tab.mat-mdc-tab-link {
+      position: relative;
       height: 3.6rem;
       min-width: 0;
       padding: 0 0.8rem;
@@ -114,6 +145,10 @@ step-grid-layout-tabs {
         color: var.$black;
       }
 
+      &:not(.mdc-tab--active):hover {
+        background-color: #293e5014;
+      }
+
       &.mdc-tab.mat-mdc-tab-link.mdc-tab--active .tab-content,
       &.mdc-tab--active:hover .mdc-tab__text-label {
         color: var.$gray-800;
@@ -122,10 +157,9 @@ step-grid-layout-tabs {
 
       &.mdc-tab--active {
         z-index: 1;
-        margin-bottom: -0.1rem;
         border-color: var.$gray-300;
-        border-bottom-color: var.$white;
-        background: var.$white;
+        border-bottom-color: #f8f9fa;
+        background: #f8f9fa;
       }
     }
   }

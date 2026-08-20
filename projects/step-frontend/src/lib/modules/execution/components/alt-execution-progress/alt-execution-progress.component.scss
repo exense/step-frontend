@@ -3,14 +3,21 @@
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-alt-execution-progress {
+  --execution-progress-horizontal-padding: 2.5rem;
+
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-  padding: 0 2.5rem;
+  padding: 0 var(--execution-progress-horizontal-padding);
   position: relative;
 
+  @media screen {
+    min-height: 100vh;
+  }
+
   &.small-screen {
-    padding: 0.75rem 2.25rem;
+    --execution-progress-horizontal-padding: 2.25rem;
+    padding: 0.75rem var(--execution-progress-horizontal-padding);
   }
 
   section.no-gap {
@@ -227,6 +234,8 @@ step-alt-execution-progress {
 
   // reduces the surrounding 2rem flex gap to 1.2rem around the tab bar
   > step-alt-execution-tabs {
+    display: block;
+    width: 100%;
     margin-top: -0.8rem;
     margin-bottom: -0.8rem;
   }
@@ -257,12 +266,20 @@ step-alt-execution-progress {
   .main {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
     gap: 1rem;
+    min-height: 0;
 
     .primary-content {
       display: flex;
       flex-direction: column;
+      flex: 1 1 auto;
       gap: 1.8rem;
+      margin-inline: calc(-1 * var(--execution-progress-horizontal-padding));
+      padding-inline: var(--execution-progress-horizontal-padding);
+      min-height: 0;
+      // The surrounding flex margins overlap this area by 0.4rem.
+      background: linear-gradient(to bottom, transparent 0 0.4rem, #f8f9fa 0.4rem 100%);
     }
 
     &.has-drilldown > step-simple-outlet {
