@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { filter, Observable, of, switchMap } from 'rxjs';
 import { Resource } from '../../../../client/step-client-module';
 import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
@@ -9,6 +9,9 @@ import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
+import { ApResourcePickerDataProviderService } from '../../injectables/ap-resource-picker-data-provider.service';
+import { FilePickerDataProviderService, FilePickerService, SelectionMode } from '../../../file-picker';
+import { AutomationPackageResourceComponent } from '../automation-package-resource/automation-package-resource.component';
 
 const MAX_FILES = 1;
 
@@ -19,7 +22,7 @@ type OnTouch = () => void;
   selector: 'step-resource-input',
   templateUrl: './resource-input.component.html',
   styleUrls: ['./resource-input.component.scss'],
-  imports: [StepBasicsModule],
+  imports: [StepBasicsModule, AutomationPackageResourceComponent],
   hostDirectives: [
     {
       directive: ResourceInputConfigDirective,
@@ -34,6 +37,7 @@ type OnTouch = () => void;
         'preserveExistingResource',
         'disableServerPath',
         'withUploadFromFileSystem',
+        'ignoreAutomationPackage',
       ],
     },
   ],
@@ -43,22 +47,29 @@ type OnTouch = () => void;
       provide: RESOURCE_INPUT,
       useFactory: () => {
         // Allow to override resource input definition on parent levels
-        const current = inject(ResourceInputService, { self: true });
-        const parent = inject(ResourceInputService, { skipSelf: true, optional: true });
-        return parent ?? current;
+        const _current = inject(ResourceInputService, { self: true });
+        const _parent = inject(ResourceInputService, { skipSelf: true, optional: true });
+        return _parent ?? _current;
       },
     },
+    ApResourcePickerDataProviderService,
+    {
+      provide: FilePickerDataProviderService,
+      useExisting: ApResourcePickerDataProviderService,
+    },
+    FilePickerService,
   ],
 })
 export class ResourceInputComponent implements ControlValueAccessor {
   private _utils = inject(ResourceInputUtilsService);
   private _resourceInputService = inject(RESOURCE_INPUT);
   protected _config = inject(ResourceInputConfigDirective, { self: true });
+  protected readonly _ngControl = inject(NgControl);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  private fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
+  private readonly fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
 
   readonly uploadProgress = this._resourceInputService.uploadProgress;
 
@@ -80,13 +91,18 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   readonly isResource = computed(() => this._utils.isResourceValue(this.modelInternal()));
 
+  protected readonly automationPackageId = computed(() => {
+    const config = this._config.config();
+    return config?.automationPackageId;
+  });
+
   protected readonly absoluteFilepath = computed(() => {
     const model = this.modelInternal();
     const isResource = this.isResource();
-    return !isResource ? model ?? '' : '';
+    return !isResource ? (model ?? '') : '';
   });
 
-  private resource = signal<Resource | undefined>(undefined);
+  private readonly resource = signal<Resource | undefined>(undefined);
   readonly resourceNotExisting = computed(() => !this.resource());
   protected readonly resourceFilename = computed(() => this.resource()?.resourceName ?? '');
 
@@ -98,7 +114,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
     )
     .subscribe((resource) => this.setResource(resource));
 
-  constructor(protected _ngControl: NgControl) {
+  constructor() {
     this._ngControl.valueAccessor = this;
   }
 

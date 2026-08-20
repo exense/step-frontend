@@ -64,104 +64,119 @@
   }
 </ng-template>
 
-<step-upload-container (filesChange)="handleFilesChange($event)">
-  @if (!isResource()) {
-    <step-form-field
-      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
-      [class.ng-touched]="_ngControl.touched"
-      alignLabelAddon="near"
-      [showRequiredMarker]="showRequiredMarker()"
-    >
-      @if (label(); as label) {
-        <step-label>
-          <span>{{ label }}</span>
-        </step-label>
-      }
-      @if (helpIconTooltip(); as helpIconTooltip) {
-        <step-label-addon>
-          <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
-        </step-label-addon>
-      }
-      <input
-        type="text"
-        [ngModel]="modelInternal()"
-        (ngModelChange)="handleModelChange($event)"
-        [readonly]="!!_config.disableServerPath()"
-        [disabled]="isDisabled()"
-        [matTooltip]="
-          !!_config.disableServerPath()
-            ? 'Drag and drop your file here'
-            : 'Drag and drop your file here or enter the path to a file accessible from the controller'
-        "
-        (blur)="handleBlur()"
-      />
+@if (automationPackageId(); as appId) {
+  <step-automation-package-resource
+    [apId]="appId"
+    [label]="label()"
+    [showRequiredMarker]="showRequiredMarker()"
+    [helpIconTooltip]="helpIconTooltip()"
+    [isInvalid]="_ngControl.invalid || isParentInvalid()"
+    [isTouched]="!!_ngControl.touched"
+    [isDisabled]="isDisabled()"
+    [value]="modelInternal()"
+    (valueChange)="handleModelChange($event)"
+    (blur)="handleBlur()"
+  />
+} @else {
+  <step-upload-container (filesChange)="handleFilesChange($event)">
+    @if (!isResource()) {
+      <step-form-field
+        [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+        [class.ng-touched]="_ngControl.touched"
+        alignLabelAddon="near"
+        [showRequiredMarker]="showRequiredMarker()"
+      >
+        @if (label(); as label) {
+          <step-label>
+            <span>{{ label }}</span>
+          </step-label>
+        }
+        @if (helpIconTooltip(); as helpIconTooltip) {
+          <step-label-addon>
+            <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
+          </step-label-addon>
+        }
+        <input
+          type="text"
+          [ngModel]="modelInternal()"
+          (ngModelChange)="handleModelChange($event)"
+          [readonly]="!!_config.disableServerPath()"
+          [disabled]="isDisabled()"
+          [matTooltip]="
+            !!_config.disableServerPath()
+              ? 'Drag and drop your file here'
+              : 'Drag and drop your file here or enter the path to a file accessible from the controller'
+          "
+          (blur)="handleBlur()"
+        />
 
-      <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
-      <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
-      <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
-      <ng-content select="step-suffix" />
-    </step-form-field>
-  } @else if (!resourceNotExisting()) {
-    <step-form-field
-      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
-      [class.ng-touched]="_ngControl.touched"
-      alignLabelAddon="near"
-      [showRequiredMarker]="showRequiredMarker()"
-    >
-      @if (label(); as label) {
-        <step-label>
-          <span>{{ label }}</span>
-        </step-label>
-      }
-      @if (helpIconTooltip(); as helpIconTooltip) {
-        <step-label-addon>
-          <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
-        </step-label-addon>
-      }
-      <input
-        type="text"
-        readonly="readonly"
-        [ngModel]="resourceFilename()"
-        matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
-      />
-      <ng-container *ngTemplateOutlet="downloadButtonTemplate" />
-      <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
-      <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
-      <ng-container *ngTemplateOutlet="clearButtonTemplate" />
-      <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
-      <ng-content select="step-suffix" />
-    </step-form-field>
-  } @else {
-    <step-form-field
-      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
-      [class.ng-touched]="_ngControl.touched"
-      alignLabelAddon="near"
-      [showRequiredMarker]="showRequiredMarker()"
-    >
-      @if (label(); as label) {
-        <step-label>
-          <span>{{ label }}</span>
-        </step-label>
-      }
-      @if (helpIconTooltip(); as helpIconTooltip) {
-        <step-label-addon>
-          <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
-        </step-label-addon>
-      }
-      <input
-        type="text"
-        readonly="readonly"
-        value="Error: the referenced resource doesn't exist anymore."
-        matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
-      />
-      <ng-container *ngTemplateOutlet="clearButtonTemplate" />
-      <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
-      <ng-content select="step-suffix" />
-    </step-form-field>
-  }
-</step-upload-container>
+        <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
+        <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+        <ng-content select="step-suffix" />
+      </step-form-field>
+    } @else if (!resourceNotExisting()) {
+      <step-form-field
+        [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+        [class.ng-touched]="_ngControl.touched"
+        alignLabelAddon="near"
+        [showRequiredMarker]="showRequiredMarker()"
+      >
+        @if (label(); as label) {
+          <step-label>
+            <span>{{ label }}</span>
+          </step-label>
+        }
+        @if (helpIconTooltip(); as helpIconTooltip) {
+          <step-label-addon>
+            <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
+          </step-label-addon>
+        }
+        <input
+          type="text"
+          readonly="readonly"
+          [ngModel]="resourceFilename()"
+          matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
+        />
+        <ng-container *ngTemplateOutlet="downloadButtonTemplate" />
+        <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
+        <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
+        <ng-container *ngTemplateOutlet="clearButtonTemplate" />
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+        <ng-content select="step-suffix" />
+      </step-form-field>
+    } @else {
+      <step-form-field
+        [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+        [class.ng-touched]="_ngControl.touched"
+        alignLabelAddon="near"
+        [showRequiredMarker]="showRequiredMarker()"
+      >
+        @if (label(); as label) {
+          <step-label>
+            <span>{{ label }}</span>
+          </step-label>
+        }
+        @if (helpIconTooltip(); as helpIconTooltip) {
+          <step-label-addon>
+            <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
+          </step-label-addon>
+        }
+        <input
+          type="text"
+          readonly="readonly"
+          value="Error: the referenced resource doesn't exist anymore."
+          matTooltip="Drag and drop your file here or enter the path to a file accessible from the controller"
+        />
+        <ng-container *ngTemplateOutlet="clearButtonTemplate" />
+        <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+        <ng-content select="step-suffix" />
+      </step-form-field>
+    }
+  </step-upload-container>
 
-<input #fileInput type="file" (input)="handleChooseFile()" [disabled]="isDisabled()" />
+  <input #fileInput type="file" (input)="handleChooseFile()" [disabled]="isDisabled()" />
+}
 
 @if (uploadProgress() !== undefined) {
   <step-progress-bar [progress]="uploadProgress()!" />

@@ -1,0 +1,43 @@
+<step-form-field
+  [class.ng-invalid]="isInvalid()"
+  [class.ng-touched]="isTouched()"
+  alignLabelAddon="near"
+  [showRequiredMarker]="showRequiredMarker()"
+>
+  @if (label(); as label) {
+    <step-label>
+      <span>{{ label }}</span>
+    </step-label>
+  }
+  @if (helpIconTooltip(); as helpIconTooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="helpIconTooltip" />
+    </step-label-addon>
+  }
+  <step-prefix>
+    <step-icon name="automation" matTooltip="AP resource" matTooltipPosition="below" />
+  </step-prefix>
+  <input
+    type="text"
+    [ngModel]="apResourcePath()"
+    (ngModelChange)="handleApPathChange($event)"
+    [disabled]="isDisabled()"
+    (blur)="blur.emit()"
+  />
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Select from automation package"
+      (click)="openApResourceChooser()"
+      [disabled]="isDisabled()"
+    >
+      <step-icon name="folder-plus" />
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button type="button" (click)="downloadApResource()" mat-stroked-button matTooltip="Download this resource">
+      <step-icon name="download" />
+    </button>
+  </step-suffix>
+</step-form-field>

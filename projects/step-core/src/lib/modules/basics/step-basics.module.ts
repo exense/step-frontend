@@ -417,3 +417,4 @@ export * from './utils/combine-latest-with-track-changes';
 export * from './components/skeleton-placeholder/skeleton-placeholder.component';
 export * from './injectables/ide-mode.token';
 export * from './components/button-spinner/button-spinner.component';
+export * from './utils/signal-from-form-control';

@@ -8,6 +8,8 @@ export type FetchBucketsRequest = {
   oqlFilter?: string;
   params?: Record<string, any>;
   groupDimensions?: Array<string>;
+  timeAggregation?: 'MERGE' | 'AVG' | 'SAMPLED_AVG' | 'SUM' | 'COUNT' | 'MIN' | 'MAX';
+  groupAggregation?: 'MERGE' | 'AVG' | 'SAMPLED_AVG' | 'SUM' | 'COUNT' | 'MIN' | 'MAX';
   numberOfBuckets?: number;
   intervalSize?: number;
   percentiles?: Array<number>;

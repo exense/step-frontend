@@ -5,7 +5,8 @@
 import type { FileDescriptor } from './FileDescriptor';
 
 export type DirectoryListing = {
-  currentPath?: string;
+  path?: string;
   parentPath?: string;
-  items?: Array<FileDescriptor>;
+  resourceReference?: string;
+  entries?: Array<FileDescriptor>;
 };

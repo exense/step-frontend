@@ -1,6 +1,7 @@
 import { computed, Directive, effect, inject, input } from '@angular/core';
 import { ResourceConfig } from '../../types/resource-config';
 import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
+import { RESOURCE_AP_ID } from '../../injectables/resource-ap-id.token';
 
 @Directive({
   selector: '[stepResourceInputConfig]',
@@ -8,6 +9,7 @@ import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 })
 export class ResourceInputConfigDirective {
   private _resourceInputService = inject(RESOURCE_INPUT);
+  private _resourceAutomationPackageId = inject(RESOURCE_AP_ID, { optional: true }) ?? undefined;
 
   readonly type = input.required<string>();
   readonly isBounded = input(false);
@@ -20,6 +22,7 @@ export class ResourceInputConfigDirective {
   readonly preserveExistingResource = input(false);
   readonly disableServerPath = input(false);
   readonly withUploadFromFileSystem = input(true);
+  readonly ignoreAutomationPackage = input(false);
 
   readonly config = computed<ResourceConfig>(() => {
     const type = this.type();
@@ -32,6 +35,10 @@ export class ResourceInputConfigDirective {
     const preventExistingResource = this.preserveExistingResource();
     const disableServerPath = this.disableServerPath();
     const withUploadFromFileSystem = this.withUploadFromFileSystem();
+    const ignoreAutomationPackage = this.ignoreAutomationPackage();
+    const apPackageId = this._resourceAutomationPackageId?.();
+    const automationPackageId = ignoreAutomationPackage ? undefined : apPackageId;
+
     return {
       type,
       isBounded,
@@ -43,11 +50,15 @@ export class ResourceInputConfigDirective {
       preventExistingResource,
       disableServerPath,
       withUploadFromFileSystem,
+      automationPackageId,
     };
   });
 
   private effectSyncConfig = effect(() => {
     const config = this.config();
+    if (!!config.automationPackageId) {
+      return;
+    }
     this._resourceInputService.setConfig(config);
   });
 }

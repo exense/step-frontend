@@ -50,6 +50,10 @@ export const $Bucket = {
         format: 'int64',
       },
     },
+    average: {
+      type: 'number',
+      format: 'int64',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
