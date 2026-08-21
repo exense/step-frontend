@@ -1,3 +1,5 @@
+@let conf = config();
+
 <ng-template #downloadButtonTemplate>
   <step-suffix class="button-suffix">
     <a [href]="downloadResourceUrl()" mat-stroked-button matTooltip="Download this file">
@@ -7,7 +9,7 @@
 </ng-template>
 
 <ng-template #uploadResourceButtonTemplate>
-  @if (_config.withUploadFromFileSystem()) {
+  @if (conf.withUploadFromFileSystem) {
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -23,7 +25,7 @@
 </ng-template>
 
 <ng-template #chooseExistingResourceButtonTemplate>
-  @if (_config.withChooseExistingResourceButton()) {
+  @if (conf.withChooseExistingResourceButton) {
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -39,7 +41,7 @@
 </ng-template>
 
 <ng-template #clearButtonTemplate>
-  @if (_config.withClearButton()) {
+  @if (conf.withClearButton) {
     <step-suffix class="button-suffix">
       <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()" [disabled]="isDisabled()">
         <step-icon name="x" />
@@ -49,7 +51,7 @@
 </ng-template>
 
 <ng-template #dynamicSwitchTemplate>
-  @if (_config.withDynamicSwitch()) {
+  @if (conf.withDynamicSwitch) {
     <step-suffix class="button-suffix">
       <button
         type="button"
@@ -64,9 +66,9 @@
   }
 </ng-template>
 
-@if (automationPackageId(); as appId) {
+@if (isApResource()) {
   <step-automation-package-resource
-    [apId]="appId"
+    [apId]="automationPackageId()!"
     [label]="label()"
     [showRequiredMarker]="showRequiredMarker()"
     [helpIconTooltip]="helpIconTooltip()"
@@ -100,10 +102,10 @@
           type="text"
           [ngModel]="modelInternal()"
           (ngModelChange)="handleModelChange($event)"
-          [readonly]="!!_config.disableServerPath()"
+          [readonly]="!!conf.disableServerPath"
           [disabled]="isDisabled()"
           [matTooltip]="
-            !!_config.disableServerPath()
+            !!conf.disableServerPath
               ? 'Drag and drop your file here'
               : 'Drag and drop your file here or enter the path to a file accessible from the controller'
           "

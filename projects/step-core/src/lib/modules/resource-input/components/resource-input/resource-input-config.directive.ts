@@ -25,6 +25,10 @@ export class ResourceInputConfigDirective {
   readonly ignoreAutomationPackage = input(false);
 
   readonly config = computed<ResourceConfig>(() => {
+    const ignoreAutomationPackage = this.ignoreAutomationPackage();
+    const apPackageId = this._resourceAutomationPackageId?.();
+    const automationPackageId = ignoreAutomationPackage ? undefined : apPackageId;
+
     const type = this.type();
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
@@ -35,30 +39,24 @@ export class ResourceInputConfigDirective {
     const preventExistingResource = this.preserveExistingResource();
     const disableServerPath = this.disableServerPath();
     const withUploadFromFileSystem = this.withUploadFromFileSystem();
-    const ignoreAutomationPackage = this.ignoreAutomationPackage();
-    const apPackageId = this._resourceAutomationPackageId?.();
-    const automationPackageId = ignoreAutomationPackage ? undefined : apPackageId;
 
     return {
       type,
       isBounded,
       supportsDirectory,
-      withChooseExistingResourceButton,
+      withChooseExistingResourceButton: !!automationPackageId ? false : withChooseExistingResourceButton,
       searchTypes,
-      withClearButton,
-      withDynamicSwitch,
+      withClearButton: !!automationPackageId ? false : withClearButton,
+      withDynamicSwitch: !!automationPackageId ? false : withDynamicSwitch,
       preventExistingResource,
       disableServerPath,
-      withUploadFromFileSystem,
+      withUploadFromFileSystem: !!automationPackageId ? false : withUploadFromFileSystem,
       automationPackageId,
     };
   });
 
   private effectSyncConfig = effect(() => {
     const config = this.config();
-    if (!!config.automationPackageId) {
-      return;
-    }
     this._resourceInputService.setConfig(config);
   });
 }

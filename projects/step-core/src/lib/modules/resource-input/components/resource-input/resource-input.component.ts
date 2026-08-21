@@ -55,7 +55,7 @@ type OnTouch = () => void;
 export class ResourceInputComponent implements ControlValueAccessor {
   private _utils = inject(ResourceInputUtilsService);
   private _resourceInputService = inject(RESOURCE_INPUT);
-  protected _config = inject(ResourceInputConfigDirective, { self: true });
+  private _config = inject(ResourceInputConfigDirective, { self: true });
   protected readonly _ngControl = inject(NgControl);
 
   private onChange?: OnChange;
@@ -77,6 +77,8 @@ export class ResourceInputComponent implements ControlValueAccessor {
   protected readonly isDisabled = signal(false);
   protected readonly modelInternal = signal<string | undefined>(undefined);
 
+  protected readonly config = this._config.config;
+
   protected readonly resourceId = computed(() => this._utils.getResourceId(this.modelInternal()));
 
   protected readonly downloadResourceUrl = computed(() => this._resourceInputService.getDownloadUrl(this.resourceId()));
@@ -86,6 +88,23 @@ export class ResourceInputComponent implements ControlValueAccessor {
   protected readonly automationPackageId = computed(() => {
     const config = this._config.config();
     return config?.automationPackageId;
+  });
+
+  protected readonly isApResource = computed(() => {
+    let model = this.modelInternal();
+    model = (model ?? '').trim();
+    const apId = this.automationPackageId();
+
+    if (!model && !!apId) {
+      return true;
+    }
+
+    if (!apId) {
+      return false;
+    }
+
+    const modelApId = this._utils.getResourceApId(model);
+    return modelApId === apId;
   });
 
   protected readonly absoluteFilepath = computed(() => {
@@ -143,9 +162,9 @@ export class ResourceInputComponent implements ControlValueAccessor {
     const [file] = files;
 
     let resource$: Observable<Resource | undefined>;
-
-    if (this.isResource() && !this.resourceNotExisting() && !this._config.preserveExistingResource()) {
-      if (!this._config.isBounded()) {
+    const config = this._config.config();
+    if (this.isResource() && !this.resourceNotExisting() && !config.preserveExistingResource) {
+      if (!config.isBounded) {
         resource$ = this._resourceInputService.showUpdateResourceWarning().pipe(
           switchMap((resultState) => {
             switch (resultState) {
