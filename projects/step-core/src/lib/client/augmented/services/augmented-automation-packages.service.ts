@@ -198,7 +198,7 @@ export class AugmentedAutomationPackagesService
     return result;
   }
 
-  downloadAutomationPackageResourceUrl(apId: string, path: string, fileName: string): void {
+  downloadAutomationPackageResource(apId: string, path: string, fileName: string): void {
     const url = this.getDownloadAutomationPackageResourceUrl(apId, path);
     downloadFile(url, fileName);
   }

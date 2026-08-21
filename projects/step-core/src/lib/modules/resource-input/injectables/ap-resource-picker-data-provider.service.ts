@@ -37,7 +37,7 @@ export class ApResourcePickerDataProviderService implements FilePickerDataProvid
     }
     const list = path.split('/');
     const fileName = list[list.length - 1];
-    this._apApiService.downloadAutomationPackageResourceUrl(this.apId, path, fileName);
+    this._apApiService.downloadAutomationPackageResource(this.apId, path, fileName);
   }
 
   createDirectory(path: string, name: string): Observable<FileDescriptor> {

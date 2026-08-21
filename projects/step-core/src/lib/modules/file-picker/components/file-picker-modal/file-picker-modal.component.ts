@@ -4,6 +4,7 @@ import {
   computed,
   ElementRef,
   inject,
+  linkedSignal,
   OnInit,
   signal,
   untracked,
@@ -62,7 +63,7 @@ export class FilePickerModalComponent implements OnInit {
   protected readonly locationControl = this._fb.control('');
 
   protected readonly location = signalFromFormControl<string>(this.locationControl);
-  protected readonly isLocationButtonDisabled = computed(() => {
+  protected readonly isLocationButtonDisabled = linkedSignal(() => {
     const location = this.location();
     return !location.trim();
   });
@@ -177,7 +178,9 @@ export class FilePickerModalComponent implements OnInit {
         this.updateStateFromResult(result, directory);
       },
       error: () => {
-        this.locationControl.setValue(this.currentDirectory() ?? '', { emitEvent: false });
+        const currentDirectory = this.currentDirectory() ?? '';
+        this.locationControl.setValue(currentDirectory, { emitEvent: false });
+        this.isLocationButtonDisabled.set(!currentDirectory);
       },
     });
   }
@@ -193,6 +196,7 @@ export class FilePickerModalComponent implements OnInit {
     this.currentDirectory.set(null);
     this.parentDirectory.set(null);
     this.locationControl.setValue('', { emitEvent: false });
+    this.isLocationButtonDisabled.set(false);
     this.files.set(this.roots());
   }
 
@@ -200,6 +204,7 @@ export class FilePickerModalComponent implements OnInit {
     const currentDirectory = result.path ?? baseDirectory;
     this.currentDirectory.set(currentDirectory);
     this.locationControl.setValue(currentDirectory, { emitEvent: false });
+    this.isLocationButtonDisabled.set(!currentDirectory);
     this.parentDirectory.set(result.parentPath || null);
     this.files.set(result.entries || []);
   }
