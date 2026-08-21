@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output, untracked } from '@angular/core';
 import { ApResourcePickerDataProviderService } from '../../injectables/ap-resource-picker-data-provider.service';
 import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
-import { FilePickerService, SelectionMode } from '../../../file-picker';
+import { FilePickerDataProviderService, FilePickerService, SelectionMode } from '../../../file-picker';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
@@ -9,6 +9,16 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   imports: [StepBasicsModule],
   templateUrl: './automation-package-resource.component.html',
   styleUrl: './automation-package-resource.component.scss',
+  providers: [
+    ApResourcePickerDataProviderService,
+    {
+      provide: FilePickerDataProviderService,
+      useFactory: () => {
+        return inject(ApResourcePickerDataProviderService);
+      },
+    },
+    FilePickerService,
+  ],
 })
 export class AutomationPackageResourceComponent {
   private _utils = inject(ResourceInputUtilsService);

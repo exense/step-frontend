@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, input, output, signal, untracked, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { filter, Observable, of, switchMap } from 'rxjs';
 import { Resource } from '../../../../client/step-client-module';
 import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
@@ -9,8 +9,6 @@ import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
-import { ApResourcePickerDataProviderService } from '../../injectables/ap-resource-picker-data-provider.service';
-import { FilePickerDataProviderService, FilePickerService, SelectionMode } from '../../../file-picker';
 import { AutomationPackageResourceComponent } from '../automation-package-resource/automation-package-resource.component';
 
 const MAX_FILES = 1;
@@ -52,12 +50,6 @@ type OnTouch = () => void;
         return _parent ?? _current;
       },
     },
-    ApResourcePickerDataProviderService,
-    {
-      provide: FilePickerDataProviderService,
-      useExisting: ApResourcePickerDataProviderService,
-    },
-    FilePickerService,
   ],
 })
 export class ResourceInputComponent implements ControlValueAccessor {
