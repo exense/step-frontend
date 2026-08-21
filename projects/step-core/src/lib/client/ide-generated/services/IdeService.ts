@@ -4,10 +4,6 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AiConfiguration } from '../models/AiConfiguration';
-import type { AiGenerateRequest } from '../models/AiGenerateRequest';
-import type { AiGenerateResponse } from '../models/AiGenerateResponse';
-import type { AiSpec } from '../models/AiSpec';
 import type { AutomationPackageDescriptor } from '../models/AutomationPackageDescriptor';
 
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
@@ -67,47 +63,6 @@ export class IdeService {
       query: {
         directory: directory,
       },
-    });
-  }
-
-  /**
-   * @returns AiConfiguration default response
-   * @throws ApiError
-   */
-  public getAiConfiguration(): Observable<AiConfiguration> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/local/ide/ai/config',
-    });
-  }
-
-  /**
-   * @param testCaseName
-   * @returns AiSpec default response
-   * @throws ApiError
-   */
-  public getAiSpec(testCaseName?: string): Observable<AiSpec> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/local/ide/ai/spec',
-      query: {
-        testCaseName: testCaseName,
-      },
-    });
-  }
-
-  /**
-   * Writes the specs and launches the agentic workflow.
-   * @param requestBody
-   * @returns string the id of the launched execution
-   * @throws ApiError
-   */
-  public generateAiPlans(requestBody?: AiGenerateRequest): Observable<AiGenerateResponse> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/local/ide/ai/generate',
-      body: requestBody,
-      mediaType: 'application/json',
     });
   }
 }

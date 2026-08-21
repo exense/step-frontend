@@ -101,7 +101,7 @@ import { AltExecutionParametersComponent } from './components/alt-execution-para
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Route, Router } from '@angular/router';
 import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
@@ -170,6 +170,72 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
+
+const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
+  path,
+  component: AltExecutionProgressComponent,
+  data: { [EXECUTION_REPORT_LAYOUT_ROUTE_DATA]: layoutId },
+  providers: [
+    ActiveExecutionsService,
+    AltExecutionRefreshActivityService,
+    AggregatedReportViewTreeNodeUtilsService,
+    { provide: DialogParentService, useClass: ExecutionViewDialogUrlCleanupService },
+    { provide: TreeNodeUtilsService, useExisting: AggregatedReportViewTreeNodeUtilsService },
+    { provide: AGGREGATED_TREE_WIDGET_STATE, useClass: AggregatedReportViewTreeStateService },
+    AltReportNodeDetailsStateService,
+    ActiveExecutionContextService,
+    AggregatedReportViewTreeStateContextService,
+  ],
+  canActivate: [
+    sequenceCanActivateGuards([
+      checkEntityGuardFactory({
+        entityType: 'execution',
+        getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
+        getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
+        isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
+        getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
+      }),
+      altExecutionGuard,
+    ]),
+    () => {
+      const _ctx = inject(AggregatedReportViewTreeStateContextService);
+      const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+      _ctx.setState(_treeState);
+      return true;
+    },
+  ],
+  resolve: {
+    setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
+      inject(ActiveExecutionContextService).setupExecutionId(route.params['id']);
+      return true;
+    },
+  },
+  canDeactivate: [
+    () => {
+      inject(AugmentedExecutionsService).cleanupCache();
+      inject(MultipleProjectsService).cleanupProjectMessage();
+      return true;
+    },
+    () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+    () => inject(AltReportNodeDetailsStateService).cleanup(),
+    () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
+  ],
+  children: [
+    {
+      path: '',
+      component: AltExecutionReportComponent,
+      data: { mode: ViewMode.VIEW },
+      canActivate: [
+        () => {
+          inject(AltExecutionRefreshActivityService).setupRefreshActivity(...ALL_ALT_EXECUTION_REFRESH_ACTIVITY);
+          return true;
+        },
+      ],
+      canDeactivate: [canLeaveComponent],
+    },
+  ],
+});
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
 import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
@@ -424,6 +490,7 @@ export class ExecutionModule {
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _gridSettingsRegistry: GridSettingsRegistryService,
+    _staticLayouts: ExecutionReportStaticLayoutRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -431,6 +498,9 @@ export class ExecutionModule {
       this.registerEntities();
       this.registerDashlets();
       this.registerRoutes();
+      _staticLayouts.setRouteRegistrar((route) =>
+        this._viewRegistry.registerRoute(staticAltExecutionReportRoute(route.path, route.layoutId)),
+      );
       this.registerInfoBanners();
       this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;

@@ -17,14 +17,6 @@ step-alt-execution-progress {
     margin-bottom: -2rem;
   }
 
-  .ai-generation-status-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    width: 100%;
-  }
-
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;
@@ -35,6 +27,19 @@ step-alt-execution-progress {
     row-gap: 0.5rem;
     align-items: flex-start;
     min-height: 8.3rem;
+
+    &.compact-report {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'title compact-controls'
+        'sub-title sub-title';
+      min-height: 0;
+    }
+
+    .compact-controls {
+      grid-area: compact-controls;
+      justify-self: flex-end;
+    }
 
     &.small-screen {
       grid-template-columns: 1fr 1fr;
