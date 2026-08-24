@@ -218,7 +218,7 @@ export class FilePickerModalComponent implements OnInit {
   }
 
   private scrollDirectoryIntoView(directory: string, attempt: number = 0): void {
-    const directoryList = this._elementRef.nativeElement.querySelector<HTMLDivElement>('.directory-list');
+    const directoryList = this._elementRef.nativeElement.querySelector<HTMLDivElement>('.file-list');
     const directoryItem = Array.from(directoryList?.querySelectorAll<HTMLButtonElement>('button') ?? []).find(
       (item) => item.dataset['directory'] === directory,
     );
