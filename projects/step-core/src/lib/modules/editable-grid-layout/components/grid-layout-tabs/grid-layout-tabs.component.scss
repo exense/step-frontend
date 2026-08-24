@@ -29,19 +29,27 @@ step-grid-layout-tabs {
     display: block;
     flex: 1 1 auto;
     min-width: 0;
-    overflow: visible;
+    overflow: hidden;
 
     .mat-mdc-tab-header {
       height: 3.6rem;
       border-bottom: none;
-      overflow: visible;
+      overflow: hidden;
     }
 
     .mat-mdc-tab-link-container,
-    .mat-mdc-tab-list,
-    .mat-mdc-tab-links {
+    .mat-mdc-tab-list {
       height: 3.6rem;
       width: 100%;
+    }
+
+    .mat-mdc-tab-link-container {
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-links {
+      min-width: 100%;
+      width: max-content;
       overflow: visible;
     }
 
@@ -80,8 +88,11 @@ step-grid-layout-tabs {
 
       .mdc-tab__text-label,
       .mdc-tab__content {
+        display: flex;
+        flex: 1 1 auto;
         min-width: 0;
         max-width: 100%;
+        width: 100%;
       }
 
       .mat-ripple,
@@ -96,18 +107,25 @@ step-grid-layout-tabs {
       .tab-content {
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 0.6rem;
+        width: 100%;
         min-width: 0;
         font-weight: 400;
         letter-spacing: normal;
         color: inherit;
 
         .tab-label {
+          flex: 1 1 auto;
           min-width: 0;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           color: inherit;
+        }
+
+        .tab-action-slot {
+          margin-left: auto;
         }
 
         step-icon {
@@ -171,12 +189,6 @@ step-grid-layout-tabs {
     flex: 0 0 1.8rem;
     width: 1.8rem;
     height: 1.8rem;
-    margin-right: -0.4rem;
-  }
-
-  .tab-close-slot {
-    margin-right: -0.4rem;
-    margin-left: -0.4rem;
   }
 
   .tab-action {
