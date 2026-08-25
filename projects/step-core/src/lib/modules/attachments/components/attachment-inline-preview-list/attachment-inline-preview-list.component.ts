@@ -130,7 +130,17 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       availableWidth -= CAP_ICON_SPACE;
     }
 
-    return this.determineElementsWithWidths(elementsToDisplay, availableWidth);
+    //Sometime elements to display may have not recent data.
+    //Create a record with actual data
+    const actualData = items.reduce(
+      (res, item) => {
+        res[item.id!] = item;
+        return res;
+      },
+      {} as Record<string, AttachmentMetaWithExplicitWidth>,
+    );
+
+    return this.determineElementsWithWidths(elementsToDisplay, availableWidth, actualData);
   });
 
   protected readonly showMoreButton = computed(() => {
@@ -178,15 +188,24 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private determineElementsWithWidths(
     renderedElementsWithInitialWidths: AttachmentInlinePreviewComponent[],
     availableWidth: number,
+    actualData?: Record<string, AttachmentMetaWithExplicitWidth>,
   ): AttachmentMetaWithExplicitWidth[] {
     const totalCount = renderedElementsWithInitialWidths.length;
 
     const fairShareContext = new FareShareCalculator(MIN_WIDTH, GAP, availableWidth, totalCount, PADDINGS);
 
-    let changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
+    let changedItems = this.createItemsWithReallocatedWidths(
+      renderedElementsWithInitialWidths,
+      fairShareContext,
+      actualData,
+    );
     const isReallocated = fairShareContext.reallocate();
     if (isReallocated) {
-      changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fairShareContext);
+      changedItems = this.createItemsWithReallocatedWidths(
+        renderedElementsWithInitialWidths,
+        fairShareContext,
+        actualData,
+      );
     }
     return changedItems;
   }
@@ -194,9 +213,13 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private createItemsWithReallocatedWidths(
     elements: readonly AttachmentInlinePreviewComponent[],
     context: FareShareCalculator,
+    actualData?: Record<string, AttachmentMetaWithExplicitWidth>,
   ): AttachmentMetaWithExplicitWidth[] {
     return elements.map((element) => {
-      const item = element.getAttachmentData();
+      let item = element.getAttachmentData();
+      if (actualData?.[item.id!]) {
+        item = actualData[item.id!];
+      }
       let explicitWidth = element.getWidth();
       context.openContainer();
       explicitWidth = context.applyFairShare(explicitWidth);
