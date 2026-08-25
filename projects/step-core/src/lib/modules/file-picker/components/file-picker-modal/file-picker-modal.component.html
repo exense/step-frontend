@@ -66,6 +66,8 @@
           >
             @if (item.directory) {
               <step-icon name="folder" />
+            } @else {
+              <step-icon name="file" />
             }
             {{ item.name }}
           </button>

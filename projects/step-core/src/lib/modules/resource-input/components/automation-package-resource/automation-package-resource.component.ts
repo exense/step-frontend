@@ -63,6 +63,11 @@ export class AutomationPackageResourceComponent {
     this._apPickerDataProviderService.downloadResource(apPath);
   }
 
+  protected removeApResource(): void {
+    this.handleApPathChange(undefined);
+    this.blur.emit();
+  }
+
   protected openApResourceChooser(): void {
     this._apFilePicker
       .showFilePicker('Select Automation Package Resource', { selectionMode: SelectionMode.FILE })

@@ -40,4 +40,9 @@
       <step-icon name="download" />
     </button>
   </step-suffix>
+  <step-suffix class="button-suffix">
+    <button type="button" (click)="removeApResource()" mat-stroked-button matTooltip="Clear" [disabled]="isDisabled()">
+      <step-icon name="x" />
+    </button>
+  </step-suffix>
 </step-form-field>
