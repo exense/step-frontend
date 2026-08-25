@@ -53,8 +53,8 @@
       <div class="detail-container">
         @if (!showDetails) {
           <div class="detail-label m-right">Input</div>
-          <step-json-viewer class="detail" [json]="node!.input!" [format]="ViewerFormat.KV" />
         }
+        <step-json-viewer class="detail" [json]="node!.input!" [format]="ViewerFormat.KV" />
       </div>
     }
     @if (showDetails) {
