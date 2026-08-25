@@ -734,7 +734,7 @@ export class AltExecutionProgressComponent
       .pipe(
         filter(([isActive]) => isActive),
         map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
-        debounceTime(300),
+        debounceTime(200),
         smartSwitchMap(
           (curr, prev) => {
             return (
