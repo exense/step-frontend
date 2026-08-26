@@ -561,7 +561,10 @@ export class AltExecutionProgressComponent
       });
     });
 
-  readonly keywordsDataSource$ = of(this.keywordsDataSource);
+  readonly keywordsDataSource$ = this.keywordParameters$.pipe(
+    map(() => this.keywordsDataSource),
+    shareReplay(1),
+  );
 
   readonly errors$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
