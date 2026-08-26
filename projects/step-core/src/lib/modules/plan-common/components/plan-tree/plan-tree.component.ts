@@ -6,11 +6,10 @@ import {
   ElementRef,
   forwardRef,
   inject,
-  Input,
+  input,
   output,
   Signal,
   viewChild,
-  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { filter, map, Observable, of, partition } from 'rxjs';
@@ -22,6 +21,7 @@ import { ArtefactTreeNode } from '../../types/artefact-tree-node';
 import { PlanArtefactResolverService } from '../../injectables/plan-artefact-resolver.service';
 import { PlanEditorPersistenceStateService } from '../../injectables/plan-editor-persistence-state.service';
 import { PlanEditorService } from '../../injectables/plan-editor.service';
+import { PlanReferencePolicyService } from '../../injectables/plan-reference-policy.service';
 import { PlanInteractiveSessionService } from '../../injectables/plan-interactive-session.service';
 import { PlanTreeAction } from '../../types/plan-tree-action.enum';
 import { DragDataService, DropInfo, DragEndType, DRAG_DROP_EXPORTS } from '../../../drag-drop';
@@ -63,6 +63,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
   private _planPersistenceState = inject(PlanEditorPersistenceStateService);
   readonly _planEditorService = inject(PlanEditorService);
+  private _planReferencePolicy = inject(PlanReferencePolicyService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
   readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
@@ -70,17 +71,17 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();
 
-  @Input() isReadonly: boolean = false;
+  readonly isReadonly = input(false);
 
-  @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
+  readonly splitAreaElementRef = viewChild<ElementRef<HTMLElement>>('area');
 
-  @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
+  readonly tree = viewChild<TreeComponent<ArtefactTreeNode>>(TreeComponent);
 
   /** @ViewChild **/
-  private dragData = viewChild(DragDataService);
+  private readonly dragData = viewChild(DragDataService);
 
-  protected treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
-  protected artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);
+  protected readonly treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
+  protected readonly artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);
 
   private actions: TreeAction[] = [
     { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
@@ -128,7 +129,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
         actions
           .map((action) => {
             let disabled = false;
-            if (this.isReadonly || action.disabled) {
+            if (this.isReadonly() || action.disabled) {
               disabled = true;
             } else if (action.id === PlanTreeAction.OPEN) {
               disabled = !this.canOpenArtefact(node.originalArtefact);
@@ -156,12 +157,13 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   }
 
   openTreeMenu(event: MouseEvent, nodeId: string): void {
-    if (!this.tree) {
+    const tree = this.tree();
+    if (!tree) {
       return;
     }
     event.preventDefault();
     event.stopImmediatePropagation();
-    this.tree.openContextMenu({
+    tree.openContextMenu({
       event,
       nodeId,
     });
@@ -265,7 +267,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     }
   }
 
-  handlePlanChange() {
+  handlePlanChange(): void {
     // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
     // a plan change
     setTimeout(() => {
@@ -286,7 +288,10 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     if (!artefact) {
       return false;
     }
-    return ['CallPlan', 'CallKeyword'].includes(artefact._class);
+    return (
+      ['CallPlan', 'CallKeyword'].includes(artefact._class) &&
+      this._planReferencePolicy.canNavigateToReferencedPlan(artefact)
+    );
   }
 
   private setupDragStart(): void {
