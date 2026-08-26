@@ -3,14 +3,14 @@
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-aggregated-tree-node-drilldown {
-  background: #f8f9fa;
+  background: var.$white;
 
   step-stack-view {
-    background: #f8f9fa;
+    background: var.$white;
   }
 
   step-split-gutter {
-    background: #f8f9fa;
+    background: var.$white;
   }
 
   step-split-area {

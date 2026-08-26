@@ -169,15 +169,15 @@ step-grid-layout-tabs {
 
       &.mdc-tab.mat-mdc-tab-link.mdc-tab--active .tab-content,
       &.mdc-tab--active:hover .mdc-tab__text-label {
-        color: var.$gray-800;
+        color: var.$white;
         font-weight: 500;
       }
 
       &.mdc-tab--active {
         z-index: 1;
         border-color: var.$gray-300;
-        border-bottom-color: #f8f9fa;
-        background: #f8f9fa;
+        border-bottom-color: var.$white;
+        background: var.$white;
       }
     }
   }

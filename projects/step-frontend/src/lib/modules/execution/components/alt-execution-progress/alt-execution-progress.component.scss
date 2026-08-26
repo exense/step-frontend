@@ -278,8 +278,7 @@ step-alt-execution-progress {
       margin-inline: calc(-1 * var(--execution-progress-horizontal-padding));
       padding-inline: var(--execution-progress-horizontal-padding);
       min-height: 0;
-      // The surrounding flex margins overlap this area by 0.4rem.
-      background: linear-gradient(to bottom, transparent 0 0.4rem, #f8f9fa 0.4rem 100%);
+      background: var.$white;
     }
 
     &.has-drilldown > step-simple-outlet {

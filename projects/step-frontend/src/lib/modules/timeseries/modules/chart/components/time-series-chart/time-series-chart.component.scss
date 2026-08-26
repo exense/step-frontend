@@ -41,7 +41,12 @@ step-timeseries-chart {
 
   &.performance-dashlet-chart .u-title {
     justify-content: flex-start;
-    padding: 0 7rem 0 0.4rem;
+    padding: 0 7rem 0 1.1rem;
+  }
+
+  &.performance-dashlet-chart .ts-chart-legend {
+    margin: -0.2rem -0.5rem -0.5rem;
+    border-radius: 0;
   }
 
   .u-legend {
