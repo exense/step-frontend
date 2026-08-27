@@ -536,10 +536,7 @@ export class AltExecutionProgressComponent
     )
     .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
-  readonly keywordsDataSource$ = this.keywordParameters$.pipe(
-    map(() => this.keywordsDataSource),
-    shareReplay(1),
-  );
+  readonly keywordsDataSource$ = this.keywordParameters$.pipe(map(() => this.keywordsDataSource));
 
   readonly errors$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
