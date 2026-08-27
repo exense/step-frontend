@@ -112,8 +112,14 @@ export class ArtefactsFactoryService {
         return artefact$.pipe(
           switchMap((artefact) => {
             const callPlan = artefact as AbstractArtefact & CallPlan;
-            callPlan.attributes!['name'] = plan.attributes!['name'];
-            callPlan.dynamicName!.dynamic = callPlan.useDynamicName;
+            const planName = plan.attributes?.['name'];
+            if (planName !== undefined) {
+              callPlan.attributes ??= {};
+              callPlan.attributes['name'] = planName;
+            }
+            if (callPlan.dynamicName) {
+              callPlan.dynamicName.dynamic = callPlan.useDynamicName;
+            }
 
             if (options.referenceMode !== 'SELECTION_CRITERIA') {
               callPlan.planId = planId;

@@ -33,9 +33,9 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   planProject = '';
   protected isReferencedPlanActionDisabled = false;
 
-  protected readonly formReference = viewChild.required<NgForm>('form');
+  protected readonly formReference = viewChild<NgForm>('form');
 
-  protected get form(): NgForm {
+  protected get form(): NgForm | undefined {
     return this.formReference();
   }
 

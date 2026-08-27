@@ -288,10 +288,10 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     if (!artefact) {
       return false;
     }
-    return (
-      ['CallPlan', 'CallKeyword'].includes(artefact._class) &&
-      this._planReferencePolicy.canNavigateToReferencedPlan(artefact)
-    );
+    if (artefact._class === 'CallKeyword') {
+      return true;
+    }
+    return artefact._class === 'CallPlan' && this._planReferencePolicy.canNavigateToReferencedPlan(artefact);
   }
 
   private setupDragStart(): void {
