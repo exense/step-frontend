@@ -7,6 +7,9 @@ export const $MetricAggregation = {
       type: 'Enum',
       isRequired: true,
     },
+    twoStageAggregation: {
+      type: 'TwoStageAggregation',
+    },
     params: {
       type: 'dictionary',
       contains: {

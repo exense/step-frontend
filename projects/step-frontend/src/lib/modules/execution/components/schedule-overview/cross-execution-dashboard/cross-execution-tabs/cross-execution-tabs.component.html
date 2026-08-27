@@ -1,0 +1,7 @@
+<step-grid-layout-tabs>
+  <ng-container *stepGridLayoutExternalTab="let tab">
+    @if (tab.type === CrossExecutionViewTabType.PERFORMANCE) {
+      <span class="tab-label">{{ tab.label }}</span>
+    }
+  </ng-container>
+</step-grid-layout-tabs>

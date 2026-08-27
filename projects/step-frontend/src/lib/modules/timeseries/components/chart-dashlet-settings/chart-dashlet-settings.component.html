@@ -2,6 +2,10 @@
   <div step-modal-window-body>
     <form #formContainer="ngForm">
       @if (item) {
+        <div class="section-header">
+          <step-label>General</step-label>
+          <div class="section-description">Basic information about this chart.</div>
+        </div>
         <div class="form-row">
           <step-form-field [showRequiredMarker]="true">
             <step-label>Name</step-label>
@@ -9,14 +13,14 @@
           </step-form-field>
           <step-form-field>
             <step-label
-              >Master Dashlet
+              >Master dashlet
               <step-icon
                 class="help-icon"
                 matTooltip="The chart will inherit metric, filters, grouping and will stay in sync with the master dashlet."
                 name="help-circle"
               ></step-icon>
             </step-label>
-            <mat-select [(ngModel)]="item.masterChartId" name="masterChartId">
+            <mat-select placeholder="Select a master dashlet" [(ngModel)]="item.masterChartId" name="masterChartId">
               <mat-option [value]="undefined">-</mat-option>
               @for (dashlet of tableDashlets; track dashlet.id) {
                 <mat-option [value]="dashlet.id">{{ dashlet.name }}</mat-option>
@@ -24,24 +28,21 @@
             </mat-select>
           </step-form-field>
         </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Type</step-label>
-            <input disabled placeholder="Type" [value]="item.type" name="type" />
-          </step-form-field>
-
-          <step-form-field>
-            <step-label>Metric</step-label>
-            <input
-              disabled
-              placeholder="Metric"
-              [value]="item.masterChartId ? ' - inherited -' : item.metricKey"
-              name="metricKey"
-            />
-          </step-form-field>
+        <div class="readonly-field">
+          <div class="readonly-field-label">Metric</div>
+          <div class="readonly-field-value">
+            @if (item.masterChartId) {
+              Inherited from the master dashlet
+            } @else {
+              {{ item.metricKey }}
+            }
+          </div>
         </div>
         <mat-divider />
-        <step-label>Filters</step-label>
+        <div class="section-header">
+          <step-label>Filters</step-label>
+          <div class="section-description">Define which series to include in this chart.</div>
+        </div>
         @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
@@ -53,7 +54,10 @@
                 [updateTimeRangeOption]="false"
               />
             }
-            <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
+            <button type="button" class="add-filter-button" mat-raised-button [matMenuTriggerFor]="typesMenu">
+              <step-icon name="plus" />
+              <span>Filter</span>
+            </button>
           </div>
           <div class="form-row">
             <step-form-field>
@@ -66,7 +70,7 @@
                 <span>Inherit global filters</span>
                 <step-icon
                   class="help-icon"
-                  matTooltip="The chart filters will be combined with the dashboard filters"
+                  matTooltip="These filters will be combined with the dashboard filters"
                   name="help-circle"
                 ></step-icon>
               </mat-checkbox>
@@ -78,10 +82,10 @@
                   [(ngModel)]="item.inheritSpecificFiltersOnly"
                   name="inheritSpecificFiltersOnly"
                 >
-                  <span>Inherit specific fields only</span>
+                  <span>Inherit specific filters only</span>
                   <step-icon
                     class="help-icon"
-                    matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
+                    matTooltip="Only the specified filters will be inherited, if present. Note that while using OQL, all the filters will be inherited"
                     name="help-circle"
                   ></step-icon>
                 </mat-checkbox>
@@ -110,8 +114,9 @@
           </mat-menu>
         }
         <mat-divider />
-        <div>
+        <div class="section-header">
           <step-label>Grouping</step-label>
+          <div class="section-description">Define how the series are grouped together.</div>
         </div>
         @if (!item.masterChartId) {
           <div class="form-row">
@@ -130,7 +135,7 @@
             <div>
               <step-form-field>
                 <mat-checkbox color="primary" [(ngModel)]="item.readonlyGrouping" name="readonlyGrouping">
-                  <span>Readonly grouping</span>
+                  <span>Read-only grouping</span>
                   <step-icon
                     class="help-icon"
                     matTooltip="The users will not be able to change the grouping of this dashlet"
@@ -142,8 +147,15 @@
           </div>
           @if (!item.inheritGlobalGrouping) {
             <step-form-field>
-              <step-label>Grouping Attributes</step-label>
-              <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+              <step-label
+                >Group series by
+                <step-icon
+                  class="help-icon"
+                  matTooltip="The series sharing the same values for the selected attributes are grouped together, and each group is displayed as one series"
+                  name="help-circle"
+                ></step-icon>
+              </step-label>
+              <mat-select placeholder="Select attributes" [(ngModel)]="item.grouping" multiple name="grouping">
                 @for (attr of item.attributes; track attr) {
                   <mat-option [value]="attr.name">{{ attr.displayName }} </mat-option>
                 }
@@ -154,148 +166,283 @@
           <div class="info-txt">Settings inherited from the master dashlet</div>
         }
         <mat-divider />
-        <div>
-          <step-label>Primary Axes</step-label>
+        <div class="axis-heading">
+          <step-label>Primary axis</step-label>
         </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Aggregate</step-label>
-            <button
-              class="aggregate-select-container"
-              #primaryAggregateMenuTrigger="matMenuTrigger"
-              [matMenuTriggerFor]="aggregateMenu"
-              mat-button
-            >
-              {{ item.chartSettings!.primaryAxes.aggregation.type }}
-              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
-                {{ item.chartSettings!.primaryAxes.aggregation.params?.['pclValue'] }}
-              }
-              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE) {
-                (/{{ item.chartSettings!.primaryAxes.aggregation.params?.['rateUnit'] }})
-              }
-            </button>
-          </step-form-field>
-          <step-form-field>
-            <step-label>Unit</step-label>
-            <input
-              placeholder="Series units, like 'ms', 'hrs', '%'"
-              name="unit"
-              [(ngModel)]="item.chartSettings!.primaryAxes.unit"
+        <div class="axis-card">
+          <div class="axis-subheader">
+            <div class="axis-subheader-titles">
+              <span class="axis-subheader-title">Aggregation</span>
+              <span class="axis-subheader-description">Define how the data points of each series are aggregated.</span>
+            </div>
+            <step-tabs
+              [tabs]="AGGREGATION_MODES"
+              [shrink]="true"
+              [compactTabs]="true"
+              [activeTabId]="aggregationMode"
+              (activeTabIdChange)="aggregationMode = $event"
             />
-          </step-form-field>
-          <step-form-field>
-            <step-label>Display</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
-              <mat-option [value]="'LINE'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="trending-up"></step-icon>
-                  <span>Line</span>
-                </div>
-              </mat-option>
-              <mat-option [value]="'BAR_CHART'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="bar-chart-2"></step-icon>
-                  <span>Bar</span>
-                </div>
-              </mat-option>
-              <mat-option [value]="'STEPPED'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="trending-up"></step-icon>
-                  <span>Stepped</span>
-                </div>
-              </mat-option>
-              <mat-option [value]="'STACKED_BAR'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="bar-chart-2"></step-icon>
-                  <span>Stacked bars</span>
-                </div>
-              </mat-option>
-            </mat-select>
-          </step-form-field>
-          <mat-menu #aggregateMenu="matMenu">
-            <step-timeseries-aggregate-picker
-              [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
-              [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
-              (aggregateChange)="handlePrimaryAggregationChange($event)"
-            />
-          </mat-menu>
-        </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Colorization</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes!.colorizationType" name="colorizationType">
-              <mat-option [value]="'STROKE'">Stroke only</mat-option>
-              <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
-            </mat-select>
-          </step-form-field>
-        </div>
-        <step-form-field>
-          <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
-            <span>Readonly aggregate</span>
             <step-icon
               class="help-icon"
-              matTooltip="The users will not be able to change the aggregate of this dashlet"
+              [matTooltip]="
+                'Single: Combines all data points together over time and across series, then applies one single aggregation function.\n\nTwo-stage: Applies separate aggregation functions in two stages, first over time (e.g., Average per minute) and then across series (e.g., Sum across applications).'
+              "
               name="help-circle"
             ></step-icon>
-          </mat-checkbox>
-        </step-form-field>
-        <mat-divider />
-        <div>
-          <step-label
-            >Secondary Axes
-            <step-icon
-              class="help-icon"
-              matTooltip="The secondary axis sums each group's aggregated value into a single combined series, thus showing the total aggregated values across series. It always uses a filled style."
-              name="help-circle"
-            ></step-icon>
-          </step-label>
-        </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Aggregate</step-label>
-            <button
-              class="aggregate-select-container"
-              #secondaryAggregateMenuTrigger="matMenuTrigger"
-              [matMenuTriggerFor]="secondaryAggregateMenu"
-              mat-button
-            >
-              {{ item.chartSettings!.secondaryAxes?.aggregation?.type }}
-              @if (item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.PERCENTILE) {
-                {{ item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue'] }}
-              }
-            </button>
-            <mat-menu #secondaryAggregateMenu="matMenu">
+          </div>
+          @if (aggregationMode === 'SINGLE') {
+            <div class="form-row half-width">
+              <step-form-field>
+                <step-label
+                  >Aggregation
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="Value extracted from the combined data points of each time interval"
+                    name="help-circle"
+                  ></step-icon>
+                </step-label>
+                <button
+                  class="aggregate-select-container"
+                  #primaryAggregateMenuTrigger="matMenuTrigger"
+                  [matMenuTriggerFor]="aggregateMenu"
+                  mat-button
+                >
+                  {{ AGGREGATION_LABELS[singleStageAggregation.type] }}
+                  @if (singleStageAggregation.type === ChartAggregation.PERCENTILE) {
+                    {{ singleStageAggregation.params?.['pclValue'] }}
+                  }
+                  @if (singleStageAggregation.type === ChartAggregation.RATE) {
+                    (/{{ singleStageAggregation.params?.['rateUnit'] }})
+                  }
+                </button>
+              </step-form-field>
+            </div>
+            <mat-menu #aggregateMenu="matMenu">
               <step-timeseries-aggregate-picker
-                [selectedAggregate]="$any(item.chartSettings!.secondaryAxes?.aggregation)"
-                [allowEmptyAggregate]="true"
-                [pclValue]="item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue']"
-                (aggregateChange)="handleSecondaryAggregationChange($event)"
+                [selectedAggregate]="singleStageAggregation"
+                [pclValue]="singleStageAggregation.params?.['pclValue']"
+                (aggregateChange)="handlePrimaryAggregationChange($event)"
               />
             </mat-menu>
+          } @else {
+            <div class="form-row">
+              <div class="field-with-hint">
+                <step-form-field>
+                  <step-label
+                    >Time aggregation
+                    <step-icon
+                      class="help-icon"
+                      matTooltip="The calculation applied over time within each series (e.g., Average value per 1-minute interval)."
+                      name="help-circle"
+                    ></step-icon>
+                  </step-label>
+                  <mat-select [(ngModel)]="twoStageAggregation.timeAggregation" name="primaryTimeAggregation">
+                    @for (option of PIPELINE_TIME_AGGREGATION_OPTIONS; track option.value) {
+                      <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                  </mat-select>
+                </step-form-field>
+                <div class="field-hint">How the data points of each series are combined over time.</div>
+              </div>
+              <div class="field-with-hint">
+                <step-form-field>
+                  <step-label
+                    >Series aggregation
+                    <step-icon
+                      class="help-icon"
+                      matTooltip="The calculation applied across the series of the same group, for each time interval (e.g., Sum across all applications)."
+                      name="help-circle"
+                    ></step-icon>
+                  </step-label>
+                  <mat-select [(ngModel)]="twoStageAggregation.groupAggregation" name="primaryGroupAggregation">
+                    @for (option of PIPELINE_GROUP_AGGREGATION_OPTIONS; track option.value) {
+                      <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                  </mat-select>
+                </step-form-field>
+                <div class="field-hint">How the series of the same group are combined.</div>
+              </div>
+            </div>
+          }
+          <step-form-field>
+            <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
+              <span>Read-only aggregation</span>
+              <step-icon
+                class="help-icon"
+                matTooltip="The users will not be able to change the aggregation of this dashlet from the dashboard"
+                name="help-circle"
+              ></step-icon>
+            </mat-checkbox>
           </step-form-field>
-          @if (item.chartSettings!.secondaryAxes) {
+          <mat-divider />
+          <div class="axis-subheader">
+            <div class="axis-subheader-titles">
+              <span class="axis-subheader-title">Appearance</span>
+              <span class="axis-subheader-description">Define how the resulting series are displayed.</span>
+            </div>
+          </div>
+          <div class="form-row">
             <step-form-field>
-              <step-label>Display</step-label>
-              <mat-select [(ngModel)]="item.chartSettings!.secondaryAxes.displayType" name="secondaryDisplayType">
-                <mat-option [value]="'BAR_CHART'" class="option-with-icon">
-                  <div class="inner">
-                    <step-icon name="bar-chart-2"></step-icon>
-                    <span>Bar</span>
-                  </div>
-                </mat-option>
+              <step-label
+                >Unit
+                <step-icon
+                  class="help-icon"
+                  matTooltip="Unit appended to the axis values, like 'ms', 'hrs', '%'"
+                  name="help-circle"
+                ></step-icon>
+              </step-label>
+              <input
+                placeholder="Series units, like 'ms', 'hrs', '%'"
+                name="unit"
+                [(ngModel)]="item.chartSettings!.primaryAxes.unit"
+              />
+            </step-form-field>
+            <step-form-field>
+              <step-label
+                >Plot type
+                <step-icon class="help-icon" matTooltip="How each series is drawn" name="help-circle"></step-icon>
+              </step-label>
+              <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
                 <mat-option [value]="'LINE'" class="option-with-icon">
                   <div class="inner">
                     <step-icon name="trending-up"></step-icon>
                     <span>Line</span>
                   </div>
                 </mat-option>
+                <mat-option [value]="'BAR_CHART'" class="option-with-icon">
+                  <div class="inner">
+                    <step-icon name="bar-chart-2"></step-icon>
+                    <span>Bar</span>
+                  </div>
+                </mat-option>
+                <mat-option [value]="'STEPPED'" class="option-with-icon">
+                  <div class="inner">
+                    <step-icon name="trending-up"></step-icon>
+                    <span>Stepped</span>
+                  </div>
+                </mat-option>
+                <mat-option [value]="'STACKED_BAR'" class="option-with-icon">
+                  <div class="inner">
+                    <step-icon name="bar-chart-2"></step-icon>
+                    <span>Stacked bars</span>
+                  </div>
+                </mat-option>
               </mat-select>
             </step-form-field>
-          }
+            <step-form-field>
+              <step-label
+                >Color style
+                <step-icon
+                  class="help-icon"
+                  matTooltip="Whether each series is drawn with a stroke only or with a filled area"
+                  name="help-circle"
+                ></step-icon>
+              </step-label>
+              <mat-select [(ngModel)]="item.chartSettings!.primaryAxes!.colorizationType" name="colorizationType">
+                <mat-option [value]="'STROKE'">Stroke only</mat-option>
+                <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
+              </mat-select>
+            </step-form-field>
+          </div>
         </div>
         <mat-divider />
-        <step-label>Visual settings</step-label>
-        <div class="form-row">
+        <div class="axis-heading">
+          <step-label
+            >Total axis
+            <step-icon
+              class="help-icon"
+              matTooltip="The total axis combines all the series of the primary axis into one single total series, drawn on its own axis on the right. It is computed out of the primary axis series, so it has no metric, grouping or filtering of its own."
+              name="help-circle"
+            ></step-icon>
+          </step-label>
+          <mat-slide-toggle
+            color="primary"
+            [ngModel]="showSecondaryAxes"
+            (ngModelChange)="handleShowSecondaryAxesChange($event)"
+            name="showSecondaryAxes"
+            >Show total axis</mat-slide-toggle
+          >
+        </div>
+        @if (showSecondaryAxes && item.chartSettings!.secondaryAxes; as secondaryAxes) {
+          <div class="axis-card">
+            @if (aggregationMode === 'SINGLE') {
+              <div class="section-description">
+                The value selected below is computed for each series of the primary axis, and the results are summed
+                into one single total series.
+              </div>
+            } @else {
+              <div class="section-description">
+                The value produced by the two-stage aggregation for each series of the primary axis is summed into one
+                single total series.
+              </div>
+            }
+            <div class="form-row" [class.half-width]="aggregationMode === 'TWO_STAGE'">
+              @if (aggregationMode === 'SINGLE') {
+                <step-form-field>
+                  <step-label
+                    >Sum of
+                    <step-icon
+                      class="help-icon"
+                      matTooltip="This value is extracted from each series of the primary axis, and the results are then summed into the total series. Selecting Average therefore displays the sum of the per-series averages, not the overall average."
+                      name="help-circle"
+                    ></step-icon>
+                  </step-label>
+                  <button
+                    class="aggregate-select-container"
+                    #secondaryAggregateMenuTrigger="matMenuTrigger"
+                    [matMenuTriggerFor]="secondaryAggregateMenu"
+                    mat-button
+                  >
+                    {{ AGGREGATION_LABELS[secondaryAxes.aggregation.type] }}
+                    @if (secondaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
+                      {{ secondaryAxes.aggregation.params?.['pclValue'] }}
+                    }
+                    @if (secondaryAxes.aggregation.type === ChartAggregation.RATE) {
+                      (/{{ secondaryAxes.aggregation.params?.['rateUnit'] }})
+                    }
+                  </button>
+                </step-form-field>
+                <mat-menu #secondaryAggregateMenu="matMenu">
+                  <step-timeseries-aggregate-picker
+                    [selectedAggregate]="secondaryAxes.aggregation"
+                    [pclValue]="secondaryAxes.aggregation.params?.['pclValue']"
+                    (aggregateChange)="handleSecondaryAggregationChange($event)"
+                  />
+                </mat-menu>
+              }
+              <step-form-field>
+                <step-label
+                  >Plot type
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="How the total series is drawn"
+                    name="help-circle"
+                  ></step-icon>
+                </step-label>
+                <mat-select [(ngModel)]="secondaryAxes.displayType" name="secondaryDisplayType">
+                  <mat-option [value]="'BAR_CHART'" class="option-with-icon">
+                    <div class="inner">
+                      <step-icon name="bar-chart-2"></step-icon>
+                      <span>Bar</span>
+                    </div>
+                  </mat-option>
+                  <mat-option [value]="'LINE'" class="option-with-icon">
+                    <div class="inner">
+                      <step-icon name="trending-up"></step-icon>
+                      <span>Line</span>
+                    </div>
+                  </mat-option>
+                </mat-select>
+              </step-form-field>
+            </div>
+          </div>
+        }
+        <mat-divider />
+        <div class="section-header">
+          <step-label>General visual settings</step-label>
+          <div class="section-description">Settings that apply to the whole chart.</div>
+        </div>
+        <div class="form-row half-width">
           <step-form-field>
             <step-label>Chart width</step-label>
             <mat-select [(ngModel)]="item.size" name="item.size">

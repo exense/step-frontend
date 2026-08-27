@@ -19,6 +19,7 @@ import {
   DashboardView,
   Execution,
   ExecutiontTaskParameters,
+  MetricAggregation,
   MetricAttribute,
   MetricType,
   Plan,
@@ -29,6 +30,7 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
+  PipelineAggregationService,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
@@ -96,6 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   readonly id = input.required<string>(); // dashboard id
   readonly storageId = input<string>(); // for persistence across views
@@ -304,13 +307,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       readonlyGrouping: true,
       inheritSpecificFiltersOnly: false,
       specificFiltersToInherit: [],
-      tableSettings: { columns: this.getInitialTableColumns() },
+      tableSettings: {
+        columns: this.getInitialTableColumns(),
+        aggregation: this.getInitialTableAggregation(metric),
+      },
     };
     this.filterBar()!.addUniqueFilterItems(
       tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
     );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
+  }
+
+  /**
+   * Only two-stage aggregations are kept at table level. Single-stage ones are already covered by the columns,
+   * each of them displaying its own aggregation.
+   */
+  private getInitialTableAggregation(metric: MetricType): MetricAggregation | undefined {
+    const defaultAggregation = metric.defaultAggregation;
+    return this._pipelineAggregationService.getTwoStageAggregation(defaultAggregation) ? defaultAggregation : undefined;
   }
 
   private getInitialTableColumns(): ColumnSelection[] {

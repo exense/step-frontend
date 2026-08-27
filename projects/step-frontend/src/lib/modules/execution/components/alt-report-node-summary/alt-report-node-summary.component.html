@@ -7,17 +7,8 @@
     }
   </step-alt-report-widget-title>
   <step-alt-report-widget-content>
-    @if (loading()) {
-      <section class="summary-skeleton" aria-hidden="true">
-        <div class="summary-skeleton-chart">
-          <span></span>
-        </div>
-        <div class="summary-skeleton-legend">
-          @for (item of [1, 2, 3]; track item) {
-            <span><span></span></span>
-          }
-        </div>
-      </section>
+    @if (showProgressIndicator()) {
+      <step-alt-report-node-summary-skeleton />
     } @else {
       @if (chartSettings(); as chartSettings) {
         <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
@@ -30,18 +21,19 @@
             }
           </section>
         </step-doughnut-chart>
-        @if (legend(); as legend) {
-          <section class="summary">
-            @for (item of legend; track item.status) {
-              <step-status-count-badge
-                [status]="item.status"
-                [count]="item.value"
-                [isDisabled]="item.isDisabled"
-                (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
-              />
-            }
-          </section>
-        }
+      }
+
+      @if (legend(); as legend) {
+        <section class="summary">
+          @for (item of legend; track item.status) {
+            <step-status-count-badge
+              [status]="item.status"
+              [count]="item.value"
+              [isDisabled]="item.isDisabled"
+              (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
+            />
+          }
+        </section>
       }
     }
   </step-alt-report-widget-content>

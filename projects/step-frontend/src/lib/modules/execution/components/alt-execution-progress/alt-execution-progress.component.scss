@@ -245,37 +245,8 @@ step-alt-execution-progress {
   }
 
   .execution-lifecycle-errors {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.2rem;
-    padding: 1.2rem 1.6rem;
-    border: 0.1rem solid var.$red-15;
-    border-left: 0.4rem solid var.$red-650;
-    border-radius: 0.8rem;
-    background: var.$red-10;
-    color: var.$gray-800;
     margin-top: -0.8rem;
     margin-bottom: 0.5rem;
-
-    .lifecycle-error-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      width: 2.4rem;
-      height: 2.4rem;
-      color: var.$red-650;
-    }
-
-    .lifecycle-error-content {
-      min-width: 0;
-
-      strong {
-        display: block;
-        margin-bottom: 0.35rem;
-        color: var.$gray-800;
-      }
-    }
 
     ul {
       margin: 0;

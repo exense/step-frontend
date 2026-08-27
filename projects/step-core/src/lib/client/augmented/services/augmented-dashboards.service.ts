@@ -24,7 +24,7 @@ export class AugmentedDashboardsService extends DashboardsService implements Htt
 
   createDataSource(): StepDataSource<DashboardView> {
     return this._dataSourceFactory.createDataSource(AugmentedDashboardsService.TABLE_ID, {
-      name: 'name',
+      name: 'attributes.name',
       description: 'description',
       actions: '',
     });

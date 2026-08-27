@@ -1,0 +1,19 @@
+<step-alt-report-widget class="summary-card">
+  <step-alt-report-widget-title>
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
+  <step-alt-report-widget-content>
+    <div class="card-value">
+      @let data = value();
+      @if (data === null || data === undefined || inProgress()) {
+        <ng-container *ngTemplateOutlet="loadingLineSkeleton" />
+      } @else {
+        {{ data }}
+      }
+    </div>
+  </step-alt-report-widget-content>
+</step-alt-report-widget>
+
+<ng-template #loadingLineSkeleton>
+  <div class="line-skeleton"></div>
+</ng-template>

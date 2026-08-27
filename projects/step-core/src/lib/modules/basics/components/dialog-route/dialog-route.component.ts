@@ -5,6 +5,7 @@ import { asyncScheduler, map, observeOn, Subject, switchMap, takeUntil, timer } 
 import { DialogParentService } from '../../injectables/dialog-parent.service';
 import { DialogRouteResult } from '../../types/dialog-route-result';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProjectScopeWarningService } from '../../injectables/project-scope-warning.service';
 
 @Component({
   selector: 'step-dialog-route',
@@ -19,6 +20,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   private _dialogParent = inject(DialogParentService, { optional: true });
+  private _projectScopeWarning = inject(ProjectScopeWarningService);
 
   private modalRef?: MatDialogRef<unknown>;
   private dialogCloseTerminator$?: Subject<void>;
@@ -34,6 +36,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.closeModalAndTerminate();
+    this._projectScopeWarning.clear();
   }
 
   private createModal(routeData: Data): void {
@@ -50,6 +53,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
     this.modalRef = this._matDialog.open<unknown, unknown, DialogRouteResult>(dialogComponent, {
       ...dialogConfig,
       data,
+      injector: dialogConfig.injector ?? this._viewContainerRef.injector,
       viewContainerRef: this._viewContainerRef,
       // The DialogRouteComponent handles closing by it's own
       closeOnNavigation: false,
