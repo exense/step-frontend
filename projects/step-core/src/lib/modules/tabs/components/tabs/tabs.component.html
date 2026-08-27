@@ -1,6 +1,9 @@
 <nav mat-tab-nav-bar [disablePagination]="disablePagination()" [tabPanel]="tabPanel" [class.compact]="compactTabs()">
   @if (userRouteLinks()) {
-    @for (tab of tabs(); track tab.id) {
+    @for (tab of tabs(); track tab.id; let isFirst = $first) {
+      @if (!isFirst) {
+        <span class="tab-divider" aria-hidden="true"></span>
+      }
       <a
         mat-tab-link
         [routerLink]="tab.link!"
@@ -15,7 +18,10 @@
       </a>
     }
   } @else {
-    @for (tab of tabs(); track tab.id) {
+    @for (tab of tabs(); track tab.id; let isFirst = $first) {
+      @if (!isFirst) {
+        <span class="tab-divider" aria-hidden="true"></span>
+      }
       <a
         mat-tab-link
         stepTestId="tab-selector-{{ tab.id }}"
