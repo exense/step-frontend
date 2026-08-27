@@ -8,32 +8,24 @@ import {
   OnInit,
   output,
   signal,
-  SimpleChanges,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
-  AppConfigContainerService,
-  AxesSettings,
-  BucketResponse,
   DashboardItem,
   FetchBucketsRequest,
-  MarkerType,
   MetricAggregation,
   MetricAttribute,
-  MetricType,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  createStackedBarPaths,
   PipelineAggregationService,
   TimeSeriesConfig,
+  TimeSeriesChartUtilsService,
   TimeSeriesContext,
   TimeSeriesEntityService,
-  TimeSeriesUtils,
-  UPlotUtilsService,
 } from '../../modules/_common';
 import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
@@ -51,11 +43,8 @@ import {
 } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
-import { Axis, Hooks } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
-import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
-import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   AggregateParams,
@@ -64,8 +53,6 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { TooltipContentDirective } from '../../modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ChartStandardTooltipComponent } from '../../modules/chart/components/tooltip/chart-standard-tooltip.component';
-
-declare const uPlot: any;
 
 interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
@@ -98,29 +85,17 @@ const resolutionLabels: Record<string, string> = {
   standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDestroy {
-  private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
-  private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
-
   protected readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per second', unitKey: 's' },
     { menuLabel: 'Per minute', unitKey: 'm' },
     { menuLabel: 'Per hour', unitKey: 'h' },
   ];
 
-  protected readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
-    s: 3600,
-    m: 60,
-    h: 1,
-  };
-
   private _matDialog = inject(MatDialog);
-  private _uPlotUtils = inject(UPlotUtilsService);
   private _pipelineAggregationService = inject(PipelineAggregationService);
+  private _timeSeriesChartUtils = inject(TimeSeriesChartUtilsService);
   protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
-  private _appConfigContainer = inject(AppConfigContainerService);
-
-  private readonly samplingIntervalMs: number = this.resolveSamplingIntervalMs();
 
   protected readonly settingsMenuTrigger = viewChild<MatMenuTrigger>('settingsMenuTrigger');
   protected readonly chart = viewChild<TimeSeriesChartComponent>('chart');
@@ -304,404 +279,34 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     }
   }
 
-  private getSeriesStroke(colorKey: string, axes: AxesSettings): SeriesStroke {
-    const hasGrouping = this.getGroupDimensions()?.length > 0;
-    if (!hasGrouping) {
-      return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
-    }
-    const customSeriesColor = this.getCustomSeriesColor(colorKey, axes.renderingSettings?.seriesColors);
-    if (customSeriesColor) {
-      return { color: customSeriesColor, type: MarkerType.SQUARE };
-    }
-    return this.context().colorsPool.getSeriesColor(colorKey);
-  }
-
-  private getCustomSeriesColor(colorKey: string, seriesColors?: Record<string, string>): string | undefined {
-    const customSeriesColor = seriesColors?.[colorKey];
-    if (customSeriesColor || !seriesColors) {
-      return customSeriesColor;
-    }
-    const normalizedColorKey = colorKey.toLowerCase();
-    const matchingKey = Object.keys(seriesColors).find((key) => key.toLowerCase() === normalizedColorKey);
-    return matchingKey ? seriesColors[matchingKey] : undefined;
-  }
-
-  /**
-   * When there is no grouping, the key and label will be 'Value'.
-   * If there are grouping, all empty elements will be replaced with an empty label
-   */
   private createChartSettings(
     response: TimeSeriesAPIResponse,
     request: FetchBucketsRequest,
   ): Observable<TSChartSettings> {
-    let syncGroup: TimeSeriesSyncGroup | undefined;
-    if (this.item().masterChartId) {
-      syncGroup = this.context().getSyncGroup(this.item().masterChartId!);
-    }
-    const primaryAxes = this.item().chartSettings!.primaryAxes!;
-    const primaryAggregation = primaryAxes.aggregation;
-    const primaryTwoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation);
-    const primaryDisplayAggregation = this._pipelineAggregationService.getDisplayAggregation(primaryAggregation);
-    const hasSteppedDisplay = primaryAxes.displayType === 'STEPPED';
-    const hasSecondaryAxes = !!this.item().chartSettings!.secondaryAxes;
-    const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
-    const secondaryAxesAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
-    const groupDimensions = this.getGroupDimensions();
-    const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const barPaths = this.barsFunction({ size: [0.98, Infinity], align: 1, radius: 0.1 });
-    const metric = this.context().getMetric(this.item().metricKey);
-    const isGauge = this.context().getMetric(this.item().metricKey)?.instrumentType === 'gauge';
-    const maxForwardFillBuckets = this.getMaxForwardFillBuckets(metric?.samplingMode, response.interval);
-    const isRateOrCount = primaryDisplayAggregation.type === 'RATE' || primaryDisplayAggregation.type === 'COUNT';
-    const useForwardFill = isGauge && !isRateOrCount;
-    const isNullMeansZero =
-      isRateOrCount ||
-      (!isGauge && (primaryAxes.displayType === 'BAR_CHART' || primaryAxes.displayType === 'STACKED_BAR'));
-    const spanGaps = !isNullMeansZero && !useForwardFill;
-    const finalSecondaryAxesAggregation = primaryTwoStageAggregation ? primaryAggregation : secondaryAxesAggregation;
-    const finalSecondaryDisplayAggregation = primaryTwoStageAggregation
-      ? primaryDisplayAggregation
-      : secondaryAxesAggregation;
-    const isSecondaryRateOrCount =
-      finalSecondaryDisplayAggregation?.type === 'RATE' || finalSecondaryDisplayAggregation?.type === 'COUNT';
-    const useSecondaryForwardFill = isGauge && !isSecondaryRateOrCount;
-    const secondaryAxesData: (number | undefined | null)[] = [];
-    const accumulateSecondarySeries = (buckets: BucketResponse[], interval: number): void => {
-      let lastSecondaryValue: number | undefined;
-      let emptySecondaryBucketsCount = 0;
-      buckets.forEach((b: BucketResponse, j: number) => {
-        let bucketValue = this.getBucketValue(b, finalSecondaryAxesAggregation!, interval);
-        if (bucketValue == null) {
-          emptySecondaryBucketsCount++;
-          if (useSecondaryForwardFill && lastSecondaryValue !== undefined) {
-            bucketValue = emptySecondaryBucketsCount <= maxForwardFillBuckets ? lastSecondaryValue : 0;
-          }
-        } else {
-          emptySecondaryBucketsCount = 0;
-          lastSecondaryValue = bucketValue;
-        }
-        if (secondaryAxesData[j] == null) {
-          secondaryAxesData[j] = bucketValue;
-        } else if (bucketValue != null) {
-          secondaryAxesData[j] = (secondaryAxesData[j] as number) + bucketValue;
-        }
-      });
-    };
-    const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
-      const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
-      let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
-      if (groupDimensions.length === 0) {
-        labelItems = [metric.displayName];
-      }
-      const seriesKey = this.mergeLabelItems(labelItems);
-      const colorKey = this.composeColorKey(labelItems);
-      const stroke: SeriesStroke = this.getSeriesStroke(colorKey, primaryAxes);
-
-      if (hasExecutionLinks || hasSecondaryAxes) {
-        seriesBuckets.forEach((b: BucketResponse) => metadata.push(b?.attributes));
-        if (hasSecondaryAxes) {
-          accumulateSecondarySeries(seriesBuckets, response.interval);
-        }
-      }
-      const seriesData: (number | undefined | null)[] = [];
-      let lastPrimaryValue: number | undefined;
-      let emptyBucketsCount = 0;
-      seriesBuckets.forEach((b, i) => {
-        let value = this.getBucketValue(b, primaryAggregation!, response.interval);
-        if (value === undefined) {
-          emptyBucketsCount++;
-          if (isNullMeansZero) {
-            value = 0;
-          } else if (useForwardFill && lastPrimaryValue !== undefined) {
-            value = emptyBucketsCount <= maxForwardFillBuckets ? lastPrimaryValue : 0;
-          }
-          // when no flag applies the value is left undefined, so that the chart renders a gap
-        } else {
-          emptyBucketsCount = 0;
-          if (value !== null) {
-            lastPrimaryValue = value;
-          }
-        }
-        seriesData[i] = value;
-      });
-      const s: TSChartSeries = {
-        id: seriesKey,
-        scale: 'y',
-        labelItems: labelItems,
-        legendName: seriesKey,
-        data: seriesData,
-        metadata: metadata,
-        spanGaps: spanGaps,
-        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        strokeConfig: stroke,
-        points:
-          spanGaps && primaryAxes.displayType === 'LINE'
-            ? { show: true, size: 5, fill: stroke.color, width: 0 }
-            : { show: false },
-        show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
-      };
-      switch (stroke.type) {
-        case MarkerType.SQUARE:
-          s.width = 1;
-          break;
-        case MarkerType.DASHED:
-          s.dash = [10, 5];
-          s.width = 1;
-          break;
-        case MarkerType.DOTS:
-          s.width = 2;
-          s.dash = [2, 2];
-          break;
-      }
-      if (primaryAxes.colorizationType === 'FILL' && primaryAxes.displayType !== 'STACKED_BAR') {
-        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
-      }
-      switch (primaryAxes.displayType) {
-        case 'BAR_CHART':
-          s.paths = barPaths;
-          break;
-        case 'STEPPED':
-          s.paths = this.stepped({ align: 1 });
-          break;
-      }
-      return s;
-    });
-
-    const edgeExtensionHook: Hooks.Arrays | undefined =
-      spanGaps && primaryAxes.displayType === 'LINE'
-        ? {
-            drawSeries: [
-              (u: any, seriesIdx: number) => {
-                if (!u.series[seriesIdx].show) return;
-                const ourSeries = series[seriesIdx - 1];
-                if (!ourSeries || ourSeries.scale !== 'y' || !ourSeries.spanGaps) return;
-                const yData = u.data[seriesIdx] as (number | null | undefined)[];
-                let firstIdx = -1;
-                let lastIdx = -1;
-                for (let k = 0; k < yData.length; k++) {
-                  if (yData[k] != null) {
-                    if (firstIdx === -1) firstIdx = k;
-                    lastIdx = k;
-                  }
-                }
-                if (firstIdx === -1 || (firstIdx === 0 && lastIdx === yData.length - 1)) return;
-                const xData = u.data[0] as number[];
-                const ctx = u.ctx as CanvasRenderingContext2D;
-                const dpr: number = devicePixelRatio || 1;
-                ctx.save();
-                ctx.strokeStyle = ourSeries.strokeConfig!.color + '70';
-                ctx.lineWidth = dpr;
-                ctx.setLineDash([4 * dpr, 4 * dpr]);
-                if (firstIdx > 0) {
-                  const yPos = u.valToPos(yData[firstIdx], 'y', true);
-                  const xPos = u.valToPos(xData[firstIdx], 'x', true);
-                  ctx.beginPath();
-                  ctx.moveTo(u.bbox.left, yPos);
-                  ctx.lineTo(xPos, yPos);
-                  ctx.stroke();
-                }
-                if (lastIdx < yData.length - 1) {
-                  const yPos = u.valToPos(yData[lastIdx], 'y', true);
-                  const xPos = u.valToPos(xData[lastIdx], 'x', true);
-                  ctx.beginPath();
-                  ctx.moveTo(xPos, yPos);
-                  ctx.lineTo(u.bbox.left + u.bbox.width, yPos);
-                  ctx.stroke();
-                }
-                ctx.restore();
-              },
-            ],
-          }
-        : undefined;
-
-    if (primaryAxes.displayType === 'STACKED_BAR') {
-      series.sort((a, b) => (a.id! < b.id! ? -1 : a.id! > b.id! ? 1 : 0));
-      series.forEach((s) => (s.originalData = [...s.data]));
-      series.forEach((s) => {
-        s.data = s.data.map((v) => v ?? 0);
-      });
-      this.cumulateSeriesData(series);
-      const skipSeries = hasSecondaryAxes ? 1 : 0;
-      const stackStartSeriesIdx = 1 + skipSeries;
-      const stackEndSeriesIdx = series.length + skipSeries;
-      series.forEach((s) => {
-        s.paths = createStackedBarPaths({
-          size: [0.85, Infinity],
-          align: 1,
-          radius: 0.1,
-          stackStartSeriesIdx,
-          stackEndSeriesIdx,
-        });
-        s.fill = s.strokeConfig!.color + 'cc';
-        s.value = (self: any, x: number, seriesIdx: number, idx: number) =>
-          TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
-            this.calculateStackedValue(self, x, seriesIdx, idx, skipSeries),
-          );
-      });
-    }
-    const primaryUnit = primaryAxes.unit!;
-    const yAxesUnit = this.getUnitLabel(primaryDisplayAggregation, primaryUnit);
-
-    const axes: Axis[] = [
-      {
-        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        scale: 'y',
-        values: (u, vals) => {
-          return vals.map((v: any) => this.getAxesFormatFunction(primaryDisplayAggregation, primaryUnit)(v));
-        },
-      },
-    ];
-
-    if (hasSecondaryAxes) {
-      axes.push({
-        // @ts-ignore
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
-        side: 1,
-        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        values: (u: unknown, vals: number[]) =>
-          vals.map((v) => this.getAxesFormatFunction(finalSecondaryDisplayAggregation!, undefined)(v)),
-        grid: { show: false },
-      });
-      const secondaryAxesSettings = this.item().chartSettings!.secondaryAxes!;
-      const secondaryDisplayType = secondaryAxesSettings.displayType;
-      const secondaryNullMeansZero = isSecondaryRateOrCount || (!isGauge && secondaryDisplayType !== 'LINE');
-      if (useSecondaryForwardFill) {
-        let lastSecVal: number | undefined;
-        let emptyTotalBucketsCount = 0;
-        for (let k = 0; k < secondaryAxesData.length; k++) {
-          if (secondaryAxesData[k] == null) {
-            emptyTotalBucketsCount++;
-            if (lastSecVal !== undefined) {
-              secondaryAxesData[k] = emptyTotalBucketsCount <= maxForwardFillBuckets ? lastSecVal : 0;
-            }
-          } else {
-            emptyTotalBucketsCount = 0;
-            lastSecVal = secondaryAxesData[k] as number;
-          }
-        }
-      } else if (secondaryNullMeansZero) {
-        for (let k = 0; k < secondaryAxesData.length; k++) {
-          if (secondaryAxesData[k] == null) {
-            secondaryAxesData[k] = 0;
-          }
-        }
-      }
-      const secondarySeries: TSChartSeries = {
-        scale: 'z',
-        labelItems: ['Total'],
-        id: 'total',
-        strokeConfig: { color: '', type: MarkerType.SQUARE },
-        data: secondaryAxesData,
-        spanGaps: !secondaryNullMeansZero && !useSecondaryForwardFill,
-        value: (x, v: number) => Math.trunc(v) + ' total',
-        points: { show: false },
-      };
-      if (secondaryDisplayType !== 'LINE') {
-        secondarySeries.paths = barPaths;
-        secondarySeries.fill = TimeSeriesConfig.TOTAL_BARS_COLOR;
-      } else {
-        // scale:'z' series are skipped by the chart component's automatic stroke assignment, so set it explicitly
-        secondarySeries.stroke = TimeSeriesConfig.TOTAL_BARS_COLOR;
-        secondarySeries.fill = (self: any) => this._uPlotUtils.gradientFill(self, TimeSeriesConfig.TOTAL_BARS_COLOR);
-      }
-      series.unshift(secondarySeries);
-    }
-
-    const fetchExecutionsFn: (idx: number, seriesId: string) => Observable<string[]> = (
-      idx: number,
-      seriesId: string,
-    ) => {
-      if (!response.collectionIgnoredAttributes?.includes('eId')) {
-        // if eId is not ignored, the eIds attributes should be received on the response
-        return of([]);
-      }
-      const selectedSeriesIndex = series.findIndex((s) => s.id === seriesId);
-      const selectedBucketAttributes = response.matrixKeys[selectedSeriesIndex - (hasSecondaryAxes ? 1 : 0)];
-      request.groupDimensions?.forEach((dimension) => {
-        if (!selectedBucketAttributes[dimension]) {
-          // force null filtering for missing attributes
-          selectedBucketAttributes[dimension] = null;
-        }
-      });
-      const isolateRequest: FetchBucketsRequest = {
-        start: xLabels[idx],
-        end: xLabels[idx] + response.interval,
-        groupDimensions: ['eId'],
-        oqlFilter: request.oqlFilter,
-        params: selectedBucketAttributes,
-      };
-      return this._timeSeriesService.fetchBuckets(isolateRequest).pipe(
-        map((response) => {
-          return response.matrixKeys.map((attributes) => attributes['eId']);
-        }),
-      );
-    };
-
-    return this.fetchLegendEntities(series).pipe(
-      map((v) => {
-        return {
-          title: this.getChartTitle(),
-          xAxesSettings: {
-            values: xLabels,
-          },
-          series: series,
-          tooltipOptions: {
-            enabled: true,
-            zAxisLabel: this.getSecondAxesLabel(),
-            yAxisUnit: yAxesUnit,
-            useExecutionLinks: this.showExecutionLinks(),
-            fetchExecutionsFn: fetchExecutionsFn,
-          },
-          showLegend: true,
-          axes: axes,
-          hooks: edgeExtensionHook,
-          scales:
-            primaryAxes.displayType === 'STACKED_BAR'
-              ? { y: { range: (_: any, _min: number, max: number) => [0, max] as [number, number] } }
-              : undefined,
-          cursor:
-            primaryAxes.displayType === 'BAR_CHART' ||
-            primaryAxes.displayType === 'STACKED_BAR' ||
-            (hasSecondaryAxes && this.item().chartSettings!.secondaryAxes!.displayType !== 'LINE')
-              ? {
-                  dataIdx: (self: any, seriesIdx: number, hoveredIdx: number, cursorXVal: number) => {
-                    const xData = self.data[0] as number[];
-                    let i = hoveredIdx;
-                    while (i > 0 && xData[i] > cursorXVal) i--;
-                    while (i < xData.length - 1 && xData[i + 1] <= cursorXVal) i++;
-                    return i;
-                  },
-                }
-              : undefined,
-          truncated: response.truncated,
-        };
-      }),
-      finalize(() => this.isLoading.set(false)),
-    );
-  }
-
-  private removeDataGaps(data: (number | undefined)[]): number[] {
-    for (let i = 0; i < data.length; i++) {}
-    return [];
-  }
-
-  private composeColorKey(items: (string | undefined)[]): string {
-    return items.map((item) => (item || '').trim().toLowerCase()).join('|');
-  }
-
-  private mergeLabelItems(items: (string | undefined)[]): string {
-    if (items.length === 0) {
-      return this.item().metricKey;
-    }
-    return items
-      .map((i) => {
-        if (i === '' || i == null) {
-          return TimeSeriesConfig.SERIES_LABEL_EMPTY;
-        } else {
-          return i;
-        }
+    const item = this.item();
+    const metric = this.context().getMetric(item.metricKey);
+    const syncGroup = item.masterChartId ? this.context().getSyncGroup(item.masterChartId) : undefined;
+    return this._timeSeriesChartUtils
+      .createChartSettings({
+        response,
+        request,
+        metricKey: item.metricKey,
+        metricDisplayName: metric.displayName,
+        primaryAxes: item.chartSettings!.primaryAxes,
+        secondaryAxes: item.chartSettings!.secondaryAxes,
+        groupDimensions: this.getGroupDimensions(),
+        colorsPool: this.context().colorsPool,
+        title: this.getChartTitle(),
+        instrumentType: metric.instrumentType,
+        samplingMode: metric.samplingMode,
+        syncGroup,
+        hasExecutionAttribute: !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE],
+        showExecutionLinks: this.showExecutionLinks(),
+        secondaryAxesLabel: this.getSecondAxesLabel(),
+        useDefaultColorWithoutGrouping: true,
+        fetchLegendEntities: (series) => this.fetchLegendEntities(series),
       })
-      .join(' | ');
+      .pipe(finalize(() => this.isLoading.set(false)));
   }
 
   private getSecondAxesLabel(): string | undefined {
@@ -711,7 +316,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     const aggregation = this.item().chartSettings!.secondaryAxes?.aggregation!;
     switch (aggregation?.type) {
       case ChartAggregation.RATE:
-        return 'Total Hits/' + aggregation.params?.['rateUnit'];
+        return 'Total Hits/' + this._timeSeriesChartUtils.getRateUnit(aggregation);
       case ChartAggregation.PERCENTILE:
         return 'Total (PCL ' + aggregation.params?.['pclValue'] + ')';
       default:
@@ -736,7 +341,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
           aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
           break;
         case ChartAggregation.RATE:
-          aggregationLabel = 'RATE/' + this.getRateUnit(aggregation);
+          aggregationLabel = 'RATE/' + this._timeSeriesChartUtils.getRateUnit(aggregation);
           break;
         default:
           aggregationLabel = aggregation.type;
@@ -744,10 +349,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
       }
       return `${title} (${aggregationLabel})`;
     }
-  }
-
-  private getRateUnit(aggregation: MetricAggregation): string {
-    return aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM] || 's';
   }
 
   private fetchDataAndCreateChartSettings(): Observable<TSChartSettings> {
@@ -760,35 +361,24 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     if (start >= end) {
       throw new Error(`Invalid time range`);
     }
-    const request: FetchBucketsRequest = {
-      start: start,
-      end: end,
-      metricType: this.item().metricKey,
-      groupDimensions: groupDimensions,
-      oqlFilter: oqlFilter,
-      percentiles: this.getRequiredPercentiles(),
-      ...this._pipelineAggregationService.getFetchBucketsAggregationOptions(
-        this.item().chartSettings!.primaryAxes.aggregation,
-      ),
-    };
-    const customResolution = this.context().getChartsResolution();
-    if (customResolution) {
-      request.intervalSize = customResolution;
-    } else {
-      request.numberOfBuckets = 100;
-    }
-    if (!!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
-      // has execution attribute
-      request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
-      request.collectAttributesValuesLimit = 10;
-    }
+    const request = this._timeSeriesChartUtils.createRequest({
+      range: { from: start, to: end },
+      metricKey: this.item().metricKey,
+      groupDimensions,
+      oqlFilter,
+      primaryAggregation: this.item().chartSettings!.primaryAxes.aggregation,
+      secondaryAggregation: this.item().chartSettings!.secondaryAxes?.aggregation,
+      resolution: this.context().getChartsResolution(),
+      collectExecutionIds: !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE],
+    });
     return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
       tap((response) => {
-        this.showHigherResolutionWarning = response.higherResolutionUsed;
-        this.collectionResolutionUsed = response.collectionResolution;
+        const responseMetadata = this._timeSeriesChartUtils.getResponseMetadata(response);
+        this.showHigherResolutionWarning = responseMetadata.higherResolutionUsed;
+        this.collectionResolutionUsed = responseMetadata.collectionResolution;
         this.cachedResponse = response;
         this.cachedRequest = request;
-        this.emptyStateChange.emit(response.matrix.length === 0);
+        this.emptyStateChange.emit(responseMetadata.empty);
       }),
       switchMap((response) => this.createChartSettings(response, request)),
       takeUntilDestroyed(this._destroyRef),
@@ -860,148 +450,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
         return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
       }
     }
-  }
-
-  private getAxesFormatFunction(aggregation: MetricAggregation, unit?: string): (v: number) => string {
-    if (aggregation.type === ChartAggregation.RATE) {
-      const rateUnit = this.getRateUnit(aggregation);
-      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + rateUnit;
-    }
-    if (!unit) {
-      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
-    }
-    switch (unit) {
-      case '1':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      case 'ms':
-        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
-      case '%':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      default:
-        throw new Error('Unit not handled: ' + unit);
-    }
-  }
-
-  private getUnitLabel(aggregation: MetricAggregation, unit: string): string {
-    if (aggregation.type === 'RATE') {
-      return '/ ' + this.getRateUnit(aggregation);
-    }
-    switch (unit) {
-      case '%':
-        return '%';
-      case 'ms':
-        return ' ms';
-      default:
-        return '';
-    }
-  }
-
-  private getRequiredPercentiles(): number[] {
-    const primaryAggregation = this.item().chartSettings!.primaryAxes.aggregation;
-    const secondaryAggregation = this.item().chartSettings!.secondaryAxes?.aggregation;
-    const percentilesToRequest: number[] = [];
-    if (!this._pipelineAggregationService.getTwoStageAggregation(primaryAggregation)) {
-      if (primaryAggregation.type === ChartAggregation.MEDIAN) {
-        percentilesToRequest.push(50);
-      }
-      if (primaryAggregation.type === ChartAggregation.PERCENTILE) {
-        percentilesToRequest.push(this.getPrimaryPclValue() || 90);
-      }
-      if (secondaryAggregation?.type === ChartAggregation.MEDIAN) {
-        percentilesToRequest.push(50);
-      }
-      if (secondaryAggregation?.type === ChartAggregation.PERCENTILE) {
-        percentilesToRequest.push(secondaryAggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90);
-      }
-    }
-    return percentilesToRequest;
-  }
-
-  private resolveSamplingIntervalMs(): number {
-    const rawValue =
-      this._appConfigContainer.conf?.miscParams?.[TimeSeriesConfig.PARAM_KEY_METRICS_SAMPLING_INTERVAL_MS];
-    const samplingInterval = parseInt(rawValue ?? '', 10);
-    return samplingInterval > 0 ? samplingInterval : TimeSeriesConfig.DEFAULT_METRICS_SAMPLING_INTERVAL_MS;
-  }
-
-  /**
-   * Sampled metrics stop emitting when their source disappears, forward fill only cover the sampling interval with some
-   * headroom. Event driven metrics report every change and are therefore filled without limit.
-   */
-  private getMaxForwardFillBuckets(
-    samplingMode: MetricType['samplingMode'] | undefined,
-    bucketIntervalMs: number,
-  ): number {
-    if (samplingMode !== 'SAMPLED' || bucketIntervalMs <= 0) {
-      return Number.MAX_SAFE_INTEGER;
-    }
-    const maxForwardFillMs = TimeSeriesConfig.FORWARD_FILL_MAX_SAMPLING_INTERVALS * this.samplingIntervalMs;
-    return Math.floor(maxForwardFillMs / bucketIntervalMs);
-  }
-
-  private getBucketValue(
-    b: BucketResponse,
-    aggregation: MetricAggregation,
-    bucketIntervalMs: number,
-  ): number | undefined | null {
-    if (!b) {
-      return undefined;
-    }
-    switch (aggregation.type) {
-      case 'TWO_STAGE':
-        return b.sum;
-      case 'SUM':
-        return b.sum;
-      case 'AVG':
-        return b.sum / b.count;
-      case 'MAX':
-        return b.max;
-      case 'MIN':
-        return b.min;
-      case 'COUNT':
-        return b.count;
-      case 'RATE':
-        if (this.item().metricKey === 'counter') {
-          return b.sum / (bucketIntervalMs / 3_600_000) / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
-        }
-        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
-      case 'MEDIAN':
-        return b.pclValues?.['50.0'];
-      case 'PERCENTILE':
-        return b.pclValues?.[this.getPclWithDecimals(aggregation.params?.['pclValue']) || '90.0'];
-      default:
-        throw new Error('Unhandled aggregation value: ' + aggregation);
-    }
-  }
-
-  private getPclWithDecimals(value: number): string | number {
-    if (Math.floor(value) === value) {
-      return value.toFixed(1);
-    } else {
-      return value;
-    }
-  }
-
-  private cumulateSeriesData(series: TSChartSeries[]): void {
-    series.forEach((s, i) => {
-      if (i === 0) return;
-      s.data.forEach((_, j) => {
-        s.data[j] = (series[i - 1].data[j] as number) + (s.data[j] as number);
-      });
-    });
-  }
-
-  private calculateStackedValue(
-    self: any,
-    currentValue: number,
-    seriesIdx: number,
-    idx: number,
-    skipSeries: number,
-  ): number {
-    if (seriesIdx > 1 + skipSeries) {
-      return currentValue - (self.data[seriesIdx - 1][idx] || 0);
-    }
-    return currentValue;
   }
 
   ngOnDestroy(): void {
