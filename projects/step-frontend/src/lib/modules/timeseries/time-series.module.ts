@@ -132,5 +132,8 @@ export class TimeSeriesModule {
   }
 }
 
-export { StandaloneChartConfig } from './components/standalone-chart/standalone-chart-config';
+export {
+  StandaloneChartAxesConfig,
+  StandaloneChartConfig,
+} from './components/standalone-chart/standalone-chart-config';
 export { FilterBarItem, FilterBarItemType } from './modules/_common';

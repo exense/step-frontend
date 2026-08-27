@@ -13,6 +13,7 @@ import {
 } from '@exense/step-core';
 import { defaultIfEmpty, map, Observable, of } from 'rxjs';
 import { Axis, Hooks } from 'uplot';
+import type * as UPlot from 'uplot';
 import { PipelineAggregationService } from './pipeline-aggregation.service';
 import { ChartAggregation } from '../types/chart-aggregation';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
@@ -72,6 +73,7 @@ export interface TimeSeriesChartSettingsOptions {
   nullMeansZero?: boolean;
   seriesMin?: number;
   seriesPxAlign?: number;
+  secondaryBarPathOptions?: UPlot.Series.BarsPathBuilderOpts;
   fetchLegendEntities?: (series: TSChartSeries[]) => Observable<unknown>;
 }
 
@@ -237,6 +239,7 @@ export class TimeSeriesChartUtilsService {
         isSecondaryRateOrCount,
         useSecondaryForwardFill,
         maxForwardFillBuckets,
+        options.secondaryBarPathOptions,
       );
     }
 
@@ -580,6 +583,7 @@ export class TimeSeriesChartUtilsService {
     isRateOrCount: boolean,
     useForwardFill: boolean,
     maxForwardFillBuckets: number,
+    barPathOptions?: UPlot.Series.BarsPathBuilderOpts,
   ): void {
     const nullMeansZero = isRateOrCount || (!useForwardFill && axes.displayType !== 'LINE');
     if (useForwardFill) {
@@ -615,7 +619,7 @@ export class TimeSeriesChartUtilsService {
       points: { show: false },
     };
     if (axes.displayType !== 'LINE') {
-      secondarySeries.paths = this.bars({ size: [0.98, Infinity], align: 1, radius: 0.1 });
+      secondarySeries.paths = this.bars(barPathOptions ?? { size: [0.98, Infinity], align: 1, radius: 0.1 });
       secondarySeries.fill = TimeSeriesConfig.TOTAL_BARS_COLOR;
     } else {
       secondarySeries.stroke = TimeSeriesConfig.TOTAL_BARS_COLOR;
