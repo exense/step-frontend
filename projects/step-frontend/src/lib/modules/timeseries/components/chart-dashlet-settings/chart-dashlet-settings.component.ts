@@ -1,5 +1,13 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
+import {
+  AxesSettings,
+  DashboardItem,
+  ErrorMessageHandlerService,
+  MetricAggregation,
+  MetricAttribute,
+  Tab,
+  TwoStageAggregation,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -7,10 +15,15 @@ import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
+  PipelineAggregationService,
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import {
+  PIPELINE_GROUP_AGGREGATION_OPTIONS,
+  PIPELINE_TIME_AGGREGATION_OPTIONS,
+} from '../../modules/_common/types/pipeline-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   AggregateParams,
@@ -22,6 +35,8 @@ export interface ChartDashletSettingsData {
   context: TimeSeriesContext;
 }
 
+export type AggregationMode = 'SINGLE' | 'TWO_STAGE';
+
 @Component({
   selector: 'step-chart-dashlet-settings',
   templateUrl: './chart-dashlet-settings.component.html',
@@ -32,17 +47,36 @@ export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
+  private _pipelineAggregationService = inject(PipelineAggregationService);
 
   readonly ChartAggregation = ChartAggregation;
 
   _attributesByKey: Record<string, MetricAttribute> = {};
 
-  @ViewChild('primaryAggregateMenuTrigger') primaryAggregateMenuTrigger?: MatMenuTrigger;
-  @ViewChild('secondaryAggregateMenuTrigger') secondaryAggregateMenuTrigger?: MatMenuTrigger;
-  @ViewChild('formContainer', { static: true })
-  private formContainer!: NgForm;
+  readonly primaryAggregateMenuTrigger = viewChild<MatMenuTrigger>('primaryAggregateMenuTrigger');
+  readonly secondaryAggregateMenuTrigger = viewChild<MatMenuTrigger>('secondaryAggregateMenuTrigger');
+  private readonly formContainer = viewChild.required<NgForm>('formContainer');
 
   readonly FilterBarItemType = FilterBarItemType;
+
+  readonly PIPELINE_TIME_AGGREGATION_OPTIONS = PIPELINE_TIME_AGGREGATION_OPTIONS;
+  readonly PIPELINE_GROUP_AGGREGATION_OPTIONS = PIPELINE_GROUP_AGGREGATION_OPTIONS;
+
+  readonly AGGREGATION_MODES: Tab<AggregationMode>[] = [
+    { id: 'SINGLE', label: 'Single' },
+    { id: 'TWO_STAGE', label: 'Two-stage' },
+  ];
+
+  readonly AGGREGATION_LABELS: Record<string, string> = {
+    SUM: 'Sum',
+    AVG: 'Average',
+    MAX: 'Max',
+    MIN: 'Min',
+    COUNT: 'Count',
+    RATE: 'Rate',
+    MEDIAN: 'Median',
+    PERCENTILE: 'Percentile',
+  };
 
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
@@ -50,6 +84,15 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
+
+  aggregationMode: AggregationMode = 'SINGLE';
+  singleStageAggregation: MetricAggregation = { type: 'SUM' };
+  twoStageAggregation: TwoStageAggregation = {
+    timeAggregation: 'AVG',
+    groupAggregation: 'SUM',
+  };
+  showSecondaryAxes = false;
+  private stashedSecondaryAxes?: AxesSettings;
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -64,13 +107,46 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.allAttributes = this._inputData.context
       .getAllAttributes()
       .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
+    this.initAggregationModes();
   }
 
-  addFilterItem(attribute: MetricAttribute) {
+  private initAggregationModes(): void {
+    const aggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    const twoStageAggregation = this._pipelineAggregationService.getTwoStageAggregation(aggregation);
+    if (twoStageAggregation) {
+      this.aggregationMode = 'TWO_STAGE';
+      this.twoStageAggregation = { ...twoStageAggregation };
+    } else {
+      this.singleStageAggregation = aggregation;
+    }
+    this.showSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
+  }
+
+  handleShowSecondaryAxesChange(show: boolean): void {
+    this.showSecondaryAxes = show;
+    const chartSettings = this.item.chartSettings!;
+    if (show) {
+      chartSettings.secondaryAxes = this.stashedSecondaryAxes ?? this.createDefaultSecondaryAxes();
+    } else {
+      this.stashedSecondaryAxes = chartSettings.secondaryAxes;
+      chartSettings.secondaryAxes = undefined;
+    }
+  }
+
+  private createDefaultSecondaryAxes(): AxesSettings {
+    return {
+      aggregation: { type: 'SUM' },
+      displayType: 'BAR_CHART',
+      colorizationType: 'STROKE',
+      unit: '',
+    };
+  }
+
+  addFilterItem(attribute: MetricAttribute): void {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
-  handleFilterItemChange(index: number, item: FilterBarItem) {
+  handleFilterItemChange(index: number, item: FilterBarItem): void {
     this.filterItems[index] = item;
     if (!item.attributeName) {
       return;
@@ -84,7 +160,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     }
   }
 
-  addCustomFilter(type: FilterBarItemType) {
+  addCustomFilter(type: FilterBarItemType): void {
     this.filterItems.push({
       attributeName: '',
       type: type,
@@ -97,39 +173,36 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
-    if (this.formContainer.invalid) {
-      this.formContainer.form.markAllAsTouched();
+    if (this.formContainer().invalid) {
+      this.formContainer().form.markAllAsTouched();
       return;
     }
+    this.applyAggregationMode();
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }
 
-  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
-    this.item.chartSettings!.primaryAxes.aggregation = {
+  private applyAggregationMode(): void {
+    this.item.chartSettings!.primaryAxes.aggregation =
+      this.aggregationMode === 'TWO_STAGE'
+        ? this._pipelineAggregationService.createTwoStageAggregation(this.twoStageAggregation)
+        : this.singleStageAggregation;
+  }
+
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
+    this.singleStageAggregation = {
       type: change.aggregate!,
       params: change.params,
     };
-    this.primaryAggregateMenuTrigger?.closeMenu();
+    this.primaryAggregateMenuTrigger()?.closeMenu();
   }
 
-  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
-    const newAggregate = change.aggregate;
-    if (newAggregate) {
-      if (!this.item.chartSettings!.secondaryAxes) {
-        this.item.chartSettings!.secondaryAxes = {
-          aggregation: { type: newAggregate, params: change.params },
-          displayType: 'BAR_CHART',
-          colorizationType: 'STROKE',
-          unit: '',
-        };
-      } else {
-        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
-      }
-    } else {
-      this.item.chartSettings!.secondaryAxes = undefined;
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }): void {
+    if (!change.aggregate) {
+      return;
     }
-    this.secondaryAggregateMenuTrigger?.closeMenu();
+    this.item.chartSettings!.secondaryAxes!.aggregation = { type: change.aggregate, params: change.params };
+    this.secondaryAggregateMenuTrigger()?.closeMenu();
   }
 }

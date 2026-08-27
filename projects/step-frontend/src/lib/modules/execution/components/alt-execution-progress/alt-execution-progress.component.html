@@ -261,19 +261,17 @@
 @if (execution$ | async; as execution) {
   @if (execution.lifecycleErrors; as errors) {
     @if (errors.length) {
-      <section class="execution-lifecycle-errors" aria-label="Fatal execution errors">
-        <div class="lifecycle-error-icon">
-          <step-icon name="alert-circle" />
-        </div>
-        <div class="lifecycle-error-content">
-          <strong>Fatal execution {{ errors.length === 1 ? 'error' : 'errors' }}</strong>
-          <ul>
-            @for (error of errors; track error.msg) {
-              <li>{{ error.msg }}</li>
-            }
-          </ul>
-        </div>
-      </section>
+      <step-display-alert
+        type="error"
+        [title]="'Fatal execution ' + (errors.length === 1 ? 'error' : 'errors')"
+        class="execution-lifecycle-errors"
+      >
+        <ul>
+          @for (error of errors; track error.msg) {
+            <li>{{ error.msg }}</li>
+          }
+        </ul>
+      </step-display-alert>
     }
   }
 }

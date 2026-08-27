@@ -33,14 +33,84 @@ div[step-modal-window-body] > form {
   & > * {
     flex-grow: 1;
     flex-basis: 0;
+    min-width: 0;
   }
+}
+
+.form-row.half-width > * {
+  flex-grow: 0;
+  flex-basis: calc(50% - 0.6rem);
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.section-description {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.section-header step-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var.$gray-800;
+}
+
+.aggregation-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2rem;
+
+  .section-header {
+    margin-right: auto;
+  }
+
+  step-tabs {
+    width: auto;
+  }
+}
+
+.field-with-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-hint {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.add-filter-button {
+  @include core.button-round;
+  min-width: 9rem;
+  border: 1px solid var.$gray-300 !important;
+}
+
+.readonly-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.readonly-field-label {
+  color: var.$gray-500;
+  font-size: 1.2rem;
+}
+
+.readonly-field-value {
+  font-weight: 500;
+  color: var.$gray-800;
 }
 
 .filters-container {
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  background: var.$gray-50;
 }
 
 .columns-container {

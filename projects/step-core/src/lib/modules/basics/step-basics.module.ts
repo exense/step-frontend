@@ -13,6 +13,7 @@ import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-ed
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
 import { WidthExpandersDirective } from './directives/width-expanders.directive';
 import { ModalWindowComponent } from './components/modal-window/modal-window.component';
+import { DisplayAlertComponent } from './components/display-alert/display-alert.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
 import { LabelDirective } from './directives/label.directive';
 import { PrefixDirective } from './directives/prefix.directive';
@@ -82,6 +83,7 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 import { UndraggedClickDirective } from './directives/undragged-click.directive';
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
+import { ChartSkeletonComponent } from './components/chart-skeleton/chart-skeleton.component';
 import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
 
 @NgModule({
@@ -104,6 +106,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     NumberSeparateThousandsPipe,
     UndraggedClickDirective,
     SkeletonPlaceholderComponent,
+    ChartSkeletonComponent,
     ButtonSpinnerComponent,
   ],
   declarations: [
@@ -118,6 +121,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    DisplayAlertComponent,
     FormFieldComponent,
     LabelDirective,
     DescriptionDirective,
@@ -190,6 +194,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     ElementRefMapDirective,
     WidthExpandersDirective,
     ModalWindowComponent,
+    DisplayAlertComponent,
     FormFieldComponent,
     LabelDirective,
     DescriptionDirective,
@@ -258,6 +263,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
     SkeletonPlaceholderComponent,
+    ChartSkeletonComponent,
     ButtonSpinnerComponent,
   ],
 })
@@ -274,6 +280,7 @@ export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 export * from './components/modal-window/modal-window.component';
+export * from './components/display-alert/display-alert.component';
 export * from './components/form-field/form-field.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
@@ -406,6 +413,7 @@ export * from './types/file-types';
 export * from './injectables/file-type-utils.service';
 export * from './components/long-inline-text/long-inline-text.component';
 export * from './injectables/dialog-route-open-state.service';
+export * from './injectables/project-scope-warning.service';
 export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';
@@ -416,5 +424,6 @@ export * from './utils/fare-share-calculator';
 export * from './utils/combine-latest-with-track-changes';
 export * from './components/skeleton-placeholder/skeleton-placeholder.component';
 export * from './injectables/ide-mode.token';
+export * from './components/chart-skeleton/chart-skeleton.component';
 export * from './components/button-spinner/button-spinner.component';
 export * from './utils/signal-from-form-control';

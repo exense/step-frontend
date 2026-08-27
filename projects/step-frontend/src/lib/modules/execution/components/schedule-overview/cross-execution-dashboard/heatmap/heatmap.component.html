@@ -21,7 +21,9 @@
       @for (row of filteredAndPaginatedRows(); track row.label) {
         <tr>
           <td class="sticky-col label-cell" [style.max-width.px]="labelColWidth()" [style.height.px]="rowHeight()">
-            {{ row.label }}
+            <div>
+              <step-long-inline-text [text]="row.label" />
+            </div>
           </td>
 
           @for (col of columns(); track col.id) {
