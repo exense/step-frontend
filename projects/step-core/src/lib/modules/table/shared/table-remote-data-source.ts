@@ -143,7 +143,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         this.inProgressInternal$.next(true);
       }
     }),
-    debounceTime(500),
+    debounceTime(200),
     switchMap((x) => {
       if (!x.isForce && this.requestRef$) {
         // return the current request

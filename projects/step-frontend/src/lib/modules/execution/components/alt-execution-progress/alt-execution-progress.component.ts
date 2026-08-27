@@ -536,7 +536,7 @@ export class AltExecutionProgressComponent
     )
     .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
 
-  readonly keywordsDataSource$ = of(this.keywordsDataSource);
+  readonly keywordsDataSource$ = this.keywordParameters$.pipe(map(() => this.keywordsDataSource));
 
   readonly errors$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
@@ -734,7 +734,7 @@ export class AltExecutionProgressComponent
       .pipe(
         filter(([isActive]) => isActive),
         map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
-        debounceTime(300),
+        debounceTime(200),
         smartSwitchMap(
           (curr, prev) => {
             return (
