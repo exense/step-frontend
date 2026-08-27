@@ -24,6 +24,7 @@ export interface StandaloneChartConfig {
   colorizationType?: 'STROKE' | 'FILL';
   primaryAxes?: StandaloneChartAxesConfig;
   secondaryAxes?: StandaloneChartAxesConfig | null;
+  nullMeansZero?: boolean;
   resolution?: number;
   height?: number;
 }

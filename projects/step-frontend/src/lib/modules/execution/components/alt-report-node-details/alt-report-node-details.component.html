@@ -53,6 +53,9 @@
       }
     </div>
   }
+  @if (performanceNode(); as performanceNode) {
+    <step-alt-report-node-performance class="execution-report-node-details" [node]="performanceNode" />
+  }
   @if (isTestCase()) {
     @if (node?.id; as reportNodeId) {
       <step-alt-report-node-details-testcases-steps

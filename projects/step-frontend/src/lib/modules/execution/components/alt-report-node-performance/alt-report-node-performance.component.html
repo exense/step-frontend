@@ -1,0 +1,25 @@
+@if (context(); as context) {
+  <div class="charts">
+    <section>
+      <h3>Response Times</h3>
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [timeRange]="context.timeRange"
+        [filters]="context.filters"
+        [grouping]="grouping"
+        [config]="responseTimesConfig"
+      />
+    </section>
+
+    <section>
+      <h3>Throughput</h3>
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [timeRange]="context.timeRange"
+        [filters]="context.filters"
+        [grouping]="grouping"
+        [config]="throughputConfig"
+      />
+    </section>
+  </div>
+}

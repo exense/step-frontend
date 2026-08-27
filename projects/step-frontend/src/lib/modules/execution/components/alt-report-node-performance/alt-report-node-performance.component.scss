@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(25rem, 1fr));
+  gap: 2rem;
+  min-width: 50rem;
+  overflow-x: auto;
+}
+
+section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+}
+
+h3 {
+  margin: 0;
+}
+
+step-standalone-dashlet {
+  display: block;
+  min-height: 20rem;
+}

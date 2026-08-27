@@ -138,7 +138,7 @@ export class StandaloneChartComponent {
             zoomEnabled: config.zoomEnabled,
             secondaryAxesLabel: config.tooltipYAxesUnit,
             includeSecondaryMetadata: false,
-            nullMeansZero: true,
+            nullMeansZero: config.nullMeansZero ?? true,
             seriesMin: 50,
             seriesPxAlign: 1,
             secondaryBarPathOptions: { size: [1, 100, 4], radius: 0.2, gap: 1 },

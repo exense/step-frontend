@@ -218,6 +218,7 @@ import {
 import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
+import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
 
 @NgModule({
   declarations: [
@@ -285,6 +286,7 @@ import { CrossExecutionTabsComponent } from './components/schedule-overview/cros
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
+    AltReportNodePerformanceComponent,
     AltExecutionLaunchDialogComponent,
     AltExecutionRepositoryLinkComponent,
     AltIterationListTitleComponent,
