@@ -10,3 +10,13 @@
 step-auto-shrink-list {
   display: block;
 }
+
+.copy-parameter-value.mat-mdc-icon-button.mat-mdc-button-base {
+  width: 1.8rem;
+  height: 1.8rem;
+  min-width: 1.8rem;
+  min-height: 1.8rem;
+  margin-left: 0.4rem;
+  padding: 0;
+  --mdc-icon-button-state-layer-size: 1.8rem;
+}
