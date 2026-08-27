@@ -238,6 +238,11 @@ step-alt-execution-progress {
     width: 100%;
     margin-top: -0.8rem;
     margin-bottom: -0.8rem;
+
+    &:has(.layout-edit-bar) {
+      position: relative;
+      z-index: 1;
+    }
   }
 
   .execution-lifecycle-errors {

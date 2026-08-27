@@ -223,10 +223,11 @@ step-grid-layout-tabs {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    min-height: 3.4rem;
+    min-height: 3.6rem;
   }
 
   .layout-name-input {
+    box-sizing: border-box;
     width: min(24rem, 100%);
     height: 3.2rem;
     padding: 0 1.2rem;
