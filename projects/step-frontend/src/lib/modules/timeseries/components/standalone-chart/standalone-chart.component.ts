@@ -47,6 +47,7 @@ export class StandaloneChartComponent {
 
   protected chartSettings?: TSChartSettings;
   protected readonly loading = signal(true);
+  protected readonly requestError = signal(false);
   private previousLoadingKey?: string;
 
   private readonly _fetchParams = computed(() => ({
@@ -79,6 +80,7 @@ export class StandaloneChartComponent {
     const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
 
     return defer(() => {
+      this.requestError.set(false);
       const shouldDisplayLoading =
         !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
       if (loadingKey !== undefined) {
@@ -94,7 +96,13 @@ export class StandaloneChartComponent {
           }
         }),
       );
-    }).pipe(catchError(() => of(undefined)));
+    }).pipe(
+      catchError(() => {
+        this.chartSettings = undefined;
+        this.requestError.set(true);
+        return of(undefined);
+      }),
+    );
   }
 
   private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
