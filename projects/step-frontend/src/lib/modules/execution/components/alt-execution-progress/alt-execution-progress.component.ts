@@ -96,6 +96,8 @@ import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { AltExecutionDrilldownNavigationUtilsService } from '../../services/alt-execution-drilldown-navigation-utils.service';
 import { AltExecutionRefreshActivityService } from '../../services/alt-execution-refresh-activity.service';
 import { AltExecutionRefreshActivity } from '../../shared/alt-execution-refresh-activity.enum';
+import { REPORT_TYPE } from '../../services/report-type.token';
+import { isExecutionCompletionTransition } from '../../shared/execution-refresh.utils';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -209,6 +211,10 @@ interface AgentProvisioningEventState {
       useExisting: forwardRef(() => AltExecutionProgressComponent),
     },
     AggregatedTreeDataLoaderService,
+    {
+      provide: REPORT_TYPE,
+      useValue: 'SingleExecution',
+    },
     {
       provide: GridPersistenceStateService,
       useClass: ExecutionReportGridPersistenceStateService,
@@ -536,9 +542,8 @@ export class AltExecutionProgressComponent
    * Logic to reload keyword's datasource when execution is refreshed
    * **/
   private readonly executionRefresh$ = this.execution$.pipe(
-    map((execution) => execution.id),
     pairwise(),
-    filter((pair) => pair[0] === pair[1]),
+    filter(([previous, current]) => previous.id === current.id),
   );
 
   private refreshKeywordsSubscription = combineLatest([
@@ -549,7 +554,12 @@ export class AltExecutionProgressComponent
       filter(([isActive]) => isActive),
       takeUntilDestroyed(),
     )
-    .subscribe(() => this.keywordsDataSource.reload({ isForce: false, hideProgress: true }));
+    .subscribe(([, [previous, current]]) => {
+      this.keywordsDataSource.reload({
+        isForce: isExecutionCompletionTransition(previous, current),
+        hideProgress: true,
+      });
+    });
 
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 

@@ -24,6 +24,10 @@ export const $MetricType = {
       type: 'string',
       isRequired: true,
     },
+    samplingMode: {
+      type: 'Enum',
+      isRequired: true,
+    },
     attributes: {
       type: 'array',
       contains: {

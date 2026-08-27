@@ -6,9 +6,8 @@ import {
   inject,
   NgZone,
   OnDestroy,
-  QueryList,
-  ViewChild,
-  ViewChildren,
+  viewChild,
+  viewChildren,
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -79,8 +78,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   );
   private _location = inject(Location);
 
-  @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
-  @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
+  readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
+  readonly tabs = viewChild<ElementRef<HTMLElement>>('tabs');
 
   private locationStateSubscription = this._location.subscribe((popState: any) => {
     this.openMainMenuBasedOnActualView();
@@ -111,7 +110,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render
-        this._sideBarState.initializeProjectsReadOnly();
         if (this._sideBarState.openedMenuItems) {
           this.initializeMainMenuItemsFromState();
         } else {
@@ -152,7 +150,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   private openMainMenu(mainMenuKey: string, isOpened: boolean = true): void {
-    const checkbox = this.mainMenuCheckBoxes?.find((item) => item.nativeElement.getAttribute('name') === mainMenuKey);
+    const checkbox = this.mainMenuCheckBoxes().find((item) => item.nativeElement.getAttribute('name') === mainMenuKey);
     if (checkbox) {
       checkbox.nativeElement.checked = isOpened;
     }
@@ -194,7 +192,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._customMenuEntries.remove(id);
   }
 
-  toggleOpenClose() {
+  toggleOpenClose(): void {
     this._sideBarState.toggleIsOpened();
   }
 
@@ -207,12 +205,12 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   handleScroll($event: Event): void {
     this._zone.runOutsideAngular(() => {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
-      this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
+      this.tabs()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
   }
 
   private createMenuItemsTree(menuItems: MenuEntry[]): DisplayMenuEntry[] {
-    const weightCompare = (a: MenuEntry, b: MenuEntry) => {
+    const weightCompare = (a: MenuEntry, b: MenuEntry): number => {
       if (!a.weight) {
         return 1;
       }
@@ -222,7 +220,15 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       return a.weight - b.weight;
     };
 
-    const convert = ({ id, title, icon, isCustom, parentId, isActiveFunction, isEnabledFunction }: MenuEntry): DisplayMenuEntry => ({
+    const convert = ({
+      id,
+      title,
+      icon,
+      isCustom,
+      parentId,
+      isActiveFunction,
+      isEnabledFunction,
+    }: MenuEntry): DisplayMenuEntry => ({
       id,
       title,
       icon,
@@ -232,7 +238,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       isActiveFunction: isActiveFunction,
     });
 
-    const findChildren = (parent: DisplayMenuEntry) => {
+    const findChildren = (parent: DisplayMenuEntry): void => {
       const children = menuItems
         .filter((item) => item?.parentId === parent.id && item.isVisibleFunction?.())
         .sort(weightCompare)
