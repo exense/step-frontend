@@ -91,6 +91,7 @@ export class AltReportNodeDetailsComponent {
   protected readonly performanceNode = computed(() => {
     const node = this.reportNode();
     if (
+      !node ||
       node.resolvedArtefact?._class !== 'CallKeyword' ||
       !node.executionID ||
       !node.artefactHash ||

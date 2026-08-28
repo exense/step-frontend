@@ -351,7 +351,7 @@ export class TimeSeriesChartUtilsService {
       case ChartAggregation.SUM:
         return bucket.sum;
       case ChartAggregation.AVG:
-        return bucket.sum / bucket.count;
+        return bucket.count > 0 ? bucket.sum / bucket.count : null;
       case ChartAggregation.MAX:
         return bucket.max;
       case ChartAggregation.MIN:
@@ -639,7 +639,14 @@ export class TimeSeriesChartUtilsService {
         return of([]);
       }
       const selectedSeriesIndex = series.findIndex((item) => item.id === seriesId);
-      const selectedBucketAttributes = options.response.matrixKeys[selectedSeriesIndex - (hasSecondaryAxes ? 1 : 0)];
+      const offset = hasSecondaryAxes ? 1 : 0;
+      if (selectedSeriesIndex < offset) {
+        return of([]);
+      }
+      const selectedBucketAttributes = options.response.matrixKeys[selectedSeriesIndex - offset];
+      if (!selectedBucketAttributes) {
+        return of([]);
+      }
       options.request.groupDimensions?.forEach((dimension) => {
         if (!selectedBucketAttributes[dimension]) {
           selectedBucketAttributes[dimension] = null;
@@ -709,9 +716,10 @@ export class TimeSeriesChartUtilsService {
     metricKey: string,
     bucketIntervalMs: number,
   ): number {
-    const divider = RATE_UNIT_DIVIDERS[this.getRateUnit(aggregation)];
+    const divider = RATE_UNIT_DIVIDERS[this.getRateUnit(aggregation)] ?? 1;
     if (metricKey === 'counter') {
-      return bucket.sum / (bucketIntervalMs / 3_600_000) / divider;
+      const intervalHours = bucketIntervalMs / 3_600_000;
+      return intervalHours > 0 ? bucket.sum / intervalHours / divider : 0;
     }
     return bucket.throughputPerHour / divider;
   }
