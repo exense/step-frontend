@@ -4,9 +4,8 @@
       <step-icon name="info" />
     </button>
     <step-popover-content>
-      <p class="instructions-intro">Select the automation package root folder on your computer:</p>
       <ul class="instructions-list">
-        <li>Single click selects a folder.</li>
+        <li>Single click selects a folder or file.</li>
         <li>Double click opens a folder.</li>
         <li>Enter a path and press Enter to navigate directly.</li>
       </ul>
@@ -48,24 +47,28 @@
         type="button"
         mat-icon-button
         matTooltip="Go to location"
-        [disabled]="!locationControl.value.trim()"
+        [disabled]="isLocationButtonDisabled()"
         (click)="loadLocation()"
       >
         <step-icon name="arrow-right" />
       </button>
     </div>
 
-    <div class="directory-list">
-      @for (item of directories(); track item.absolutePath) {
-        @if (item.isDirectory && (showingRoots() || !item.isHidden)) {
+    <div class="file-list">
+      @for (item of files(); track item.path) {
+        @if (showingRoots() || !item.hidden) {
           <button
             mat-button
-            [attr.data-directory]="item.absolutePath"
-            [class.selected]="selectedDirectory() === item.absolutePath"
-            (click)="onSelectDirectory(item.absolutePath)"
-            (dblclick)="onLoadDirectory(item.absolutePath)"
+            [attr.data-directory]="item.path"
+            [class.selected]="selectedPath() === item.path"
+            (click)="selectFile(item)"
+            (dblclick)="handleLoadDirectory(item)"
           >
-            <step-icon name="folder" />
+            @if (item.directory) {
+              <step-icon name="folder" />
+            } @else {
+              <step-icon name="file" />
+            }
             {{ item.name }}
           </button>
         }
@@ -74,11 +77,11 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="_dialogRef.close(undefined)">Cancel</button>
-    <button type="button" mat-stroked-button (click)="onCreateDirectory()" [disabled]="!currentDirectory()">
-      Create Folder
-    </button>
-    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!selectedDirectory()">
-      Select
-    </button>
+    @if (_data.createFolder) {
+      <button type="button" mat-stroked-button (click)="createDirectory()" [disabled]="!currentDirectory()">
+        Create Folder
+      </button>
+    }
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!canApply()">Select</button>
   </div>
 </step-modal-window>

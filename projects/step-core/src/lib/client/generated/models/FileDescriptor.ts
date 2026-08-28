@@ -4,10 +4,11 @@
 
 export type FileDescriptor = {
   name?: string;
-  absolutePath?: string;
+  path?: string;
+  directory?: boolean;
+  regularFile?: boolean;
+  hidden?: boolean;
+  symlink?: boolean;
   size?: number;
-  isDirectory?: boolean;
-  isFile?: boolean;
-  isSymlink?: boolean;
-  isHidden?: boolean;
+  resourceReference?: string;
 };
