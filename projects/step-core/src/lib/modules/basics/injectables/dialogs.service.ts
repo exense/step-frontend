@@ -32,6 +32,12 @@ export interface WarningDialogOptions {
   confirmButtonColor?: 'primary';
 }
 
+export interface ErrorDialogOptions {
+  cancelButtonLabel?: string;
+  confirmButtonLabel?: string;
+  disableClose?: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -116,15 +122,18 @@ export class DialogsService {
     return dialogRef.afterClosed().pipe(map((result) => !!result)) as Observable<boolean>;
   }
 
-  showErrorMsg(messageHTML: string): Observable<boolean> {
+  showErrorMsg(messageHTML: string, options?: ErrorDialogOptions): Observable<boolean> {
     const dialogRef = this._matDialog.open<MessageDialogComponent, MessageDialogData, MessageDialogResult>(
       MessageDialogComponent,
       {
         data: {
           messageHTML,
           title: 'Error',
-          hideCancelButton: true,
+          hideCancelButton: !options?.cancelButtonLabel,
+          cancelButtonLabel: options?.cancelButtonLabel,
+          confirmButtonLabel: options?.confirmButtonLabel,
         },
+        disableClose: options?.disableClose,
       },
     );
 

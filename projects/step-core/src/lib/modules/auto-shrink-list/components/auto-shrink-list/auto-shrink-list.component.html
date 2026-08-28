@@ -2,7 +2,7 @@
   @for (item of items(); track item.key) {
     <div [stepAutoShrinkItem]="item" class="item">
       <strong>{{ item.key }}</strong>
-      <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
+      <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
     </div>
   }
 </section>
@@ -11,13 +11,13 @@
     <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
       <div class="item">
         <strong>{{ item.key }}</strong>
-        <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
+        <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
       </div>
       <step-popover-content>
         <div class="popover-item">
           <strong>{{ item.key }}</strong
           >&nbsp;
-          <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
+          <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
         </div>
       </step-popover-content>
     </step-popover>
@@ -50,7 +50,8 @@
           <strong>{{ allTitle() }}</strong>
           <step-auto-shrink-all-items
             [items]="items()"
-            [emptyValueTemplate]="emptyValueTemplate()"
+            [emptyValue]="emptyValue()"
+            [itemAction]="itemAction()"
             [emptySearchPatterns]="emptySearchPatterns()"
           />
         </div>
@@ -67,13 +68,13 @@
           <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
             <div class="auto-shrink-popover-item">
               <strong>{{ item.key }}</strong>
-              <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
+              <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
             </div>
             <step-popover-content>
               <div class="popover-item">
                 <strong>{{ item.key }}</strong
                 >&nbsp;
-                <step-auto-shrink-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
+                <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
               </div>
             </step-popover-content>
           </step-popover>

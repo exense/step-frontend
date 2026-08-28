@@ -4,7 +4,7 @@
       type="button"
       mat-icon-button
       aria-label="Left Align"
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
       [matTooltip]="tooltips().link"
       matTooltipPosition="below"
       (click)="copyLink.emit()"
@@ -14,7 +14,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().simulate"
       matTooltipPosition="below"
@@ -25,7 +25,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().schedule"
       matTooltipPosition="below"
@@ -37,7 +37,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async)"
+        [disabled]="disabled() || !('plan-execute' | hasRight | async)"
         aria-label="Left Align"
         [matTooltip]="tooltips().executeWithParams"
         matTooltipPosition="below"
@@ -60,7 +60,7 @@
       type="button"
       mat-icon-button
       class="mat-primary"
-      [disabled]="!('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().execute"
       matTooltipPosition="below"
@@ -76,7 +76,7 @@
           aria-label="Left Align"
           [matTooltip]="tooltips().stop"
           matTooltipPosition="below"
-          [disabled]="!('plan-execute' | hasRight | async)"
+          [disabled]="disabled() || !('plan-execute' | hasRight | async)"
           (click)="stop.emit()"
         >
           <step-icon name="stop-circle" aria-hidden="true" />
@@ -90,7 +90,7 @@
           aria-label="Left Align"
           [matTooltip]="tooltips().forceStop"
           matTooltipPosition="below"
-          [disabled]="!('plan-execute' | hasRight | async)"
+          [disabled]="disabled() || !('plan-execute' | hasRight | async)"
           (click)="forceStop.emit()"
         >
           <step-icon name="stop-circle" aria-hidden="true" />

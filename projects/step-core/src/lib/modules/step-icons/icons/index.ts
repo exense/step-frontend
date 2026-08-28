@@ -280,6 +280,7 @@ export { Smile } from './svg/smile';
 export { Speaker } from './svg/speaker';
 export { Square } from './svg/square';
 export { Star } from './svg/star';
+export { StepRefresh } from './svg/step-refresh';
 export { StopCircle } from './svg/stop-circle';
 export { Stopwatch } from './svg/stopwatch';
 export { Sun } from './svg/sun';

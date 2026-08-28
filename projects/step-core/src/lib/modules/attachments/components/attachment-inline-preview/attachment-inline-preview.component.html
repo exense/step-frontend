@@ -27,7 +27,11 @@
           }
         </div>
       } @else {
-        <div class="attachment-name-container">
+        <div
+          class="attachment-name-container"
+          stepUndraggedClick
+          (click)="$event.preventDefault(); $event.stopImmediatePropagation()"
+        >
           <step-icon class="skipped" name="alert-circle" />
           <span class="highlight-inline-item">
             <step-long-inline-text [text]="att.name" />
@@ -48,7 +52,7 @@
             <step-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
           }
           @case (AttachmentType.SKIPPED) {
-            <step-skipped-attachment-info [attachment]="att" />
+            <step-skipped-attachment-info class="attachment-inline-preview-skipped-popover" [attachment]="att" />
           }
           @default {
             <div class="default-attachment-popover-view">

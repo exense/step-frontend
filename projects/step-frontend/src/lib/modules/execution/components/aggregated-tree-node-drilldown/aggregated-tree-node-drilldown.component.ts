@@ -13,7 +13,7 @@ import {
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { filter, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { ReportNode } from '@exense/step-core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
 import { AltExecutionDialogsService, PartialOpenIterationsParams } from '../../services/alt-execution-dialogs.service';
@@ -40,6 +40,7 @@ import { AggregatedReportViewTreeStateContextService } from '../../services/aggr
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
+import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -83,6 +84,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
+  protected readonly testCasesDisplayMode = toSignal(this._executionState.testCasesDisplayMode$, {
+    initialValue: TestCasesDisplayMode.AGGREGATED,
+  });
 
   protected readonly selectedRootReportNodeId = computed(() => {
     const stackItems = this.stackItems();
@@ -245,6 +249,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     });
   }
 
+  protected toggleTestCasesDisplayMode(): void {
+    this._executionState.toggleTestCasesDisplayMode();
+  }
+
   protected handleOpenDetails(node: ReportNode, parentStackItemId: string): void {
     if (!this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.REPORT_NODE, parentStackItemId)) {
       return;
@@ -398,4 +406,5 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   }
 
   protected readonly DrilldownRootType = DrilldownRootType;
+  protected readonly TestCasesDisplayMode = TestCasesDisplayMode;
 }

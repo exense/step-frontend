@@ -21,6 +21,7 @@ import {
   GridEditableService,
   IS_SMALL_SCREEN,
   ReportNode,
+  TableIndicatorMode,
   TimeRange,
   WidgetsPersistenceStateService,
 } from '@exense/step-core';
@@ -38,7 +39,6 @@ import {
   AggregatedTreeNodeDialogHooksService,
   AggregatedTreeNodeDialogHooksStrategy,
 } from '../../services/aggregated-tree-node-dialog-hooks.service';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { AltReportNodeTestcasesWidgetComponent } from '../alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
 import { AltReportNodeKeywordsWidgetComponent } from '../alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
 import { SearchError, SearchErrorType } from '../../shared/search-error';
@@ -92,7 +92,7 @@ export class AltExecutionReportComponent
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
-  protected readonly emptyReportNodeSummary = { total: 0, items: {} } as ReportNodeSummary;
+  protected readonly TableIndicatorMode = TableIndicatorMode;
   protected readonly renderReportContent = signal(this._mode === ViewMode.PRINT);
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(

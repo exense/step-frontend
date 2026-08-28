@@ -29,7 +29,7 @@ export const editScheduledTaskRoute = ({
     dialogComponent: EditSchedulerTaskDialogComponent,
     canActivate: [
       checkEntityGuardFactory({
-        entityType: 'task',
+        entityType: 'tasks',
         idExtractor,
         getEntity: (id) => {
           const _schedulerService = inject(AugmentedSchedulerService);

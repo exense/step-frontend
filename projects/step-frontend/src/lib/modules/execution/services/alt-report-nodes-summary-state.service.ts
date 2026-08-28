@@ -3,6 +3,7 @@ import {
   BehaviorSubject,
   catchError,
   combineLatest,
+  defer,
   filter,
   finalize,
   map,
@@ -19,6 +20,7 @@ import {
   smartSwitchMap,
   TableDataSource,
   TimeRange,
+  TimeRangeSelection,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -52,12 +54,18 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
 
   protected abstract readonly statusDistributionViewId: string;
   protected summaryInProgressInternal$ = new BehaviorSubject(false);
+  protected summaryDisplayInProgressInternal$ = new BehaviorSubject(false);
   readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
+  readonly summaryDisplayInProgress$ = this.summaryDisplayInProgressInternal$.asObservable();
 
   readonly summary$: Observable<ReportNodeSummary>;
+  private initialSummaryLoadPending = true;
+  private previousSummaryProgressExecutionId?: string;
+  private previousSummaryProgressRange?: TimeRangeSelection;
 
   ngOnDestroy(): void {
     this.summaryInProgressInternal$.complete();
+    this.summaryDisplayInProgressInternal$.complete();
   }
 
   protected abstract createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest;
@@ -114,16 +122,29 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
           );
         },
         ({ execution, range }) => {
+          if (!execution) {
+            return of(undefined);
+          }
           const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
           if (!timeRange) {
             return of(undefined);
           }
           const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
-          this.summaryInProgressInternal$.next(true);
-          return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
-            catchError(() => of(undefined)),
-            finalize(() => this.summaryInProgressInternal$.next(false)),
-          );
+          return defer(() => {
+            const displayProgress = this.shouldDisplayProgress(execution, range);
+            this.summaryInProgressInternal$.next(true);
+            if (displayProgress) {
+              this.summaryDisplayInProgressInternal$.next(true);
+            }
+            return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
+              finalize(() => {
+                this.summaryInProgressInternal$.next(false);
+                if (displayProgress) {
+                  this.summaryDisplayInProgressInternal$.next(false);
+                }
+              }),
+            );
+          }).pipe(catchError(() => of(undefined)));
         },
         this._destroyRef,
       ),
@@ -134,5 +155,18 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
       shareReplay(1),
       takeUntilDestroyed(this._destroyRef),
     );
+  }
+
+  private shouldDisplayProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+    const displayProgress =
+      this.initialSummaryLoadPending ||
+      this.previousSummaryProgressExecutionId !== execution?.id ||
+      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousSummaryProgressRange, range);
+
+    this.initialSummaryLoadPending = false;
+    this.previousSummaryProgressExecutionId = execution?.id;
+    this.previousSummaryProgressRange = range;
+
+    return displayProgress;
   }
 }

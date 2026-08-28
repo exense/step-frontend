@@ -1,5 +1,6 @@
-import { Component, ElementRef, input, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
 import { BaseModalWindowComponent } from './base-modal-window.component';
+import { ProjectScopeWarning, ProjectScopeWarningService } from '../../injectables/project-scope-warning.service';
 
 @Component({
   selector: 'step-modal-window',
@@ -17,15 +18,20 @@ import { BaseModalWindowComponent } from './base-modal-window.component';
   },
 })
 export class ModalWindowComponent extends BaseModalWindowComponent {
-  private trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
-  private dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
+  private _projectScopeWarning = inject(ProjectScopeWarningService, { optional: true });
+
+  private readonly trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
+  private readonly dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
 
   readonly showSpinner = input<boolean | unknown>(false);
+  readonly spinnerTooltip = input<string>('');
   readonly title = input('');
   readonly hideButtonsSection = input(false);
   readonly hideHeaderSection = input(false);
+  protected readonly projectScopeWarning: Signal<ProjectScopeWarning | undefined> =
+    this._projectScopeWarning?.warning ?? signal<ProjectScopeWarning | undefined>(undefined);
 
-  override focusDialog() {
+  override focusDialog(): void {
     this.trackFocus()?.nativeElement?.focus();
   }
 

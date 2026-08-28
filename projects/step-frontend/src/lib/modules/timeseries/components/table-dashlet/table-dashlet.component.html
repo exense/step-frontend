@@ -20,6 +20,9 @@
       </div>
     }
     @if (!editMode()) {
+      <button mat-icon-button matTooltip="Export as CSV" (click)="exportAsCSV()">
+        <step-icon name="download"></step-icon>
+      </button>
       <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
         <step-icon name="filter"></step-icon>
       </button>
@@ -45,7 +48,16 @@
         <step-icon name="settings" />
       </button>
       <mat-menu #settingsMenu="matMenu">
-        <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+        @if (hasTwoStageAggregation) {
+          <span
+            class="disabled-columns-menu-item"
+            matTooltip="The table displays one single value per row, resulting from the two-stage aggregation configured in the table settings"
+          >
+            <button mat-menu-item disabled>Columns</button>
+          </span>
+        } @else {
+          <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+        }
       </mat-menu>
     }
     <mat-menu #columnsMenu="matMenu">

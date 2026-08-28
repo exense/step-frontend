@@ -7,6 +7,7 @@ import type { Observable } from 'rxjs';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 import type { Resource } from '../models/Resource';
+import type { ResourcePreview } from '../models/ResourcePreview';
 import type { ResourceUploadResponse } from '../models/ResourceUploadResponse';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
@@ -25,6 +26,27 @@ export class ResourcesService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/resources/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param numberOflines
+   * @param requestBody
+   * @returns ResourcePreview default response
+   * @throws ApiError
+   */
+  public bulkPreviewContent(
+    numberOflines: number = 6,
+    requestBody?: Array<string>,
+  ): Observable<Array<ResourcePreview>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources/bulk-preview-content',
+      query: {
+        numberOflines: numberOflines,
+      },
       body: requestBody,
       mediaType: 'application/json',
     });

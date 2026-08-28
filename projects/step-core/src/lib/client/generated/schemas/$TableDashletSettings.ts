@@ -10,5 +10,8 @@ export const $TableDashletSettings = {
       },
       isRequired: true,
     },
+    aggregation: {
+      type: 'MetricAggregation',
+    },
   },
 } as const;

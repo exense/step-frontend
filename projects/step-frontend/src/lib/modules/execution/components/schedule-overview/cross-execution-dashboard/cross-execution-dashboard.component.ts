@@ -1,8 +1,9 @@
 import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
-import { ExecutionNamePipe, IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
+import { DateFormat, ExecutionNamePipe, IS_SMALL_SCREEN, SchedulerService, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, map, merge, of, Subject, switchMap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -18,12 +19,28 @@ import {
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected _state = inject(CrossExecutionDashboardState);
+  private _schedulerService = inject(SchedulerService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
+  protected readonly DateFormat = DateFormat;
 
+  private readonly taskId$ = toObservable(this._state.task).pipe(
+    map((task) => task?.id),
+    distinctUntilChanged(),
+  );
+
+  protected readonly nextExecutionDate$ = merge(
+    this.taskId$,
+    this._state.onTimeSelectionChanged,
+    this._state.onRefreshTriggered,
+  ).pipe(
+    map(() => this._state.task()?.id),
+    switchMap((id) =>
+      id ? this._schedulerService.getNextExecutionDate(id).pipe(catchError(() => of(undefined))) : of(undefined),
+    ),
+  );
   protected readonly viewTitle = computed(() => {
     const loadingLabel = 'Loading...';
     switch (this._state.viewType()) {
@@ -98,13 +115,5 @@ export class CrossExecutionDashboardComponent implements OnInit {
     } else {
       this._state.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
-  }
-
-  private createTab(id: string, label: string, link?: string): Tab<string> {
-    return {
-      id,
-      label,
-      link: [{ outlets: { primary: link ?? id, modal: null } }],
-    };
   }
 }

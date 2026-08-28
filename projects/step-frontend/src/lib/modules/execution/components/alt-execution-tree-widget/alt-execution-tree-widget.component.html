@@ -25,6 +25,7 @@
       stepTreeAutoChooseVirtualScroll="100%"
       [applyVirtualScrollFrom]="100"
       [showSpinnerWhileTreeInitialize]="true"
+      [showSkeletonWhileLoading]="(_state.treeInProgress$ | async) ?? false"
       (openIterations)="handleOpenIterations($event)"
     />
   </step-alt-report-widget-content>

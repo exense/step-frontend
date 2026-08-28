@@ -20,14 +20,17 @@ step-alt-report-performance-overview-chart {
       min-height: 0;
 
       .chart-wrapper {
-        flex: 1;
+        flex: 1 1 auto;
+        height: auto;
         overflow: hidden;
+        min-height: 0;
       }
 
       .ts-chart-legend {
         flex-grow: 0;
         flex-shrink: 0;
         margin-bottom: 1.5rem;
+        min-height: 3.2rem;
       }
     }
   }
