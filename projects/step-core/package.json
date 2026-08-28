@@ -42,7 +42,7 @@
     "ace-builds": "1.43.2",
     "angular-split": "20.0.0",
     "ngx-markdown": "20.1.0",
-    "marked": "15.0.12",
+    "marked": "16.4.2",
     "luxon": "3.4.4",
     "@angular/build": "20.3.32"
   },

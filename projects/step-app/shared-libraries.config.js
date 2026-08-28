@@ -30,11 +30,11 @@ const config = {
   '@angular/cdk': libraryConfig(),
   '@angular/material': libraryConfig(),
   'ngx-mat-select-search': libraryConfig(),
-  'ngx-markdown': libraryConfig({ requiredVersion: '19.1.1' }),
+  'ngx-markdown': libraryConfig({ requiredVersion: '20.1.0' }),
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
   luxon: libraryConfig({ requiredVersion: '3.4.4' }),
-  marked: libraryConfig({ requiredVersion: '15.0.12' }),
+  marked: libraryConfig({ requiredVersion: '16.4.2' }),
 };
 
 module.exports = {
