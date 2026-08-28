@@ -9,4 +9,5 @@ export interface ResourceConfig {
   readonly withDynamicSwitch?: boolean;
   readonly preserveExistingResource?: boolean;
   readonly withUploadFromFileSystem?: boolean;
+  readonly automationPackageId?: string;
 }

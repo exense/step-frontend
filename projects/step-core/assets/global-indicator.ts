@@ -212,7 +212,7 @@
 
   class GlobalIndicatorElement extends HTMLElement {
     static get observedAttributes() {
-      return ['message', 'fallback-message', 'timeout'];
+      return ['message', 'fallback-message', 'timeout', 'error-message'];
     }
 
     private timerId?: number;
@@ -246,12 +246,23 @@
         case 'message':
           this.showMessage(newValue as string);
           break;
+        case 'error-message':
+          this.showErrorMessage(newValue as string);
+          break;
       }
     }
 
     private showMessage(message: string): void {
       this.printMessageInDivContainer('.global-indicator-container__message', message);
       this.showFallbackMessage();
+    }
+
+    private showErrorMessage(message: string): void {
+      if (this.timerId !== undefined) {
+        clearTimeout(this.timerId);
+      }
+      this.timerId = undefined;
+      this.printMessageInDivContainer('.global-indicator-container__timeout-message', message);
     }
 
     private showFallbackMessage(): void {
@@ -292,6 +303,10 @@
 
     setFallbackMessageTimeout(timeout: number): void {
       this.indicatorElement?.setAttribute?.('timeout', timeout.toString());
+    }
+
+    showErrorMessage(message: string): void {
+      this.indicatorElement?.setAttribute?.('error-message', message);
     }
 
     private get indicatorElement(): HTMLElement | null {

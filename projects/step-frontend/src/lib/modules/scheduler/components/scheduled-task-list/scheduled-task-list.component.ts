@@ -14,6 +14,7 @@ import {
   tableColumnsConfigProvider,
   AlertType,
   entitySelectionStateProvider,
+  IDE_MODE,
   DateFormat,
   StepDataSource,
 } from '@exense/step-core';
@@ -57,6 +58,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   private _schedulerService = inject(AugmentedSchedulerService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  protected readonly _isIdeMode = inject(IDE_MODE);
   private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private updateDataSourceAfterChange = pipe(

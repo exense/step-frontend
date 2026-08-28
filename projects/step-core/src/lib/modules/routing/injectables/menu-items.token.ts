@@ -7,12 +7,12 @@ import { MenuEntry } from '../types/menu-entry';
 export const MENU_ITEMS = new InjectionToken<Observable<MenuEntry[]>>('Menu items', {
   providedIn: 'root',
   factory: () => {
-    const viewRegistry = inject(ViewRegistryService);
-    const menuItemsOverrideConfig = inject(MenuItemsOverrideConfigService);
+    const _viewRegistry = inject(ViewRegistryService);
+    const _menuItemsOverrideConfig = inject(MenuItemsOverrideConfigService);
 
-    return of(undefined).pipe(
-      switchMap(() => menuItemsOverrideConfig.menuItemsOverride$ || of(undefined)),
-      map((menuItemsOverride) => menuItemsOverride ?? viewRegistry.registeredMenuEntries),
+    return _menuItemsOverrideConfig.menuItemsOverride$.pipe(
+      switchMap((items$) => items$ ?? of(undefined)),
+      map((menuItemsOverride) => menuItemsOverride ?? _viewRegistry.registeredMenuEntries),
       shareReplay(1),
     );
   },

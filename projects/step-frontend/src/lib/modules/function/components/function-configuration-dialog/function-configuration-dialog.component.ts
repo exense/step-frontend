@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
 import {
-  AfterContentInit,
   ChangeDetectorRef,
   Component,
+  computed,
   DestroyRef,
   forwardRef,
   HostListener,
@@ -10,7 +10,7 @@ import {
   OnInit,
   viewChild,
 } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AlertType,
@@ -33,6 +33,8 @@ import {
   CustomFormWrapperComponent,
   ArrayItemLabelValueExtractor,
   ReloadableDirective,
+  RESOURCE_AP_ID,
+  provideResourceApId,
 } from '@exense/step-core';
 import { finalize, map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -47,6 +49,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       provide: FunctionTypeParentFormService,
       useExisting: forwardRef(() => FunctionConfigurationDialogComponent),
     },
+    provideResourceApId(() => {
+      const _data = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
+      return computed(() => _data.keyword);
+    }),
   ],
   hostDirectives: [ReloadableDirective],
   standalone: false,

@@ -4,7 +4,6 @@ import {
   AutomationPackage,
   AutomationPackagesService,
   ExecutiontTaskParameters,
-  FormDataContentDisposition,
   Plan,
   TableBulkOperationRequest,
 } from '../../generated';
@@ -24,6 +23,7 @@ import { HttpOverrideResponseInterceptorService } from './http-override-response
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 import { Keyword } from '../shared/keyword';
 import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
+import { downloadFile } from '../shared/download-file';
 
 export interface AutomationPackageParams {
   id?: string;
@@ -188,6 +188,19 @@ export class AugmentedAutomationPackagesService
     );
 
     return uploadWithProgress(request$);
+  }
+
+  private getDownloadAutomationPackageResourceUrl(apId: string, path: string, inline?: boolean): string {
+    let result = `rest/automation-packages/ap-resources/content?apId=${encodeURIComponent(apId)}&path=${encodeURIComponent(path)}`;
+    if (inline) {
+      result += '&inline=true';
+    }
+    return result;
+  }
+
+  downloadAutomationPackageResource(apId: string, path: string, fileName: string): void {
+    const url = this.getDownloadAutomationPackageResourceUrl(apId, path);
+    downloadFile(url, fileName);
   }
 
   automationPackageCreateOrUpdate({

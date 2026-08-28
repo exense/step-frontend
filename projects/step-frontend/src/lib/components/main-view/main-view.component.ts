@@ -23,11 +23,12 @@ export class MainViewComponent {
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
   private _dialogRouteOpenState = inject(DialogRouteOpenStateService);
-  readonly _appConfig = inject(AppConfigContainerService);
-  readonly _authService = inject(AuthService);
+  protected readonly _appConfig = inject(AppConfigContainerService);
+  protected readonly _authService = inject(AuthService);
 
-  readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
-  readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
+  protected readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
+  protected readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
+  protected readonly ideBar = this._viewRegistry.getDashlets('ide/bar')[0];
 
   private mainScrollableContent = viewChild('mainScrollableContent', { read: CdkScrollable });
 
@@ -46,7 +47,7 @@ export class MainViewComponent {
       this.mainScrollableContent()?.scrollTo?.({ top: 0, left: 0 });
     });
 
-  addBookmark(): void {
+  protected addBookmark(): void {
     this._matDialog.open(BookmarkCreateDialogComponent);
   }
 }
