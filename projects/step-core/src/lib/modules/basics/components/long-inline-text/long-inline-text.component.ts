@@ -24,9 +24,17 @@ export class LongInlineTextComponent {
   private readonly fullWidth = computed(() => this.fullValue()?.width?.());
   private readonly availableWidth = this._elementSize.width;
 
+  protected readonly hideDisplayValue = computed(() => {
+    const fullWidth = this.fullWidth();
+    return !fullWidth;
+  });
+
   protected readonly cutValue = computed(() => {
-    const fullWidth = this.fullWidth() ?? 0;
+    const fullWidth = this.fullWidth();
     const availableWidth = this.availableWidth();
+    if (!fullWidth) {
+      return false;
+    }
     return availableWidth > 0 && availableWidth < fullWidth;
   });
 
