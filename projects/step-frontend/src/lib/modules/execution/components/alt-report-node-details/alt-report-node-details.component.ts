@@ -88,6 +88,21 @@ export class AltReportNodeDetailsComponent {
   protected readonly children = toSignal(this.children$, { initialValue: [] });
   protected readonly artefactClass = computed(() => this.reportNode().resolvedArtefact?._class);
 
+  protected readonly performanceNode = computed(() => {
+    const node = this.reportNode();
+    if (
+      !node ||
+      node.resolvedArtefact?._class !== 'CallKeyword' ||
+      !node.executionID ||
+      !node.artefactHash ||
+      node.executionTime === undefined ||
+      node.duration === undefined
+    ) {
+      return undefined;
+    }
+    return node;
+  });
+
   /**
    * todo: As tree has been moved to a separate component, rootCauseErrors will never work
    * Later the new REST endpoint should appear, to retrieve it

@@ -4,6 +4,8 @@
     [showLegend]="config().showLegend !== false"
     [fillContainer]="!config().height"
   />
+} @else if (requestError()) {
+  <div class="chart-state">Unable to load chart data.</div>
 } @else if (chartSettings) {
   <step-timeseries-chart
     #chart

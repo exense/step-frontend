@@ -4,3 +4,11 @@
   flex-direction: column;
   min-height: 0;
 }
+
+.chart-state {
+  display: grid;
+  flex: 1;
+  min-height: 12rem;
+  place-items: center;
+  opacity: 0.7;
+}
