@@ -724,8 +724,9 @@ export class TimeSeriesChartUtilsService {
     return bucket.throughputPerHour / divider;
   }
 
-  private getPercentileKey(value: number): string | number {
-    return Math.floor(value) === value ? value.toFixed(1) : value;
+  private getPercentileKey(value: number | string): string {
+    const numericValue = Number(value);
+    return Number.isInteger(numericValue) ? numericValue.toFixed(1) : String(value);
   }
 
   private resolveSamplingIntervalMs(): number {
