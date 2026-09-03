@@ -1,6 +1,7 @@
 import { computed, Directive, effect, inject, input } from '@angular/core';
 import { ResourceConfig } from '../../types/resource-config';
 import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
+import { RESOURCE_AP_ID } from '../../injectables/resource-ap-id.token';
 
 @Directive({
   selector: '[stepResourceInputConfig]',
@@ -8,6 +9,7 @@ import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 })
 export class ResourceInputConfigDirective {
   private _resourceInputService = inject(RESOURCE_INPUT);
+  private _resourceAutomationPackageId = inject(RESOURCE_AP_ID, { optional: true }) ?? undefined;
 
   readonly type = input.required<string>();
   readonly isBounded = input(false);
@@ -20,8 +22,13 @@ export class ResourceInputConfigDirective {
   readonly preserveExistingResource = input(false);
   readonly disableServerPath = input(false);
   readonly withUploadFromFileSystem = input(true);
+  readonly ignoreAutomationPackage = input(false);
 
   readonly config = computed<ResourceConfig>(() => {
+    const ignoreAutomationPackage = this.ignoreAutomationPackage();
+    const apPackageId = this._resourceAutomationPackageId?.();
+    const automationPackageId = ignoreAutomationPackage ? undefined : apPackageId;
+
     const type = this.type();
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
@@ -32,17 +39,19 @@ export class ResourceInputConfigDirective {
     const preventExistingResource = this.preserveExistingResource();
     const disableServerPath = this.disableServerPath();
     const withUploadFromFileSystem = this.withUploadFromFileSystem();
+
     return {
       type,
       isBounded,
       supportsDirectory,
-      withChooseExistingResourceButton,
+      withChooseExistingResourceButton: !!automationPackageId ? false : withChooseExistingResourceButton,
       searchTypes,
-      withClearButton,
-      withDynamicSwitch,
+      withClearButton: !!automationPackageId ? false : withClearButton,
+      withDynamicSwitch: !!automationPackageId ? false : withDynamicSwitch,
       preventExistingResource,
       disableServerPath,
-      withUploadFromFileSystem,
+      withUploadFromFileSystem: !!automationPackageId ? false : withUploadFromFileSystem,
+      automationPackageId,
     };
   });
 

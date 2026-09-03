@@ -1,16 +1,12 @@
 import {
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
   input,
-  Input,
   OnInit,
   output,
-  Output,
   signal,
   viewChild,
-  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
@@ -26,15 +22,13 @@ import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { sign } from 'chart.js/helpers';
-import { ChartSkeletonComponent } from '../../../chart';
 
 @Component({
   selector: 'step-execution-time-selection',
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TSRangerComponent, ChartSkeletonComponent],
+  imports: [COMMON_IMPORTS, TSRangerComponent],
   standalone: true,
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {

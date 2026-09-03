@@ -12,6 +12,7 @@
       position: absolute;
       top: 0;
       left: 100%;
+      white-space: nowrap;
     }
   }
 }
@@ -22,6 +23,9 @@
 }
 
 .value {
+  &.hidden {
+    visibility: hidden;
+  }
   width: 100%;
 }
 

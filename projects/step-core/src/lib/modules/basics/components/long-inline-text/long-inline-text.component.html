@@ -1,2 +1,2 @@
 <div class="invisible-value" stepElementSize #fullValue="ElementSize">{{ text() }}</div>
-<div class="value">{{ text() }}</div>
+<div class="value" [class.hidden]="hideDisplayValue()">{{ text() }}</div>

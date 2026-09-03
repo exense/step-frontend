@@ -13,5 +13,6 @@ export type Bucket = {
   max?: number;
   pclPrecision?: number;
   distribution?: Record<string, number>;
+  average?: number;
   id?: string;
 };

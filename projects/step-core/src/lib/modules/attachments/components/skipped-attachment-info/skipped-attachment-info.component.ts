@@ -15,7 +15,7 @@ const STREAMING_ATTACHMENT_QUOTA_URL =
 export class SkippedAttachmentInfoComponent {
   readonly attachment = input.required<AttachmentMeta>();
 
-  private readonly skippedReason = computed(() => (this.attachment() as SkippedAttachmentMeta).reason ?? '');
+  protected readonly skippedReason = computed(() => (this.attachment() as SkippedAttachmentMeta).reason ?? '');
 
   protected readonly documentationUrl = computed(() =>
     this.isStreamingAttachment() ? STREAMING_ATTACHMENT_QUOTA_URL : NON_STREAMING_ATTACHMENT_QUOTA_URL,

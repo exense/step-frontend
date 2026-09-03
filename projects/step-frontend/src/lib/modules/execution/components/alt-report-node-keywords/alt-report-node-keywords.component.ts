@@ -1,7 +1,9 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   computed,
+  DestroyRef,
   inject,
   input,
   output,
@@ -31,7 +33,7 @@ import { AltReportNodesStateService } from '../../services/alt-report-nodes-stat
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
@@ -74,6 +76,8 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
 
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
 
   readonly selectedReportId = input<string | undefined>(undefined);
   readonly openDetails = output<ReportNode>();
@@ -95,6 +99,13 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
   private readonly keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
   ngAfterViewInit(): void {
+    this._state.datasource$
+      .pipe(
+        switchMap((dataSource) => dataSource.connect()),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this._changeDetectorRef.markForCheck());
+
     this.searchName$.subscribe((name) => this.tableSearchUntracked?.onSearch?.('name', name));
     this._listSearch.searchStatuses$.subscribe((status) => this.tableSearchUntracked?.onSearch?.('status', status));
     this._listSearch.searchReportNodeClass$.subscribe((reportNodeClass) =>

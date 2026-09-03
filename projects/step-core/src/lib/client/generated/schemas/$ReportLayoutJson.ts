@@ -9,6 +9,9 @@ export const $ReportLayoutJson = {
     name: {
       type: 'string',
     },
+    reportType: {
+      type: 'Enum',
+    },
     layout: {
       type: 'dictionary',
       contains: {

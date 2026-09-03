@@ -62,7 +62,7 @@ export class AttachmentPreviewContentService {
     return this._resourceService.getBulkPreviewContent(ids, PREVIEW_NUMBER_OF_LINES).pipe(
       tap((previews) => {
         for (const preview of previews) {
-          this.setPreviewContent(preview.resourceId, preview.success ? preview.content : undefined);
+          this.setPreviewContent(preview.resourceId!, preview.success ? preview.content : undefined);
         }
       }),
       catchError(() => {
