@@ -56,6 +56,9 @@
           "builder": "@angular-architects/native-federation:build",
           "options": {},
           "configurations": {
+            "local": {
+              "target": "@exense/step-app:esbuild:local"
+            },
             "production": {
               "target": "@exense/step-app:esbuild:production"
             },
