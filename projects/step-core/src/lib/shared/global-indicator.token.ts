@@ -1,5 +1,4 @@
-import { inject, InjectionToken } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, InjectionToken, DOCUMENT } from '@angular/core';
 
 export interface GlobalIndicator {
   removeIndicator(): void;

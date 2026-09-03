@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, DOCUMENT } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DOCUMENT } from '@angular/common';
+
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ReportNode, AttachmentMeta } from '../../../../client/step-client-module';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';

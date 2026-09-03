@@ -16,6 +16,7 @@ import {
   TrackByFunction,
   viewChild,
   ViewEncapsulation,
+  DOCUMENT,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TreeActionsService } from '../../services/tree-actions.service';
@@ -26,7 +27,7 @@ import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.d
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 import { TreeFlatNode } from '../../types/tree-flat-node';
 import { TreeFocusStateService } from '../../services/tree-focus-state.service';
-import { AsyncPipe, DOCUMENT, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { TreeNodeDetailsTemplateDirective } from '../../directives/tree-node-details-template.directive';
 import { TreeNodeNameTemplateDirective } from '../../directives/tree-node-name-template.directive';
 import { TreeNodeComponent } from '../tree-node/tree-node.component';

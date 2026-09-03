@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, untracked } from '@angular/core';
+import { Component, computed, effect, inject, untracked, DOCUMENT } from '@angular/core';
 import {
   APP_HOST,
   AugmentedControllerService,
@@ -11,7 +11,7 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
-import { DOCUMENT } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
