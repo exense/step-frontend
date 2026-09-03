@@ -23,11 +23,8 @@ const config = {
   }),
   '@angular/animations': libraryConfig(),
   '@angular/platform-browser': libraryConfig(),
-  '@angular/common': libraryConfig({
-    includeSecondaries: {
-      resolveGlob: true,
-    },
-  }),
+  '@angular/common': libraryConfig(),
+  '@angular/common/http': libraryConfig(),
   '@angular/router': libraryConfig(),
   '@angular/forms': libraryConfig(),
   '@angular/cdk': libraryConfig(),
