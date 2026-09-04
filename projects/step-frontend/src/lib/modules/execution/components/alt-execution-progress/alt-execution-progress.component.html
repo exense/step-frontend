@@ -331,7 +331,12 @@
   }
 </section>
 
-<section class="main" [class.has-drilldown]="!!activeDrilldownTabId()" [class.is-layout-edit]="isLayoutEditMode()">
+<section
+  class="main"
+  [class.has-drilldown]="!!activeDrilldownTabId()"
+  [class.is-compact-report]="isCompactReport"
+  [class.is-layout-edit]="isLayoutEditMode()"
+>
   @if (!isCompactReport) {
     @if (execution$ | async; as execution) {
       <step-alt-report-widget class="print-execution-details">

@@ -297,6 +297,28 @@ step-alt-execution-progress {
       }
     }
 
+    &.is-compact-report.has-drilldown {
+      step-aggregated-tree-node-drilldown {
+        min-height: 0;
+        border: 0.1rem solid var.$gray-300;
+        border-radius: 0.8rem 0.8rem 0 0;
+        overflow: hidden;
+
+        step-view-item > section {
+          height: 100%;
+          margin: 0;
+          padding: 0 1rem 1rem;
+          padding-right: 1rem !important;
+
+          .item-header {
+            min-height: 4.8rem;
+            margin-bottom: 1rem;
+            border-bottom: 0.1rem solid var.$gray-300;
+          }
+        }
+      }
+    }
+
     &.is-layout-edit {
       .primary-content {
         padding-top: 1rem;
