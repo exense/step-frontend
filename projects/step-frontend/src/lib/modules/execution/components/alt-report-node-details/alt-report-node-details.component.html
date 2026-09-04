@@ -1,10 +1,11 @@
 @if (reportNode(); as node) {
-  @if (!isTestCase() || hasRootCauseErrors()) {
+  @let errors = rootCauseErrors();
+  @if (!isTestCase() || !!errors) {
     <div class="common-report-node-details">
-      @if (rootCauseErrors(); as rootCauseErrors) {
+      @if (errors) {
         <step-error-root-causes
           class="error-root-causes-container execution-report-node-details"
-          [data]="rootCauseErrors"
+          [data]="errors"
           (onErrorSearch)="searchFor($event)"
         />
       }

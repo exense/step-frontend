@@ -114,11 +114,6 @@ export class AltReportNodeDetailsComponent {
     return !result.length ? undefined : result;
   });
 
-  protected readonly hasRootCauseErrors = computed(() => {
-    const rootCauseErrors = this.rootCauseErrors();
-    return !!rootCauseErrors?.length;
-  });
-
   protected readonly isTestCase = computed(() => {
     const artefactClass = this.artefactClass();
     return artefactClass === 'TestCase';
