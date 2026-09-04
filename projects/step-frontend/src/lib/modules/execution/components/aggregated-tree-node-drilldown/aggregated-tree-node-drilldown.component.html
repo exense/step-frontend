@@ -1,6 +1,7 @@
 <step-stack-view
   [withOverflow]="true"
   [canClosePanels]="true"
+  [canCloseRootPanel]="canCloseRootPanel"
   rootCloseTooltip="Close drilldown"
   (removeItem)="removeItem($event, true)"
 >
