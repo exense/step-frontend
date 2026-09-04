@@ -1,6 +1,6 @@
 @if (reportNode(); as node) {
-  @if (!hideFirstPanel()) {
-    <div class="grid">
+  @if (!isTestCase() || hasRootCauseErrors()) {
+    <div class="common-report-node-details">
       @if (rootCauseErrors(); as rootCauseErrors) {
         <step-error-root-causes
           class="error-root-causes-container execution-report-node-details"

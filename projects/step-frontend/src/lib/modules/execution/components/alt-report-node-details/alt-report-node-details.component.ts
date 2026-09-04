@@ -114,15 +114,14 @@ export class AltReportNodeDetailsComponent {
     return !result.length ? undefined : result;
   });
 
+  protected readonly hasRootCauseErrors = computed(() => {
+    const rootCauseErrors = this.rootCauseErrors();
+    return !!rootCauseErrors?.length;
+  });
+
   protected readonly isTestCase = computed(() => {
     const artefactClass = this.artefactClass();
     return artefactClass === 'TestCase';
-  });
-
-  protected readonly hideFirstPanel = computed(() => {
-    const isTestCase = this.isTestCase();
-    const rootCauseErrors = this.rootCauseErrors();
-    return isTestCase && !rootCauseErrors?.length;
   });
 
   protected readonly detailsComponent = computed(() => {
