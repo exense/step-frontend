@@ -173,6 +173,88 @@ import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
 
+const createAltExecutionNodeDetailsRoute = (): Route => ({
+  path: 'node-details',
+  component: SimpleOutletComponent,
+  children: [
+    {
+      matcher: (url) => {
+        if (
+          url.length > 0 &&
+          (url[0].path === DrilldownRootType.TREE ||
+            url[0].path === DrilldownRootType.TESTCASES ||
+            url[0].path === DrilldownRootType.KEYWORDS)
+        ) {
+          return { consumed: url };
+        }
+        return null;
+      },
+      canActivate: [
+        () => {
+          inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+            AltExecutionRefreshActivity.TREE,
+            AltExecutionRefreshActivity.KEYWORDS_TABLE,
+            AltExecutionRefreshActivity.TEST_CASES_TABLE,
+          );
+          return true;
+        },
+      ],
+      resolve: {
+        drilldownState: (route: ActivatedRouteSnapshot) => {
+          const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
+          const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
+
+          const url = route.url;
+
+          const rootType = url[0].path as DrilldownRootType;
+
+          const result: DrillDownStackItemConfig[] = [
+            {
+              type: DrillDownStackItemType.ROOT,
+              rootType,
+              nodeId: DRILL_DOWN_ROOT_ID,
+            },
+          ];
+
+          for (let i = 1; i < url.length; i += 2) {
+            let type: DrillDownStackItemTypeWORoot;
+            switch (url[i].path) {
+              case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
+              case DrillDownStackItemType.REPORT_NODE:
+              case DrillDownStackItemType.PARTIAL_TREE:
+                type = url[i].path as DrillDownStackItemTypeWORoot;
+                break;
+              default:
+                type = DrillDownStackItemType.REPORT_NODE;
+                break;
+            }
+
+            const value = url[i + 1].path;
+            if (type === DrillDownStackItemType.REPORT_NODE) {
+              const nodeId = value;
+              result.push({ type, nodeId });
+            } else {
+              const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
+              let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
+              searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
+              result.push({
+                type,
+                nodeId,
+                searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
+                searchStatusCount,
+                partialTreeRootNodeId,
+              });
+            }
+          }
+
+          return result;
+        },
+      },
+      component: AggregatedTreeNodeDrilldownComponent,
+    },
+  ],
+});
+
 const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
   path,
   component: AltExecutionProgressComponent,
@@ -235,6 +317,12 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
       ],
       canDeactivate: [canLeaveComponent],
     },
+    {
+      path: 'report',
+      redirectTo: '',
+      pathMatch: 'full',
+    },
+    createAltExecutionNodeDetailsRoute(),
   ],
 });
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
@@ -909,87 +997,7 @@ export class ExecutionModule {
                 },
               },
             }),
-            {
-              path: 'node-details',
-              component: SimpleOutletComponent,
-              children: [
-                {
-                  matcher: (url) => {
-                    if (
-                      url.length > 0 &&
-                      (url[0].path === DrilldownRootType.TREE ||
-                        url[0].path === DrilldownRootType.TESTCASES ||
-                        url[0].path === DrilldownRootType.KEYWORDS)
-                    ) {
-                      return { consumed: url };
-                    }
-                    return null;
-                  },
-                  canActivate: [
-                    () => {
-                      inject(AltExecutionRefreshActivityService).setupRefreshActivity(
-                        AltExecutionRefreshActivity.TREE,
-                        AltExecutionRefreshActivity.KEYWORDS_TABLE,
-                        AltExecutionRefreshActivity.TEST_CASES_TABLE,
-                      );
-                      return true;
-                    },
-                  ],
-                  resolve: {
-                    drilldownState: (route: ActivatedRouteSnapshot) => {
-                      const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
-                      const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
-
-                      const url = route.url;
-
-                      const rootType = url[0].path as DrilldownRootType;
-
-                      const result: DrillDownStackItemConfig[] = [
-                        {
-                          type: DrillDownStackItemType.ROOT,
-                          rootType,
-                          nodeId: DRILL_DOWN_ROOT_ID,
-                        },
-                      ];
-
-                      for (let i = 1; i < url.length; i += 2) {
-                        let type: DrillDownStackItemTypeWORoot;
-                        switch (url[i].path) {
-                          case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
-                          case DrillDownStackItemType.REPORT_NODE:
-                          case DrillDownStackItemType.PARTIAL_TREE:
-                            type = url[i].path as DrillDownStackItemTypeWORoot;
-                            break;
-                          default:
-                            type = DrillDownStackItemType.REPORT_NODE;
-                            break;
-                        }
-
-                        const value = url[i + 1].path;
-                        if (type === DrillDownStackItemType.REPORT_NODE) {
-                          const nodeId = value;
-                          result.push({ type, nodeId });
-                        } else {
-                          const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
-                          let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
-                          searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
-                          result.push({
-                            type,
-                            nodeId,
-                            searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
-                            searchStatusCount,
-                            partialTreeRootNodeId,
-                          });
-                        }
-                      }
-
-                      return result;
-                    },
-                  },
-                  component: AggregatedTreeNodeDrilldownComponent,
-                },
-              ],
-            },
+            createAltExecutionNodeDetailsRoute(),
             {
               path: 'viz',
               redirectTo: 'analytics',
