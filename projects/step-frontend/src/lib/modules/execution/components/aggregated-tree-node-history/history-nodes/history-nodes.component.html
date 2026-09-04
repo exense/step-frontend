@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" [class.justify-end]="!isFitToParent()">
   <div class="previous-executions-container" [style.--style__nodeSize.px]="nodesSize()">
     <!--    eslint-disable-next-line step-lint/track-is-item-field-->
     @for (node of paddedPastExecutions(); track $index) {
