@@ -33,6 +33,7 @@ export * from './injectables/plan-context-initializer.service';
 export * from './injectables/artefact-form-change-helper.service';
 export * from './injectables/plan-filters-factory.service';
 export * from './injectables/source-editor-autocomplete.service';
+export * from './injectables/plan-reference-policy.service';
 
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
