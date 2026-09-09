@@ -13,7 +13,6 @@ export type Function = {
   schema?: Record<string, JsonValue>;
   executeLocally?: boolean;
   tokenSelectionCriteria?: Record<string, string>;
-  managed?: boolean;
   activationExpression?: Expression;
   useCustomTemplate?: boolean;
   htmlTemplate?: string;
