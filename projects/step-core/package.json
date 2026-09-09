@@ -1,12 +1,9 @@
 {
   "name": "@exense/step-core",
   "version": "0.2.0",
-  "schematics": "./schematics/collection.json",
   "scripts": {
     "build:assets": "tsc -p tsconfig.assets.json",
-    "build:schematics": "tsc -p tsconfig.schematcis.json",
-    "build": "npm run build:assets && npm run build:schematics",
-    "postbuild": "node copy-schematic-files.js",
+    "build": "npm run build:assets",
     "pack": "",
     "push": "npm publish ../../dist/step-core/*.tgz --tag latest"
   },
@@ -22,28 +19,29 @@
     }
   },
   "peerDependencies": {
-    "@angular-architects/module-federation": "19.0.3",
-    "@angular/common": "19.2.14",
-    "@angular/core": "19.2.14",
-    "@angular/forms": "19.2.14",
-    "@angular-devkit/schematics": "19.2.14",
-    "@angular/material": "19.2.18",
-    "@angular/router": "19.2.14",
-    "@angular/material-luxon-adapter": "19.2.18",
+    "@angular-architects/native-federation": "20.3.1",
+    "@softarc/native-federation-node": "^3.3.4",
+    "es-module-shims": "^1.5.12",
+    "@angular/common": "20.3.26",
+    "@angular/core": "20.3.26",
+    "@angular/forms": "20.3.26",
+    "@angular-eslint/schematics": "20.7.0",
+    "@angular/material": "20.2.14",
+    "@angular/router": "20.3.26",
+    "@angular/material-luxon-adapter": "20.2.14",
     "@types/luxon": "3.4.2",
-    "@angular/cdk": "19.2.18",
-    "@angular/cdk-experimental": "19.2.18",
+    "@angular/cdk": "20.2.14",
+    "@angular/cdk-experimental": "20.2.14",
     "@schematics/angular": "20.0.1",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
-    "rxjs": "7.4.0",
+    "rxjs": "7.8.2",
     "ace-builds": "1.43.2",
-    "angular-split": "19.0.0",
-    "ngx-build-plus": "19.0.0",
-    "ngx-markdown": "19.1.1",
-    "marked": "15.0.12",
+    "angular-split": "20.0.0",
+    "ngx-markdown": "20.1.0",
+    "marked": "16.4.2",
     "luxon": "3.4.4",
-    "@angular-devkit/build-angular": "19.2.14"
+    "@angular/build": "20.3.32"
   },
   "dependencies": {
     "tslib": "2.3.0"
@@ -52,6 +50,6 @@
     "shelljs": "0.9.2"
   },
   "engines": {
-    "node": ">=18.19.0"
+    "node": ">=24.14.1"
   }
 }

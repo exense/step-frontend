@@ -11,6 +11,7 @@ import {
   signal,
   viewChild,
   ViewEncapsulation,
+  DOCUMENT,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -24,7 +25,7 @@ import {
   StreamingAttachmentMeta,
   UserService,
 } from '../../../../client/step-client-module';
-import { DOCUMENT } from '@angular/common';
+
 import { AceMode, RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';

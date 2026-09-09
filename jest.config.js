@@ -8,7 +8,10 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!flat)/', // Exclude modules except 'flat' from transformation
   ],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
+  moduleNameMapper: {
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
+    '^ngx-markdown$': '<rootDir>/projects/step-core/mocks/ngx-markdown.mock.ts',
+  },
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   testEnvironment: '@happy-dom/jest-environment',
 };

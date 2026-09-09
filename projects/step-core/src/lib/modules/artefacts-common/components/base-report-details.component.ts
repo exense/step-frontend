@@ -1,8 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, DOCUMENT } from '@angular/core';
 import { ReportNode } from '../../../client/step-client-module';
 import { CustomComponent } from '../../custom-registeries/custom-registries.module';
 import { JsonViewerFormatterService } from '../../json-viewer/services/json-viewer-formatter.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   template: '',

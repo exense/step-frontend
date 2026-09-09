@@ -1,7 +1,6 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { ViewerFormat } from '../../shared/viewer-format.enum';
 import { JsonViewerFormatterService } from '../../services/json-viewer-formatter.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-json-viewer',

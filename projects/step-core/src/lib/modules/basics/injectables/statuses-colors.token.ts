@@ -1,6 +1,5 @@
 import { Execution } from '../../../client/step-client-module';
-import { inject, InjectionToken } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, InjectionToken, DOCUMENT } from '@angular/core';
 
 type E = Pick<Required<Execution>, 'status' | 'result'>;
 type Status = E['status'] | E['result'] | 'UNKNOW' | 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED' | 'EMPTY';

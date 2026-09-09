@@ -6,8 +6,9 @@ import {
   Injector,
   ViewContainerRef,
   ViewEncapsulation,
+  DOCUMENT,
 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+
 import { ThemeRegisterService } from '../../services/theme-register.service';
 
 @Component({

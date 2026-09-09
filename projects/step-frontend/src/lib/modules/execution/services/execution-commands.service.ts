@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy, DOCUMENT } from '@angular/core';
 import { ExecutionCommandsContext } from '../shared/execution-commands-context.interface';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import {
@@ -9,7 +9,7 @@ import {
   ExecutiontTaskParameters,
   RepositoryObjectReference,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
+
 import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
 

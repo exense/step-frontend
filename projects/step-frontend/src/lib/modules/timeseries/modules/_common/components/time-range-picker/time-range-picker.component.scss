@@ -114,6 +114,8 @@
 }
 
 .range-btn {
+  @include core.button-round;
+
   display: flex;
   min-width: 25rem;
   align-items: center;
@@ -124,6 +126,7 @@
   text-overflow: ellipsis;
   justify-content: space-between;
   height: 3.6rem;
+  border-radius: var(--form-field-border-radius, 0.8rem) !important;
 
   @media print {
     width: unset;
@@ -134,15 +137,9 @@
     }
   }
 
-  @include core.button-round;
-  border-radius: var(--form-field-border-radius, 0.8rem);
-
   .text {
     flex: 1;
     margin-left: 0.5rem;
-  }
-
-  .suffix-icon {
   }
 
   .warn {

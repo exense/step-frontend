@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   provideStepApi,
   StepCoreModule,
@@ -31,6 +30,7 @@ import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './mo
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 import { InProgressComponent } from './components/in-progress/in-progress.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 Settings.defaultLocale = 'en';
 
@@ -45,6 +45,7 @@ const MODULES_INITIALIZERS = [
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
   imports: [
     StepCommonModule,
+    BrowserAnimationsModule.withConfig({ disableAnimations: true }),
     BrowserModule,
     StepCoreModule,
     ...ERRORS_VIEW_IMPORTS,
@@ -53,7 +54,6 @@ const MODULES_INITIALIZERS = [
     FunctionModule,
     ...AUTOMATION_PACKAGE_IMPORTS,
     ExecutionModule,
-    BrowserAnimationsModule,
     SchedulerModule,
     ParameterModule,
     GridModule,

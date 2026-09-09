@@ -1,6 +1,6 @@
-import { inject, InjectionToken } from '@angular/core';
+import { inject, InjectionToken, DOCUMENT } from '@angular/core';
 import { debounceTime, map, Observable, shareReplay, startWith } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
+
 import { resizeObservable } from './resize-observable';
 
 export const SCREEN_WIDTH = new InjectionToken<Observable<number>>('Screen width observable token', {
