@@ -75,7 +75,7 @@
     "chart.js": "4.4.3",
     "chartjs-plugin-datalabels": "2.2.0",
     "zone.js": "0.15.1",
-    "playwright-core": "1.55.0"
+    "playwright-core": "1.63.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.14",
@@ -117,7 +117,7 @@
     "ts-jest": "29.4.4"
   },
   "engines": {
-    "node": ">=18.19.0"
+    "node": ">=20.11.1"
   },
   "lint-staged": {
     "projects/step-core/src/**/*.*" : ["ng-lint-staged ng lint @exense/step-core --"],
