@@ -3,13 +3,16 @@
 /* eslint-disable */
 export const $DirectoryListing = {
   properties: {
-    currentPath: {
+    path: {
       type: 'string',
     },
     parentPath: {
       type: 'string',
     },
-    items: {
+    resourceReference: {
+      type: 'string',
+    },
+    entries: {
       type: 'array',
       contains: {
         type: 'FileDescriptor',

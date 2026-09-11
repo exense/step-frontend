@@ -6,24 +6,27 @@ export const $FileDescriptor = {
     name: {
       type: 'string',
     },
-    absolutePath: {
+    path: {
       type: 'string',
+    },
+    directory: {
+      type: 'boolean',
+    },
+    regularFile: {
+      type: 'boolean',
+    },
+    hidden: {
+      type: 'boolean',
+    },
+    symlink: {
+      type: 'boolean',
     },
     size: {
       type: 'number',
       format: 'int64',
     },
-    isDirectory: {
-      type: 'boolean',
-    },
-    isFile: {
-      type: 'boolean',
-    },
-    isSymlink: {
-      type: 'boolean',
-    },
-    isHidden: {
-      type: 'boolean',
+    resourceReference: {
+      type: 'string',
     },
   },
 } as const;
