@@ -1,0 +1,51 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.step-create-package-dialog.mat-mdc-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  min-width: 0;
+}
+
+step-create-package-dialog {
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    min-width: 0;
+  }
+
+  step-form-field .form-field-content > input {
+    min-width: 0;
+
+    &.has-warnings {
+      border-color: var.$orange-100;
+    }
+
+    &.has-errors {
+      border-color: var.$red-650;
+    }
+  }
+
+  .package-directory {
+    color: var.$gray-500;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin: 0 0 0.8rem;
+    overflow-wrap: anywhere;
+
+    step-icon {
+      flex-shrink: 0;
+    }
+  }
+
+  .error {
+    color: var.$red-650;
+  }
+
+  .warning {
+    color: var.$orange-100;
+  }
+}
