@@ -1,0 +1,235 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ai-generate-page {
+  display: block;
+  min-height: 100%;
+
+  .ai-generate-page {
+    width: 100%;
+    max-width: 140rem;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 2.4rem 4rem 4rem;
+  }
+
+  .ai-generate-page__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2.4rem;
+
+    > span:first-child {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 0.4rem;
+      color: var.$gray-500;
+      font-size: 1.6rem;
+      line-height: 2.4rem;
+    }
+
+    h1 {
+      margin: 0;
+      color: var.$gray-800;
+      font-size: 3rem;
+      line-height: 3.6rem;
+    }
+  }
+
+  .ai-generate-page__availability {
+    display: flex;
+    min-width: 26rem;
+    min-height: 5.6rem;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+
+    step-alert {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.6rem 2rem;
+      border: 0.1rem solid var.$yellow-600;
+      border-radius: 0.8rem;
+      margin: 0;
+      color: var.$gold;
+      background: var.$yellow-10;
+    }
+  }
+
+  .ai-generate-page__tabs {
+    overflow: hidden;
+    margin-top: 3.2rem;
+    border: 0.1rem solid var.$gray-300;
+    border-radius: 1.2rem;
+    background: var.$white;
+
+    step-tabs {
+      display: block;
+    }
+
+    .mat-mdc-tab-link {
+      min-width: 0;
+      flex: 1 1 0;
+      height: 7rem;
+
+      &:not(:last-child) {
+        border-right: 0.1rem solid var.$gray-200;
+      }
+    }
+  }
+
+  .ai-generate-page__tab-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+    font-size: 1.6rem;
+  }
+
+  .ai-generate-page__card {
+    margin-top: 2.4rem;
+    padding: 3.2rem;
+    border: 0.1rem solid var.$gray-200;
+    border-radius: 1.2rem;
+    background: var.$white;
+    box-shadow: 0 0.4rem 1.2rem rgba(var.$black, 0.06);
+  }
+
+  .ai-generate-page__mode[hidden] {
+    display: none;
+  }
+
+  .ai-manual-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+
+    > header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+
+      h2 {
+        margin: 0;
+        color: var.$gray-800;
+        font-size: 2rem;
+        line-height: 2.8rem;
+      }
+
+      span {
+        color: var.$gray-500;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+      }
+    }
+
+    step-form-field {
+      display: block;
+
+      input,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      textarea {
+        min-height: 10rem;
+        resize: vertical;
+      }
+    }
+  }
+
+  .ai-manual-form__case {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    padding: 2rem;
+    border: 0.1rem solid var.$gray-200;
+    border-radius: 0.8rem;
+
+    > header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.6rem;
+
+      h3 {
+        margin: 0;
+        color: var.$gray-800;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+      }
+    }
+  }
+
+  .ai-manual-form__case-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    input {
+      height: 3.6rem;
+    }
+  }
+
+  .ai-manual-form__counter {
+    display: flex;
+    justify-content: flex-end;
+    color: var.$gray-500;
+    font-size: 1.4rem;
+  }
+
+  .ai-manual-form__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.6rem;
+    padding-top: 1.6rem;
+    border-top: 0.1rem solid var.$gray-200;
+
+    button {
+      min-height: 4.8rem;
+    }
+
+    &--end {
+      justify-content: flex-end;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .ai-generate-page {
+      padding: 1.6rem;
+    }
+
+    .ai-generate-page__header {
+      flex-direction: column;
+    }
+
+    .ai-generate-page__availability {
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      justify-content: flex-start;
+    }
+
+    .ai-generate-page__tabs {
+      margin-top: 2.4rem;
+
+      .mat-mdc-tab-link {
+        min-width: 16rem;
+      }
+    }
+
+    .ai-generate-page__card {
+      padding: 1.6rem;
+    }
+
+    .ai-manual-form__actions {
+      align-items: stretch;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

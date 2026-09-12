@@ -1,0 +1,106 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ai-sidebar-menu {
+  display: block;
+  width: 100%;
+  min-width: 0;
+
+  .ai-sidebar-menu {
+    width: 100%;
+    overflow: hidden;
+    color: var.$white;
+    background: rgba(var.$white, 0.1);
+    border-radius: 0.8rem;
+  }
+
+  .ai-sidebar-menu__parent,
+  .ai-sidebar-menu__item {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 1.6rem;
+    padding: 0 1.4rem;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: rgba(var.$white, 0.1);
+    }
+
+    &:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 0.2rem solid currentColor;
+      outline-offset: -0.2rem;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    step-icon {
+      flex: 0 0 auto;
+    }
+  }
+
+  .ai-sidebar-menu__parent {
+    height: 4.8rem;
+    font-size: 1.6rem;
+    font-weight: 400;
+
+    &--active,
+    &--expanded {
+      background: rgba(var.$white, 0.06);
+    }
+  }
+
+  .ai-sidebar-menu__item {
+    height: 3.2rem;
+    color: var.$gray-325;
+    font-size: 1.4rem;
+    font-weight: 300;
+
+    &--active {
+      color: var.$white;
+      background: rgba(var.$white, 0.1);
+    }
+  }
+
+  .ai-sidebar-menu__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ai-sidebar-menu__chevron {
+    margin-left: auto;
+  }
+}
+
+.sidebar.sidebar-closed step-ai-sidebar-menu {
+  .ai-sidebar-menu__parent,
+  .ai-sidebar-menu__item {
+    justify-content: center;
+    gap: 0;
+    padding: 0 1.2rem;
+  }
+
+  .ai-sidebar-menu__label,
+  .ai-sidebar-menu__chevron {
+    display: none;
+  }
+}
+
+.sidebar.sidebar-closed.small-screen step-ai-sidebar-menu {
+  .ai-sidebar-menu__parent,
+  .ai-sidebar-menu__item {
+    padding: 0 1rem;
+  }
+}

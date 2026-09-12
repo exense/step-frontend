@@ -24,7 +24,7 @@
         <step-icon name="home" />
       </span>
     }
-    @if (!_isIdeMode && (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) ) {
+    @if (!_isIdeMode && (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async))) {
       <step-settings-button
         data-step-testid="sidebar-settings-button"
         class="sidebar-home-and-settings-icon"
@@ -32,8 +32,15 @@
       />
     }
   </div>
-  <div id="sidebar-categories">
-    <div id="sidebar-categories-tabs" #tabs>
+  <div id="sidebar-categories" #categories>
+    @if (beforeCategoriesDashlets.length) {
+      <div id="sidebar-before-categories">
+        @for (item of beforeCategoriesDashlets; track item.id) {
+          <step-dashlet class="visible-when-collapsed" [itemKey]="item.template" />
+        }
+      </div>
+    }
+    <div id="sidebar-categories-tabs">
       @if (displayMenuItems$ | async; as menuItems) {
         @for (mainMenuEntry of menuItems; track mainMenuEntry.id) {
           <div class="sidebar-collapsable-tab">

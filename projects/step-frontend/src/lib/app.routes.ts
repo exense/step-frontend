@@ -78,7 +78,7 @@ export const DEFAULT_ROUTE_INITIALIZER: FactoryProvider = {
 
       root.children.unshift({
         path: '',
-        redirectTo: _defaultPage(),
+        redirectTo: () => _defaultPage(),
         pathMatch: 'full',
       });
 

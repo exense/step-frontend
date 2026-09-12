@@ -1,0 +1,50 @@
+<main class="ai-generations-list">
+  <header class="ai-generations-list__header">
+    <h1>Generations</h1>
+    <p>Review the Plans created with AI.</p>
+  </header>
+
+  <section class="ai-generations-list__card" aria-live="polite">
+    @let currentState = state();
+    @switch (currentState.type) {
+      @case (stateType.LOADING) {
+        <div class="ai-generations-list__state" role="status">
+          <mat-spinner diameter="40" />
+          <h2>Loading Generations</h2>
+          <p>Your generated Plans are being loaded.</p>
+        </div>
+      }
+      @case (stateType.EMPTY) {
+        <div class="ai-generations-list__state">
+          <span class="ai-generations-list__state-icon" aria-hidden="true">
+            <step-icon name="sparkles" />
+          </span>
+          <h2>No Generations Yet</h2>
+          <p>Plans generated with AI will appear here.</p>
+          <button type="button" mat-flat-button color="primary" (click)="generatePlan()">
+            <step-icon name="sparkles" />
+            <span>Generate Plan</span>
+          </button>
+        </div>
+      }
+      @case (stateType.CONTENT) {
+        <ul class="ai-generations-list__items" aria-label="Generations">
+          @for (item of currentState.items; track item.id) {
+            <li>
+              <span class="ai-generations-list__item-icon" aria-hidden="true">
+                <step-icon name="sparkles" />
+              </span>
+              <span>{{ item.title }}</span>
+            </li>
+          }
+        </ul>
+      }
+      @case (stateType.ERROR) {
+        <step-alert type="danger" role="alert">
+          <strong>Generations Could Not Be Loaded</strong>
+          <span>{{ currentState.message }}</span>
+        </step-alert>
+      }
+    }
+  </section>
+</main>

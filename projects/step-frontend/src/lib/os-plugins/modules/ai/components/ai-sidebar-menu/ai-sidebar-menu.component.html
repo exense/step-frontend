@@ -1,0 +1,40 @@
+<nav class="ai-sidebar-menu" aria-label="AI Generate">
+  <button
+    type="button"
+    class="ai-sidebar-menu__parent"
+    [class.ai-sidebar-menu__parent--active]="isParentActive$ | async"
+    [class.ai-sidebar-menu__parent--expanded]="isExpanded()"
+    [attr.aria-expanded]="isExpanded()"
+    aria-controls="ai-sidebar-menu-items"
+    aria-label="AI Generate"
+    matTooltip="AI Generate"
+    [matTooltipDisabled]="!!(isSidebarOpened$ | async)"
+    (click)="toggleExpanded()"
+  >
+    <step-icon name="zap" />
+    <span class="ai-sidebar-menu__label">AI Generate</span>
+    <step-icon class="ai-sidebar-menu__chevron" [name]="isExpanded() ? 'chevron-up' : 'chevron-down'" />
+  </button>
+
+  @if (isExpanded()) {
+    <div id="ai-sidebar-menu-items" class="ai-sidebar-menu__items">
+      @for (item of menuItems; track item.entry.id) {
+        <button
+          type="button"
+          class="ai-sidebar-menu__item"
+          [class.ai-sidebar-menu__item--active]="item.isActive$ | async"
+          [disabled]="!item.isEnabled"
+          [attr.aria-current]="(item.isActive$ | async) ? 'page' : null"
+          [attr.aria-label]="item.entry.title"
+          [matTooltip]="item.entry.title"
+          [matTooltipDisabled]="!!(isSidebarOpened$ | async)"
+          (click)="navigate(item, $event)"
+          (auxclick)="navigate(item, $event)"
+        >
+          <step-icon [name]="item.entry.icon" />
+          <span class="ai-sidebar-menu__label">{{ item.entry.title }}</span>
+        </button>
+      }
+    </div>
+  }
+</nav>
