@@ -1,0 +1,72 @@
+<form class="ai-manual-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <header>
+    <h2>Define Test Cases</h2>
+    <span>Add the test cases and instructions that should be included in the generated Plan.</span>
+  </header>
+
+  <div formArrayName="testCases">
+    @for (testCase of testCases.controls; track testCase.controls.id.value; let index = $index) {
+      <section class="ai-manual-form__case" [formGroupName]="index">
+        <header>
+          <h3>Test Case {{ index + 1 }}</h3>
+          @if (testCases.length > 1) {
+            <button
+              type="button"
+              mat-icon-button
+              [attr.aria-label]="'Remove Test Case ' + (index + 1)"
+              (click)="removeTestCase(index)"
+            >
+              <step-icon name="trash" />
+            </button>
+          }
+        </header>
+
+        <div class="ai-manual-form__case-fields">
+          <step-form-field [showRequiredMarker]="true">
+            <step-label>Name</step-label>
+            <input type="text" formControlName="name" />
+            @if (testCase.controls.name.touched && testCase.controls.name.errors) {
+              <step-error>
+                <step-errors-list [errors]="testCase.controls.name.errors" [keysDictionary]="requiredErrorDictionary" />
+              </step-error>
+            }
+          </step-form-field>
+
+          <step-form-field [showRequiredMarker]="true">
+            <step-label>Description</step-label>
+            <textarea formControlName="description"></textarea>
+            @if (testCase.controls.description.touched && testCase.controls.description.errors) {
+              <step-error>
+                <step-errors-list
+                  [errors]="testCase.controls.description.errors"
+                  [keysDictionary]="requiredErrorDictionary"
+                />
+              </step-error>
+            }
+          </step-form-field>
+
+          <step-form-field>
+            <step-label>Instructions</step-label>
+            <textarea formControlName="instructions"></textarea>
+          </step-form-field>
+        </div>
+      </section>
+    }
+  </div>
+
+  <step-form-field>
+    <step-label>Shared Instructions</step-label>
+    <textarea formControlName="sharedInstructions"></textarea>
+  </step-form-field>
+
+  <footer class="ai-manual-form__actions">
+    <button type="button" mat-stroked-button (click)="addTestCase()">
+      <step-icon name="plus" />
+      <span>Add Test Case</span>
+    </button>
+    <button type="submit" mat-flat-button color="primary">
+      <step-icon name="sparkles" />
+      <span>Generate Plan</span>
+    </button>
+  </footer>
+</form>

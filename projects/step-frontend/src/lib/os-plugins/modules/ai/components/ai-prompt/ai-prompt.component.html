@@ -1,0 +1,60 @@
+<form class="ai-prompt" [class.ai-prompt--start-page]="appearance() === 'start-page'" (ngSubmit)="submit()" novalidate>
+  <header class="ai-prompt__header">
+    <span class="ai-prompt__heading-icon" aria-hidden="true">
+      <step-icon name="sparkles" />
+    </span>
+    <span class="ai-prompt__heading-copy">
+      <h2>{{ heading() }}</h2>
+      <span>{{ supportingText() }}</span>
+    </span>
+  </header>
+
+  <div class="ai-prompt__body" [class.ai-prompt__body--invalid]="promptControl.touched && promptControl.invalid">
+    <div
+      class="ai-prompt__input-container"
+      [class.ai-prompt__input-container--invalid]="promptControl.touched && promptControl.invalid"
+    >
+      <textarea
+        #promptInput
+        id="ai-prompt-input"
+        [formControl]="promptControl"
+        [maxlength]="maxPromptLength"
+        [placeholder]="placeholder()"
+        [attr.aria-label]="heading()"
+        [attr.aria-invalid]="promptControl.touched && promptControl.invalid"
+        [attr.aria-describedby]="
+          promptControl.touched && promptControl.invalid ? 'ai-prompt-counter ai-prompt-error' : 'ai-prompt-counter'
+        "
+      ></textarea>
+      <span id="ai-prompt-counter" class="ai-prompt__counter"> {{ promptLength() }} / {{ maxPromptLength }} </span>
+    </div>
+
+    @if (promptControl.touched && promptControl.errors) {
+      <step-error id="ai-prompt-error" class="ai-prompt__error" role="alert">
+        <step-errors-list [errors]="promptControl.errors" [keysDictionary]="promptErrorsDictionary" />
+      </step-error>
+    }
+
+    <footer class="ai-prompt__actions">
+      <mat-button-toggle-group
+        class="ai-prompt__modes"
+        appearance="standard"
+        [hideSingleSelectionIndicator]="true"
+        [formControl]="modeControl"
+        aria-label="Generation Type"
+      >
+        @for (option of modeOptions; track option.id) {
+          <mat-button-toggle [value]="option.mode" [disabled]="option.isDisabled">
+            <step-icon [name]="option.icon" />
+            <span>{{ option.label }}</span>
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      <button class="ai-prompt__submit" type="submit" mat-flat-button color="primary">
+        <step-icon name="sparkles" />
+        <span>{{ actionLabel() }}</span>
+      </button>
+    </footer>
+  </div>
+</form>

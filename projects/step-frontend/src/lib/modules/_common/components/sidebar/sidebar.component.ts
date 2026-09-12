@@ -79,7 +79,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _location = inject(Location);
 
   readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
-  readonly tabs = viewChild<ElementRef<HTMLElement>>('tabs');
+  readonly categories = viewChild<ElementRef<HTMLElement>>('categories');
+
+  protected readonly beforeCategoriesDashlets = this._viewRegistryService.getDashlets('menu/sidebar/before-categories');
 
   private locationStateSubscription = this._location.subscribe((popState: any) => {
     this.openMainMenuBasedOnActualView();
@@ -205,7 +207,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   handleScroll($event: Event): void {
     this._zone.runOutsideAngular(() => {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
-      this.tabs()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
+      this.categories()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
   }
 

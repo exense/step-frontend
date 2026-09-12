@@ -6,3 +6,14 @@
   cursor: default;
   opacity: 0.55;
 }
+
+step-sidebar #sidebar-before-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  margin-bottom: 1.6rem;
+
+  > step-dashlet {
+    display: block;
+  }
+}
