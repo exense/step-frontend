@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { IS_SMALL_SCREEN, LogoutCleanup, Mutable } from '@exense/step-core';
+import { IS_SMALL_SCREEN, LogoutCleanup, Mutable, SidebarState } from '@exense/step-core';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, pairwise } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { MenuStorageService } from './menu-storage.service';
@@ -18,7 +18,7 @@ type FieldAccessor = Mutable<Pick<SidebarStateService, 'openedMenuItems'>>;
 @Injectable({
   providedIn: 'root',
 })
-export class SidebarStateService implements OnDestroy, LogoutCleanup {
+export class SidebarStateService implements OnDestroy, LogoutCleanup, SidebarState {
   private _menuStorage = inject(MenuStorageService);
   private _document = inject(DOCUMENT);
   private _isSmallScreen$ = inject(IS_SMALL_SCREEN).pipe(distinctUntilChanged(), takeUntilDestroyed());
