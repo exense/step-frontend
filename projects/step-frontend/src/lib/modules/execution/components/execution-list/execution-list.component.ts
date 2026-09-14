@@ -2,10 +2,12 @@ import { Component, computed, effect, inject, OnDestroy, signal, viewChild, View
 import {
   AugmentedExecutionsService,
   BulkSelectionType,
-  DateFormat, DialogsService,
+  DateFormat,
+  DialogsService,
   EntitySelectionState,
   entitySelectionStateProvider,
   Execution,
+  ExecutionListFiltersService,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   MultiLevelArrayFilterComponent,
@@ -47,10 +49,14 @@ import { FormControl } from '@angular/forms';
 export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
   protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  private _executionListFilters = inject(ExecutionListFiltersService);
   protected readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
   protected readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
+  protected readonly staticFilters = {
+    aiGenerations: this._filterConditionFactory.basicFilterCondition(this._executionListFilters.getFilters()),
+  };
   protected readonly DateFormat = DateFormat;
   protected readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   protected readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(

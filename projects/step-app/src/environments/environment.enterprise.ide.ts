@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   ideMode: true,
-  enterpriseMode: false,
+  enterpriseMode: true,
 };
