@@ -1,0 +1,87 @@
+<step-modal-window [title]="_data.title">
+  <step-popover step-modal-window-title class="instructions-popover" xPosition="before" yPosition="below">
+    <button type="button" mat-icon-button tabindex="-1" aria-label="Folder picker instructions">
+      <step-icon name="info" />
+    </button>
+    <step-popover-content>
+      <ul class="instructions-list">
+        <li>Single click selects a folder or file.</li>
+        <li>Double click opens a folder.</li>
+        <li>Enter a path and press Enter to navigate directly.</li>
+      </ul>
+    </step-popover-content>
+  </step-popover>
+  <div step-modal-window-body>
+    @if (_data.withName) {
+      <div [formGroup]="packageForm">
+        <step-form-field [showRequiredMarker]="true">
+          <step-label>Package name</step-label>
+          <input type="text" formControlName="name" />
+        </step-form-field>
+      </div>
+    }
+
+    <div class="location-bar">
+      <button
+        stepTestId="directory-picker-up-btn"
+        type="button"
+        mat-icon-button
+        matTooltip="Go to parent folder"
+        [disabled]="showingRoots() || !canNavigateUp()"
+        (click)="loadParentDirectory()"
+      >
+        <step-icon name="corner-left-up" />
+      </button>
+      <step-form-field>
+        <input
+          stepTestId="directory-picker-location-input"
+          type="text"
+          aria-label="Location"
+          placeholder="Paste a folder path"
+          [formControl]="locationControl"
+          (keydown.enter)="loadLocation()"
+        />
+      </step-form-field>
+      <button
+        stepTestId="directory-picker-go-btn"
+        type="button"
+        mat-icon-button
+        matTooltip="Go to location"
+        [disabled]="isLocationButtonDisabled()"
+        (click)="loadLocation()"
+      >
+        <step-icon name="arrow-right" />
+      </button>
+    </div>
+
+    <div class="file-list">
+      @for (item of files(); track item.path) {
+        @if (showingRoots() || !item.hidden) {
+          <button
+            mat-button
+            [attr.data-directory]="item.path"
+            [class.selected]="selectedPath() === item.path"
+            (click)="selectFile(item)"
+            (dblclick)="handleLoadDirectory(item)"
+          >
+            @if (item.directory) {
+              <step-icon name="folder" />
+            } @else {
+              <step-icon name="file" />
+            }
+            {{ item.name }}
+          </button>
+        }
+      }
+    </div>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="_dialogRef.close(undefined)">Cancel</button>
+    @if (_data.createFolder) {
+      <button type="button" mat-stroked-button (click)="createDirectory()" [disabled]="!currentDirectory()">
+        Create Folder
+      </button>
+    }
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!canApply()">Select</button>
+  </div>
+</step-modal-window>

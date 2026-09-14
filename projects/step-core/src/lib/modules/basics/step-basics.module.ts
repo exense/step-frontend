@@ -423,5 +423,7 @@ export * from './utils/duration-switch-map';
 export * from './utils/fare-share-calculator';
 export * from './utils/combine-latest-with-track-changes';
 export * from './components/skeleton-placeholder/skeleton-placeholder.component';
+export * from './injectables/ide-mode.token';
 export * from './components/chart-skeleton/chart-skeleton.component';
 export * from './components/button-spinner/button-spinner.component';
+export * from './utils/signal-from-form-control';

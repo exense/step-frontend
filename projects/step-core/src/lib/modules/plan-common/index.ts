@@ -1,5 +1,6 @@
 import { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
 import { PlanLinkComponent } from './components/plan-link/plan-link.component';
+import { AiGeneratedBadgeComponent } from './components/ai-generated-badge/ai-generated-badge.component';
 import { SelectPlanComponent } from './components/select-plan/select-plan.component';
 import { ThreadDistributionWizardDialogComponent } from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 import { PlanNamePipe } from './pipes/plan-name.pipe';
@@ -13,6 +14,7 @@ import { PlanEditorAttributesDirective } from './directives/plan-editor-attribut
 export * from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/select-plan/select-plan.component';
 export * from './components/plan-link/plan-link.component';
+export * from './components/ai-generated-badge/ai-generated-badge.component';
 export * from './components/thread-distribution-wizard-dialog/thread-distribution-wizard-dialog.component';
 export * from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './components/artefact-details/artefact-details.component';
@@ -33,6 +35,7 @@ export * from './injectables/plan-context-initializer.service';
 export * from './injectables/artefact-form-change-helper.service';
 export * from './injectables/plan-filters-factory.service';
 export * from './injectables/source-editor-autocomplete.service';
+export * from './injectables/plan-reference-policy.service';
 
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
@@ -40,6 +43,7 @@ export * from './types/plan-context.interface';
 export * from './types/artefact-node-source.enum';
 export * from './types/artefact-tree-node';
 export * from './types/artefact-context';
+export * from './types/entity-origin';
 
 export * from './pipes/plan-name.pipe';
 export * from './pipes/plan-url.pipe';
@@ -47,6 +51,7 @@ export * from './pipes/plan-url.pipe';
 export const PLAN_COMMON_EXPORTS = [
   PlanCreateDialogComponent,
   PlanLinkComponent,
+  AiGeneratedBadgeComponent,
   SelectPlanComponent,
   ThreadDistributionWizardDialogComponent,
   PlanNamePipe,

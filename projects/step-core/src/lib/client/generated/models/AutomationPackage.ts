@@ -11,7 +11,7 @@ export type AutomationPackage = {
   creationUser?: string;
   lastModificationDate?: string;
   lastModificationUser?: string;
-  status?: 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED';
+  status?: 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED' | 'EDITING';
   versionName?: string;
   activationExpression?: Expression;
   automationPackageResource?: string;

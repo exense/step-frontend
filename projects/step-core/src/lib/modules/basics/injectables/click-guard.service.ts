@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import {inject, Injectable} from '@angular/core';
 
 export interface ClickGuardOptions {
   dragThreshold?: number;
@@ -18,8 +19,11 @@ export interface ClickGuard {
   providedIn: 'root',
 })
 export class ClickGuardService {
+
+  private _doc = inject(DOCUMENT);
+
   create(options: ClickGuardOptions = {}): ClickGuard {
-    return new ClickGuardTracker(options);
+    return new ClickGuardTracker(options, this._doc.defaultView);
   }
 }
 
@@ -30,7 +34,7 @@ class ClickGuardTracker implements ClickGuard {
   private ignoreNonLeftClick: boolean;
   private ignoreTextSelection: boolean;
 
-  constructor(options: ClickGuardOptions) {
+  constructor(options: ClickGuardOptions, private defaultView: Document['defaultView']) {
     this.dragThreshold = options.dragThreshold ?? 4;
     this.ignoreNonLeftClick = options.ignoreNonLeftClick ?? true;
     this.ignoreTextSelection = options.ignoreTextSelection ?? true;
@@ -75,7 +79,7 @@ class ClickGuardTracker implements ClickGuard {
   }
 
   private hasTextSelection(): boolean {
-    const selection = globalThis.getSelection?.();
+    const selection = this.defaultView?.getSelection?.();
     if (!selection || selection.isCollapsed) {
       return false;
     }

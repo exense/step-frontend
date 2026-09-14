@@ -1,14 +1,16 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import {
   AbstractArtefact,
   AugmentedPlansService,
   AugmentedScreenService,
+  CallPlan,
   DynamicValue,
   KeywordsService,
 } from '../../../client/step-client-module';
 import { AuthService } from '../../auth';
 import { JsonFieldsSchema, JsonFieldUtilsService } from '../../json-forms';
+import { PlanReferenceMode } from '../../plan-common/injectables/plan-reference-policy.service';
 
 @Injectable({
   providedIn: 'root',
@@ -100,16 +102,52 @@ export class ArtefactsFactoryService {
     );
   }
 
-  createCallPlanArtefact(planId: string): Observable<AbstractArtefact> {
+  createCallPlanArtefact(
+    planId: string,
+    options: { referenceMode?: PlanReferenceMode } = {},
+  ): Observable<AbstractArtefact> {
     return this._planApi.getPlanById(planId).pipe(
       switchMap((plan) => {
         const artefact$ = this._planApi.getArtefactType('CallPlan');
         return artefact$.pipe(
-          map((artefact) => {
-            artefact.attributes!['name'] = plan.attributes!['name'];
-            (artefact as any)['planId'] = planId;
-            artefact.dynamicName!.dynamic = artefact.useDynamicName;
-            return artefact;
+          switchMap((artefact) => {
+            const callPlan = artefact as AbstractArtefact & CallPlan;
+            const planName = plan.attributes?.['name'];
+            if (planName !== undefined) {
+              callPlan.attributes ??= {};
+              callPlan.attributes['name'] = planName;
+            }
+            if (callPlan.dynamicName) {
+              callPlan.dynamicName.dynamic = callPlan.useDynamicName;
+            }
+
+            if (options.referenceMode !== 'SELECTION_CRITERIA') {
+              callPlan.planId = planId;
+              return of(callPlan);
+            }
+
+            return this._screenTemplates.getInputsForScreenPost('plan').pipe(
+              map((inputs) => {
+                const selectionAttributes = inputs.reduce(
+                  (res, input) => {
+                    const attributeId = (input?.id || '').replace('attributes.', '');
+                    if (!attributeId || !plan?.attributes?.[attributeId]) {
+                      return res;
+                    }
+                    res[attributeId] = { value: plan.attributes[attributeId], dynamic: false };
+                    return res;
+                  },
+                  {} as Record<string, { value: string; dynamic: boolean }>,
+                );
+
+                callPlan.selectionAttributes = {
+                  value: JSON.stringify(selectionAttributes),
+                  dynamic: false,
+                };
+                delete callPlan.planId;
+                return callPlan;
+              }),
+            );
           }),
         );
       }),

@@ -277,6 +277,7 @@ export { Sleep } from './svg/sleep';
 export { Sliders } from './svg/sliders';
 export { Smartphone } from './svg/smartphone';
 export { Smile } from './svg/smile';
+export { Sparkles } from './svg/sparkles';
 export { Speaker } from './svg/speaker';
 export { Square } from './svg/square';
 export { Star } from './svg/star';

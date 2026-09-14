@@ -22,6 +22,7 @@ import {
   MENU_ITEMS,
   BookmarkNavigatorService,
   AuthService,
+  IDE_MODE,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, first, map, startWith } from 'rxjs';
@@ -48,6 +49,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
   private _authService = inject(AuthService);
+  protected readonly _isIdeMode = inject(IDE_MODE);
   private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
     startWith([]),
     map(
