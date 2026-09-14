@@ -12,7 +12,11 @@ import {
 } from '@angular/core';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { filter, forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { ReportNode } from '@exense/step-core';
+import {
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
+  ExecutionReportStaticLayoutRegistryService,
+  ReportNode,
+} from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { AltExecutionNodesHelperService } from '../../services/alt-execution-nodes-helper.service';
@@ -74,6 +78,7 @@ const IS_DRILLDOWN_OPENED = 'is-drilldown-opened';
 export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _activatedRoute = inject(ActivatedRoute);
+  private _staticLayouts = inject(ExecutionReportStaticLayoutRegistryService);
   private _altExecutionNodesHelper = inject(AltExecutionNodesHelperService);
   private _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
   private _drilldownNavigationUtils = inject(AltExecutionDrilldownNavigationUtilsService);
@@ -82,6 +87,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   protected readonly _executionState = inject(AltExecutionStateService);
 
   protected readonly stackItems = signal<DrillDownStackItem[]>([]);
+  protected readonly canCloseRootPanel = !!this._staticLayouts.get(
+    this._activatedRoute.parent?.parent?.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined,
+  )?.compactHeader;
   protected readonly details = this._reportSettings.details('executionTree');
   protected readonly StackItemType = DrillDownStackItemType;
   protected readonly testCasesDisplayMode = toSignal(this._executionState.testCasesDisplayMode$, {

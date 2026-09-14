@@ -1,4 +1,4 @@
-<section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
+<section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)" [class.compact-report]="isCompactReport">
   @if (execution$ | async; as execution) {
     <div class="title">
       <h3 data-step-testid>
@@ -32,61 +32,65 @@
         [refreshTrigger]="execution"
       />
       <div class="user" matTooltip="User that triggered the execution">{{ execution.executionParameters?.userID }}</div>
-      @if (resolvedParameters$ | async; as resolvedParams) {
-        <step-popover
-          yPosition="below"
-          [mode]="PopoverMode.CLICK"
-          [whiteBackground]="true"
-          [smallFont]="false"
-          (toggledEvent)="isResolvedParametersVisible.set($event)"
-        >
-          <button
-            type="button"
-            mat-icon-button
-            [color]="isResolvedParametersVisible() ? 'primary' : 'default'"
-            matTooltip="Show resolved parameters"
+      @if (!isCompactReport) {
+        @if (resolvedParameters$ | async; as resolvedParams) {
+          <step-popover
+            yPosition="below"
+            [mode]="PopoverMode.CLICK"
+            [whiteBackground]="true"
+            [smallFont]="false"
+            (toggledEvent)="isResolvedParametersVisible.set($event)"
           >
-            <step-icon name="sliders" />
-          </button>
-          <step-popover-content>
-            <div class="execution-popover-table">
-              <strong>Resolved parameters</strong>
-              <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
-            </div>
-          </step-popover-content>
-        </step-popover>
+            <button
+              type="button"
+              mat-icon-button
+              [color]="isResolvedParametersVisible() ? 'primary' : 'default'"
+              matTooltip="Show resolved parameters"
+            >
+              <step-icon name="sliders" />
+            </button>
+            <step-popover-content>
+              <div class="execution-popover-table">
+                <strong>Resolved parameters</strong>
+                <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
+              </div>
+            </step-popover-content>
+          </step-popover>
+        }
       }
-      @if (notices$ | async; as notices) {
-        <step-popover
-          yPosition="below"
-          [mode]="PopoverMode.CLICK"
-          [whiteBackground]="true"
-          [smallFont]="false"
-          (toggledEvent)="isExecutionNoticesVisible.set($event)"
-        >
-          <button
-            type="button"
-            mat-icon-button
-            class="header-icon-button execution-notices-button"
-            [color]="isExecutionNoticesVisible() ? 'primary' : 'default'"
-            [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
+      @if (!isCompactReport) {
+        @if (notices$ | async; as notices) {
+          <step-popover
+            yPosition="below"
+            [mode]="PopoverMode.CLICK"
+            [whiteBackground]="true"
+            [smallFont]="false"
+            (toggledEvent)="isExecutionNoticesVisible.set($event)"
           >
-            <step-icon name="bell" />
-            @if (notices.length | noticeBadgeLabel; as noticeBadgeLabel) {
-              <span class="dot">
-                <span class="unread-messages">
-                  {{ noticeBadgeLabel }}
+            <button
+              type="button"
+              mat-icon-button
+              class="header-icon-button execution-notices-button"
+              [color]="isExecutionNoticesVisible() ? 'primary' : 'default'"
+              [matTooltip]="notices.length ? 'Show execution notices' : 'No execution notices'"
+            >
+              <step-icon name="bell" />
+              @if (notices.length | noticeBadgeLabel; as noticeBadgeLabel) {
+                <span class="dot">
+                  <span class="unread-messages">
+                    {{ noticeBadgeLabel }}
+                  </span>
                 </span>
-              </span>
-            }
-          </button>
-          <step-popover-content>
-            <div class="execution-popover-table">
-              <strong>Execution Notices</strong>
-              <step-alt-execution-notices [notices]="notices" />
-            </div>
-          </step-popover-content>
-        </step-popover>
+              }
+            </button>
+            <step-popover-content>
+              <div class="execution-popover-table">
+                <strong>Execution Notices</strong>
+                <step-alt-execution-notices [notices]="notices" />
+              </div>
+            </step-popover-content>
+          </step-popover>
+        }
       }
       @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
         @if (agentProvisioningInfo.hasProvisioning) {
@@ -155,31 +159,17 @@
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
-      @if (execution?.executionParameters?.customParameters; as executionParameters) {
-        <step-alt-execution-parameters
-          [executionParameters]="executionParameters"
-          [executionProjectId]="execution?.executionParameters?.attributes?.['project']"
-        />
-      }
-    </div>
-    <div class="controls">
-      <step-execution-legacy-switcher [execution]="execution" />
-      @if (!(isExecutionCompleted$ | async)) {
-        @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="without-borders with-form-field-corners">
-            <step-autorefresh-toggle
-              [model]="activeExecution.autoRefreshModel"
-              buttonType="stroke"
-              requestWarning="The request took too long to process. Displayed data may be older than the current refresh interval."
-              matTooltipPosition="below"
-              #requestWarningRef="StepRequestWarning"
-              [hideTooltip]="requestWarningRef.hasWarning()"
-              (intervalChangeExplicit)="requestWarningRef.resetWarning()"
-            />
-          </step-btn-group>
+      @if (!isCompactReport) {
+        @if (execution?.executionParameters?.customParameters; as executionParameters) {
+          <step-alt-execution-parameters
+            [executionParameters]="executionParameters"
+            [executionProjectId]="execution?.executionParameters?.attributes?.['project']"
+          />
         }
       }
-      <step-btn-group class="with-form-field-borders">
+    </div>
+    @if (isCompactReport && execution.status === 'RUNNING') {
+      <div class="compact-controls">
         <ng-container
           stepExecutionCommands
           #commands="StepExecutionCommands"
@@ -192,69 +182,113 @@
           <button
             type="button"
             mat-icon-button
+            matTooltip="Stop execution"
+            matTooltipPosition="below"
             [disabled]="!('plan-execute' | hasRight | async)"
-            matTooltip="Relaunch execution with same parameters"
-            (click)="commands.execute(false)"
+            (click)="commands.stop()"
+          >
+            <step-icon name="stop-circle" aria-hidden="true" />
+          </button>
+        </ng-container>
+      </div>
+    }
+    @if (!isCompactReport) {
+      <div class="controls">
+        <step-execution-legacy-switcher [execution]="execution" />
+        @if (!(isExecutionCompleted$ | async)) {
+          @if (activeExecution$ | async; as activeExecution) {
+            <step-btn-group class="without-borders with-form-field-corners">
+              <step-autorefresh-toggle
+                [model]="activeExecution.autoRefreshModel"
+                buttonType="stroke"
+                requestWarning="The request took too long to process. Displayed data may be older than the current refresh interval."
+                matTooltipPosition="below"
+                #requestWarningRef="StepRequestWarning"
+                [hideTooltip]="requestWarningRef.hasWarning()"
+                (intervalChangeExplicit)="requestWarningRef.resetWarning()"
+              />
+            </step-btn-group>
+          }
+        }
+        <step-btn-group class="with-form-field-borders">
+          <ng-container
+            stepExecutionCommands
+            #commands="StepExecutionCommands"
+            [description]="execution.description"
+            [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+            [execution]="execution"
+            [includedTestcases]="testCasesForRelaunch()"
+            (refresh)="manualRefresh()"
+          >
+            <button
+              type="button"
+              mat-icon-button
+              [disabled]="!('plan-execute' | hasRight | async)"
+              matTooltip="Relaunch execution with same parameters"
+              (click)="commands.execute(false)"
+              matTooltipPosition="below"
+            >
+              <step-icon name="play-refresh" aria-hidden="true" />
+            </button>
+            @if (execution.status; as status) {
+              @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {
+                <button
+                  type="button"
+                  mat-icon-button
+                  aria-label="Left Align"
+                  matTooltip="Stop execution"
+                  matTooltipPosition="below"
+                  [disabled]="!('plan-execute' | hasRight | async)"
+                  (click)="commands.stop()"
+                >
+                  <step-icon name="stop-circle" aria-hidden="true" />
+                </button>
+              }
+              @if (status === 'ABORTING') {
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="warning"
+                  aria-label="Left Align"
+                  matTooltip="Force stop execution"
+                  matTooltipPosition="below"
+                  [disabled]="!('plan-execute' | hasRight | async)"
+                  (click)="commands.forceStop()"
+                >
+                  <step-icon name="stop-circle" aria-hidden="true" />
+                </button>
+              }
+            }
+          </ng-container>
+          <button
+            type="button"
+            mat-icon-button
+            (click)="relaunchExecution()"
+            matTooltip="Launch execution with parameters"
             matTooltipPosition="below"
           >
-            <step-icon name="play-refresh" aria-hidden="true" />
+            <step-icon name="play-circle" />
           </button>
-          @if (execution.status; as status) {
-            @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {
-              <button
-                type="button"
-                mat-icon-button
-                aria-label="Left Align"
-                matTooltip="Stop execution"
-                matTooltipPosition="below"
-                [disabled]="!('plan-execute' | hasRight | async)"
-                (click)="commands.stop()"
-              >
-                <step-icon name="stop-circle" aria-hidden="true" />
-              </button>
-            }
-            @if (status === 'ABORTING') {
-              <button
-                type="button"
-                mat-icon-button
-                class="warning"
-                aria-label="Left Align"
-                matTooltip="Force stop execution"
-                matTooltipPosition="below"
-                [disabled]="!('plan-execute' | hasRight | async)"
-                (click)="commands.forceStop()"
-              >
-                <step-icon name="stop-circle" aria-hidden="true" />
-              </button>
-            }
-          }
-        </ng-container>
-        <button
-          type="button"
-          mat-icon-button
-          (click)="relaunchExecution()"
-          matTooltip="Launch execution with parameters"
-          matTooltipPosition="below"
-        >
-          <step-icon name="play-circle" />
-        </button>
-      </step-btn-group>
-      <router-outlet name="controls" />
-    </div>
-    <div class="range-picker">
-      <step-time-range-picker
-        [activeSelection]="(timeRangeSelection$ | async)!"
-        [activeTimeRange]="(timeRange$ | async)!"
-        [selectOptions]="timeRangeOptions"
-        (selectionChange)="handleTimeRangeChange($event)"
-        [fullRangeLabel]="(fullTimeRangeLabel | async)!"
-      />
-    </div>
+        </step-btn-group>
+        <router-outlet name="controls" />
+      </div>
+      <div class="range-picker">
+        <step-time-range-picker
+          [activeSelection]="(timeRangeSelection$ | async)!"
+          [activeTimeRange]="(timeRange$ | async)!"
+          [selectOptions]="timeRangeOptions"
+          (selectionChange)="handleTimeRangeChange($event)"
+          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+        />
+      </div>
+    }
   } @else {
     <step-skeleton-placeholder class="title" />
     <step-skeleton-placeholder class="sub-title" />
-    <step-skeleton-placeholder class="controls" />
-    <step-skeleton-placeholder class="range-picker" />
+    @if (!isCompactReport) {
+      <step-skeleton-placeholder class="controls" />
+      <step-skeleton-placeholder class="range-picker" />
+    }
   }
 </section>
 
@@ -276,7 +310,9 @@
   }
 }
 
-<step-alt-execution-tabs />
+@if (!isCompactReport) {
+  <step-alt-execution-tabs />
+}
 
 <section class="no-gap">
   @if (execution$ | async; as execution) {
@@ -295,13 +331,20 @@
   }
 </section>
 
-<section class="main" [class.has-drilldown]="!!activeDrilldownTabId()" [class.is-layout-edit]="isLayoutEditMode()">
-  @if (execution$ | async; as execution) {
-    <step-alt-report-widget class="print-execution-details">
-      <step-alt-report-widget-content>
-        <step-execution-details [execution]="execution" [showPlan]="false" [showUser]="false" />
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
+<section
+  class="main"
+  [class.has-drilldown]="!!activeDrilldownTabId()"
+  [class.is-compact-report]="isCompactReport"
+  [class.is-layout-edit]="isLayoutEditMode()"
+>
+  @if (!isCompactReport) {
+    @if (execution$ | async; as execution) {
+      <step-alt-report-widget class="print-execution-details">
+        <step-alt-report-widget-content>
+          <step-execution-details [execution]="execution" [showPlan]="false" [showUser]="false" />
+        </step-alt-report-widget-content>
+      </step-alt-report-widget>
+    }
   }
   <div class="primary-content">
     <router-outlet />

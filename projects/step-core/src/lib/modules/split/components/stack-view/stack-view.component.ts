@@ -49,6 +49,7 @@ export class StackViewComponent {
 
   readonly withOverflow = input(false);
   readonly canClosePanels = input(false);
+  readonly canCloseRootPanel = input(false);
   readonly rootCloseTooltip = input('Close panel');
 
   private readonly isMaximizedInternal = signal(false);
