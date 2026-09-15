@@ -6,4 +6,5 @@ export interface FilePickerModalData {
   withName?: boolean;
   createFolder?: boolean;
   selectionMode?: SelectionMode;
+  confirmButtonLabel?: string;
 }

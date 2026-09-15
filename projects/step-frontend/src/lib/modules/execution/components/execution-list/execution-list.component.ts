@@ -62,9 +62,9 @@ export class ExecutionListComponent implements OnDestroy {
   protected readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
-  readonly _dialogs = inject(DialogsService);
+  protected readonly _dialogs = inject(DialogsService);
 
-  autoRefreshDisabled: boolean = false;
+  protected autoRefreshDisabled: boolean = false;
 
   private effectSelectionTypeChanged = effect(() => {
     const selectionType = this._selectionState.selectionType();

@@ -8,9 +8,11 @@ import {
   IdeService,
   FilePickerModalResult,
 } from '@exense/step-core';
+import { MatDialog } from '@angular/material/dialog';
 import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
 import { ApAccessHistoryService } from './ap-access-history.service';
 import { ApFsDataProviderService } from './ap-fs-data-provider.service';
+import { CreatePackageDialogComponent } from '../components/create-package-dialog/create-package-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,7 @@ export class IdeStateService {
   private _reloadable = inject(GlobalReloadService);
   private _accessHistory = inject(ApAccessHistoryService);
   private _injector = inject(Injector);
+  private _matDialog = inject(MatDialog);
 
   private filePickerInjector = Injector.create({
     providers: [
@@ -73,11 +76,17 @@ export class IdeStateService {
   }
 
   create(): void {
-    this.openPicker('Create package', true)
+    this._matDialog
+      .open<CreatePackageDialogComponent, void, boolean>(CreatePackageDialogComponent, {
+        injector: this.filePickerInjector,
+        panelClass: 'step-create-package-dialog',
+        width: '60rem',
+        maxWidth: 'calc(100vw - 3.2rem)',
+      })
+      .afterClosed()
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
-        switchMap(({ filePath, packageName }) => this._ideApi.initializeNewAp(filePath, packageName)),
         switchMap(() => this._ideApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
@@ -91,7 +100,7 @@ export class IdeStateService {
   }
 
   openWithPicker(): void {
-    this.openPicker('Open package')
+    this.openPicker('Open Package')
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
@@ -132,10 +141,9 @@ export class IdeStateService {
     }
   }
 
-  private openPicker(title: string, withName: boolean = false): Observable<FilePickerModalResult | undefined> {
+  private openPicker(title: string): Observable<FilePickerModalResult | undefined> {
     return this._filePicker.showFilePicker(title, {
-      withName,
-      createFolder: true,
+      confirmButtonLabel: 'Select Folder',
       selectionMode: SelectionMode.DIRECTORY,
     });
   }

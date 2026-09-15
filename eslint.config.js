@@ -60,4 +60,44 @@ module.exports = defineConfig([
   {
     ignores: ['projects/step-core/src/lib/client/generated/**/*'],
   },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/execution/components/alt-execution-progress/alt-execution-progress.component.ts',
+    ],
+    rules: {
+      // This component is also provided as these services, so their contracts must remain public.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            {
+              interfaceName: 'AltExecutionStateService',
+              exclusions: [
+                'timeRangeSelection$',
+                'timeRangeOptions',
+                'executionId$',
+                'execution$',
+                'keywordParameters$',
+                'keywordsDataSource$',
+                'errors$',
+                'availableErrorTypes$',
+                'testCases$',
+                'testCasesDataSource$',
+                'testCasesTableParameters$',
+                'testCasesDisplayMode$',
+                'currentOperations$',
+                'timeRange$',
+                'treeInProgress$',
+                'errorsDisplayInProgress$',
+                'toggleTestCasesDisplayMode',
+                'updateTimeRangeSelection',
+                'selectFullRange',
+              ],
+            },
+            { interfaceName: 'EntityRefService', exclusions: ['currentEntity'] },
+          ],
+        },
+      ],
+    },
+  },
 ]);
