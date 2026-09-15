@@ -1,0 +1,28 @@
+@if (context(); as context) {
+  <p class="performance-scope">
+    All invocations of this node in the selected execution time range. Table filters do not apply to these charts.
+  </p>
+  <div class="charts">
+    <section>
+      <h3>Response Times</h3>
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [timeRange]="context.timeRange"
+        [filters]="context.filters"
+        [grouping]="grouping"
+        [config]="responseTimesConfig"
+      />
+    </section>
+
+    <section>
+      <h3>Throughput</h3>
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [timeRange]="context.timeRange"
+        [filters]="context.filters"
+        [grouping]="grouping"
+        [config]="throughputConfig"
+      />
+    </section>
+  </div>
+}

@@ -1,29 +1,25 @@
-import { Component, computed, EventEmitter, Output, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, EventEmitter, Output, inject, input, signal, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
   TimeseriesColorsPool,
+  TimeSeriesChartUtilsService,
   TimeSeriesConfig,
-  TimeSeriesUtils,
-  UPlotUtilsService,
 } from '../../modules/_common';
-import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { TimeSeriesChartComponent, TSChartSettings } from '../../modules/chart';
 import {
-  BucketResponse,
+  AxesSettings,
   ChartSkeletonComponent,
-  FetchBucketsRequest,
+  MetricAggregation,
   TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { catchError, defer, finalize, Observable, of, switchMap, tap } from 'rxjs';
-import { Axis } from 'uplot';
-import { StandaloneChartConfig } from './standalone-chart-config';
+import { catchError, defer, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { StandaloneChartAxesConfig, StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-
-declare const uPlot: any;
 
 type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
 
@@ -34,9 +30,6 @@ type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
   imports: [ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class StandaloneChartComponent {
-  private readonly barsFunction = uPlot.paths.bars;
-  private readonly chart = viewChild<TimeSeriesChartComponent>('chart');
-
   readonly metricKey = input.required<string>();
   readonly timeRange = input.required<TimeRange>();
   readonly filters = input<FilterBarItem[]>([]);
@@ -46,14 +39,15 @@ export class StandaloneChartComponent {
   readonly config = input<StandaloneChartConfig>({});
   readonly colorsPool = input<TimeseriesColorsPool>(new TimeseriesColorsPool());
 
-  @Output() zoomReset = new EventEmitter<void>();
-  @Output() zoomChange = new EventEmitter<TimeRange>();
+  readonly zoomReset = output();
+  readonly zoomChange = output<TimeRange>();
 
   private readonly _timeSeriesService = inject(TimeSeriesService);
-  private readonly _uPlotUtils = inject(UPlotUtilsService);
+  private readonly _timeSeriesChartUtils = inject(TimeSeriesChartUtilsService);
 
   protected chartSettings?: TSChartSettings;
   protected readonly loading = signal(true);
+  protected readonly requestError = signal(false);
   private previousLoadingKey?: string;
 
   private readonly _fetchParams = computed(() => ({
@@ -86,6 +80,7 @@ export class StandaloneChartComponent {
     const rangeChange = (range as TimeRangeWithManualChange).isManualChange;
 
     return defer(() => {
+      this.requestError.set(false);
       const shouldDisplayLoading =
         !this.chartSettings || rangeChange !== false || this.previousLoadingKey !== loadingKey;
       if (loadingKey !== undefined) {
@@ -101,198 +96,122 @@ export class StandaloneChartComponent {
           }
         }),
       );
-    }).pipe(catchError(() => of(undefined)));
+    }).pipe(
+      catchError(() => {
+        this.chartSettings = undefined;
+        this.requestError.set(true);
+        return of(undefined);
+      }),
+    );
   }
 
   private fetchDataAndCreateChart(range: TimeRange): Observable<TimeSeriesAPIResponse> {
     if (range.from >= range.to) {
       throw new Error(`Invalid time range ${JSON.stringify(range)}`);
     }
-    const groupDimensions = this.grouping();
-    const request: FetchBucketsRequest = {
-      start: range.from,
-      end: range.to,
-      metricType: this.metricKey(),
+    const config = this.config();
+    const primaryAxes = this.resolvePrimaryAxes(config);
+    const secondaryAxes = this.resolveSecondaryAxes(config);
+    const useLegacyPercentiles =
+      config.primaryAxes?.aggregation === undefined && config.primaryAxes?.pclValue === undefined;
+    const request = this._timeSeriesChartUtils.createRequest({
+      range,
+      metricKey: this.metricKey(),
       oqlFilter: this.composeRequestFilter(),
-      groupDimensions: groupDimensions,
-      percentiles: this.getRequiredPercentiles(this.aggregation()),
-    };
-    if (this.config().resolution) {
-      request.intervalSize = this.config().resolution;
-    } else {
-      request.numberOfBuckets = 100;
-    }
+      groupDimensions: this.grouping(),
+      primaryAggregation: primaryAxes.aggregation,
+      secondaryAggregation: secondaryAxes?.aggregation,
+      resolution: config.resolution,
+      percentiles:
+        useLegacyPercentiles && this.aggregation() === ChartAggregation.PERCENTILE ? [80, 90, 99] : undefined,
+    });
     return this._timeSeriesService.fetchBucketsWithFallback(request).pipe(
-      tap((response) => {
-        this.createChart(response);
-      }),
+      switchMap((response) =>
+        this._timeSeriesChartUtils
+          .createChartSettings({
+            response,
+            request,
+            metricKey: this.metricKey(),
+            metricDisplayName: this.metricKey(),
+            primaryAxes,
+            secondaryAxes,
+            groupDimensions: this.grouping(),
+            colorsPool: this.colorsPool(),
+            title: config.title ?? '',
+            showTooltip: config.showTooltip,
+            showLegend: config.showLegend,
+            showYAxes: config.showYAxes ?? true,
+            showTimeAxes: config.showTimeAxes,
+            showCursor: config.showCursor,
+            zoomEnabled: config.zoomEnabled,
+            secondaryAxesLabel: config.tooltipYAxesUnit,
+            includeSecondaryMetadata: false,
+            nullMeansZero: config.nullMeansZero ?? true,
+            seriesMin: 50,
+            seriesPxAlign: 1,
+            secondaryBarPathOptions: { size: [1, 100, 4], radius: 0.2, gap: 1 },
+          })
+          .pipe(
+            tap((settings) => (this.chartSettings = settings)),
+            map(() => response),
+          ),
+      ),
     );
   }
 
-  private createChart(response: TimeSeriesAPIResponse): void {
-    const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
-    const primaryAggregation = this.aggregation();
-    const hasZAxes = this.config().showZAxes;
-    const zAxesAggregation = ChartAggregation.RATE;
-    const zAxesData: (number | undefined | null)[] = [];
-    const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
-      const metadata: any[] = [];
-      let labelItems = this.grouping().map((field) => response.matrixKeys[i]?.[field]);
-      if (this.grouping().length === 0) {
-        labelItems = [this.metricKey()];
-      }
-      const seriesKey = this.mergeLabelItems(labelItems);
-      const color = this.colorsPool().getSeriesColor(seriesKey).color;
-
-      const seriesData: (number | undefined | null)[] = [];
-      seriesBuckets.forEach((b, i) => {
-        if (hasZAxes) {
-          const bucketValue = this.getBucketValue(b, zAxesAggregation, response.interval);
-          if (zAxesData[i] == undefined) {
-            zAxesData[i] = bucketValue;
-          } else if (bucketValue) {
-            zAxesData[i]! += bucketValue;
-          }
-        }
-        seriesData[i] = this.getBucketValue(b, primaryAggregation!, response.interval);
-      });
-      const s: TSChartSeries = {
-        id: seriesKey,
-        pxAlign: 1,
-        min: 50,
-        scale: 'y',
-        labelItems: labelItems,
-        legendName: seriesKey,
-        data: seriesData,
-        metadata: metadata,
-        value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: color,
-        points: { show: false },
-        show: true,
-      };
-      if (this.config().colorizationType === 'FILL') {
-        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
-      }
-      return s;
-    });
-    const primaryUnit = this.config().primaryAxesUnit;
-    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
-
-    const axes: Axis[] = [
-      {
-        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        scale: 'y',
-        values: (u, vals) => {
-          return vals.map((v: any) => TimeSeriesUtils.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
-        },
-        show: this.config().showYAxes ?? true,
-      },
-    ];
-    if (hasZAxes) {
-      axes.push({
-        // @ts-ignore
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
-        side: 1,
-        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        values: (u: unknown, vals: number[]) =>
-          vals.map((v) => TimeSeriesUtils.getAxesFormatFunction(zAxesAggregation, undefined)(v)),
-        grid: { show: false },
-      });
-      series.unshift({
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
-        labelItems: ['Total'],
-        id: 'total',
-        data: zAxesData,
-        value: (x, v: number) => Math.trunc(v) + ' total',
-        fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
-        paths: this.barsFunction({ size: [1, 100, 4], radius: 0.2, gap: 1 }),
-        points: { show: false },
-      });
-    }
-
-    this.chartSettings = {
-      title: this.config().title || '',
-      xAxesSettings: {
-        values: xLabels,
-        show: this.config().showTimeAxes,
-      },
-      series: series,
-      tooltipOptions: {
-        enabled: this.config().showTooltip ?? true,
-        zAxisLabel: this.config().tooltipYAxesUnit,
-        yAxisUnit: yAxesUnit,
-      },
-      zoomEnabled: this.config().zoomEnabled,
-      showLegend: this.config().showLegend,
-      showCursor: this.config().showCursor,
-      axes: axes,
-      truncated: response.truncated,
+  private resolvePrimaryAxes(config: StandaloneChartConfig): AxesSettings {
+    const axesConfig = config.primaryAxes;
+    return {
+      aggregation: this.resolveAggregation(axesConfig, this.aggregation(), this.pclValue()),
+      displayType: axesConfig?.displayType ?? 'LINE',
+      unit: axesConfig?.unit ?? config.primaryAxesUnit ?? '',
+      renderingSettings: axesConfig?.renderingSettings,
+      colorizationType: axesConfig?.colorizationType ?? config.colorizationType ?? 'STROKE',
     };
   }
 
-  private mergeLabelItems(items: (string | undefined)[]): string {
-    if (items.length === 0) {
-      return this.metricKey();
+  private resolveSecondaryAxes(config: StandaloneChartConfig): AxesSettings | undefined {
+    if (config.secondaryAxes === null) {
+      return undefined;
     }
-    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
+    if (config.secondaryAxes === undefined && !config.showZAxes) {
+      return undefined;
+    }
+    const axesConfig = config.secondaryAxes;
+    return {
+      aggregation: this.resolveAggregation(axesConfig, ChartAggregation.RATE),
+      displayType: axesConfig?.displayType ?? 'BAR_CHART',
+      unit: axesConfig?.unit ?? '',
+      renderingSettings: axesConfig?.renderingSettings,
+      colorizationType: axesConfig?.colorizationType ?? 'STROKE',
+    };
   }
 
-  private getBucketValue(
-    b: BucketResponse,
-    aggregation: ChartAggregation,
-    bucketIntervalMs: number,
-  ): number | undefined | null {
-    if (!b) {
-      return 0;
+  private resolveAggregation(
+    axesConfig: StandaloneChartAxesConfig | undefined,
+    fallbackType: ChartAggregation,
+    fallbackPclValue?: number,
+  ): MetricAggregation {
+    const aggregation = axesConfig?.aggregation ?? this.createAggregation(fallbackType, fallbackPclValue);
+    const params: Record<string, string | number> = { ...aggregation.params };
+    if (axesConfig?.rateUnit !== undefined) {
+      params[TimeSeriesConfig.RATE_UNIT_PARAM] = axesConfig.rateUnit;
     }
-    switch (aggregation) {
-      case 'SUM':
-        return b.sum;
-      case 'AVG':
-        return b.sum / b.count;
-      case 'MAX':
-        return b.max;
-      case 'MIN':
-        return b.min;
-      case 'COUNT':
-        return b.count;
-      case 'RATE':
-        if (this.metricKey() === 'counter') {
-          return b.sum / (bucketIntervalMs / 3_600_000);
-        }
-        return b.throughputPerHour;
-      case 'MEDIAN':
-        return b.pclValues?.[50];
-      case 'PERCENTILE':
-        return b.pclValues?.[this.pclValue()];
-      default:
-        throw new Error('Unhandled aggregation value: ' + aggregation);
+    if (axesConfig?.pclValue !== undefined) {
+      params[TimeSeriesConfig.PCL_VALUE_PARAM] = axesConfig.pclValue;
     }
+    return { ...aggregation, params };
   }
 
-  private getUnitLabel(aggregation: ChartAggregation, unit?: string): string {
-    if (aggregation === 'RATE') {
-      return '/ h';
+  private createAggregation(type: ChartAggregation, pclValue?: number): MetricAggregation {
+    const params: Record<string, string | number> = {};
+    if (type === ChartAggregation.RATE) {
+      params[TimeSeriesConfig.RATE_UNIT_PARAM] = 'h';
     }
-    switch (unit) {
-      case '%':
-        return '%';
-      case 'ms':
-        return ' ms';
-      default:
-        return '';
+    if (type === ChartAggregation.PERCENTILE) {
+      params[TimeSeriesConfig.PCL_VALUE_PARAM] = pclValue ?? this.pclValue();
     }
-  }
-
-  private getRequiredPercentiles(aggregate: ChartAggregation): number[] {
-    const percentilesToRequest: number[] = [];
-    if (aggregate === ChartAggregation.MEDIAN) {
-      percentilesToRequest.push(50);
-    }
-    if (aggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(80, 90, 99);
-    }
-    return percentilesToRequest;
+    return { type, params };
   }
 
   protected handleZoomReset(): void {
