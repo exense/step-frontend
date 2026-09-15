@@ -1,10 +1,11 @@
 @if (reportNode(); as node) {
-  @if (!hideFirstPanel()) {
-    <div class="grid">
-      @if (rootCauseErrors(); as rootCauseErrors) {
+  @let errors = rootCauseErrors();
+  @if (!isTestCase() || !!errors) {
+    <div class="common-report-node-details">
+      @if (errors) {
         <step-error-root-causes
           class="error-root-causes-container execution-report-node-details"
-          [data]="rootCauseErrors"
+          [data]="errors"
           (onErrorSearch)="searchFor($event)"
         />
       }
