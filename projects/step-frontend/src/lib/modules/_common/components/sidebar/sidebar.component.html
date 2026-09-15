@@ -33,9 +33,9 @@
     }
   </div>
   <div id="sidebar-categories" #categories>
-    @if (beforeCategoriesDashlets.length) {
+    @if (beforeCategoriesDashlets().length) {
       <div id="sidebar-before-categories">
-        @for (item of beforeCategoriesDashlets; track item.id) {
+        @for (item of beforeCategoriesDashlets(); track item.id) {
           <step-dashlet class="visible-when-collapsed" [itemKey]="item.template" />
         }
       </div>

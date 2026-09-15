@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  computed,
   ElementRef,
   inject,
   NgZone,
@@ -45,7 +46,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _navigator = inject(NavigatorService);
   private _viewRegistryService = inject(ViewRegistryService);
   private _zone = inject(NgZone);
-  public _viewStateService = inject(ViewStateService);
+  protected _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
   private _authService = inject(AuthService);
@@ -78,10 +79,14 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   );
   private _location = inject(Location);
 
-  readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
-  readonly categories = viewChild<ElementRef<HTMLElement>>('categories');
+  private readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
+  private readonly categories = viewChild<ElementRef<HTMLElement>>('categories');
 
-  protected readonly beforeCategoriesDashlets = this._viewRegistryService.getDashlets('menu/sidebar/before-categories');
+  protected readonly beforeCategoriesDashlets = computed(() =>
+    this._viewRegistryService
+      .getDashlets('menu/sidebar/before-categories')
+      .filter((dashlet) => !dashlet.isEnabledFunction || dashlet.isEnabledFunction()),
+  );
 
   private locationStateSubscription = this._location.subscribe((popState: any) => {
     this.openMainMenuBasedOnActualView();
@@ -90,8 +95,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   private _customMenuEntries = inject(CustomMenuEntriesService);
   private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly displayMenuItems$ = combineLatest([
     this._menuItems$,
     this._customMenuEntries.customMenuEntries$,
     this._bookmarkMenuItems$,
@@ -104,7 +109,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     map((menuItems) => this.createMenuItemsTree(menuItems)),
   );
 
-  readonly isOpened$ = this._sideBarState.isOpened$;
+  protected readonly isOpened$ = this._sideBarState.isOpened$;
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
@@ -159,11 +164,11 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._sideBarState.setMenuItemState(mainMenuKey, isOpened);
   }
 
-  toggleMenuItem(item: HTMLInputElement): void {
+  protected toggleMenuItem(item: HTMLInputElement): void {
     this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
-  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean, isEnabled: boolean = true): void {
+  protected navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean, isEnabled: boolean = true): void {
     if (!isEnabled) {
       $event.preventDefault();
       $event.stopPropagation();
@@ -187,24 +192,24 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  removeCustomEntry(id: string, $event: MouseEvent): void {
+  protected removeCustomEntry(id: string, $event: MouseEvent): void {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
     this._customMenuEntries.remove(id);
   }
 
-  toggleOpenClose(): void {
+  protected toggleOpenClose(): void {
     this._sideBarState.toggleIsOpened();
   }
 
-  showVersionsDialog(): void {
+  protected showVersionsDialog(): void {
     this._authService
       .hasRight$('admin-ui-menu')
       .subscribe((hasRight) => hasRight && this._matDialog.open(VersionsDialogComponent));
   }
 
-  handleScroll($event: Event): void {
+  protected handleScroll($event: Event): void {
     this._zone.runOutsideAngular(() => {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
       this.categories()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
