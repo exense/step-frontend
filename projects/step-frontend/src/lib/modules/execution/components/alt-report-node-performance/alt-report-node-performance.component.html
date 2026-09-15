@@ -1,4 +1,7 @@
 @if (context(); as context) {
+  <p class="performance-scope">
+    All invocations of this node in the selected execution time range. Table filters do not apply to these charts.
+  </p>
   <div class="charts">
     <section>
       <h3>Response Times</h3>
@@ -22,6 +25,4 @@
       />
     </section>
   </div>
-} @else {
-  <div class="performance-state">Performance data is unavailable for this node.</div>
 }

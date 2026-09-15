@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { ReportNode, TimeRange } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 interface NodePerformanceContext {
   timeRange: TimeRange;
@@ -15,37 +18,38 @@ interface NodePerformanceContext {
   standalone: false,
 })
 export class AltReportNodePerformanceComponent {
-  readonly node = input.required<ReportNode>();
+  private readonly _executionState = inject(AltExecutionStateService);
+  private readonly executionId = toSignal(this._executionState.executionId$);
+  private readonly timeRange = toSignal(this._executionState.timeRange$);
+
+  readonly node = input.required<AggregatedTreeNode>();
 
   protected readonly metricKey = 'response-time';
   protected readonly grouping = ['name'];
 
   protected readonly context = computed<NodePerformanceContext | undefined>(() => {
     const node = this.node();
-    const resolvedArtefact = node.resolvedArtefact;
-    const executionId = node.executionID;
+    const artefact = node.originalArtefact;
+    const executionId = this.executionId();
     const artefactHash = node.artefactHash;
-    const executionTime = node.executionTime;
-    const duration = node.duration;
-    const keywordName = resolvedArtefact?.attributes?.['name'];
+    const timeRange = this.timeRange();
+    const invocationCount = Object.values(node.countByStatus ?? {}).reduce((sum, count) => sum + count, 0);
+    const instrumented = artefact?.instrumentNode;
+    const hasMeasurements = artefact?._class === 'CallKeyword' || instrumented?.value || instrumented?.dynamic;
 
     if (
-      resolvedArtefact?._class !== 'CallKeyword' ||
+      !hasMeasurements ||
+      invocationCount <= 1 ||
       !executionId ||
       !artefactHash ||
-      !keywordName ||
-      executionTime === undefined ||
-      duration === undefined ||
-      duration <= 0
+      !timeRange ||
+      timeRange.from >= timeRange.to
     ) {
       return undefined;
     }
 
     return {
-      timeRange: {
-        from: executionTime,
-        to: executionTime + duration,
-      },
+      timeRange,
       filters: [
         {
           attributeName: 'eId',
@@ -56,18 +60,10 @@ export class AltReportNodePerformanceComponent {
           type: FilterBarItemType.EXECUTION,
         },
         {
-          attributeName: 'type',
+          attributeName: 'artefactHash',
           isLocked: true,
           exactMatch: true,
-          freeTextValues: ['keyword'],
-          searchEntities: [],
-          type: FilterBarItemType.FREE_TEXT,
-        },
-        {
-          attributeName: 'name',
-          isLocked: true,
-          exactMatch: false,
-          freeTextValues: [keywordName],
+          freeTextValues: [JSON.stringify(artefactHash)],
           searchEntities: [],
           type: FilterBarItemType.FREE_TEXT,
         },
@@ -76,6 +72,8 @@ export class AltReportNodePerformanceComponent {
   });
 
   protected readonly responseTimesConfig: StandaloneChartConfig = {
+    height: 240,
+    zoomEnabled: false,
     showTooltip: true,
     showLegend: true,
     showYAxes: true,
@@ -92,6 +90,8 @@ export class AltReportNodePerformanceComponent {
   };
 
   protected readonly throughputConfig: StandaloneChartConfig = {
+    height: 240,
+    zoomEnabled: false,
     showTooltip: true,
     showLegend: true,
     showYAxes: true,

@@ -157,7 +157,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   });
   private initialTimeRangeLoadPending = true;
 
-  private readonly currentAggregatedNode = computed(() => {
+  protected readonly currentAggregatedNode = computed(() => {
     const node = this.aggregatedNode();
     const treeState = this._treeStateContext.getState();
     return treeState.findNodeById(node.id) ?? node;

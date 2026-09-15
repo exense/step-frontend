@@ -4,10 +4,9 @@
 
 .charts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(25rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
   gap: 2rem;
-  min-width: 50rem;
-  overflow-x: auto;
+  margin-bottom: 2rem;
 }
 
 section {
@@ -26,9 +25,7 @@ step-standalone-dashlet {
   min-height: 20rem;
 }
 
-.performance-state {
-  display: grid;
-  min-height: 12rem;
-  place-items: center;
+.performance-scope {
+  margin: 0 0 1rem;
   opacity: 0.7;
 }
