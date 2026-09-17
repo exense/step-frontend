@@ -1,28 +1,32 @@
 @if (context(); as context) {
-  <p class="performance-scope">
-    All invocations of this node in the selected execution time range. Table filters do not apply to these charts.
-  </p>
-  <div class="charts">
-    <section>
-      <h3>Response Times</h3>
-      <step-standalone-dashlet
-        [metricKey]="metricKey"
-        [timeRange]="context.timeRange"
-        [filters]="context.filters"
-        [grouping]="grouping"
-        [config]="responseTimesConfig"
-      />
-    </section>
-
-    <section>
-      <h3>Throughput</h3>
-      <step-standalone-dashlet
-        [metricKey]="metricKey"
-        [timeRange]="context.timeRange"
-        [filters]="context.filters"
-        [grouping]="grouping"
-        [config]="throughputConfig"
-      />
-    </section>
-  </div>
+  <section class="execution-report-node-details">
+    <div class="data-container">
+      <div class="container-title">
+        <span>Measurements</span>
+        <step-icon
+          name="info"
+          class="help-icon"
+          tabindex="0"
+          aria-label="Measurement scope"
+          matTooltip="All invocations of this node in the selected execution time range. Table filters do not apply to these charts."
+        />
+      </div>
+      <div class="charts">
+        <step-standalone-dashlet
+          [metricKey]="metricKey"
+          [timeRange]="context.timeRange"
+          [filters]="context.filters"
+          [grouping]="grouping"
+          [config]="responseTimesConfig"
+        />
+        <step-standalone-dashlet
+          [metricKey]="metricKey"
+          [timeRange]="context.timeRange"
+          [filters]="context.filters"
+          [grouping]="grouping"
+          [config]="throughputConfig"
+        />
+      </div>
+    </div>
+  </section>
 }

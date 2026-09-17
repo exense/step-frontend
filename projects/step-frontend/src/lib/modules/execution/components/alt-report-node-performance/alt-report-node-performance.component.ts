@@ -72,8 +72,9 @@ export class AltReportNodePerformanceComponent {
   });
 
   protected readonly responseTimesConfig: StandaloneChartConfig = {
+    title: 'Response Times',
     height: 240,
-    zoomEnabled: false,
+    zoomEnabled: true,
     showTooltip: true,
     showLegend: true,
     showYAxes: true,
@@ -90,8 +91,9 @@ export class AltReportNodePerformanceComponent {
   };
 
   protected readonly throughputConfig: StandaloneChartConfig = {
+    title: 'Throughput',
     height: 240,
-    zoomEnabled: false,
+    zoomEnabled: true,
     showTooltip: true,
     showLegend: true,
     showYAxes: true,

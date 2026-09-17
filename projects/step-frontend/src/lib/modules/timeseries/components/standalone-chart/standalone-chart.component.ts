@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, Output, inject, input, signal, output } from '@angular/core';
+import { Component, computed, inject, input, signal, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   FilterBarItem,
@@ -20,6 +20,8 @@ import {
 import { catchError, defer, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { StandaloneChartAxesConfig, StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { TooltipContentDirective } from '../../modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ChartStandardTooltipComponent } from '../../modules/chart/components/tooltip/chart-standard-tooltip.component';
 
 type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
 
@@ -27,7 +29,7 @@ type TimeRangeWithManualChange = TimeRange & { isManualChange?: boolean };
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
   styleUrls: ['./standalone-chart.component.scss'],
-  imports: [ChartSkeletonComponent, TimeSeriesChartComponent],
+  imports: [ChartSkeletonComponent, TimeSeriesChartComponent, TooltipContentDirective, ChartStandardTooltipComponent],
 })
 export class StandaloneChartComponent {
   readonly metricKey = input.required<string>();
