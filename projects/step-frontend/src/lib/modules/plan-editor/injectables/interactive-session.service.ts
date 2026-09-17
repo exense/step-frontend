@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, model, OnDestroy, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedScreenService,
@@ -7,7 +7,8 @@ import {
   PlanContextApiService,
 } from '@exense/step-core';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
-import { KeywordParameters, TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../execution/execution.module';
+import { KeywordParameters } from '../../execution/shared/keyword-parameters';
+import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../execution/shared/type-leaf-report-nodes-table-params';
 
 @Injectable()
 export class InteractiveSessionService implements OnDestroy {
@@ -52,9 +53,14 @@ export class InteractiveSessionService implements OnDestroy {
       customParameters: this.executionParameters(),
     };
 
-    return this._interactiveApi
-      .startInteractiveSession(executionParameters)
-      .pipe(tap((sessionId) => this.interactiveSessionId$.next(sessionId)));
+    return this._screenTemplates
+      .filterInactiveParameters('executionParameters', executionParameters.customParameters)
+      .pipe(
+        switchMap((customParameters) =>
+          this._interactiveApi.startInteractiveSession({ ...executionParameters, customParameters }),
+        ),
+        tap((sessionId) => this.interactiveSessionId$.next(sessionId)),
+      );
   }
 
   stopInteractive(): Observable<unknown> {

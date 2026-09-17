@@ -1,4 +1,15 @@
-import { Component, computed, inject, input, linkedSignal, OnDestroy, OnInit, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  input,
+  linkedSignal,
+  OnDestroy,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { AugmentedScreenService, Input as StInput, ScreenInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
@@ -13,7 +24,6 @@ import {
   filter,
   groupBy,
   map,
-  merge,
   mergeMap,
   Observable,
   of,
@@ -21,7 +31,7 @@ import {
   tap,
 } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 interface CustomFormInputsSchema {
   ids: string[];
@@ -49,6 +59,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
+  private _destroyRef = inject(DestroyRef);
 
   private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
   private valueChangeDebounced$ = this.valueChange$.pipe(
@@ -56,10 +67,11 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     mergeMap((group) => group.pipe(debounceTime(500))),
   );
 
-  private changeStart$ = this.valueChange$.pipe(map(() => true));
-  private changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
-
-  readonly changeInProgress$ = merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged());
+  private pendingChanges = new Set<string | undefined>([undefined]);
+  private changeInProgressState$ = new BehaviorSubject(true);
+  // eslint-disable-next-line step-lint/component-public-fields -- Preserve the public form readiness API.
+  readonly changeInProgress$ = this.changeInProgressState$.pipe(distinctUntilChanged());
+  // eslint-disable-next-line step-lint/component-public-fields -- Preserve the public form readiness API.
   readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
 
   readonly stEditableLabelMode = input(false);
@@ -75,13 +87,13 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   readonly customInputTouch = output<void>();
 
   private activeExpressionInputsKeys = new Set<string>();
-  private orderedIds = signal<string[]>([]);
-  private originalInputs = signal<Record<string, StInput>>({});
-  private visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
-  private visibilityFlagsJson = computed(() => JSON.stringify(this.visibilityFlags()));
+  private readonly orderedIds = signal<string[]>([]);
+  private readonly originalInputs = signal<Record<string, StInput>>({});
+  private readonly visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
 
-  private internalModel = linkedSignal(() => this.stModel());
+  private readonly internalModel = linkedSignal(() => this.stModel());
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Parent templates use the visible input count.
   readonly inputs = computed(() => {
     const orderedIds = this.orderedIds();
     const originalInputs = this.originalInputs();
@@ -113,8 +125,10 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.valueChange$.complete();
+    this.changeInProgressState$.complete();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Submit handlers wait for the form through this API.
   readyToProceed(): Observable<void> {
     if (!this.changeInProgress()) {
       return of(undefined);
@@ -128,6 +142,8 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   protected onInputValueChange(input: StInput, value: string): void {
     const inputId = input.id!;
+    this.pendingChanges.add(inputId);
+    this.changeInProgressState$.next(true);
     this.valueChange$.next({ inputId, value });
   }
 
@@ -187,14 +203,15 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .getScreenInputsByScreenIdWithCache(this.stScreen())
       .pipe(
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
-        tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((schema) => {
         this.orderedIds.set(schema.ids);
         this.originalInputs.set(schema.inputs);
         this.activeExpressionInputsKeys = schema.activeExpressionInputsKeys;
         if (!this.activeExpressionInputsKeys.size) {
+          this.setDefaultValues(schema.ids.map((id) => ({ input: schema.inputs[id] })));
           this.visibilityFlags.set({});
           this.setupValueChange();
           return;
@@ -207,14 +224,18 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   }
 
   private setupValueChange(): void {
-    this.valueChangeDebounced$.pipe(filter((valueChange) => !!valueChange)).subscribe((valueChange) => {
-      const changedModel = this._objectUtils.setObjectFieldValue(
-        this.internalModel(),
-        valueChange!.inputId,
-        valueChange!.value,
-      );
-      this.internalModel.set(changedModel);
-      this.stModelChange.emit(changedModel);
+    this.valueChangeDebounced$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((valueChange) => {
+      if (valueChange) {
+        const changedModel = this._objectUtils.setObjectFieldValue(
+          this.internalModel(),
+          valueChange.inputId,
+          valueChange.value,
+        );
+        this.internalModel.set(changedModel);
+        this.stModelChange.emit(changedModel);
+      }
+      this.pendingChanges.delete(valueChange?.inputId);
+      this.changeInProgressState$.next(!!this.pendingChanges.size);
     });
   }
 
@@ -222,6 +243,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     this.valueChangeDebounced$
       .pipe(
         map((valueChange) => {
+          this.pendingChanges.delete(valueChange?.inputId);
           if (!valueChange) {
             return undefined;
           }
@@ -235,15 +257,19 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           return changedModel;
         }),
         switchMap((changedModel) =>
-          this._screensService.getScreenInputsForScreenPost(this.stScreen(), changedModel ?? this.internalModel()),
+          this._screensService.getActivatedScreenInputs(this.stScreen(), changedModel ?? this.internalModel()),
         ),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
+        tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
         ),
-        filter((visibilityFlags) => JSON.stringify(visibilityFlags) !== this.visibilityFlagsJson()),
+        takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
+      .subscribe((visibilityFlags) => {
+        this.visibilityFlags.set(visibilityFlags);
+        this.changeInProgressState$.next(!!this.pendingChanges.size);
+      });
   }
 
   private setDefaultValues(screenInputs: ScreenInput[]): void {
@@ -256,7 +282,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     let valueHasBeenChanged = false;
     let model = this.internalModel();
     for (let item of inputs) {
-      const defaultValue = item.type === 'CHECKBOX' ? item.defaultValue ?? false : item.defaultValue;
+      const defaultValue = item.type === 'CHECKBOX' ? (item.defaultValue ?? false) : item.defaultValue;
       if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
         model = this._objectUtils.setObjectFieldValue(model, item.id!, defaultValue);
         valueHasBeenChanged = true;
