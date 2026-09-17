@@ -1,3 +1,9 @@
+@if (activationFailed()) {
+  <step-alert type="danger" role="alert">
+    Unable to load fields. Please retry.
+    <button type="button" mat-button (click)="retryActivation()">Retry</button>
+  </step-alert>
+}
 @if (stEditableLabelMode()) {
   @for (input of inputs(); track input.id) {
     <step-dynamic-label-custom-form-inputs
