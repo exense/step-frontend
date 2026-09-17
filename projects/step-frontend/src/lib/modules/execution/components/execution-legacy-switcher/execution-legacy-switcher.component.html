@@ -1,4 +1,4 @@
-@if (!forceLegacyReporting()) {
+@if (!forceLegacyReporting() && !disableLegacyReporting) {
   <step-btn-group class="legacy-execution-report">
     <mat-slide-toggle
       [formControl]="toggleControl"
