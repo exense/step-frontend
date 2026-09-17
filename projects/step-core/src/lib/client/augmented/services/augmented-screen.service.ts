@@ -136,8 +136,6 @@ export class AugmentedScreenService
   getActivatedScreenInputs(screenId: string, parameters: Record<string, unknown> = {}): Observable<ScreenInput[]> {
     return this.getScreenInputsByScreenIdWithCache(screenId).pipe(
       switchMap((definitions) => {
-        // The backend uses defaults as script bindings. Supply them separately from the model,
-        // also avoiding its duplicate-key collection error for definitions sharing an input ID.
         const defaults = definitions.reduce(
           (result, { input }) => {
             const value = input?.type === 'CHECKBOX' ? (input.defaultValue ?? false) : input?.defaultValue;
