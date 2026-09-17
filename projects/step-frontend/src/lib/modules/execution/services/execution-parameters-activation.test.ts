@@ -5,6 +5,7 @@ import { ActivatedRoute, provideRouter, Router } from '@angular/router';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { config } from 'rxjs';
 import {
   AugmentedScreenService,
   AuthService,
@@ -126,6 +127,19 @@ describe('Execution parameter activation', () => {
     expect(actual).toEqual(parameters);
   }
 
+  function failActivation(): void {
+    const previousHandler = config.onUnhandledError;
+    config.onUnhandledError = jest.fn();
+    try {
+      http
+        .expectOne((request) => request.url.endsWith('/screen-inputs'))
+        .flush('Temporary failure', { status: 503, statusText: 'Service Unavailable' });
+      tick();
+    } finally {
+      config.onUnhandledError = previousHandler;
+    }
+  }
+
   it('loads defaults only from active definitions, including global and local parameters sharing an ID', fakeAsync(() => {
     TestBed.inject(AugmentedScreenService)
       .getDefaultParametersByScreenId('executionParameters')
@@ -185,6 +199,52 @@ describe('Execution parameter activation', () => {
     http.expectNone((request) => request.url.endsWith('/executions/start'));
     tick(200);
     expectStart({ globalParameter: 'ONE', localParameter: 'TWO', shared: 'ACTIVE' });
+  }));
+
+  it('preserves fields and blocks submission after an activation failure, then recovers on the next edit', fakeAsync(() => {
+    createForm();
+    respondToScreens();
+    form!.detectChanges();
+    const control = form!.debugElement.query(By.css('step-standard-custom-form-inputs'));
+    control.triggerEventHandler('ngModelChange', 'FIRST EDIT');
+    execute();
+    tick(500);
+    failActivation();
+    form!.detectChanges();
+    expect(form!.componentInstance.inputs().map((input) => input.id)).toEqual(Object.keys(defaults));
+    expect(form!.componentInstance.changeInProgress()).toBe(true);
+    http.expectNone((request) => request.url.endsWith('/executions/start'));
+
+    control.triggerEventHandler('ngModelChange', 'RECOVERED');
+    tick(500);
+    const retry = http.expectOne((request) => request.url.endsWith('/screen-inputs'));
+    expect(JSON.parse(retry.request.body).globalParameter).toBe('RECOVERED');
+    const active = activeDefinitions.filter((item) => item.input!.id !== 'shared');
+    retry.flush(active);
+    respondToScreens(active);
+    expectStart({ globalParameter: 'RECOVERED', localParameter: 'LOCAL' });
+    form!.detectChanges();
+    expect(form!.componentInstance.inputs().map((input) => input.id)).toEqual(['globalParameter', 'localParameter']);
+    expect(form!.nativeElement.querySelector('[role="alert"]')).toBeNull();
+  }));
+
+  it('allows retrying an initial activation failure before using defaults or submitting', fakeAsync(() => {
+    createForm();
+    flushMicrotasks();
+    http.expectOne((request) => request.url.includes('/screens/input/byscreen/')).flush(definitions);
+    tick(500);
+    execute();
+    failActivation();
+    form!.detectChanges();
+    expect(model).toEqual({});
+    http.expectNone((request) => request.url.endsWith('/executions/start'));
+    const alert = form!.debugElement.query(By.css('[role="alert"]'));
+    expect(alert).not.toBeNull();
+    alert.query(By.css('button')).nativeElement.click();
+    respondToScreens();
+    expectStart(defaults);
+    form!.detectChanges();
+    expect(form!.nativeElement.querySelector('[role="alert"]')).toBeNull();
   }));
 
   it('filters inactive parameters when starting an interactive session', fakeAsync(() => {

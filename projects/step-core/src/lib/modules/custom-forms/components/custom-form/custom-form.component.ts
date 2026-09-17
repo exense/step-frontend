@@ -19,8 +19,10 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
 import { ActivatedRoute } from '@angular/router';
 import {
   BehaviorSubject,
+  catchError,
   debounceTime,
   distinctUntilChanged,
+  EMPTY,
   filter,
   groupBy,
   map,
@@ -86,6 +88,8 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   readonly stModelChange = output<Record<string, unknown | string>>();
   readonly customInputTouch = output<void>();
 
+  protected readonly activationFailed = signal(false);
+
   private activeExpressionInputsKeys = new Set<string>();
   private readonly orderedIds = signal<string[]>([]);
   private readonly originalInputs = signal<Record<string, StInput>>({});
@@ -149,6 +153,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   protected onCustomInputTouched(): void {
     this.customInputTouch.emit();
+  }
+
+  protected retryActivation(): void {
+    this.pendingChanges.add(undefined);
+    this.changeInProgressState$.next(true);
+    this.valueChange$.next(undefined);
   }
 
   private determineCustomFormInputSchema(screenInputs: ScreenInput[]): CustomFormInputsSchema {
@@ -256,9 +266,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           this.stModelChange.emit(changedModel);
           return changedModel;
         }),
-        switchMap((changedModel) =>
-          this._screensService.getActivatedScreenInputs(this.stScreen(), changedModel ?? this.internalModel()),
-        ),
+        switchMap((changedModel) => {
+          this.activationFailed.set(false);
+          return this._screensService
+            .getActivatedScreenInputs(this.stScreen(), changedModel ?? this.internalModel())
+            .pipe(
+              catchError(() => {
+                this.activationFailed.set(true);
+                return EMPTY;
+              }),
+            );
+        }),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) =>
