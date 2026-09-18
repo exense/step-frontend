@@ -8,7 +8,7 @@ import { PopoverHarness } from './popover-harness';
 @Component({
   selector: 'step-popover-test',
   imports: [StepBasicsModule, StepIconsModule],
-  template: `<step-popover [mode]="popoverMode()">
+  template: `<step-popover [mode]="popoverMode()" (toggledEvent)="isPopoverToggled.set($event)">
     <step-icon name="help-circle" />
     <step-popover-content>
       <div class="popover-content">Test test test</div>
@@ -16,7 +16,18 @@ import { PopoverHarness } from './popover-harness';
   </step-popover>`,
 })
 class PopoverTestComponent {
-  readonly popoverMode = signal(PopoverMode.HOVER);
+  protected readonly popoverMode = signal(PopoverMode.HOVER);
+  protected readonly isPopoverToggled = signal(false);
+
+  /* eslint-disable step-lint/component-public-fields -- Test host exposes controls and observed output to assertions. */
+  setPopoverMode(mode: PopoverMode): void {
+    this.popoverMode.set(mode);
+  }
+
+  getIsPopoverToggled(): boolean {
+    return this.isPopoverToggled();
+  }
+  /* eslint-enable step-lint/component-public-fields */
 }
 
 describe('PopoverComponent', () => {
@@ -33,7 +44,7 @@ describe('PopoverComponent', () => {
     await fixture.whenStable();
   });
 
-  const wait = async (ms: number) => {
+  const wait = async (ms: number): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, ms));
     await fixture.whenStable();
   };
@@ -65,7 +76,7 @@ describe('PopoverComponent', () => {
   });
 
   it('Click mode', async () => {
-    fixture.componentInstance.popoverMode.set(PopoverMode.CLICK);
+    fixture.componentInstance.setPopoverMode(PopoverMode.CLICK);
     const popover = await loader.getHarness(PopoverHarness);
 
     let isOpened = await popover.isPopoverOpened();
@@ -78,18 +89,29 @@ describe('PopoverComponent', () => {
     await popover.click();
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeTruthy();
+    expect(fixture.componentInstance.getIsPopoverToggled()).toBeTruthy();
 
     await popover.mouseLeave();
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeTruthy();
 
-    await popover.backdropClick();
+    await popover.pressEscape();
     isOpened = await popover.isPopoverOpened();
     expect(isOpened).toBeFalsy();
+    expect(fixture.componentInstance.getIsPopoverToggled()).toBeFalsy();
+
+    await popover.click();
+    isOpened = await popover.isPopoverOpened();
+    expect(isOpened).toBeTruthy();
+
+    await popover.pressEscape();
+    isOpened = await popover.isPopoverOpened();
+    expect(isOpened).toBeFalsy();
+    expect(fixture.componentInstance.getIsPopoverToggled()).toBeFalsy();
   });
 
   it('Both mode', async () => {
-    fixture.componentInstance.popoverMode.set(PopoverMode.BOTH);
+    fixture.componentInstance.setPopoverMode(PopoverMode.BOTH);
     const popover = await loader.getHarness(PopoverHarness);
 
     let isOpened = await popover.isPopoverOpened();
