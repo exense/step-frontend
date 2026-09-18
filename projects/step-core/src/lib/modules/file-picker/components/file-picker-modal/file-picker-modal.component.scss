@@ -1,0 +1,64 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+div[step-modal-window-body] {
+  display: flex;
+  flex-direction: column;
+  height: 40rem;
+  gap: 1rem;
+}
+
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  step-form-field {
+    flex: 1;
+  }
+}
+
+step-modal-window {
+  position: relative;
+}
+
+.instructions-popover {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+
+  button {
+    color: var.$gray-500;
+  }
+}
+
+.instructions-list {
+  margin: 0;
+  padding-left: 1.6rem;
+
+  li + li {
+    margin-top: 0.4rem;
+  }
+}
+
+.instructions-intro {
+  margin: 0 0 0.8rem;
+}
+
+.file-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  button {
+    min-height: 2.5rem;
+    justify-content: flex-start;
+
+    &.selected {
+      background: var.$blue-15;
+    }
+  }
+}

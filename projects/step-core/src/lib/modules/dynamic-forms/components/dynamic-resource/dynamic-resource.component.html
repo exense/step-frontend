@@ -20,6 +20,7 @@
     [ngModel]="value"
     [isParentInvalid]="!!_ngControl.invalid"
     [disabled]="isDisabled"
+    [ignoreAutomationPackage]="ignoreAutomationPackage()"
     (ngModelChange)="onValueChange($event)"
     (dynamicSwitch)="toggleDynamicExpression(true)"
     (blur)="onBlur()"

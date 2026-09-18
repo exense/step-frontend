@@ -67,7 +67,10 @@ describe('Execution report view policy', () => {
     ] as const) {
       const result = await firstValueFrom(
         TestBed.runInInjectionContext(() =>
-          guard({} as ActivatedRouteSnapshot, { url: `/${mode}/${execution.id}` } as RouterStateSnapshot),
+          guard(
+            { data: {}, queryParams: {} } as ActivatedRouteSnapshot,
+            { url: `/${mode}/${execution.id}` } as RouterStateSnapshot,
+          ),
         ) as Observable<boolean | UrlTree>,
       );
       if (mode === expectedMode) {

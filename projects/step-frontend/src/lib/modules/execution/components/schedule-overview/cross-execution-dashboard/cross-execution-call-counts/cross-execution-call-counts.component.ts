@@ -1,8 +1,8 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {CrossExecutionDashboardState} from '../cross-execution-dashboard-state';
-import {Tab} from '@exense/step-core';
-import {take} from 'rxjs';
-import {Router} from '@angular/router';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
+import { Tab } from '@exense/step-core';
+import { take } from 'rxjs';
+import { Router } from '@angular/router';
 
 export type ReportNodesChartType = 'keywords' | 'testcases';
 
@@ -10,7 +10,7 @@ export type ReportNodesChartType = 'keywords' | 'testcases';
   selector: 'step-cross-execution-call-counts',
   templateUrl: './cross-execution-call-counts.component.html',
   styleUrl: './cross-execution-call-counts.component.scss',
-  standalone: false
+  standalone: false,
 })
 export class CrossExecutionCallCountsComponent implements OnInit {
   private _router = inject(Router);

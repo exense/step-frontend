@@ -13,24 +13,23 @@
   type="functions"
   tooltip="[Optional] Specify a single jar or a folder containing a list of jars. This file/folder will be transferred automatically to the agents."
   [formControl]="formGroup.controls.librariesFile"
-></step-dynamic-resource>
+/>
 
-<ng-container [ngSwitch]="scriptLanguage">
-  <ng-container *ngSwitchCase="ScriptLanguage.JAVA">
+@switch (scriptLanguage) {
+  @case (ScriptLanguage.JAVA) {
     <step-dynamic-resource
       label="Jar file"
       type="functions"
       tooltip="The jar file containing the keyword definitions. This file will be transferred automatically to the agents."
       [formControl]="formGroup.controls.scriptFile"
-    ></step-dynamic-resource>
-  </ng-container>
-
-  <ng-container *ngSwitchDefault>
+    />
+  }
+  @default {
     <step-dynamic-resource
       label="Script file"
       type="functions"
-      tooltip="Leave empty if you wan\'t step to generate it for you otherwise specify a file accessible to the controller. This file will be transferred automatically to the agents."
+      tooltip="Leave empty if you want step to generate it for you otherwise specify a file accessible to the controller. This file will be transferred automatically to the agents."
       [formControl]="formGroup.controls.scriptFile"
-    ></step-dynamic-resource>
-  </ng-container>
-</ng-container>
+    />
+  }
+}

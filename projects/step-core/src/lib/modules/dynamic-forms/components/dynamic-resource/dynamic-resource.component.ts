@@ -13,6 +13,7 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
 export class DynamicResourceComponent extends DynamicValueBaseComponent<DynamicValueString> {
   readonly type = input.required<string>();
   readonly supportsDirectory = input(false);
+  readonly ignoreAutomationPackage = input(false);
 
   constructor(_ngControl: NgControl) {
     super(_ngControl);

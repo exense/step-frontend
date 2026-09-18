@@ -9,6 +9,7 @@ import {
   ScheduledTaskTemporaryStorageService,
   ReloadableDirective,
   EntityRefService,
+  provideResourceApId,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SchedulerInvokerService } from '../../../execution/execution.module';
@@ -27,6 +28,10 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
       provide: EntityRefService,
       useExisting: forwardRef(() => PlanEditorComponent),
     },
+    provideResourceApId(() => {
+      const _entityRef = inject<EntityRefService<Plan>>(EntityRefService);
+      return _entityRef.currentEntity;
+    }),
   ],
   standalone: false,
 })
