@@ -232,6 +232,7 @@ interface AgentProvisioningEventState {
   ],
   standalone: false,
 })
+/* eslint-disable step-lint/component-public-fields -- This component also provides the public report-state API through AltExecutionStateService. */
 export class AltExecutionProgressComponent
   implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
 {
@@ -460,6 +461,7 @@ export class AltExecutionProgressComponent
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     map((result) => result?.aggregatedReportViews ?? []),
+    takeUntilDestroyed(),
     shareReplay(1),
   );
   private readonly testCases = toSignal(this.testCases$, { initialValue: [] });
@@ -561,7 +563,7 @@ export class AltExecutionProgressComponent
       });
     });
 
-  readonly keywordsDataSource$ = of(this.keywordsDataSource);
+  readonly keywordsDataSource$ = this.keywordParameters$.pipe(map(() => this.keywordsDataSource));
 
   readonly errors$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
@@ -601,8 +603,8 @@ export class AltExecutionProgressComponent
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     map((errors) => (!errors?.length ? undefined : errors)),
-    shareReplay(1),
     takeUntilDestroyed(),
+    shareReplay(1),
   );
 
   readonly availableErrorTypes$ = this.errors$.pipe(
@@ -772,7 +774,7 @@ export class AltExecutionProgressComponent
       .pipe(
         filter(([isActive]) => isActive),
         map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
-        debounceTime(300),
+        debounceTime(200),
         smartSwitchMap(
           (curr, prev) => {
             return (
@@ -984,3 +986,4 @@ export class AltExecutionProgressComponent
     this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
   }
 }
+/* eslint-enable step-lint/component-public-fields */

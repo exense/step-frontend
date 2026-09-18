@@ -152,8 +152,8 @@ export abstract class AltReportNodesSummaryStateService<T> extends AltReportNode
 
     return combineLatest([summaryTimeSeries$, forecastSummaryTotal$]).pipe(
       map(([summaryTimeSeries, countForecast]) => this.protectedTimeSeriesResponse(summaryTimeSeries, countForecast)),
-      shareReplay(1),
       takeUntilDestroyed(this._destroyRef),
+      shareReplay(1),
     );
   }
 
