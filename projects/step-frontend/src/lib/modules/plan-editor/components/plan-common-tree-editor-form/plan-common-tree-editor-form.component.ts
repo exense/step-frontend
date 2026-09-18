@@ -46,7 +46,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private planContextChange$ = new Subject<PlanContext>();
 
   private selectedNode$ = toObservable(this._treeState.selectedNode);
-  private planContextInternal = signal<PlanContext | undefined>(undefined);
+  private readonly planContextInternal = signal<PlanContext | undefined>(undefined);
 
   readonly planContext = this.planContextInternal.asReadonly();
 
@@ -101,7 +101,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   ngOnDestroy(): void {
     this.planContextChange$.complete();
-    this._planEditor.removeStrategy();
+    this._planEditor.removeStrategy(this);
   }
 
   addControl(artefactTypeId: string): void {
@@ -185,14 +185,14 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this._treeState.moveSelectedNodes('down');
   }
 
-  moveInNextSibling(node?: AbstractArtefact) {
+  moveInNextSibling(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
     this._treeState.moveSelectedNodesIn('nextSibling');
   }
 
-  moveInPrevSibling(node?: AbstractArtefact) {
+  moveInPrevSibling(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
@@ -276,7 +276,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     });
   }
 
-  rename(node?: AbstractArtefact) {
+  rename(node?: AbstractArtefact): void {
     if (node) {
       this._treeState.selectNodeById(node.id!);
     }
@@ -324,7 +324,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       .subscribe((savedContext) => {
         const forceRefresh = savedContext.forceRefresh;
         if (forceRefresh) {
-          this.selectedNode$.pipe(first()).subscribe((node) => this.init(savedContext, node?.id));
+          this.initContextWithSelectedNode(savedContext);
         } else if (this.planContext()) {
           this.planContextInternal.update((ctx) => ({
             ...ctx!,
@@ -335,6 +335,10 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
           }));
         }
       });
+  }
+
+  private initContextWithSelectedNode(context: PlanContext): void {
+    this.selectedNode$.pipe(first()).subscribe((node) => this.init(context, node?.id));
   }
 
   private cloneArtefactsFromBuffer(): Observable<AbstractArtefact[] | undefined> {

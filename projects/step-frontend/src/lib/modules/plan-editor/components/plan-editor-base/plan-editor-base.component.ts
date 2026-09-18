@@ -2,18 +2,18 @@ import {
   Component,
   DestroyRef,
   effect,
-  EventEmitter,
   forwardRef,
   inject,
   Injector,
-  Input,
-  OnChanges,
+  input,
+  model,
   OnDestroy,
   OnInit,
-  Output,
-  SimpleChanges,
+  output,
+  signal,
+  Type,
   untracked,
-  ViewChild,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -40,6 +40,9 @@ import {
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   CommonEntitiesUrlsService,
+  CustomComponent,
+  CustomRegistryService,
+  CustomRegistryType,
   PlanContext,
   AuthService,
   ExecutionParameters,
@@ -103,7 +106,6 @@ export interface ActionsConfig {
 export class PlanEditorBaseComponent
   implements
     OnInit,
-    OnChanges,
     PlanInteractiveSessionService,
     PlanArtefactResolverService,
     PlanContextInitializerService,
@@ -126,6 +128,7 @@ export class PlanEditorBaseComponent
   private _destroyRef = inject(DestroyRef);
   private _auth = inject(AuthService);
   private _injector = inject(Injector);
+  private _customRegistryService = inject(CustomRegistryService);
   public _planEditorService = inject(PlanEditorService);
 
   private planTypeChangeTerminator$?: Subject<void>;
@@ -136,22 +139,22 @@ export class PlanEditorBaseComponent
   }
 
   private get currentPlanId(): string | undefined {
-    return this.initialPlanContext?.id;
+    return untracked(() => this.initialPlanContext())?.id;
   }
 
-  @Input() initialPlanContext?: PlanContext | null;
-  @Input() actionsConfig?: ActionsConfig = {
+  readonly initialPlanContext = input<PlanContext | null>();
+  readonly actionsConfig = input<ActionsConfig | undefined>({
     showExecuteButton: true,
     showExportSourceButton: true,
-  };
-  @Output() runPlan = new EventEmitter<void>();
+  });
+  readonly runPlan = output();
 
   selectedTab = 'controls';
 
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
   readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
 
-  planTypes$ = this._planApi.getArtefactTemplates().pipe(
+  readonly planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
@@ -168,11 +171,18 @@ export class PlanEditorBaseComponent
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
-  private keywords?: KeywordCallsComponent;
+  private readonly keywords = viewChild('keywordCalls', { read: KeywordCallsComponent });
 
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
+
+  private readonly initializeContextEffect = effect(() => {
+    const context = this.initialPlanContext();
+    untracked(() => {
+      this.initializeContext(context ?? undefined, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(context?.id);
+    });
+  });
 
   private effectCheckAccessToPlanTypeControl = effect(() => {
     const planEditorType = this._planEditorService.plan();
@@ -190,18 +200,9 @@ export class PlanEditorBaseComponent
     this.initConsoleTabToggle();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.terminatePlanTypeChanges();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cPlanCtx = changes['initialPlanContext'];
-    if (cPlanCtx?.previousValue !== cPlanCtx?.currentValue || cPlanCtx?.firstChange) {
-      this.initializeContext(cPlanCtx?.currentValue, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(
-        (cPlanCtx?.currentValue as PlanContext)?.id,
-      );
-    }
+    this._planEditorService.removeStrategy();
   }
 
   handlePlanSizeChange(size: number): void {
@@ -346,9 +347,8 @@ export class PlanEditorBaseComponent
     }
 
     this._interactiveSession.execute(this.currentPlanId!, artefactIds).subscribe(() => {
-      if (this.keywords) {
-        this.keywords._leafReportsDataSource.reload();
-      }
+      const keywords = untracked(() => this.keywords());
+      keywords?._leafReportsDataSource?.reload?.();
     });
   }
 
@@ -361,7 +361,6 @@ export class PlanEditorBaseComponent
       this.synchronizeDynamicName(context.plan.root);
     }
 
-    this.planClass = context.plan._class;
     this.terminatePlanTypeChanges();
     this.planTypeControl.setValue(
       {
@@ -373,8 +372,8 @@ export class PlanEditorBaseComponent
     this.setupPlanTypeChanges();
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
-    const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
-    this._planEditorService.init(context!, artefactId);
+    const artefactId = preselectArtefact ? (planOpenState?.artefactId ?? this.artefactIdFromUrl) : undefined;
+    this.initializeEditorContext(context, artefactId);
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
@@ -440,12 +439,31 @@ export class PlanEditorBaseComponent
         takeUntil(this.planTypeChangeTerminator$),
       )
       .subscribe((context) => {
-        this.planClass = context!.plan!._class;
-        this._planEditorService.init(context);
+        this.initializeEditorContext(context);
       });
   }
 
-  setTargetExecutionParameters(executionParameters: Record<string, string>) {
+  private resolveEditorComponent(planClass?: string): Type<CustomComponent> | undefined {
+    if (!planClass) {
+      return undefined;
+    }
+
+    return this._customRegistryService.getRegisteredItem(CustomRegistryType.PLAN_TYPE, planClass)?.component;
+  }
+
+  private initializeEditorContext(context: PlanContext, selectedArtefactId?: string): void {
+    const previousComponent = this.resolveEditorComponent(this.planClass);
+    const nextComponent = this.resolveEditorComponent(context.plan._class);
+
+    if (previousComponent !== nextComponent) {
+      this._planEditorService.removeStrategy();
+    }
+
+    this.planClass = context.plan._class;
+    this._planEditorService.init(context, selectedArtefactId);
+  }
+
+  setTargetExecutionParameters(executionParameters: Record<string, string>): void {
     this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }
