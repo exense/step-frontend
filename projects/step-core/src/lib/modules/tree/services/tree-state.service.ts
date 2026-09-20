@@ -19,18 +19,18 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   private originalRoot?: T;
 
-  private editNodeIdInternal = signal<string | undefined>(undefined);
+  private readonly editNodeIdInternal = signal<string | undefined>(undefined);
   readonly editNodeId = this.editNodeIdInternal.asReadonly();
 
   private treeUpdateInternal$ = new Subject<T>();
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
-  protected rootNode = signal<N | null | undefined>(null);
-  private hideRootInternal = signal(false);
-  private selectedInsertionParentId = signal<string | undefined>(undefined);
-  protected treeData = computed(() => this._treeFlattener.flattenTree(this.rootNode()));
-  private selectedNodeIdsInternal = signal<string[]>([]);
-  private expandedNodeIdsInternal = signal<string[]>([]);
+  protected readonly rootNode = signal<N | null | undefined>(null);
+  private readonly hideRootInternal = signal(false);
+  private readonly selectedInsertionParentId = signal<string | undefined>(undefined);
+  protected readonly treeData = computed(() => this._treeFlattener.flattenTree(this.rootNode()));
+  private readonly selectedNodeIdsInternal = signal<string[]>([]);
+  private readonly expandedNodeIdsInternal = signal<string[]>([]);
 
   readonly flatTree = computed(() => {
     const { tree } = this.treeData();
@@ -42,7 +42,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return tree.filter((node) => !node.parentPath.some((id) => collapsedNodeIds.includes(id)));
   });
 
-  private flatTreeNodeIndexes = computed(() => {
+  private readonly flatTreeNodeIndexes = computed(() => {
     const flatTree = this.flatTree();
     return flatTree.reduce((res, item, index) => {
       res.set(item.id, index);
@@ -79,6 +79,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   init(root?: T, options: TreeStateInitOptions = {}): void {
     const { selectedNodeIds, expandAllByDefault, hideRoot } = { ...DEFAULT_OPTIONS, ...options };
     this.hideRootInternal.set(!!hideRoot);
+    const previousRootId = this.rootNode()?.id;
     this.originalRoot = root;
     const rootNode = !!root ? this._treeNodeUtils.convertItem(root) : undefined;
     this.rootNode.set(rootNode);
@@ -87,7 +88,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
-    if (!this.selectedInsertionParentId()) {
+    if (!this.selectedInsertionParentId() || previousRootId !== rootNode.id) {
       this.selectedInsertionParentId.set(rootNode.id);
     }
 
@@ -453,7 +454,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
         })
         .sort((a, b) => a.index - b.index);
 
-      const calcNodesForMovement = () => {
+      const calcNodesForMovement = (): { nodes: N[]; before: N[]; after: N[] } => {
         const nodes = nodesIndices.map((nodeIndex) => nodeIndex.node);
         const before = children.filter((child, index) => index < nodesIndices[0].index);
         const after = children.filter((child, index) => index > nodesIndices[nodesIndices.length - 1].index);
@@ -774,7 +775,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private expandPath(path: string[]): Observable<boolean> {
     const checkChildren = !!this._treeNodeUtils.hasChildren && !!this._treeNodeUtils.loadChildren;
 
-    const expandChild = (nodeId: string) => {
+    const expandChild = (nodeId: string): Observable<boolean> => {
       if (this.isNodeExpanded(nodeId)) {
         return of(true);
       }
