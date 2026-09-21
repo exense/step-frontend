@@ -47,7 +47,6 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   readonly dragLeave = output<DropInfo>();
 
   ngAfterViewInit(): void {
-    this.initListeners();
     this._zone.runOutsideAngular(() => this.initListeners());
   }
 

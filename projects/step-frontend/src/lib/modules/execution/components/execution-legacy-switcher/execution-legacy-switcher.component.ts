@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Execution, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -9,6 +9,7 @@ import { map } from 'rxjs';
   templateUrl: './execution-legacy-switcher.component.html',
   styleUrl: './execution-legacy-switcher.component.scss',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExecutionLegacySwitcherComponent {
   /** @Input() **/
@@ -26,6 +27,8 @@ export class ExecutionLegacySwitcherComponent {
   protected readonly forceLegacyReporting = toSignal(this._executionViewModeService.checkForceLegacyReporting(), {
     initialValue: false,
   });
+
+  protected readonly disableLegacyReporting = this._executionViewModeService.isLegacyReportingDisabled();
 
   constructor() {
     effect(() => {

@@ -6,7 +6,6 @@ export { AugmentedExecutionsService } from './services/augmented-executions.serv
 export { AugmentedParametersService } from './services/augmented-parameters.service';
 export { AugmentedResourcesService } from './services/augmented-resources.service';
 export { AugmentedSchedulerService } from './services/augmented-scheduler.service';
-export { AugmentedKeywordPackagesService } from './services/augmented-keyword-packages.service';
 export { AugmentedKeywordsService } from './services/augmented-keywords.service';
 export { AugmentedScreenService } from './services/augmented-screen.service';
 export { AugmentedSettingsService } from './services/augmented-settings.service';
