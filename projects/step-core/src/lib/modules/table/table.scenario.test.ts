@@ -81,11 +81,15 @@ function names(fixture: ComponentFixture<TableTestComponent>): string[] {
   return Array.from(element.querySelectorAll('tr.content-row .mat-column-name'), (cell) => cell.textContent!.trim());
 }
 
-function search(fixture: ComponentFixture<TableTestComponent>, value: string): void {
+function setSearchValue(fixture: ComponentFixture<TableTestComponent>, value: string): void {
   const element: HTMLElement = fixture.nativeElement;
   const input = element.querySelector<HTMLInputElement>('.mat-column-search-name input')!;
   input.value = value;
   input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function search(fixture: ComponentFixture<TableTestComponent>, value: string): void {
+  setSearchValue(fixture, value);
   tick(201);
   settle(fixture);
 }
@@ -212,8 +216,10 @@ describe('Table scenarios', () => {
       expect.objectContaining({ skip: 0, limit: 2, sort: [{ field: 'attributes.name', direction: 'ASCENDING' }] }),
       undefined,
     );
-    search(fixture, 'A');
-    search(fixture, 'Alpha');
+    setSearchValue(fixture, 'A');
+    setSearchValue(fixture, 'Alpha');
+    tick(201);
+    settle(fixture);
     expect(api.requestTable).toHaveBeenCalledTimes(1);
     tick(500);
     expect(api.requestTable).toHaveBeenCalledTimes(2);
