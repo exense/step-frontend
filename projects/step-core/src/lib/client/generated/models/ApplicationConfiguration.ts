@@ -17,4 +17,5 @@ export type ApplicationConfiguration = {
   title?: string;
   contextRoot?: string;
   forceLegacyReporting?: boolean;
+  disableLegacyReporting?: boolean;
 };

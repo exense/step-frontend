@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, computed, DestroyRef, inject, OnInit } fr
 import { Keyword, PlanContext, PlanContextApiService, PlanEditorService, ReloadableDirective } from '@exense/step-core';
 import { CompositeKeywordPlanContextApiService } from '../../injectables/composite-keyword-plan-context-api.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -22,15 +22,10 @@ export class CompositeFunctionEditorComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
   private _cd = inject(ChangeDetectorRef);
   private _activatedRoute = inject(ActivatedRoute);
-  readonly _planEditorService = inject(PlanEditorService);
+  protected readonly _planEditorService = inject(PlanEditorService);
 
-  readonly initialCompositePlanContext$ = this._activatedRoute.data.pipe(
+  protected readonly initialCompositePlanContext$ = this._activatedRoute.data.pipe(
     map((data) => data['compositePlan'] as PlanContext | undefined),
-  );
-
-  readonly hasFunctionPackage$ = this.initialCompositePlanContext$.pipe(
-    map((context) => context?.entity as unknown as Keyword),
-    map((keyword) => !!keyword?.customFields?.['functionPackageId']),
   );
 
   protected readonly actualKeyword = computed(() => {
@@ -43,7 +38,7 @@ export class CompositeFunctionEditorComponent implements OnInit {
       .subscribe(() => this._cd.detectChanges());
   }
 
-  handleKeywordChange(keyword: Keyword): void {
+  protected handleKeywordChange(keyword: Keyword): void {
     const ctx = this._planEditorService.planContext();
     if (!ctx) {
       return;

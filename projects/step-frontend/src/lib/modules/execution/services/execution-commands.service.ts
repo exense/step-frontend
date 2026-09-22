@@ -3,6 +3,7 @@ import { ExecutionCommandsContext } from '../shared/execution-commands-context.i
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
+  AugmentedScreenService,
   CommonEntitiesUrlsService,
   ExecutionParameters,
   ExecutionParamsFactoryService,
@@ -17,6 +18,7 @@ import { Router } from '@angular/router';
 export class ExecutionCommandsService implements OnDestroy {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _executionService = inject(AugmentedExecutionsService);
+  private _screensService = inject(AugmentedScreenService);
   private _executionParamsFactory = inject(ExecutionParamsFactoryService);
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
@@ -94,7 +96,10 @@ export class ExecutionCommandsService implements OnDestroy {
     const customForms = this.context.getCustomForms();
     const isReady$ = !customForms ? of(undefined) : customForms.readyToProceed();
     return isReady$.pipe(
-      map(() =>
+      switchMap(() =>
+        this._screensService.filterInactiveParameters('executionParameters', this.context.getExecutionParameters()),
+      ),
+      map((customParameters) =>
         this._executionParamsFactory.create({
           simulate,
           includeUserId,
@@ -102,7 +107,7 @@ export class ExecutionCommandsService implements OnDestroy {
           repositoryObject: this.cloneRepositoryObjectRef(),
           isolatedExecution: this.context.getIsExecutionIsolated(),
           includedTestCases: this.context.getIncludedTestcases() ?? undefined,
-          customParameters: this.context.getExecutionParameters(),
+          customParameters,
         }),
       ),
     );

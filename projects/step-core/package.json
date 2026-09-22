@@ -14,8 +14,12 @@
     "./styles/core-variables": {
       "sass": "./styles/_core-variables.scss"
     },
-    "./step-lint" : {
+    "./step-lint": {
       "default": "./step-lint/index.js"
+    },
+    "./testing": {
+      "types": "./testing/index.d.ts",
+      "default": "./testing/index.js"
     }
   },
   "peerDependencies": {
