@@ -3,23 +3,12 @@
     <div class="data-container">
       <div class="container-title">
         <span>Measurements</span>
-        @for (status of selectedStatuses(); track status) {
-          <button
-            [class]="'status-filter-pill status-filter-pill-' + status"
-            type="button"
-            [attr.aria-label]="'Remove ' + status + ' status filter'"
-            (click)="removeStatus.emit(status)"
-          >
-            <span>{{ status }}</span>
-            <step-icon name="x" />
-          </button>
-        }
         <step-icon
           name="info"
           class="help-icon"
           tabindex="0"
           aria-label="Measurement scope"
-          matTooltip="The charts show measurements for this node within the selected execution time range. Status filters match the Iterations list; other list filters do not apply."
+          matTooltip="The charts show measurements for this node within the selected execution time range. Click a status count in the title, tree, or list to filter both charts and iterations. Click the selected count in this title again to show all statuses. The search field filters only iterations."
         />
       </div>
       <div class="charts">

@@ -30,6 +30,8 @@ export class AggregatedStatusComponent {
   readonly hasDescendantInvocations = input<boolean | undefined>(false);
   readonly showTooltips = input(true);
   readonly hideSingleStatus = input(false);
+  readonly interactive = input(false);
+  readonly selectedStatus = input<Status | undefined>(undefined);
 
   protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();

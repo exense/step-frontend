@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
@@ -25,8 +25,7 @@ export class AltReportNodePerformanceComponent {
   private readonly timeRange = toSignal(this._executionState.timeRange$);
 
   readonly node = input.required<AggregatedTreeNode>();
-  readonly selectedStatuses = input<Status[]>([]);
-  readonly removeStatus = output<Status>();
+  readonly statusFilter = input<Status | undefined>(undefined);
 
   protected readonly metricKey = 'response-time';
   protected readonly grouping = ['name'];
@@ -37,7 +36,7 @@ export class AltReportNodePerformanceComponent {
     const executionId = this.executionId();
     const artefactHash = node.artefactHash;
     const timeRange = this.timeRange();
-    const selectedStatuses = this.selectedStatuses();
+    const statusFilter = this.statusFilter();
     const invocationCount = Object.values(node.countByStatus ?? {}).reduce((sum, count) => sum + count, 0);
     const instrumented = artefact?.instrumentNode;
     const hasMeasurements = artefact?._class === 'CallKeyword' || instrumented?.value || instrumented?.dynamic;
@@ -71,12 +70,12 @@ export class AltReportNodePerformanceComponent {
         type: FilterBarItemType.FREE_TEXT,
       },
     ];
-    if (selectedStatuses.length) {
+    if (statusFilter) {
       filters.push({
         attributeName: TimeSeriesConfig.STATUS_ATTRIBUTE,
         isLocked: true,
         exactMatch: true,
-        freeTextValues: selectedStatuses.map((status) => JSON.stringify(status)),
+        freeTextValues: [JSON.stringify(statusFilter)],
         searchEntities: [],
         type: FilterBarItemType.FREE_TEXT,
       });

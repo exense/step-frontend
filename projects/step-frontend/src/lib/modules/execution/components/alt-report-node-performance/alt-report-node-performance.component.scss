@@ -1,43 +1,5 @@
-@use 'projects/step-core/styles/core-mixins' as core;
-@use 'projects/step-core/styles/core-variables' as var;
-
 :host {
   display: block;
-}
-
-.container-title {
-  flex-wrap: wrap;
-}
-
-.status-filter-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  padding: 0 0.3rem 0 0.5rem;
-  border: 0.1rem solid;
-  border-radius: 1rem;
-  background: transparent;
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.8rem;
-  cursor: pointer;
-
-  step-icon {
-    @include core.step-icon-size(1rem);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 0;
-  }
-}
-
-@each $status, $color in var.$statuses {
-  .status-filter-pill-#{$status} {
-    color: $color;
-    border-color: $color;
-  }
 }
 
 .charts {

@@ -33,6 +33,20 @@
   font-weight: 600;
   font-size: 1rem;
 
+  &.is-interactive {
+    cursor: pointer;
+    transition:
+      background-color 120ms ease,
+      box-shadow 120ms ease,
+      opacity 120ms ease;
+
+    &:hover {
+      background-color: var.$gray-50;
+      box-shadow: 0 0 0 0.15rem var.$gray-100;
+      opacity: 1;
+    }
+  }
+
   &:not(:first-child) {
     border-left: none;
     border-top-left-radius: 0;
@@ -42,5 +56,21 @@
   &:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+  }
+}
+
+.is-dimmed {
+  opacity: 0.35;
+}
+
+step-status.is-interactive {
+  cursor: pointer;
+  transition:
+    filter 120ms ease,
+    opacity 120ms ease;
+
+  &:hover {
+    filter: brightness(1.1);
+    opacity: 1;
   }
 }
