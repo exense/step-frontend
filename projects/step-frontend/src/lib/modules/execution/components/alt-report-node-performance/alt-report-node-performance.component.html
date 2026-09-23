@@ -1,0 +1,32 @@
+@if (context(); as context) {
+  <section class="execution-report-node-details">
+    <div class="data-container">
+      <div class="container-title">
+        <span>Measurements</span>
+        <step-icon
+          name="info"
+          class="help-icon"
+          tabindex="0"
+          aria-label="Measurement scope"
+          matTooltip="The charts show measurements for this node within the selected execution time range. Click a status count in the title, tree, or list to filter both charts and iterations. Click the selected count in this title again to show all statuses. The search field filters only iterations."
+        />
+      </div>
+      <div class="charts">
+        <step-standalone-dashlet
+          [metricKey]="metricKey"
+          [timeRange]="context.timeRange"
+          [filters]="context.filters"
+          [grouping]="grouping"
+          [config]="responseTimesConfig"
+        />
+        <step-standalone-dashlet
+          [metricKey]="metricKey"
+          [timeRange]="context.timeRange"
+          [filters]="context.filters"
+          [grouping]="grouping"
+          [config]="throughputConfig"
+        />
+      </div>
+    </div>
+  </section>
+}

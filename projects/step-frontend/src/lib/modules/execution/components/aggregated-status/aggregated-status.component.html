@@ -2,6 +2,8 @@
   <step-status
     [status]="singleStatus.status"
     [iconMode]="true"
+    [class.is-interactive]="interactive()"
+    [class.is-dimmed]="selectedStatus() && selectedStatus() !== singleStatus.status"
     (stepStrategyClick)="handleClick(singleStatus, $event)"
   />
 } @else if (isEmptyStatus()) {
@@ -11,12 +13,20 @@
 } @else {
   @for (item of allStatusItems(); track item.status) {
     @if (item.status === Status.RUNNING && item.count === 1) {
-      <step-status [status]="item.status" [iconMode]="true" (stepStrategyClick)="handleClick(item, $event)" />
+      <step-status
+        [status]="item.status"
+        [iconMode]="true"
+        [class.is-interactive]="interactive()"
+        [class.is-dimmed]="selectedStatus() && selectedStatus() !== item.status"
+        (stepStrategyClick)="handleClick(item, $event)"
+      />
     } @else {
       <div class="status-group">
         <div
           class="step-aggregated-status"
           [class]="item.className"
+          [class.is-interactive]="interactive()"
+          [class.is-dimmed]="selectedStatus() && selectedStatus() !== item.status"
           [matTooltip]="item.tooltipMessage"
           matTooltipPosition="below"
           (click)="handleClick(item, $event)"

@@ -41,6 +41,7 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
+import { Status } from '../../../_common/shared/status.enum';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -215,16 +216,22 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     params: PartialOpenIterationsParams = {},
   ): void {
     const singleReportNode = this._drilldownNavigationUtils.getSingleReportNode(node);
-    if (
-      (singleReportNode &&
-        !this.isPossibleToInsertItem(singleReportNode.id!, DrillDownStackItemType.REPORT_NODE, parentStackItemId)) ||
-      !this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.AGGREGATED_REPORT_NODE, parentStackItemId)
-    ) {
+    if (singleReportNode) {
+      this.handleOpenDetails(singleReportNode, parentStackItemId);
       return;
     }
 
-    if (singleReportNode) {
-      this.handleOpenDetails(singleReportNode, parentStackItemId);
+    const items = this.stackItemsUntracked;
+    const parentIndex = items.findIndex((item) => item.id === parentStackItemId);
+    const nextItem = items[parentIndex + 1];
+    const replacesOpenIterations =
+      parentIndex >= 0 &&
+      nextItem?.type === DrillDownStackItemType.AGGREGATED_REPORT_NODE &&
+      nextItem.nodeId === node.id;
+    if (
+      !replacesOpenIterations &&
+      !this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.AGGREGATED_REPORT_NODE, parentStackItemId)
+    ) {
       return;
     }
 
@@ -246,6 +253,26 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
       });
+    });
+  }
+
+  protected handleTitleStatusClick(itemId: string, status: Status, count: number): void {
+    this.updateStackItems((items) => {
+      const index = items.findIndex((item) => item.id === itemId);
+      const item = items[index];
+      if (item?.type !== DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
+        return items;
+      }
+
+      const searchStatus = item.searchStatus === status ? undefined : status;
+      const result = [...items];
+      result[index] = {
+        ...item,
+        searchStatus,
+        searchStatusCount: searchStatus ? count : undefined,
+      };
+      this._drilldownNavigationUtils.changeDrilldownLocation(result);
+      return result;
     });
   }
 

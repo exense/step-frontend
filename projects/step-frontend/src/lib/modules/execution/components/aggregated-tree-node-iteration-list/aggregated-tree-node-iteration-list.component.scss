@@ -91,7 +91,11 @@ step-aggregated-tree-node-iteration-list {
     }
   }
 
-  & > section > div {
+  & > section.execution-report-node-details {
+    gap: 1rem;
+  }
+
+  .iteration-controls {
     display: flex;
     gap: 1rem;
     align-items: center;

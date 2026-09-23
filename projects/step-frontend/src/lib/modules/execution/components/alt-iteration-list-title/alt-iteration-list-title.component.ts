@@ -1,6 +1,7 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-alt-iteration-list-title',
@@ -12,6 +13,13 @@ export class AltIterationListTitleComponent {
   private readonly _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
 
   readonly node = input<AggregatedTreeNode | undefined>();
+  readonly selectedStatus = input<Status | undefined>(undefined);
+  readonly statusClick = output<{ status: Status; count: number }>();
+
+  protected handleStatusClick(item: { status: Status; count: number; event: MouseEvent }): void {
+    item.event.stopPropagation();
+    this.statusClick.emit({ status: item.status, count: item.count });
+  }
 
   protected readonly displayNode = computed(() => {
     const node = this.node();
