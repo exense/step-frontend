@@ -556,7 +556,7 @@ export class TimeSeriesChartUtilsService {
   private createAxes(primaryAggregation: MetricAggregation, primaryUnit: string, showYAxes?: boolean): Axis[] {
     return [
       {
-        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+        size: (plot, values, axisIndex) => this.getYAxisWidth(plot, values, axisIndex),
         scale: 'y',
         values: (plot, values) =>
           values.map((value: number) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(value)),
@@ -569,11 +569,28 @@ export class TimeSeriesChartUtilsService {
     return {
       scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
       side: 1,
-      size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+      size: (plot, values, axisIndex) => this.getYAxisWidth(plot, values, axisIndex),
       values: (plot: unknown, values: number[]) =>
         values.map((value) => this.getAxesFormatFunction(aggregation)(value)),
       grid: { show: false },
     } as Axis;
+  }
+
+  private getYAxisWidth(plot: UPlot, values: string[] | null, axisIndex: number): number {
+    if (!values?.length) {
+      return TimeSeriesConfig.CHART_LEGEND_SIZE;
+    }
+
+    const axis = plot.axes[axisIndex];
+    const context = plot.ctx;
+    context.save();
+    context.font = (axis.font as unknown as [string])[0];
+    const labelWidth = Math.max(...values.map((value) => (value == null ? 0 : context.measureText(value).width)));
+    context.restore();
+
+    const tickWidth = axis.ticks?.show === false ? 0 : (axis.ticks?.size ?? 10);
+    const requiredWidth = labelWidth / uPlot.pxRatio + (axis.gap ?? 5) + tickWidth + 5;
+    return Math.max(TimeSeriesConfig.CHART_LEGEND_SIZE, Math.ceil(requiredWidth));
   }
 
   private prepareSecondarySeries(
