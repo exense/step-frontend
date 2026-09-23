@@ -100,4 +100,30 @@ module.exports = defineConfig([
       ],
     },
   },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/function/components/function-configuration-dialog/function-configuration-dialog.component.ts',
+    ],
+    rules: {
+      // The form and keyword are exposed through FunctionTypeParentFormService.
+      'step-lint/component-public-fields': [
+        'warn',
+        { exclusions: [{ interfaceName: 'FunctionTypeParentFormService', exclusions: ['keyword', 'formGroup'] }] },
+      ],
+    },
+  },
+  {
+    files: ['projects/step-frontend/src/lib/modules/function/components/function-list/function-list.component.ts'],
+    rules: {
+      // DialogParentService consumers use these public members for navigation and refresh.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            { interfaceName: 'DialogParentService', exclusions: ['returnParentUrl', 'dialogSuccessfullyClosed'] },
+          ],
+        },
+      ],
+    },
+  },
 ]);

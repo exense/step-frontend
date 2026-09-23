@@ -1,11 +1,11 @@
-import { Component, inject, input, Input } from '@angular/core';
+import { Component, inject, input, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { map, of } from 'rxjs';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../../table/table.module';
 import { StepBasicsModule, LinkDisplayType, IDE_MODE } from '../../../basics/step-basics.module';
 import { Plan } from '../../../../client/step-client-module';
 import { PlanUrlPipe } from '../../pipes/plan-url.pipe';
-import { ENTITY_ORIGIN_AI, ENTITY_ORIGIN_CUSTOM_FIELD } from '../../types/entity-origin';
+import { isAiGeneratedEntity } from '../../types/entity-origin';
 import { AiGeneratedBadgeComponent } from '../ai-generated-badge/ai-generated-badge.component';
 
 @Component({
@@ -14,7 +14,7 @@ import { AiGeneratedBadgeComponent } from '../ai-generated-badge/ai-generated-ba
   styleUrls: ['./plan-link.component.scss'],
   imports: [StepBasicsModule, PlanUrlPipe, AiGeneratedBadgeComponent],
 })
-export class PlanLinkComponent implements CustomComponent {
+export class PlanLinkComponent implements CustomComponent, OnChanges {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
   protected readonly _isIdeMode = inject(IDE_MODE);
   private readonly options$ = this._customColumnOptions?.options$ ?? of([]);
@@ -24,10 +24,19 @@ export class PlanLinkComponent implements CustomComponent {
   readonly linkDisplayType = input(LinkDisplayType.TEXT_ONLY);
 
   protected readonly LinkDisplayType = LinkDisplayType;
-  protected readonly ENTITY_ORIGIN_AI = ENTITY_ORIGIN_AI;
-  protected readonly ENTITY_ORIGIN_CUSTOM_FIELD = ENTITY_ORIGIN_CUSTOM_FIELD;
+  protected isAiGenerated = false;
 
   protected readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
 
   protected readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['context']) {
+      this.isAiGenerated = isAiGeneratedEntity(this.context);
+    }
+  }
+
+  contextChange(_previousContext?: Plan, currentContext?: Plan): void {
+    this.isAiGenerated = isAiGeneratedEntity(currentContext);
+  }
 }

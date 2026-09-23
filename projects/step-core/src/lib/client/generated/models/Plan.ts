@@ -9,6 +9,7 @@ import type { Function } from './Function';
 
 export type Plan = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   root?: AbstractArtefact;
   functions?: Array<Function>;

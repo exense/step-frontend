@@ -34,11 +34,7 @@
 } @else {
   <ng-container *ngTemplateOutlet="linkTemplate"></ng-container>
 }
-@if (
-  _isIdeMode &&
-  linkDisplayType() !== LinkDisplayType.ICON_ONLY &&
-  context?.customFields?.[ENTITY_ORIGIN_CUSTOM_FIELD] === ENTITY_ORIGIN_AI
-) {
+@if (_isIdeMode && linkDisplayType() !== LinkDisplayType.ICON_ONLY && isAiGenerated) {
   <step-ai-generated-badge />
 }
 @if (!(noDescriptionHint$ | async)) {
