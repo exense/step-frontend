@@ -3,12 +3,23 @@
     <div class="data-container">
       <div class="container-title">
         <span>Measurements</span>
+        @for (status of selectedStatuses(); track status) {
+          <button
+            [class]="'status-filter-pill status-filter-pill-' + status"
+            type="button"
+            [attr.aria-label]="'Remove ' + status + ' status filter'"
+            (click)="removeStatus.emit(status)"
+          >
+            <span>{{ status }}</span>
+            <step-icon name="x" />
+          </button>
+        }
         <step-icon
           name="info"
           class="help-icon"
           tabindex="0"
           aria-label="Measurement scope"
-          matTooltip="The charts show all invocations of this node within the selected time range, regardless of filters applied to the Iterations list below."
+          matTooltip="The charts show measurements for this node within the selected execution time range. Status filters match the Iterations list; other list filters do not apply."
         />
       </div>
       <div class="charts">

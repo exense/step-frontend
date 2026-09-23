@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
+import { TimeSeriesConfig } from '../../../timeseries/modules/_common';
+import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
@@ -23,6 +25,8 @@ export class AltReportNodePerformanceComponent {
   private readonly timeRange = toSignal(this._executionState.timeRange$);
 
   readonly node = input.required<AggregatedTreeNode>();
+  readonly selectedStatuses = input<Status[]>([]);
+  readonly removeStatus = output<Status>();
 
   protected readonly metricKey = 'response-time';
   protected readonly grouping = ['name'];
@@ -33,6 +37,7 @@ export class AltReportNodePerformanceComponent {
     const executionId = this.executionId();
     const artefactHash = node.artefactHash;
     const timeRange = this.timeRange();
+    const selectedStatuses = this.selectedStatuses();
     const invocationCount = Object.values(node.countByStatus ?? {}).reduce((sum, count) => sum + count, 0);
     const instrumented = artefact?.instrumentNode;
     const hasMeasurements = artefact?._class === 'CallKeyword' || instrumented?.value || instrumented?.dynamic;
@@ -48,27 +53,36 @@ export class AltReportNodePerformanceComponent {
       return undefined;
     }
 
-    return {
-      timeRange,
-      filters: [
-        {
-          attributeName: 'eId',
-          label: 'Execution',
-          isLocked: true,
-          exactMatch: true,
-          searchEntities: [{ searchValue: executionId }],
-          type: FilterBarItemType.EXECUTION,
-        },
-        {
-          attributeName: 'artefactHash',
-          isLocked: true,
-          exactMatch: true,
-          freeTextValues: [JSON.stringify(artefactHash)],
-          searchEntities: [],
-          type: FilterBarItemType.FREE_TEXT,
-        },
-      ],
-    };
+    const filters: FilterBarItem[] = [
+      {
+        attributeName: 'eId',
+        label: 'Execution',
+        isLocked: true,
+        exactMatch: true,
+        searchEntities: [{ searchValue: executionId }],
+        type: FilterBarItemType.EXECUTION,
+      },
+      {
+        attributeName: 'artefactHash',
+        isLocked: true,
+        exactMatch: true,
+        freeTextValues: [JSON.stringify(artefactHash)],
+        searchEntities: [],
+        type: FilterBarItemType.FREE_TEXT,
+      },
+    ];
+    if (selectedStatuses.length) {
+      filters.push({
+        attributeName: TimeSeriesConfig.STATUS_ATTRIBUTE,
+        isLocked: true,
+        exactMatch: true,
+        freeTextValues: selectedStatuses.map((status) => JSON.stringify(status)),
+        searchEntities: [],
+        type: FilterBarItemType.FREE_TEXT,
+      });
+    }
+
+    return { timeRange, filters };
   });
 
   protected readonly responseTimesConfig: StandaloneChartConfig = {

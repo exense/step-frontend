@@ -152,7 +152,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
   });
 
-  private readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+  protected readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });
   private initialTimeRangeLoadPending = true;
@@ -221,6 +221,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const isFilteredByNonPassed = this.isFilteredByNonPassed();
     const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
     this.statusesCtrl.setValue(statuses);
+  }
+
+  protected removeStatus(status: Status): void {
+    this.statusesCtrl.setValue(this.statusesCtrl.value.filter((selectedStatus) => selectedStatus !== status));
   }
 
   private getReportNodeDataSource(artefactHash?: string, partialTreeRootNodeId?: string): TableDataSource<ReportNode> {

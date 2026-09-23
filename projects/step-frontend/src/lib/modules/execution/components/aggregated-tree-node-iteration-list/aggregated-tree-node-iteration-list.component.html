@@ -1,4 +1,8 @@
-<step-alt-report-node-performance [node]="currentAggregatedNode()" />
+<step-alt-report-node-performance
+  [node]="currentAggregatedNode()"
+  [selectedStatuses]="statusCtrlValue()"
+  (removeStatus)="removeStatus($event)"
+/>
 <section class="execution-report-node-details" matSort [matSortDisableClear]="true" stepElementSize>
   <div class="container-title">Iterations</div>
   <div class="iteration-controls">
