@@ -72,16 +72,12 @@
     "ngx-markdown": "20.1.0",
     "ngx-mat-select-search": "^8.0.6",
     "normalize.css": "8.0.1",
-    "playwright-core": "1.55.0",
+    "playwright-core": "1.63.0",
     "rxjs": "7.8.2",
     "tslib": "2.3.0",
     "uplot": "1.6.22",
     "uuid": "8.3.2",
     "zone.js": "0.15.1"
-    "chart.js": "4.4.3",
-    "chartjs-plugin-datalabels": "2.2.0",
-    "zone.js": "0.15.1",
-    "playwright-core": "1.63.0"
   },
   "devDependencies": {
     "@angular-devkit/schematics": "20.3.32",
