@@ -168,15 +168,16 @@
           <ng-container *stepStackViewItemTitle>
             <step-alt-iteration-list-title
               [node]="$any(item).data"
-              [selectedStatus]="$any(item).searchStatus"
-              (statusClick)="handleTitleStatusClick(item.id, $event.status, $event.count)"
+              [selectedStatuses]="$any(item).searchStatuses"
+              (statusClick)="handleTitleStatusClick(item.id, $event.status)"
             />
           </ng-container>
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
               [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
-              [statusFilter]="$any(item).searchStatus"
+              [statusFilter]="$any(item).searchStatuses"
+              (statusFilterChange)="handleStatusFilterChange(item.id, $event)"
               (showDetails)="handleOpenDetails($event, item.id)"
             />
           </section>

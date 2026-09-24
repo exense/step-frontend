@@ -14,6 +14,17 @@
         <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
       </button>
     </div>
+    <step-form-field class="status-filter">
+      <step-select
+        [ngModel]="dropdownStatuses()"
+        (ngModelChange)="handleStatusChange($event)"
+        [items]="statusOptions"
+        [multiple]="true"
+        [useClear]="false"
+        [useSearch]="false"
+        emptyPlaceholder="Status"
+      />
+    </step-form-field>
     <step-form-field>
       <step-prefix class="icon-prefix">
         <step-icon name="search" />

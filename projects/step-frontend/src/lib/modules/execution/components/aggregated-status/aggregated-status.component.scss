@@ -42,7 +42,7 @@
 
     &:hover {
       background-color: var.$gray-50;
-      box-shadow: 0 0 0 0.15rem var.$gray-100;
+      box-shadow: 0 0 0 0.15rem currentColor;
       opacity: 1;
     }
   }
@@ -71,6 +71,8 @@ step-status.is-interactive {
 
   &:hover {
     filter: brightness(1.1);
+    outline: 0.15rem solid currentColor;
+    outline-offset: 0.1rem;
     opacity: 1;
   }
 }

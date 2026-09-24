@@ -2,7 +2,7 @@
   <step-icon
     [ngClass]="className()"
     [name]="status() | statusIcon"
-    [matTooltip]="status() ?? ''"
+    [matTooltip]="tooltip() ?? status() ?? ''"
     matTooltipPosition="below"
   />
 } @else {

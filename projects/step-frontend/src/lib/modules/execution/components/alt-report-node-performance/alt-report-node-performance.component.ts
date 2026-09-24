@@ -6,6 +6,7 @@ import { TimeSeriesConfig } from '../../../timeseries/modules/_common';
 import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { areAllIterationStatusesSelected } from '../../shared/iteration-filter-statuses';
 
 interface NodePerformanceContext {
   timeRange: TimeRange;
@@ -25,7 +26,14 @@ export class AltReportNodePerformanceComponent {
   private readonly timeRange = toSignal(this._executionState.timeRange$);
 
   readonly node = input.required<AggregatedTreeNode>();
-  readonly statusFilter = input<Status | undefined>(undefined);
+  readonly statusFilter = input<Status[] | undefined>();
+
+  private readonly statusSuffix = computed(() => {
+    const statuses = this.statusFilter();
+    return statuses?.length && !areAllIterationStatusesSelected(statuses)
+      ? ` (${statuses.map((status) => status.toLowerCase().replaceAll('_', ' ')).join(', ')})`
+      : '';
+  });
 
   protected readonly metricKey = 'response-time';
   protected readonly grouping = ['name'];
@@ -70,12 +78,12 @@ export class AltReportNodePerformanceComponent {
         type: FilterBarItemType.FREE_TEXT,
       },
     ];
-    if (statusFilter) {
+    if (statusFilter?.length) {
       filters.push({
         attributeName: TimeSeriesConfig.STATUS_ATTRIBUTE,
         isLocked: true,
         exactMatch: true,
-        freeTextValues: [JSON.stringify(statusFilter)],
+        freeTextValues: statusFilter.map((status) => JSON.stringify(status)),
         searchEntities: [],
         type: FilterBarItemType.FREE_TEXT,
       });
@@ -130,4 +138,14 @@ export class AltReportNodePerformanceComponent {
       colorizationType: 'STROKE',
     },
   };
+
+  protected readonly filteredResponseTimesConfig = computed<StandaloneChartConfig>(() => ({
+    ...this.responseTimesConfig,
+    title: `Response Times${this.statusSuffix()}`,
+  }));
+
+  protected readonly filteredThroughputConfig = computed<StandaloneChartConfig>(() => ({
+    ...this.throughputConfig,
+    title: `Throughput${this.statusSuffix()}`,
+  }));
 }

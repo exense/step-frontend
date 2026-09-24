@@ -42,6 +42,7 @@ import { AltExecutionStateService } from '../../services/alt-execution-state.ser
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { Status } from '../../../_common/shared/status.enum';
+import { areAllIterationStatusesSelected, ITERATION_FILTER_STATUSES } from '../../shared/iteration-filter-statuses';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -242,8 +243,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       nodeId: node.id!,
       data: node,
       id: v4(),
-      searchStatus: params.nodeStatus,
-      searchStatusCount: params.nodeStatusCount,
+      searchStatuses: params.nodeStatus ? [params.nodeStatus] : undefined,
       partialTreeRootNodeId: untracked(() => this._treeStateContext.getState().partialTreeRootNodeId()),
     };
 
@@ -256,7 +256,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     });
   }
 
-  protected handleTitleStatusClick(itemId: string, status: Status, count: number): void {
+  protected handleTitleStatusClick(itemId: string, status: Status): void {
     this.updateStackItems((items) => {
       const index = items.findIndex((item) => item.id === itemId);
       const item = items[index];
@@ -264,12 +264,33 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         return items;
       }
 
-      const searchStatus = item.searchStatus === status ? undefined : status;
+      const activeStatuses = item.searchStatuses ?? ITERATION_FILTER_STATUSES;
+      const searchStatuses = areAllIterationStatusesSelected(item.searchStatuses)
+        ? [status]
+        : activeStatuses.includes(status)
+          ? activeStatuses.filter((activeStatus) => activeStatus !== status)
+          : [...activeStatuses, status];
       const result = [...items];
       result[index] = {
         ...item,
-        searchStatus,
-        searchStatusCount: searchStatus ? count : undefined,
+        searchStatuses: searchStatuses.length ? searchStatuses : undefined,
+      };
+      this._drilldownNavigationUtils.changeDrilldownLocation(result);
+      return result;
+    });
+  }
+
+  protected handleStatusFilterChange(itemId: string, statuses: Status[]): void {
+    this.updateStackItems((items) => {
+      const index = items.findIndex((item) => item.id === itemId);
+      const item = items[index];
+      if (item?.type !== DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
+        return items;
+      }
+      const result = [...items];
+      result[index] = {
+        ...item,
+        searchStatuses: !statuses.length || areAllIterationStatusesSelected(statuses) ? undefined : statuses,
       };
       this._drilldownNavigationUtils.changeDrilldownLocation(result);
       return result;

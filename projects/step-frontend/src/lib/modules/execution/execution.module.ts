@@ -1,6 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
+import { areAllIterationStatusesSelected } from './shared/iteration-filter-statuses';
 import { StatusComponent } from './components/status/status.component';
 import { StatusDistributionComponent } from './components/status-distribution/status-distribution.component';
 import { ExecutionResultComponent } from './components/execution-result/execution-result.component';
@@ -902,14 +903,14 @@ export class ExecutionModule {
                           const nodeId = value;
                           result.push({ type, nodeId });
                         } else {
-                          const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
-                          let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
-                          searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
+                          const [nodeId, searchStatuses] = value.split(';');
+                          const selectedStatuses = searchStatuses ? (searchStatuses.split(',') as Status[]) : undefined;
                           result.push({
                             type,
                             nodeId,
-                            searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
-                            searchStatusCount,
+                            searchStatuses: areAllIterationStatusesSelected(selectedStatuses)
+                              ? undefined
+                              : selectedStatuses,
                             partialTreeRootNodeId,
                           });
                         }

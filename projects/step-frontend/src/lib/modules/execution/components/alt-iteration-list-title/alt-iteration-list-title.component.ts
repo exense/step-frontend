@@ -13,7 +13,7 @@ export class AltIterationListTitleComponent {
   private readonly _treeStateContext = inject(AggregatedReportViewTreeStateContextService);
 
   readonly node = input<AggregatedTreeNode | undefined>();
-  readonly selectedStatus = input<Status | undefined>(undefined);
+  readonly selectedStatuses = input<Status[] | undefined>();
   readonly statusClick = output<{ status: Status; count: number }>();
 
   protected handleStatusClick(item: { status: Status; count: number; event: MouseEvent }): void {

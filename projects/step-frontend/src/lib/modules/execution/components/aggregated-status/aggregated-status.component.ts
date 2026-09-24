@@ -31,13 +31,19 @@ export class AggregatedStatusComponent {
   readonly showTooltips = input(true);
   readonly hideSingleStatus = input(false);
   readonly interactive = input(false);
-  readonly selectedStatus = input<Status | undefined>(undefined);
+  readonly action = input<'drilldown' | 'filter'>('drilldown');
+  readonly selectedStatuses = input<Status[] | undefined>();
 
   protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
     const showTooltips = this.showTooltips();
+    const interactive = this.interactive();
+    const action = this.action();
+    const selectedStatuses = this.selectedStatuses();
     return Object.entries(countByStatus)
-      .map(([status, count]) => this.createStatusItem(showTooltips, status, count))
+      .map(([status, count]) =>
+        this.createStatusItem(showTooltips, interactive, action, selectedStatuses, status, count),
+      )
       .filter((item) => !!item) as StatusItem[];
   });
 
@@ -72,12 +78,30 @@ export class AggregatedStatusComponent {
     this.statusClick.emit({ status, count, event });
   }
 
-  private createStatusItem(showTooltips: boolean, status?: string | Status, count?: number): StatusItem | undefined {
+  private createStatusItem(
+    showTooltips: boolean,
+    interactive: boolean,
+    action: 'drilldown' | 'filter',
+    selectedStatuses: Status[] | undefined,
+    status?: string | Status,
+    count?: number,
+  ): StatusItem | undefined {
     if (!status || !count) {
       return undefined;
     }
     const className = `step-aggregated-status-${status}`;
-    const tooltipMessage = showTooltips ? `${status}: ${count}` : undefined;
+    const label = status.toLowerCase().replaceAll('_', ' ');
+    const description =
+      action === 'drilldown'
+        ? `Drill to execution details with ${label} nodes only`
+        : !selectedStatuses
+          ? `Filter ${label} nodes`
+          : !selectedStatuses.includes(status as Status)
+            ? `Show ${label} nodes`
+            : selectedStatuses.length === 1
+              ? 'Show all nodes'
+              : `Hide ${label} nodes`;
+    const tooltipMessage = showTooltips ? `${status}: ${count}${interactive ? ` — ${description}` : ''}` : undefined;
     return { className, count, status: status as Status, tooltipMessage };
   }
 

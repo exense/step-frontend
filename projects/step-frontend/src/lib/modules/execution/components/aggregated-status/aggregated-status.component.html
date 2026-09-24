@@ -2,8 +2,9 @@
   <step-status
     [status]="singleStatus.status"
     [iconMode]="true"
+    [tooltip]="singleStatus.tooltipMessage"
     [class.is-interactive]="interactive()"
-    [class.is-dimmed]="selectedStatus() && selectedStatus() !== singleStatus.status"
+    [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(singleStatus.status)"
     (stepStrategyClick)="handleClick(singleStatus, $event)"
   />
 } @else if (isEmptyStatus()) {
@@ -16,8 +17,9 @@
       <step-status
         [status]="item.status"
         [iconMode]="true"
+        [tooltip]="item.tooltipMessage"
         [class.is-interactive]="interactive()"
-        [class.is-dimmed]="selectedStatus() && selectedStatus() !== item.status"
+        [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
         (stepStrategyClick)="handleClick(item, $event)"
       />
     } @else {
@@ -26,7 +28,7 @@
           class="step-aggregated-status"
           [class]="item.className"
           [class.is-interactive]="interactive()"
-          [class.is-dimmed]="selectedStatus() && selectedStatus() !== item.status"
+          [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
           [matTooltip]="item.tooltipMessage"
           matTooltipPosition="below"
           (click)="handleClick(item, $event)"

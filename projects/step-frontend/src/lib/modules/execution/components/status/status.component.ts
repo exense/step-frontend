@@ -11,6 +11,7 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
 export class StatusComponent {
   readonly status = input<string | undefined>();
   readonly iconMode = input(false);
+  readonly tooltip = input<string | undefined>();
   protected readonly className = computed(() => {
     const status = this.status();
     return !status ? '' : `status-${status}`;

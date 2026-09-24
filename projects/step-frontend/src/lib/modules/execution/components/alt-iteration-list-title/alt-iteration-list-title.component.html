@@ -6,7 +6,8 @@
   [hasDescendantInvocations]="item?.hasDescendantInvocations"
   [countByStatus]="item?.countByStatus"
   [interactive]="true"
-  [selectedStatus]="selectedStatus()"
+  action="filter"
+  [selectedStatuses]="selectedStatuses()"
   (statusClick)="handleStatusClick($event)"
 />
 <span class="name">{{ item?.name }}</span>

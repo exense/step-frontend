@@ -39,6 +39,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { Status } from '../../../_common/shared/status.enum';
+import { ITERATION_FILTER_STATUSES } from '../../shared/iteration-filter-statuses';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
@@ -100,7 +101,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   protected readonly selectedReportNode = signal<ReportNode | undefined>(undefined);
 
   protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
-  readonly statusFilter = input<Status | undefined>(undefined);
+  readonly statusFilter = input<Status[] | undefined>();
+  readonly statusFilterChange = output<Status[]>();
+  protected readonly statusOptions = ITERATION_FILTER_STATUSES;
+  protected readonly dropdownStatuses = computed(() => this.statusFilter() ?? this.statusOptions);
   readonly partialTreeRootNodeId = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
@@ -155,7 +159,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private readonly expectedCount = computed(() => {
     const countByStatus = this.currentAggregatedNode().countByStatus ?? {};
     const statusFilter = this.statusFilter();
-    const statusesToCount = statusFilter ? [statusFilter] : Object.keys(countByStatus);
+    const statusesToCount = statusFilter ?? Object.keys(countByStatus);
     return statusesToCount.reduce((sum, status) => sum + (countByStatus[status] ?? 0), 0);
   });
 
@@ -201,6 +205,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
+  protected handleStatusChange(statuses: Status[]): void {
+    this.statusFilterChange.emit(statuses ?? []);
+  }
+
   private getReportNodeDataSource(artefactHash?: string, partialTreeRootNodeId?: string): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
@@ -233,14 +241,11 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
       .subscribe((filterCondition) => untracked(() => this.tableSearch())?.onSearch?.('name', filterCondition));
 
     this.statusFilter$
-      .pipe(
-        map((status) => (status ? [status] : [])),
-        takeUntilDestroyed(this._destroyRef),
-      )
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((statuses) =>
         untracked(() => this.tableSearch())?.onSearch?.(
           'status',
-          this._filterConditionFactory.inFilterCondition(statuses),
+          this._filterConditionFactory.inFilterCondition(statuses ?? []),
         ),
       );
 
