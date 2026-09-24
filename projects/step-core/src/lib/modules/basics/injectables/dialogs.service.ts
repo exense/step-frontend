@@ -38,13 +38,19 @@ export interface ErrorDialogOptions {
   disableClose?: boolean;
 }
 
+export interface EnterValueOptions {
+  confirmButtonLabel?: string;
+  multiline?: boolean;
+  subtitle?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class DialogsService {
   private _matDialog = inject(MatDialog);
 
-  enterValue(title: string, value: string, multiline?: boolean): Observable<string> {
+  enterValue(title: string, value: string, options?: EnterValueOptions): Observable<string> {
     const dialogRef = this._matDialog.open<
       EnterTextValueDialogComponent,
       EnterTextValueDialogData,
@@ -53,7 +59,7 @@ export class DialogsService {
       data: {
         title,
         value,
-        multiline,
+        ...options,
       },
     });
 

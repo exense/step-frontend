@@ -1,4 +1,4 @@
-import { makeEnvironmentProviders } from '@angular/core';
+import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 
 import { StepHttpRequestService } from './augmented';
 import {
@@ -18,12 +18,13 @@ export { ApiError } from './generated/core/ApiError';
 export * from './generated/index';
 export * from './async-task/async-task.module';
 export * from './augmented';
+export * from './ide-generated';
 export { provideLazyLoadedInterceptor, LAZY_LOAD_INTERCEPTORS } from './augmented/interceptros/lazy-loaded.interceptor';
 export * from './table';
 export * from './_common';
 export * from './websockets';
 
-export const provideStepApi = (...features: HttpFeature<HttpFeatureKind>[]) =>
+export const provideStepApi = (...features: HttpFeature<HttpFeatureKind>[]): EnvironmentProviders =>
   makeEnvironmentProviders([
     provideHttpClient(withInterceptorsFromDi(), withInterceptors([lazyLoadedMainInterceptor]), ...features),
     OPEN_API_CONFIG_PROVIDER,
@@ -33,7 +34,7 @@ export const provideStepApi = (...features: HttpFeature<HttpFeatureKind>[]) =>
     },
   ]);
 
-export const provideTestStepApi = () =>
+export const provideTestStepApi = (): EnvironmentProviders =>
   makeEnvironmentProviders([
     provideHttpClient(withInterceptorsFromDi()),
     OPEN_API_CONFIG_PROVIDER,

@@ -2,6 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import {
   LOCAL_STORAGE,
   AppConfigContainerService,
+  EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
+  ExecutionReportStaticLayout,
+  ExecutionReportStaticLayoutRegistryService,
   GridPersistenceStateService,
   GridPresetListItem,
   ReportLayoutService,
@@ -32,8 +36,13 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   private _reportType = inject(REPORT_TYPE);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _staticLayouts = inject(ExecutionReportStaticLayoutRegistryService);
 
   save(gridId: string, preset: WidgetStatePreset): Observable<string> {
+    const staticLayout = this.getStaticLayout();
+    if (staticLayout) {
+      return of(staticLayout.id);
+    }
     preset.reportType = this._reportType;
     return this._api.saveReportLayout(preset).pipe(
       logAndRethrow(),
@@ -42,6 +51,10 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   load(gridId: string, presetId: string): Observable<WidgetStatePreset | undefined> {
+    const staticLayout = this.getStaticLayout();
+    if (staticLayout) {
+      return of(presetId === staticLayout.id ? this.toPreset(staticLayout) : undefined);
+    }
     return this._api.getReportLayoutById(presetId).pipe(
       logAndRethrow(),
       map((result) => result as WidgetStatePreset),
@@ -49,6 +62,10 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   getGridPresets(gridId: string): Observable<GridPresetListItem[]> {
+    const staticLayout = this.getStaticLayout();
+    if (staticLayout) {
+      return of([{ key: staticLayout.id, value: staticLayout.name, visibility: 'Preset' }]);
+    }
     return this._api.getAllReportLayouts(this._reportType).pipe(
       logAndRethrow(),
       map((result) =>
@@ -63,6 +80,10 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   getGridPreferredPresetSelection(gridId: string): Observable<string | undefined> {
+    const staticLayout = this.getStaticLayout();
+    if (staticLayout) {
+      return of(staticLayout.id);
+    }
     const queryParamPresetId = this._activatedRoute.snapshot.queryParams[LAYOUT_ID_QUERY_PARAM] as string | undefined;
     if (queryParamPresetId) {
       return of(queryParamPresetId);
@@ -71,11 +92,18 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   getGridDefaultPresetSelection(gridId: string): Observable<string> {
+    const staticLayout = this.getStaticLayout();
+    if (staticLayout) {
+      return of(staticLayout.id);
+    }
     const id = this._appConfigContainer.conf?.miscParams?.[DEFAULT_LAYOUT_ID_KEY] ?? '';
     return of(id);
   }
 
   setGridSelectedPresetSelection(gridId: string, presetId: string): void {
+    if (this.getStaticLayout()) {
+      return;
+    }
     this._localStorage.setItem(this.getSelectedLayoutStorageKey(gridId), presetId);
     if (this._activatedRoute.snapshot.queryParams[LAYOUT_ID_QUERY_PARAM] === presetId) {
       return;
@@ -89,6 +117,9 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   removeGridPreset(gridId: string, presetId: string): Observable<void> {
+    if (this.getStaticLayout()) {
+      return of(undefined);
+    }
     return this._api.deleteReportLayout(presetId).pipe(
       logAndRethrow(),
       map(() => {}),
@@ -96,6 +127,9 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   shareGridPreset(gridId: string, presetId: string): Observable<void> {
+    if (this.getStaticLayout()) {
+      return of(undefined);
+    }
     return this._api.shareReportLayout(presetId).pipe(
       logAndRethrow(),
       map(() => {}),
@@ -103,6 +137,9 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
   }
 
   unshareGridPreset(gridId: string, presetId: string): Observable<void> {
+    if (this.getStaticLayout()) {
+      return of(undefined);
+    }
     return this._api.unshareReportLayout(presetId).pipe(
       logAndRethrow(),
       map(() => {}),
@@ -111,5 +148,21 @@ export class ExecutionReportGridPersistenceStateService implements GridPersisten
 
   private getSelectedLayoutStorageKey(gridId: string): string {
     return `${SELECTED_LAYOUT_ID_STORAGE_KEY}.${gridId}`;
+  }
+
+  private getStaticLayout(): ExecutionReportStaticLayout | undefined {
+    const layoutId =
+      (this._activatedRoute.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
+      (this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined);
+    return this._staticLayouts.get(layoutId);
+  }
+
+  private toPreset(staticLayout: ExecutionReportStaticLayout): WidgetStatePreset {
+    return {
+      id: staticLayout.id,
+      attributes: { name: staticLayout.name },
+      visibility: 'Preset',
+      layout: staticLayout.layout as NonNullable<WidgetStatePreset['layout']>,
+    };
   }
 }

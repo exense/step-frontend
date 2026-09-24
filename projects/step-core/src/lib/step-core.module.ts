@@ -367,3 +367,4 @@ export * from './modules/editable-grid-layout';
 export * from './modules/csv';
 export * from './guards/can-leave-component.guard';
 export * from './types/can-leave-component.interface';
+export * from './modules/file-picker';

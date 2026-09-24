@@ -54,7 +54,7 @@ export class SchedulerModule {
   }
 
   private registerEntity(): void {
-    this._entityRegistry.register('tasks', 'Scheduler task', {
+    this._entityRegistry.register('tasks', 'Schedule', {
       icon: 'clock',
       component: SchedulerTaskSelectionComponent,
     });
@@ -135,9 +135,9 @@ export class SchedulerModule {
                   resolve: {
                     id: (route: ActivatedRouteSnapshot) => route.params['id'],
                     filename: (route: ActivatedRouteSnapshot) => {
-                      const api = inject(AugmentedSchedulerService);
+                      const _api = inject(AugmentedSchedulerService);
                       const id = route.params['id'];
-                      return api.getExecutionTaskById(id).pipe(
+                      return _api.getExecutionTaskById(id).pipe(
                         map((task) => task.attributes!['name']),
                         map((name) => `${name}.sta`),
                       );
