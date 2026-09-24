@@ -5,12 +5,6 @@
   [stepZIndex]="1000"
 >
   <div step-modal-window-body>
-    @if (keyword?.managed) {
-      <step-alert [type]="AlertType.WARNING">
-        This keyword is part of a keyword package. All changes made will be lost when the package is updated.
-      </step-alert>
-    }
-
     @if (keyword) {
       <step-custom-form-wrapper
         [stScreen]="customScreenTable"
