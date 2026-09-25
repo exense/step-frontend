@@ -77,6 +77,10 @@ export class AggregatedStatusComponent {
   });
 
   protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
+    if (status === Status.RUNNING) {
+      event.stopPropagation();
+      return;
+    }
     this.statusClick.emit({ status, count, event });
   }
 
@@ -94,6 +98,7 @@ export class AggregatedStatusComponent {
     }
     const className = `step-aggregated-status-${status}`;
     const label = status.toLowerCase().replaceAll('_', ' ');
+    const isInteractive = interactive && status !== Status.RUNNING;
     const description =
       action === 'drilldown'
         ? `Drill to execution details with ${label} nodes only`
@@ -104,7 +109,7 @@ export class AggregatedStatusComponent {
             : selectedStatuses?.length === 1
               ? 'Show all nodes'
               : `Hide ${label} nodes`;
-    const tooltipMessage = showTooltips ? `${status}: ${count}${interactive ? ` — ${description}` : ''}` : undefined;
+    const tooltipMessage = showTooltips ? `${status}: ${count}${isInteractive ? ` — ${description}` : ''}` : undefined;
     return { className, count, status: status as Status, tooltipMessage };
   }
 

@@ -3,7 +3,8 @@
     [status]="singleStatus.status"
     [iconMode]="true"
     [tooltip]="singleStatus.tooltipMessage"
-    [class.is-interactive]="interactive()"
+    [class.is-interactive]="interactive() && singleStatus.status !== Status.RUNNING"
+    [class.is-inert]="singleStatus.status === Status.RUNNING"
     [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(singleStatus.status)"
     (stepStrategyClick)="handleClick(singleStatus, $event)"
   />
@@ -18,7 +19,7 @@
         [status]="item.status"
         [iconMode]="true"
         [tooltip]="item.tooltipMessage"
-        [class.is-interactive]="interactive()"
+        class="is-inert"
         [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
         (stepStrategyClick)="handleClick(item, $event)"
       />
@@ -27,7 +28,8 @@
         <div
           class="step-aggregated-status"
           [class]="item.className"
-          [class.is-interactive]="interactive()"
+          [class.is-interactive]="interactive() && item.status !== Status.RUNNING"
+          [class.is-inert]="item.status === Status.RUNNING"
           [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
           [matTooltip]="item.tooltipMessage"
           matTooltipPosition="below"

@@ -903,11 +903,13 @@ export class ExecutionModule {
                           result.push({ type, nodeId });
                         } else {
                           const [nodeId, searchStatuses] = value.split(';');
-                          const selectedStatuses = searchStatuses ? (searchStatuses.split(',') as Status[]) : undefined;
+                          const selectedStatuses = searchStatuses
+                            ? (searchStatuses.split(',') as Status[]).filter((status) => status !== Status.RUNNING)
+                            : undefined;
                           result.push({
                             type,
                             nodeId,
-                            searchStatuses: selectedStatuses,
+                            searchStatuses: selectedStatuses?.length ? selectedStatuses : undefined,
                             partialTreeRootNodeId,
                           });
                         }

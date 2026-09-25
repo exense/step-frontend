@@ -243,7 +243,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       nodeId: node.id!,
       data: node,
       id: v4(),
-      searchStatuses: params.nodeStatus ? [params.nodeStatus] : undefined,
+      searchStatuses: params.nodeStatus && params.nodeStatus !== Status.RUNNING ? [params.nodeStatus] : undefined,
       partialTreeRootNodeId: untracked(() => this._treeStateContext.getState().partialTreeRootNodeId()),
     };
 
