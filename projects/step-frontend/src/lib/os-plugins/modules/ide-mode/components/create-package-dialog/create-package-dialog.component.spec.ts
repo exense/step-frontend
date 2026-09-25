@@ -16,19 +16,20 @@ import { CreatePackageDialogComponent } from './create-package-dialog.component'
 describe('CreatePackageDialogComponent', () => {
   let component: CreatePackageDialogComponent;
   const proposal: ProposeDirectoryResponse = { directory: '/home/Package_Name', warnings: [], errors: [] };
-  const api = { proposeApDirectory: jest.fn(), initializeNewAp: jest.fn() };
+  const api = { initializeNewAp: jest.fn() };
+  const filesystem = { proposeApDirectory: jest.fn(), listDirectory: () => of({ path: '/home' }) };
   const dialog = { close: jest.fn(), disableClose: false };
   const picker = { showFilePicker: jest.fn() };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    api.proposeApDirectory.mockReturnValue(of(proposal));
+    filesystem.proposeApDirectory.mockReturnValue(of(proposal));
     api.initializeNewAp.mockReturnValue(of(null));
     TestBed.configureTestingModule({
       imports: [NoopAnimationsModule],
       providers: [
         { provide: IdeService, useValue: api },
-        { provide: FilesystemService, useValue: { listDirectory: () => of({ path: '/home' }) } },
+        { provide: FilesystemService, useValue: filesystem },
         { provide: FilePickerService, useValue: picker },
         { provide: MatDialogRef, useValue: dialog },
         { provide: HttpOverrideResponseInterceptorService, useValue: { overrideInterceptor: jest.fn() } },
@@ -39,10 +40,13 @@ describe('CreatePackageDialogComponent', () => {
   });
 
   it('initializes the backend-proposed path while retaining the package name and allowing warnings', fakeAsync(() => {
-    api.proposeApDirectory.mockReturnValue(of({ ...proposal, warnings: ['Directory name was sanitized'] }));
+    filesystem.proposeApDirectory.mockReturnValue(of({ ...proposal, warnings: ['Directory name was sanitized'] }));
     component['form'].controls.name.setValue('Package/Name');
     tick(300);
-    expect(api.proposeApDirectory).toHaveBeenCalledWith({ existingParentDirectory: '/home', apName: 'Package/Name' });
+    expect(filesystem.proposeApDirectory).toHaveBeenCalledWith({
+      existingParentDirectory: '/home',
+      apName: 'Package/Name',
+    });
     component['create']();
     expect(api.initializeNewAp).toHaveBeenCalledWith('/home/Package_Name', 'Package/Name');
     expect(dialog.close).toHaveBeenCalledWith(true);
@@ -50,7 +54,7 @@ describe('CreatePackageDialogComponent', () => {
 
   it('cancels stale validation immediately and blocks creation until the latest response', fakeAsync(() => {
     const oldResponse = new Subject<ProposeDirectoryResponse>();
-    api.proposeApDirectory.mockReturnValueOnce(oldResponse);
+    filesystem.proposeApDirectory.mockReturnValueOnce(oldResponse);
     component['form'].controls.name.setValue('Old');
     tick(300);
     component['form'].controls.name.setValue('New');
@@ -59,11 +63,11 @@ describe('CreatePackageDialogComponent', () => {
     expect(api.initializeNewAp).not.toHaveBeenCalled();
     expect(component['proposal']()).toBeUndefined();
     tick(300);
-    expect(api.proposeApDirectory).toHaveBeenLastCalledWith({ existingParentDirectory: '/home', apName: 'New' });
+    expect(filesystem.proposeApDirectory).toHaveBeenLastCalledWith({ existingParentDirectory: '/home', apName: 'New' });
   }));
 
   it('blocks backend errors and invalid names', fakeAsync(() => {
-    api.proposeApDirectory.mockReturnValue(of({ ...proposal, errors: ['Target is a file'] }));
+    filesystem.proposeApDirectory.mockReturnValue(of({ ...proposal, errors: ['Target is a file'] }));
     component['form'].controls.name.setValue('Package');
     tick(300);
     component['create']();
@@ -99,7 +103,7 @@ describe('CreatePackageDialogComponent', () => {
   }));
 
   it('recovers from a failed location check when the location is corrected', fakeAsync(() => {
-    api.proposeApDirectory.mockReturnValueOnce(
+    filesystem.proposeApDirectory.mockReturnValueOnce(
       throwError(
         () =>
           new HttpErrorResponse({
@@ -129,7 +133,7 @@ describe('CreatePackageDialogComponent', () => {
   });
 
   it('renders the proposed directory with warning feedback', fakeAsync(() => {
-    api.proposeApDirectory.mockReturnValue(of({ ...proposal, warnings: ['Directory already exists'] }));
+    filesystem.proposeApDirectory.mockReturnValue(of({ ...proposal, warnings: ['Directory already exists'] }));
     const fixture = TestBed.createComponent(CreatePackageDialogComponent);
     fixture.detectChanges();
     fixture.componentInstance['form'].controls.name.setValue('Package');

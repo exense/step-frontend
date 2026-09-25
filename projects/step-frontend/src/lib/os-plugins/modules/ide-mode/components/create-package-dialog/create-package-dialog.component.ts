@@ -70,7 +70,7 @@ export class CreatePackageDialogComponent implements OnInit {
           return timer(300).pipe(
             switchMap(() =>
               this.withInlineErrors(() =>
-                this._ideApi.proposeApDirectory({ existingParentDirectory: location.trim(), apName: name }),
+                this._filesystem.proposeApDirectory({ existingParentDirectory: location.trim(), apName: name }),
               ),
             ),
             catchError((error: unknown) => {

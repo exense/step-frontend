@@ -5,24 +5,12 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AutomationPackageDescriptor } from '../models/AutomationPackageDescriptor';
-import type { ProposeDirectoryResponse } from '../models/ProposeDirectoryResponse';
 
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
 export class IdeService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-  public proposeApDirectory(params: {
-    existingParentDirectory: string;
-    apName: string;
-  }): Observable<ProposeDirectoryResponse> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/local/ide/ap/propose-directory',
-      query: params,
-    });
-  }
 
   /**
    * @returns any default response
