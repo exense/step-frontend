@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal, DOCUMENT } from '@angular/core';
 import { DateFormat } from '@exense/step-core';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
-import { DOCUMENT } from '@angular/common';
+
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, finalize, map, of, switchMap } from 'rxjs';
 

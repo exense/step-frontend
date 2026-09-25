@@ -1,10 +1,9 @@
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, DOCUMENT } from '@angular/core';
 import { DateFormat, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 import { of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-call-function-report-node',

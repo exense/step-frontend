@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, DOCUMENT } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { APP_HOST } from '../../../../client/step-client-module';
 
 @Component({

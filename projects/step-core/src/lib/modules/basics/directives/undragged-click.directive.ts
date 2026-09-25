@@ -1,6 +1,5 @@
-import { DestroyRef, Directive, inject, input, output, untracked } from '@angular/core';
+import { DestroyRef, Directive, inject, input, output, untracked, DOCUMENT } from '@angular/core';
 import { ClickGuardService, ClickGuard } from '../injectables/click-guard.service';
-import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepUndraggedClick]',

@@ -1,5 +1,5 @@
-import { computed, inject, Injectable, OnDestroy, Renderer2, signal, untracked } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { computed, inject, Injectable, OnDestroy, Renderer2, signal, untracked, DOCUMENT } from '@angular/core';
+
 import { WidgetsPositionsStateService } from './widgets-positions-state.service';
 import { GridDimensionsService } from './grid-dimensions.service';
 import { WidgetPosition } from '../types/widget-position';

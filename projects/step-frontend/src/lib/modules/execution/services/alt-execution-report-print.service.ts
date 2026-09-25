@@ -1,5 +1,5 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, OnDestroy, DOCUMENT } from '@angular/core';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, from, Observable, of, pairwise, switchMap, take, timer } from 'rxjs';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from './alt-execution-report-in-progress.token';

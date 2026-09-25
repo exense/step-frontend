@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, DOCUMENT } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, filter, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../../../client/step-client-module';
