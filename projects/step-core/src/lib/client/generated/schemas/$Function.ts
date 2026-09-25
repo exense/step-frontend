@@ -9,6 +9,12 @@ export const $Function = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     attributes: {
       type: 'dictionary',
       contains: {
@@ -32,6 +38,9 @@ export const $Function = {
       contains: {
         type: 'string',
       },
+    },
+    managed: {
+      type: 'boolean',
     },
     activationExpression: {
       type: 'Expression',

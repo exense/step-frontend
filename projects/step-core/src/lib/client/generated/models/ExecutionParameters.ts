@@ -8,6 +8,7 @@ import type { RepositoryObjectReference } from './RepositoryObjectReference';
 
 export type ExecutionParameters = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   customParameters?: Record<string, string>;
   userID?: string;

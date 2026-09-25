@@ -21,6 +21,12 @@ export const $ReportLayout = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     attributes: {
       type: 'dictionary',
       contains: {

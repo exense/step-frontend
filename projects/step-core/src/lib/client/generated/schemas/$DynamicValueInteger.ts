@@ -16,5 +16,8 @@ export const $DynamicValueInteger = {
     expressionType: {
       type: 'string',
     },
+    interpolationResult: {
+      type: 'EvaluationResult',
+    },
   },
 } as const;

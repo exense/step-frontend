@@ -9,6 +9,12 @@ export const $DashboardView = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     attributes: {
       type: 'dictionary',
       contains: {
@@ -50,12 +56,6 @@ export const $DashboardView = {
         type: 'DashboardItem',
       },
       isRequired: true,
-    },
-    metadata: {
-      type: 'dictionary',
-      contains: {
-        properties: {},
-      },
     },
     id: {
       type: 'string',

@@ -9,6 +9,12 @@ export const $ScreenInput = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     attributes: {
       type: 'dictionary',
       contains: {

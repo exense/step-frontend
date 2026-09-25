@@ -1,22 +1,22 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $DynamicValueString = {
+export const $StepConnectionInfo = {
   properties: {
-    dynamic: {
+    url: {
+      type: 'string',
+    },
+    projectName: {
+      type: 'string',
+    },
+    token: {
+      type: 'string',
+    },
+    stepUser: {
+      type: 'string',
+    },
+    tokenConfigured: {
       type: 'boolean',
-    },
-    value: {
-      type: 'string',
-    },
-    expression: {
-      type: 'string',
-    },
-    expressionType: {
-      type: 'string',
-    },
-    interpolationResult: {
-      type: 'EvaluationResult',
     },
   },
 } as const;

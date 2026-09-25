@@ -4,6 +4,7 @@
 
 export type UserBookmark = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   userId: string;
   url: string;
