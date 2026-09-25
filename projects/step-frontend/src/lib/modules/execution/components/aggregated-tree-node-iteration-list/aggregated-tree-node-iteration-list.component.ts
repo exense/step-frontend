@@ -39,7 +39,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { Status } from '../../../_common/shared/status.enum';
-import { ITERATION_FILTER_STATUSES } from '../../shared/iteration-filter-statuses';
+import { getAvailableIterationStatuses, ITERATION_FILTER_STATUSES } from '../../shared/iteration-filter-statuses';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { AltAggregatedNodeDetailsDirective } from '../../directives/alt-aggregated-node-details.directive';
@@ -103,8 +103,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   protected readonly aggregatedNode = this._nodeDetailsDirective.aggregatedNode;
   readonly statusFilter = input<Status[] | undefined>();
   readonly statusFilterChange = output<Status[]>();
-  protected readonly statusOptions = ITERATION_FILTER_STATUSES;
-  protected readonly dropdownStatuses = computed(() => this.statusFilter() ?? this.statusOptions);
   readonly partialTreeRootNodeId = input<string | undefined>(undefined);
   readonly showDetails = output<ReportNode>();
 
@@ -155,6 +153,13 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const treeState = this._treeStateContext.getState();
     return treeState.findNodeById(node.id) ?? node;
   });
+
+  protected readonly statusOptions = computed(() => {
+    const availableStatuses = getAvailableIterationStatuses(this.currentAggregatedNode().countByStatus);
+    return ITERATION_FILTER_STATUSES.filter((status) => availableStatuses.includes(status));
+  });
+
+  protected readonly dropdownStatuses = computed(() => this.statusFilter() ?? this.statusOptions());
 
   private readonly expectedCount = computed(() => {
     const countByStatus = this.currentAggregatedNode().countByStatus ?? {};

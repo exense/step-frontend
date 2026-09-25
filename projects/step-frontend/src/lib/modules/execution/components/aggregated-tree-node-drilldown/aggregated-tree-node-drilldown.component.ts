@@ -42,7 +42,7 @@ import { AltExecutionStateService } from '../../services/alt-execution-state.ser
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { Status } from '../../../_common/shared/status.enum';
-import { areAllIterationStatusesSelected, ITERATION_FILTER_STATUSES } from '../../shared/iteration-filter-statuses';
+import { areAllIterationStatusesSelected } from '../../shared/iteration-filter-statuses';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -264,8 +264,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         return items;
       }
 
-      const activeStatuses = item.searchStatuses ?? ITERATION_FILTER_STATUSES;
-      const searchStatuses = areAllIterationStatusesSelected(item.searchStatuses)
+      const countByStatus =
+        this._treeStateContext.getState().findNodeById(item.nodeId)?.countByStatus ?? item.data.countByStatus;
+      const activeStatuses = item.searchStatuses ?? [];
+      const searchStatuses = areAllIterationStatusesSelected(item.searchStatuses, countByStatus)
         ? [status]
         : activeStatuses.includes(status)
           ? activeStatuses.filter((activeStatus) => activeStatus !== status)
@@ -273,7 +275,10 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       const result = [...items];
       result[index] = {
         ...item,
-        searchStatuses: searchStatuses.length ? searchStatuses : undefined,
+        searchStatuses:
+          !searchStatuses.length || areAllIterationStatusesSelected(searchStatuses, countByStatus)
+            ? undefined
+            : searchStatuses,
       };
       this._drilldownNavigationUtils.changeDrilldownLocation(result);
       return result;
@@ -287,10 +292,13 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       if (item?.type !== DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
         return items;
       }
+      const countByStatus =
+        this._treeStateContext.getState().findNodeById(item.nodeId)?.countByStatus ?? item.data.countByStatus;
       const result = [...items];
       result[index] = {
         ...item,
-        searchStatuses: !statuses.length || areAllIterationStatusesSelected(statuses) ? undefined : statuses,
+        searchStatuses:
+          !statuses.length || areAllIterationStatusesSelected(statuses, countByStatus) ? undefined : statuses,
       };
       this._drilldownNavigationUtils.changeDrilldownLocation(result);
       return result;

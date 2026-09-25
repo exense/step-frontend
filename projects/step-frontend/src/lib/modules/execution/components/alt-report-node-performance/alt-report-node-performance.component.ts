@@ -30,7 +30,7 @@ export class AltReportNodePerformanceComponent {
 
   private readonly statusSuffix = computed(() => {
     const statuses = this.statusFilter();
-    return statuses?.length && !areAllIterationStatusesSelected(statuses)
+    return statuses?.length && !areAllIterationStatusesSelected(statuses, this.node().countByStatus)
       ? ` (${statuses.map((status) => status.toLowerCase().replaceAll('_', ' ')).join(', ')})`
       : '';
   });
@@ -78,7 +78,7 @@ export class AltReportNodePerformanceComponent {
         type: FilterBarItemType.FREE_TEXT,
       },
     ];
-    if (statusFilter?.length) {
+    if (statusFilter?.length && !areAllIterationStatusesSelected(statusFilter, node.countByStatus)) {
       filters.push({
         attributeName: TimeSeriesConfig.STATUS_ATTRIBUTE,
         isLocked: true,

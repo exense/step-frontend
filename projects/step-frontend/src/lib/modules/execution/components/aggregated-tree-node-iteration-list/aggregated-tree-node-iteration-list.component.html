@@ -18,7 +18,7 @@
       <step-select
         [ngModel]="dropdownStatuses()"
         (ngModelChange)="handleStatusChange($event)"
-        [items]="statusOptions"
+        [items]="statusOptions()"
         [multiple]="true"
         [useClear]="false"
         [useSearch]="false"

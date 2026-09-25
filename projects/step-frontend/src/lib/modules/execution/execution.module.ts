@@ -1,7 +1,6 @@
 import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
-import { areAllIterationStatusesSelected } from './shared/iteration-filter-statuses';
 import { StatusComponent } from './components/status/status.component';
 import { StatusDistributionComponent } from './components/status-distribution/status-distribution.component';
 import { ExecutionResultComponent } from './components/execution-result/execution-result.component';
@@ -908,9 +907,7 @@ export class ExecutionModule {
                           result.push({
                             type,
                             nodeId,
-                            searchStatuses: areAllIterationStatusesSelected(selectedStatuses)
-                              ? undefined
-                              : selectedStatuses,
+                            searchStatuses: selectedStatuses,
                             partialTreeRootNodeId,
                           });
                         }

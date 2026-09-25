@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { Status } from '../../../_common/shared/status.enum';
+import { areAllIterationStatusesSelected } from '../../shared/iteration-filter-statuses';
 
 type CountByStatus = Record<string, number>;
 
@@ -40,9 +41,10 @@ export class AggregatedStatusComponent {
     const interactive = this.interactive();
     const action = this.action();
     const selectedStatuses = this.selectedStatuses();
+    const allStatusesSelected = areAllIterationStatusesSelected(selectedStatuses, countByStatus);
     return Object.entries(countByStatus)
       .map(([status, count]) =>
-        this.createStatusItem(showTooltips, interactive, action, selectedStatuses, status, count),
+        this.createStatusItem(showTooltips, interactive, action, selectedStatuses, allStatusesSelected, status, count),
       )
       .filter((item) => !!item) as StatusItem[];
   });
@@ -83,6 +85,7 @@ export class AggregatedStatusComponent {
     interactive: boolean,
     action: 'drilldown' | 'filter',
     selectedStatuses: Status[] | undefined,
+    allStatusesSelected: boolean,
     status?: string | Status,
     count?: number,
   ): StatusItem | undefined {
@@ -94,11 +97,11 @@ export class AggregatedStatusComponent {
     const description =
       action === 'drilldown'
         ? `Drill to execution details with ${label} nodes only`
-        : !selectedStatuses
+        : allStatusesSelected
           ? `Filter ${label} nodes`
-          : !selectedStatuses.includes(status as Status)
+          : !selectedStatuses?.includes(status as Status)
             ? `Show ${label} nodes`
-            : selectedStatuses.length === 1
+            : selectedStatuses?.length === 1
               ? 'Show all nodes'
               : `Hide ${label} nodes`;
     const tooltipMessage = showTooltips ? `${status}: ${count}${interactive ? ` — ${description}` : ''}` : undefined;
