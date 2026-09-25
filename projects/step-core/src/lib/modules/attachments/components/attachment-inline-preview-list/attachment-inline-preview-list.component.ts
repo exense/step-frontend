@@ -31,6 +31,8 @@ const PADDINGS = 6;
 const CAP_ICON_SPACE = 20;
 const OFFSET = 15;
 
+type AttachmentWidthSnapshot = Map<AttachmentInlinePreviewComponent, number | undefined>;
+
 @Component({
   selector: 'step-attachment-inline-preview-list',
   imports: [StepBasicsModule, AttachmentInlinePreviewComponent],
@@ -112,11 +114,12 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     }
 
     availableWidth = availableWidth - listPrefixWidth - OFFSET;
-    const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth);
+    const widths: AttachmentWidthSnapshot = new Map();
+    const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth, widths);
 
     if (elementsToDisplay.length === items.length) {
       const withContainers = renderedElements
-        .map((element) => element.getWidth())
+        .map((element) => this.getMeasuredWidth(element, widths))
         .map((totalWidth) => ({ totalWidth }));
 
       const totalWidth = FareShareCalculator.calculateWidths(withContainers, GAP, PADDINGS);
@@ -140,7 +143,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       {} as Record<string, AttachmentMetaWithExplicitWidth>,
     );
 
-    return this.determineElementsWithWidths(elementsToDisplay, availableWidth, actualData);
+    return this.determineElementsWithWidths(elementsToDisplay, availableWidth, widths, actualData);
   });
 
   protected readonly showMoreButton = computed(() => {
@@ -158,12 +161,14 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private determineElementsToDisplay(
     renderedElements: readonly AttachmentInlinePreviewComponent[],
     availableWidth: number,
+    widths: AttachmentWidthSnapshot,
   ): AttachmentInlinePreviewComponent[] {
     const result: AttachmentInlinePreviewComponent[] = [];
 
     let totalWidth = 0;
     for (let element of renderedElements) {
-      let width = element.getWidth(MIN_WIDTH);
+      const measuredWidth = this.getMeasuredWidth(element, widths);
+      const width = measuredWidth ? Math.min(MIN_WIDTH, measuredWidth) : measuredWidth;
       if (!width) {
         continue;
       }
@@ -185,9 +190,20 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     return items.map((item) => ({ ...item, explicitWidth: MIN_WIDTH }));
   }
 
+  private getMeasuredWidth(
+    element: AttachmentInlinePreviewComponent,
+    widths: AttachmentWidthSnapshot,
+  ): number | undefined {
+    if (!widths.has(element)) {
+      widths.set(element, element.getWidth());
+    }
+    return widths.get(element);
+  }
+
   private determineElementsWithWidths(
     renderedElementsWithInitialWidths: AttachmentInlinePreviewComponent[],
     availableWidth: number,
+    widths: AttachmentWidthSnapshot,
     actualData?: Record<string, AttachmentMetaWithExplicitWidth>,
   ): AttachmentMetaWithExplicitWidth[] {
     const totalCount = renderedElementsWithInitialWidths.length;
@@ -197,6 +213,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     let changedItems = this.createItemsWithReallocatedWidths(
       renderedElementsWithInitialWidths,
       fairShareContext,
+      widths,
       actualData,
     );
     const isReallocated = fairShareContext.reallocate();
@@ -204,6 +221,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       changedItems = this.createItemsWithReallocatedWidths(
         renderedElementsWithInitialWidths,
         fairShareContext,
+        widths,
         actualData,
       );
     }
@@ -213,6 +231,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
   private createItemsWithReallocatedWidths(
     elements: readonly AttachmentInlinePreviewComponent[],
     context: FareShareCalculator,
+    widths: AttachmentWidthSnapshot,
     actualData?: Record<string, AttachmentMetaWithExplicitWidth>,
   ): AttachmentMetaWithExplicitWidth[] {
     return elements.map((element) => {
@@ -220,7 +239,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       if (actualData?.[item.id!]) {
         item = actualData[item.id!];
       }
-      let explicitWidth = element.getWidth();
+      let explicitWidth = this.getMeasuredWidth(element, widths);
       context.openContainer();
       explicitWidth = context.applyFairShare(explicitWidth);
       return {
