@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { EMPTY, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
@@ -12,6 +12,7 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
 import { LocalExecutionStrategyService } from './local-execution-strategy.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable()
 export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyController {
@@ -21,6 +22,7 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
   private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
+  private _destroyRef = inject(DestroyRef);
 
   private contextInternal?: ExecutionCommandsContext;
   private readonly selectedStrategyInternal = signal<ExecutionStrategy>(this._localStrategy);
@@ -60,14 +62,17 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
     }
 
     const currentEId = this.context.getExecution()?.id;
-    strategy.execute(this.context, { simulate }).subscribe((result) => {
-      if (result.kind === 'LOCAL') {
-        if (currentEId && this._executionTabManager) {
-          this._executionTabManager.handleTabClose(currentEId, false);
+    strategy
+      .execute(this.context, { simulate })
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((result) => {
+        if (result.kind === 'LOCAL') {
+          if (currentEId && this._executionTabManager) {
+            this._executionTabManager.handleTabClose(currentEId, false);
+          }
+          this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(result.executionId, false));
         }
-        this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(result.executionId, false));
-      }
-    });
+      });
   }
 
   stop(): Observable<void> {
