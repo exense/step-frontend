@@ -13,8 +13,10 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
 export class DynamicResourceComponent extends DynamicValueBaseComponent<DynamicValueString> {
   readonly type = input.required<string>();
   readonly supportsDirectory = input(false);
+  readonly allowDirectorySelection = input(false);
   readonly ignoreAutomationPackage = input(false);
 
+  // eslint-disable-next-line @angular-eslint/prefer-inject -- The generated base service requires this constructor dependency.
   constructor(_ngControl: NgControl) {
     super(_ngControl);
   }

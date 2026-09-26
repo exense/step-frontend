@@ -14,6 +14,7 @@ export class ResourceInputConfigDirective {
   readonly type = input.required<string>();
   readonly isBounded = input(false);
   readonly supportsDirectory = input(false);
+  readonly allowDirectorySelection = input(false);
 
   readonly withChooseExistingResourceButton = input(true);
   readonly searchTypes = input<string[] | undefined>(undefined);
@@ -32,6 +33,7 @@ export class ResourceInputConfigDirective {
     const type = this.type();
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
+    const allowDirectorySelection = this.allowDirectorySelection();
     const withChooseExistingResourceButton = this.withChooseExistingResourceButton();
     const searchTypes = this.searchTypes();
     const withClearButton = this.withClearButton();
@@ -44,6 +46,7 @@ export class ResourceInputConfigDirective {
       type,
       isBounded,
       supportsDirectory,
+      allowDirectorySelection,
       withChooseExistingResourceButton: !!automationPackageId ? false : withChooseExistingResourceButton,
       searchTypes,
       withClearButton: !!automationPackageId ? false : withClearButton,

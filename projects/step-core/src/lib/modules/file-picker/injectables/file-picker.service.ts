@@ -23,6 +23,9 @@ export class FilePickerService {
           selectionMode: params.selectionMode ?? SelectionMode.BOTH,
         },
         injector: this._injector,
+        panelClass: 'step-file-picker-dialog',
+        width: '60rem',
+        maxWidth: 'calc(100vw - 3.2rem)',
       })
       .afterClosed();
   }
