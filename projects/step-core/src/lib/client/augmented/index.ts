@@ -33,4 +33,5 @@ export * from './models/dynamic-value-complex-types';
 export * from './shared/time-series-errors-request';
 export * from './shared/time-series-error-entry';
 export * from './shared/errors.constants';
+export * from './shared/skip-connection-retry.token';
 export * from './shared/http-override-forrbidden-response';

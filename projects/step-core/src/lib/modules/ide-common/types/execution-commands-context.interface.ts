@@ -1,4 +1,6 @@
-import { CustomFormComponent, Execution, IncludeTestcases, RepositoryObjectReference } from '@exense/step-core';
+import { Execution, RepositoryObjectReference } from '../../../client/generated';
+import { CustomFormComponent } from '../../custom-forms/components/custom-form/custom-form.component';
+import { IncludeTestcases } from '../../execution-common/types/include-testcases.interface';
 
 export interface ExecutionCommandsContext {
   getCustomForms(): CustomFormComponent | undefined;

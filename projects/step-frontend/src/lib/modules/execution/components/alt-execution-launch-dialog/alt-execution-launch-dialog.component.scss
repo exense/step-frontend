@@ -4,6 +4,33 @@ div[step-modal-window-body] {
   flex-direction: column;
 }
 
+.launch-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  min-width: 0;
+  width: 100%;
+
+  step-dashlet {
+    min-width: 0;
+
+    &:first-of-type {
+      margin-inline-start: auto;
+    }
+  }
+}
+
+.testcase-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
 .artefact-info {
   gap: 1rem;
   & > section {

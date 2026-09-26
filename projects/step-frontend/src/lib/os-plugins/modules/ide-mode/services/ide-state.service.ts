@@ -7,6 +7,7 @@ import {
   SelectionMode,
   IdeService,
   FilePickerModalResult,
+  IdeStateStrategy,
 } from '@exense/step-core';
 import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
 import { ApAccessHistoryService } from './ap-access-history.service';
@@ -15,7 +16,7 @@ import { ApFsDataProviderService } from './ap-fs-data-provider.service';
 @Injectable({
   providedIn: 'root',
 })
-export class IdeStateService {
+export class IdeStateService implements IdeStateStrategy {
   private _ideApi = inject(IdeService);
   private _reloadable = inject(GlobalReloadService);
   private _accessHistory = inject(ApAccessHistoryService);

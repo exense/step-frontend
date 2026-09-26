@@ -36,6 +36,9 @@
     </span>
   }
 </div>
+@for (item of remoteDashlets; track item.id) {
+  <step-dashlet class="remote-extension" [itemKey]="item.template" />
+}
 <section>
   <button type="button" mat-button mat-stroked-button [matMenuTriggerFor]="openMenu">
     <step-icon name="folder" />

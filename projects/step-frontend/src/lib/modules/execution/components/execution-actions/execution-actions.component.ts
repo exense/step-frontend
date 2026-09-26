@@ -1,5 +1,5 @@
-import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
-import { Execution } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, input, output, ViewEncapsulation } from '@angular/core';
+import { ALL_EXECUTION_ACTIONS_AVAILABLE, Execution, ExecutionActionAvailability } from '@exense/step-core';
 
 const DEFAULT_TOOLTIPS = {
   simulate: 'Simulate execution',
@@ -18,6 +18,7 @@ export type ExecutionActionsTooltips = Partial<typeof DEFAULT_TOOLTIPS>;
   templateUrl: './execution-actions.component.html',
   styleUrl: './execution-actions.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class ExecutionActionsComponent {
@@ -32,6 +33,9 @@ export class ExecutionActionsComponent {
 
   /** @Input() **/
   readonly disabled = input(false);
+
+  /** @Input() **/
+  readonly availability = input<ExecutionActionAvailability>(ALL_EXECUTION_ACTIONS_AVAILABLE);
 
   /** @Input() **/
   readonly externalTooltips = input<ExecutionActionsTooltips | undefined>(undefined, { alias: 'tooltips' });

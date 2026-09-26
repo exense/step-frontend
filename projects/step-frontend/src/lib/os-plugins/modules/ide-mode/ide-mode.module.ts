@@ -2,6 +2,7 @@ import {
   AdditionalRightRuleService,
   DashletRegistryService,
   IDE_MODE,
+  IdeStateStrategyService,
   MenuItemsOverrideConfigService,
   StepCoreModule,
   ViewRegistryService,
@@ -21,6 +22,7 @@ export class IdeModeModule {
   private _dashletRegistry = inject(DashletRegistryService);
   private _viewRegistry = inject(ViewRegistryService);
   private _ideState = inject(IdeStateService);
+  private _ideStateStrategy = inject(IdeStateStrategyService);
   private _additionalRightRules = inject(AdditionalRightRuleService);
 
   constructor() {
@@ -28,7 +30,7 @@ export class IdeModeModule {
       this.setupMenuItems();
       this.registerDashlets();
       this.registerRule();
-      this._ideState.initialize();
+      this.initializeState();
     }
   }
 
@@ -49,5 +51,10 @@ export class IdeModeModule {
 
       return !(right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'));
     });
+  }
+
+  private initializeState(): void {
+    this._ideStateStrategy.useStrategy(this._ideState);
+    this._ideState.initialize();
   }
 }
