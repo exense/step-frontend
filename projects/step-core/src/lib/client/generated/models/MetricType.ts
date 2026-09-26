@@ -8,6 +8,7 @@ import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type MetricType = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   name: string;
   displayName: string;
   description?: string;

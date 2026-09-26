@@ -16,6 +16,7 @@ export class DynamicResourceComponent extends DynamicValueBaseComponent<DynamicV
   readonly allowDirectorySelection = input(false);
   readonly ignoreAutomationPackage = input(false);
 
+  // eslint-disable-next-line @angular-eslint/prefer-inject -- The generated base service requires this constructor dependency.
   constructor(_ngControl: NgControl) {
     super(_ngControl);
   }

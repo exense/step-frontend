@@ -1,9 +1,14 @@
 <step-modal-window
-  [title]="title"
   [showSpinner]="loading() || screenTemplateLoading()"
   [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
   class="slim-actions"
 >
+  <div step-modal-window-title class="launch-title">
+    <span>{{ title }}</span>
+    @for (item of headerDashlets; track item.id) {
+      <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
+    }
+  </div>
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger" role="alert">
@@ -33,14 +38,19 @@
         />
       </div>
       @if (artefact.type === 'TestSet') {
-        <hr />
-        <step-repository-plan-testcase-list
-          #testCases
-          [repoRef]="repoRef"
-          [explicitTestCases]="explicitTestCases"
-          (includedTestCasesChange)="testcases.set($event)"
-        />
+        <div class="testcase-selection" [hidden]="!_commands.showTestcases()">
+          <hr />
+          <step-repository-plan-testcase-list
+            #testCases
+            [repoRef]="repoRef"
+            [explicitTestCases]="explicitTestCases"
+            (includedTestCasesChange)="testcases.set($event)"
+          />
+        </div>
       }
+    }
+    @for (item of bodyDashlets; track item.id) {
+      <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
     }
   </div>
   <div step-modal-window-buttons>
@@ -53,6 +63,7 @@
       [tooltips]="tooltips()"
       [isExecutionIsolated]="executionIsolation"
       [disabled]="loading() || screenTemplateLoading()"
+      [availability]="_commands.availability()"
       (execute)="execute($event)"
       (schedule)="schedule()"
       (copyLink)="copyExecutionServiceAsCurlToClipboard()"

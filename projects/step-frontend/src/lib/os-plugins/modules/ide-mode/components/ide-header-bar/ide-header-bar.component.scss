@@ -1,11 +1,17 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-ide-header-bar {
+  min-width: 64rem;
   padding: 1rem 5rem 1rem 2.5rem;
   gap: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  .remote-extension {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 
   .package {
     color: var.$white;

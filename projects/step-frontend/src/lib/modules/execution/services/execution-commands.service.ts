@@ -1,30 +1,41 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
-import { ExecutionCommandsContext } from '../shared/execution-commands-context.interface';
-import { from, map, Observable, of, switchMap } from 'rxjs';
+import { computed, DestroyRef, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { EMPTY, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
-  AugmentedScreenService,
   CommonEntitiesUrlsService,
-  ExecutionParameters,
-  ExecutionParamsFactoryService,
   ExecutiontTaskParameters,
-  RepositoryObjectReference,
+  ExecutionCommandsContext,
+  ExecutionStrategy,
+  ExecutionStrategyController,
 } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
+import { LocalExecutionStrategyService } from './local-execution-strategy.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable()
-export class ExecutionCommandsService implements OnDestroy {
+export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyController {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _executionService = inject(AugmentedExecutionsService);
-  private _screensService = inject(AugmentedScreenService);
-  private _executionParamsFactory = inject(ExecutionParamsFactoryService);
+  private _localStrategy = inject(LocalExecutionStrategyService);
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
   private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
+  private _destroyRef = inject(DestroyRef);
 
   private contextInternal?: ExecutionCommandsContext;
+  private readonly selectedStrategyInternal = signal<ExecutionStrategy>(this._localStrategy);
+
+  readonly selectedStrategy = this.selectedStrategyInternal.asReadonly();
+  readonly availability = computed(() => {
+    const strategy = this.selectedStrategy();
+    return strategy.availability();
+  });
+  readonly showTestcases = computed(() => {
+    const strategy = this.selectedStrategy();
+    return strategy.showTestcases();
+  });
 
   ngOnDestroy(): void {
     this.contextInternal = undefined;
@@ -35,15 +46,32 @@ export class ExecutionCommandsService implements OnDestroy {
     return this;
   }
 
+  selectStrategy(strategy: ExecutionStrategy): void {
+    this.selectedStrategyInternal.set(strategy);
+  }
+
+  restoreLocalStrategy(): void {
+    this.selectedStrategyInternal.set(this._localStrategy);
+  }
+
   execute(simulate: boolean): void {
+    const strategy = this.selectedStrategy();
+    const availability = strategy.availability();
+    if (!(simulate ? availability.simulate : availability.execute)) {
+      return;
+    }
+
     const currentEId = this.context.getExecution()?.id;
-    this.buildExecutionParams(simulate)
-      .pipe(switchMap((executionParameters) => this._executionService.execute(executionParameters)))
-      .subscribe((eId) => {
-        if (currentEId && this._executionTabManager) {
-          this._executionTabManager.handleTabClose(currentEId, false);
+    strategy
+      .execute(this.context, { simulate })
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((result) => {
+        if (result.kind === 'LOCAL') {
+          if (currentEId && this._executionTabManager) {
+            this._executionTabManager.handleTabClose(currentEId, false);
+          }
+          this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(result.executionId, false));
         }
-        this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(eId, false));
       });
   }
 
@@ -56,6 +84,10 @@ export class ExecutionCommandsService implements OnDestroy {
   }
 
   copyExecutionServiceAsCurlToClipboard(): void {
+    if (!this.availability().copyRequest) {
+      return;
+    }
+
     const { location, navigator } = this._document.defaultView as Window;
 
     const hashIndex = location.href.indexOf('#');
@@ -67,7 +99,8 @@ export class ExecutionCommandsService implements OnDestroy {
     url = url.endsWith('/') ? url : `${url}/`;
     url = `${url}rest/executions/start`;
 
-    this.buildExecutionParams(false, false)
+    this._localStrategy
+      .buildExecutionParams(this.context, { simulate: false, includeUserId: false })
       .pipe(
         map(
           (payload) =>
@@ -79,7 +112,14 @@ export class ExecutionCommandsService implements OnDestroy {
   }
 
   prefillScheduledTask(): Observable<ExecutiontTaskParameters> {
-    const executionsParameters$ = this.buildExecutionParams(false, false);
+    if (!this.availability().schedule) {
+      return EMPTY;
+    }
+
+    const executionsParameters$ = this._localStrategy.buildExecutionParams(this.context, {
+      simulate: false,
+      includeUserId: false,
+    });
     return executionsParameters$.pipe(
       map((executionsParameters) => {
         const name = executionsParameters.description ?? '';
@@ -90,39 +130,6 @@ export class ExecutionCommandsService implements OnDestroy {
         };
       }),
     );
-  }
-
-  private buildExecutionParams(simulate: boolean, includeUserId = true): Observable<ExecutionParameters> {
-    const customForms = this.context.getCustomForms();
-    const isReady$ = !customForms ? of(undefined) : customForms.readyToProceed();
-    return isReady$.pipe(
-      switchMap(() =>
-        this._screensService.filterInactiveParameters('executionParameters', this.context.getExecutionParameters()),
-      ),
-      map((customParameters) =>
-        this._executionParamsFactory.create({
-          simulate,
-          includeUserId,
-          description: this.context.getDescription(),
-          repositoryObject: this.cloneRepositoryObjectRef(),
-          isolatedExecution: this.context.getIsExecutionIsolated(),
-          includedTestCases: this.context.getIncludedTestcases() ?? undefined,
-          customParameters,
-        }),
-      ),
-    );
-  }
-
-  private cloneRepositoryObjectRef(): RepositoryObjectReference | undefined {
-    const repositoryObjectRef = this.context.getRepositoryObjectRef();
-    if (!repositoryObjectRef) {
-      return undefined;
-    }
-    const { repositoryID, repositoryParameters } = repositoryObjectRef;
-    return {
-      repositoryID,
-      repositoryParameters: repositoryParameters ? { ...repositoryParameters } : undefined,
-    };
   }
 
   private get context(): ExecutionCommandsContext {

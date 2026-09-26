@@ -1,9 +1,9 @@
 import { computed, DestroyRef, Directive, inject, input, model, OnInit, output, signal } from '@angular/core';
-import { ExecutionCommandsContext } from '../shared/execution-commands-context.interface';
 import {
   AugmentedScreenService,
   CustomFormComponent,
   Execution,
+  ExecutionCommandsContext,
   ExecutiontTaskParameters,
   IncludeTestcases,
   RepositoryObjectReference,

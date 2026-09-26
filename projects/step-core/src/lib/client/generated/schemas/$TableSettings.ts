@@ -9,6 +9,12 @@ export const $TableSettings = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     scope: {
       type: 'dictionary',
       contains: {

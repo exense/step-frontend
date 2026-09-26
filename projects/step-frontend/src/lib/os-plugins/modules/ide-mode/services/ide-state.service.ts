@@ -7,6 +7,7 @@ import {
   SelectionMode,
   IdeService,
   FilePickerModalResult,
+  IdeStateStrategy,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
@@ -17,7 +18,7 @@ import { CreatePackageDialogComponent } from '../components/create-package-dialo
 @Injectable({
   providedIn: 'root',
 })
-export class IdeStateService {
+export class IdeStateService implements IdeStateStrategy {
   private _ideApi = inject(IdeService);
   private _reloadable = inject(GlobalReloadService);
   private _accessHistory = inject(ApAccessHistoryService);

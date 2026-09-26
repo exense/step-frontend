@@ -13,6 +13,7 @@ import type { Version } from './Version';
 
 export type Execution = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   startTime?: number;
   endTime?: number;

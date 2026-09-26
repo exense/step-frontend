@@ -9,6 +9,12 @@ export const $User = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     username: {
       type: 'string',
     },
