@@ -4,8 +4,12 @@
     [iconMode]="true"
     [tooltip]="singleStatus.tooltipMessage"
     [class.is-interactive]="interactive() && singleStatus.status !== Status.RUNNING"
-    [class.is-inert]="singleStatus.status === Status.RUNNING"
-    [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(singleStatus.status)"
+    [class.is-progress-indicator]="singleStatus.status === Status.RUNNING"
+    [class.is-dimmed]="
+      singleStatus.status !== Status.RUNNING &&
+      selectedStatuses()?.length &&
+      !selectedStatuses()?.includes(singleStatus.status)
+    "
     (stepStrategyClick)="handleClick(singleStatus, $event)"
   />
 } @else if (isEmptyStatus()) {
@@ -19,8 +23,7 @@
         [status]="item.status"
         [iconMode]="true"
         [tooltip]="item.tooltipMessage"
-        class="is-inert"
-        [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
+        class="is-progress-indicator"
         (stepStrategyClick)="handleClick(item, $event)"
       />
     } @else {
@@ -29,8 +32,10 @@
           class="step-aggregated-status"
           [class]="item.className"
           [class.is-interactive]="interactive() && item.status !== Status.RUNNING"
-          [class.is-inert]="item.status === Status.RUNNING"
-          [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)"
+          [class.is-progress-indicator]="item.status === Status.RUNNING"
+          [class.is-dimmed]="
+            item.status !== Status.RUNNING && selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)
+          "
           [matTooltip]="item.tooltipMessage"
           matTooltipPosition="below"
           (click)="handleClick(item, $event)"

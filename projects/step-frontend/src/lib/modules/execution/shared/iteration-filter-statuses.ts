@@ -4,7 +4,7 @@ export const ITERATION_FILTER_STATUSES: readonly Status[] = [Status.PASSED, Stat
 
 export function getAvailableIterationStatuses(countByStatus?: Record<string, number>): Status[] {
   return Object.entries(countByStatus ?? {})
-    .filter(([, count]) => count > 0)
+    .filter(([status, count]) => status !== Status.RUNNING && count > 0)
     .map(([status]) => status as Status);
 }
 

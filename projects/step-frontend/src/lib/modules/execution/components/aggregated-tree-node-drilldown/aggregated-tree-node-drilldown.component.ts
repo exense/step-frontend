@@ -257,6 +257,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   }
 
   protected handleTitleStatusClick(itemId: string, status: Status): void {
+    if (status === Status.RUNNING) {
+      return;
+    }
     this.updateStackItems((items) => {
       const index = items.findIndex((item) => item.id === itemId);
       const item = items[index];
