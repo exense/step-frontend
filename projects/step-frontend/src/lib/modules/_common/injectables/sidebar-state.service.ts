@@ -1,7 +1,7 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy, DOCUMENT } from '@angular/core';
 import { IS_SMALL_SCREEN, LogoutCleanup, Mutable } from '@exense/step-core';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, pairwise } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
+
 import { MenuStorageService } from './menu-storage.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, DOCUMENT } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { APP_HOST } from '../../../../client/step-client-module';
 
 @Component({
@@ -20,7 +20,7 @@ export class TraceViewerComponent {
 
   private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
-  private traceViewerUrl = computed(() => {
+  private readonly traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
     const finalUrl = !reportUrl
       ? this.traceViewerPath

@@ -1,4 +1,4 @@
-import { computed, DestroyRef, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, DOCUMENT } from '@angular/core';
 import { EMPTY, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
@@ -8,7 +8,7 @@ import {
   ExecutionStrategy,
   ExecutionStrategyController,
 } from '@exense/step-core';
-import { DOCUMENT } from '@angular/common';
+
 import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
 import { LocalExecutionStrategyService } from './local-execution-strategy.service';

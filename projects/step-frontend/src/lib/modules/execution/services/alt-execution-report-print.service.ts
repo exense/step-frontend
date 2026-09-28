@@ -1,5 +1,5 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, OnDestroy, DOCUMENT } from '@angular/core';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, from, Observable, of, pairwise, switchMap, take, timer } from 'rxjs';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from './alt-execution-report-in-progress.token';
@@ -12,9 +12,9 @@ export class AltExecutionReportPrintService implements OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _inProgress$ = inject(ALT_EXECUTION_REPORT_IN_PROGRESS).pipe(takeUntilDestroyed());
 
-  private handleAfterPrint = () => this.afterPrint();
+  private handleAfterPrint = (): void => this.afterPrint();
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this._doc.defaultView?.removeEventListener('afterprint', this.handleAfterPrint);
   }
 

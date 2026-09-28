@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal, DOCUMENT } from '@angular/core';
 import { DateFormat } from '@exense/step-core';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
-import { DOCUMENT } from '@angular/common';
+
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, finalize, map, of, switchMap } from 'rxjs';
 
@@ -23,7 +23,7 @@ export class ErrorDetailsMenuComponent {
   /** @Input() **/
   readonly truncated = input<boolean>(false);
 
-  protected loading = signal(false);
+  protected readonly loading = signal(false);
 
   private executions$ = toObservable(this.executionIds).pipe(
     switchMap((ids) => {
@@ -41,7 +41,7 @@ export class ErrorDetailsMenuComponent {
 
   protected readonly executions = toSignal(this.executions$, { initialValue: [] });
 
-  protected jumpToExecution(eId: string) {
+  protected jumpToExecution(eId: string): void {
     this._doc.defaultView?.open(`#/executions/${eId!}/report`);
   }
 }
