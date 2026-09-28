@@ -9,9 +9,9 @@ import {
   input,
   NgZone,
   signal,
+  DOCUMENT,
 } from '@angular/core';
 import { CalcElementWidthDirective } from './calc-element-width.directive';
-import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepCalcElementWidthAggregator]',

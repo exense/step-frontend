@@ -28,7 +28,11 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[] | und
       console.log('received plugins', plugin);
 
       if (plugin.entryPoint && plugin.entryPoint !== DEFAULT_ENTRY_POINT) {
-        plugin.entryPoint += '?v=${project.version}';
+        if (plugin.entryPoint.endsWith('.js')) {
+          plugin.entryPoint = plugin.entryPoint.replace('.js', '.json');
+        }
+        // TODO think about how to solve it properly. For now this string breaks the local run
+        // plugin.entryPoint += '?v=${project.version}';
       }
 
       return plugin;

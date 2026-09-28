@@ -15,7 +15,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { combineLatest, delay, map, Observable, of, switchMap, take, throwError } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
 import { catchError } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
@@ -29,6 +28,8 @@ interface ParameterEditDialogData {
   selector: 'step-parameter-edit-dialog',
   templateUrl: './parameter-edit-dialog.component.html',
   styleUrls: ['./parameter-edit-dialog.component.scss'],
+  //todo reimplement with css
+  /*
   animations: [
     trigger('fadeInOut', [
       state('visible', style({ opacity: 1 })),
@@ -36,11 +37,12 @@ interface ParameterEditDialogData {
       transition('hidden <=> visible', animate('300ms ease-in-out')),
     ]),
   ],
+*/
   hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ParameterEditDialogComponent implements OnInit {
-  private form = viewChild('parameterForm', { read: NgForm });
+  private readonly form = viewChild('parameterForm', { read: NgForm });
 
   animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
@@ -97,7 +99,7 @@ export class ParameterEditDialogComponent implements OnInit {
     });
   }
 
-  saveAndNext() {
+  saveAndNext(): void {
     this.animationState = 'hidden';
     this.saveInternal()
       .pipe(
@@ -125,7 +127,7 @@ export class ParameterEditDialogComponent implements OnInit {
       });
   }
 
-  addCondition(type?: 'AND' | 'OR') {
+  addCondition(type?: 'AND' | 'OR'): void {
     this._screenService
       .getScreenInputsByScreenId('executionParameters')
       .pipe(
@@ -189,7 +191,7 @@ export class ParameterEditDialogComponent implements OnInit {
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
   }
 
-  onKeyChange(key: string) {
+  onKeyChange(key: string): void {
     if (!this.parameter) {
       return;
     }
@@ -200,7 +202,7 @@ export class ParameterEditDialogComponent implements OnInit {
     }
   }
 
-  setProtectedValue(protectedValue: boolean) {
+  setProtectedValue(protectedValue: boolean): void {
     this.parameter.protectedValue = protectedValue;
 
     //as dynamic expressions don't work with protected parameters we have to migrate to value

@@ -1,5 +1,5 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { effect, inject, Injectable, signal, DOCUMENT } from '@angular/core';
+
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, first, Subject, switchMap, takeUntil, timer } from 'rxjs';
 
@@ -12,7 +12,7 @@ export class DialogRouteOpenStateService {
   private _doc = inject(DOCUMENT);
   private _router = inject(Router);
 
-  private isOpenInternal = signal(false);
+  private readonly isOpenInternal = signal(false);
   readonly isOpen = this.isOpenInternal.asReadonly();
 
   private effectOpenStateChange = effect(() => {

@@ -58,12 +58,16 @@ import { TimeRangePickerComponent } from '../../modules/_common/components/time-
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'step-timeseries-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   providers: [DashboardUrlParamsService],
+  host: {
+    '(window:keyup.escape)': 'handleEscape()',
+  },
   standalone: true,
   imports: [
     COMMON_IMPORTS,
@@ -77,7 +81,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  readonly DASHLET_HEIGHT = 300;
+  protected readonly DASHLET_HEIGHT = 300;
 
   protected readonly dashlets = viewChildren<ChartDashlet>('chart');
   protected readonly compareDashlets = viewChildren<ChartDashlet>('compareChart');
@@ -99,6 +103,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
   private _pipelineAggregationService = inject(PipelineAggregationService);
+  private _matDialog = inject(MatDialog);
 
   readonly id = input.required<string>(); // dashboard id
   readonly storageId = input<string>(); // for persistence across views
@@ -135,6 +140,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected compareEngine?: DashboardStateEngine;
   protected compareModeChangesSubscription?: Subscription;
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Imperative API used by dashboard container components.
   public updateFullTimeRange(
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
@@ -143,6 +149,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mainEngine?.state.context.updateFullTimeRange(timeRange, opts.resetSelection);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Imperative API used by dashboard container components.
   public getSelectedTimeRange(): TimeRange {
     return this.mainEngine.state.context.timeRangeSettings.selectedRange;
   }
@@ -270,6 +277,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected enableEditMode(): void {
     this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
+  }
+
+  protected handleEscape(): void {
+    if (!this.editMode || this._matDialog.openDialogs.length > 0) {
+      return;
+    }
+    this.cancelEditMode();
   }
 
   protected cancelEditMode(): void {
