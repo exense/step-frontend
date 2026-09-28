@@ -78,10 +78,16 @@ export class AggregatedStatusComponent {
 
   protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
     if (status === Status.RUNNING) {
-      event.stopPropagation();
+      this.handleRunningClick(event);
       return;
     }
     this.statusClick.emit({ status, count, event });
+  }
+
+  protected handleRunningClick(event: MouseEvent): void {
+    if (this.action() === 'filter') {
+      event.stopPropagation();
+    }
   }
 
   private createStatusItem(
@@ -109,7 +115,13 @@ export class AggregatedStatusComponent {
             : selectedStatuses?.length === 1
               ? 'Show all nodes'
               : `Hide ${label} nodes`;
-    const tooltipMessage = showTooltips ? `${status}: ${count}${isInteractive ? ` — ${description}` : ''}` : undefined;
+    const actionDescription =
+      status === Status.RUNNING && interactive && action === 'drilldown'
+        ? ' — Open node'
+        : isInteractive
+          ? ` — ${description}`
+          : '';
+    const tooltipMessage = showTooltips ? `${status}: ${count}${actionDescription}` : undefined;
     return { className, count, status: status as Status, tooltipMessage };
   }
 

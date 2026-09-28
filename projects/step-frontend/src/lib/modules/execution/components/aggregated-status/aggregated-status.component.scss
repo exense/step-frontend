@@ -67,6 +67,10 @@
   cursor: default;
 }
 
+.is-navigation-trigger {
+  cursor: pointer;
+}
+
 step-status.is-interactive {
   cursor: pointer;
   transition:

@@ -1,17 +1,23 @@
 @if (singleStatus(); as singleStatus) {
-  <step-status
-    [status]="singleStatus.status"
-    [iconMode]="true"
-    [tooltip]="singleStatus.tooltipMessage"
-    [class.is-interactive]="interactive() && singleStatus.status !== Status.RUNNING"
-    [class.is-progress-indicator]="singleStatus.status === Status.RUNNING"
-    [class.is-dimmed]="
-      singleStatus.status !== Status.RUNNING &&
-      selectedStatuses()?.length &&
-      !selectedStatuses()?.includes(singleStatus.status)
-    "
-    (stepStrategyClick)="handleClick(singleStatus, $event)"
-  />
+  @if (singleStatus.status === Status.RUNNING) {
+    <step-status
+      [status]="singleStatus.status"
+      [iconMode]="true"
+      [tooltip]="singleStatus.tooltipMessage"
+      class="is-progress-indicator"
+      [class.is-navigation-trigger]="interactive() && action() === 'drilldown'"
+      (click)="handleRunningClick($event)"
+    />
+  } @else {
+    <step-status
+      [status]="singleStatus.status"
+      [iconMode]="true"
+      [tooltip]="singleStatus.tooltipMessage"
+      [class.is-interactive]="interactive()"
+      [class.is-dimmed]="selectedStatuses()?.length && !selectedStatuses()?.includes(singleStatus.status)"
+      (stepStrategyClick)="handleClick(singleStatus, $event)"
+    />
+  }
 } @else if (isEmptyStatus()) {
   <div class="status-group">
     <step-icon name="out-of-scope" [matTooltip]="emptyStatusMessage()" matTooltipPosition="below" />
@@ -24,7 +30,8 @@
         [iconMode]="true"
         [tooltip]="item.tooltipMessage"
         class="is-progress-indicator"
-        (stepStrategyClick)="handleClick(item, $event)"
+        [class.is-navigation-trigger]="interactive() && action() === 'drilldown'"
+        (click)="handleRunningClick($event)"
       />
     } @else {
       <div class="status-group">
@@ -33,6 +40,7 @@
           [class]="item.className"
           [class.is-interactive]="interactive() && item.status !== Status.RUNNING"
           [class.is-progress-indicator]="item.status === Status.RUNNING"
+          [class.is-navigation-trigger]="interactive() && action() === 'drilldown' && item.status === Status.RUNNING"
           [class.is-dimmed]="
             item.status !== Status.RUNNING && selectedStatuses()?.length && !selectedStatuses()?.includes(item.status)
           "
