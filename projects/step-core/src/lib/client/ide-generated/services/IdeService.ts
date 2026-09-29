@@ -53,15 +53,17 @@ export class IdeService {
 
   /**
    * @param directory
+   * @param upgrade
    * @returns any default response
    * @throws ApiError
    */
-  public useExistingAp(directory?: string): Observable<any> {
+  public useExistingAp(directory?: string, upgrade?: boolean): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/local/ide/ap/use-existing',
       query: {
         directory: directory,
+        upgrade: upgrade,
       },
     });
   }
