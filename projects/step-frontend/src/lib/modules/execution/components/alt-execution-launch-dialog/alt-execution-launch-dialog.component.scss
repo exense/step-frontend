@@ -7,17 +7,17 @@ div[step-modal-window-body] {
 .launch-title {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  justify-content: space-between;
+  gap: 1rem;
   min-width: 0;
   width: 100%;
+}
 
-  step-dashlet {
-    min-width: 0;
+.launch-target-selector {
+  flex: 0 0 auto;
 
-    &:first-of-type {
-      margin-inline-start: auto;
-    }
+  &[hidden] {
+    display: none;
   }
 }
 
@@ -49,11 +49,15 @@ hr {
 }
 
 div[step-modal-window-body] {
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
 div[step-modal-window-buttons] {
   justify-content: space-between;
+
+  &.result-actions {
+    justify-content: flex-end;
+  }
 }
 
 .btn-group-close {

@@ -1,105 +1,124 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-ide-header-bar {
-  min-width: 64rem;
-  padding: 1rem 5rem 1rem 2.5rem;
-  gap: 1rem;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.6rem;
+  width: 100%;
+  min-width: 0;
+  padding: 1rem 2.5rem;
+
+  .package-area,
+  .remote-area {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .package-area {
+    flex: 0 1 auto;
+  }
+
+  .remote-area {
+    justify-content: flex-end;
+    margin-left: auto;
+    max-width: 100%;
+  }
 
   .remote-extension {
     min-width: 0;
-    overflow-wrap: anywhere;
+    max-width: 100%;
   }
 
-  .package {
-    color: var.$white;
-    align-self: stretch;
+  .package-control {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    min-width: 0;
+    border: 1px solid rgb(255 255 255 / 45%);
+    border-radius: 0.6rem;
+    background: rgb(255 255 255 / 8%);
+    overflow: hidden;
+  }
 
-    .package-details,
-    .package-name,
-    .package-directory {
-      display: flex;
-      align-items: center;
-    }
+  .package-details {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var.$white;
+    min-width: 0;
+    padding: 0.8rem;
 
-    .package-details,
     .package-name {
-      gap: 0.5rem;
-    }
-
-    .package-name {
-      height: 18px;
-      line-height: 18px;
-    }
-
-    .package-details {
-      height: 100%;
-    }
-
-    .package-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
-    }
-
-    .package-directory {
-      color: var.$gray-300;
-      font-size: 12px;
-    }
-
-    span.icon {
-      display: flex;
-      align-items: center;
-      width: 30px;
-      height: 30px;
-      min-width: 30px;
-      margin-right: 0.5rem;
-
-      step-icon {
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    button[mat-icon-button] {
-      color: var.$white;
-      width: 2rem;
-      height: 2rem;
-      min-width: 2rem;
-      min-height: 2rem;
-      padding: 0;
-      line-height: 1;
-      transform: translate(-5px, 2px);
-      --mdc-icon-button-state-layer-size: 2rem;
-
-      step-icon {
-        width: 1.6rem;
-        height: 1.6rem;
-      }
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 24rem;
+      font-size: 1.4rem;
+      font-weight: 700;
     }
   }
 
-  section > button {
-    margin-left: 1rem;
+  .package-details:not(.package-empty) {
+    padding-right: 1.6rem;
+  }
 
-    step-icon,
-    span {
-      color: var.$white;
+  .package-empty {
+    color: var.$gray-400;
+
+    .package-name {
+      font-weight: 500;
+    }
+  }
+
+  .package-icon-action {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var.$white;
+    border: 0;
+    border-left: 1px solid rgb(255 255 255 / 25%);
+    background: transparent;
+    cursor: pointer;
+    flex: 0 0 auto;
+    width: 4rem;
+    height: 4rem;
+    padding: 0;
+
+    step-icon {
+      display: block;
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: rgb(255 255 255 / 12%);
     }
 
     &:disabled {
-      border-color: var.$muted !important;
-      step-icon,
-      span {
-        color: var.$muted !important;
-      }
+      opacity: 0.5;
+      cursor: default;
     }
   }
+
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    padding: 0.8rem 1.2rem;
+
+    .remote-area {
+      margin-left: 0;
+    }
+  }
+}
+
+.step-ide-package-path {
+  max-width: 32rem;
+  padding: 1rem 1.6rem;
+  color: var.$gray-550;
+  overflow-wrap: anywhere;
 }
 
 .step-ide-history-content {

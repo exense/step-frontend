@@ -4,69 +4,77 @@
   class="slim-actions"
 >
   <div step-modal-window-title class="launch-title">
-    <span>{{ title }}</span>
-    @for (item of headerDashlets; track item.id) {
-      <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
-    }
+    <span>{{ _commands.showHandledResults() ? 'Remote Execution Started' : title }}</span>
+    <div class="launch-target-selector" [hidden]="_commands.showHandledResults()">
+      @for (item of headerDashlets; track item.id) {
+        <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
+      }
+    </div>
   </div>
   <div step-modal-window-body>
-    @if (error(); as error) {
-      <step-alert type="danger" role="alert">
-        <step-icon name="alert-circle" aria-hidden="true" />
-        <span class="sr-only">Error:</span>
-        {{ error }}
-      </step-alert>
-    }
-    @if (loading()) {
-      <step-icon name="step-refresh" class="icon-refresh-animate" />
-    }
-    @if (artefact(); as artefact) {
-      <div class="artefact-info">
-        <section>
-          @if (artefact.icon; as icon) {
-            <step-icon [name]="icon" />
-          }
-          <h4>{{ artefact.name }}</h4>
-          @if (repoRef.repositoryID !== 'local') {
-            <step-alt-execution-repository [repositoryParams]="repoRef" />
-          }
-        </section>
-        <step-custom-forms
-          [(stModel)]="executionParameters"
-          stScreen="executionParameters"
-          (loadingChange)="setScreenTemplateLoading($event)"
-        />
-      </div>
-      @if (artefact.type === 'TestSet') {
-        <div class="testcase-selection" [hidden]="!_commands.showTestcases()">
-          <hr />
-          <step-repository-plan-testcase-list
-            #testCases
-            [repoRef]="repoRef"
-            [explicitTestCases]="explicitTestCases"
-            (includedTestCasesChange)="testcases.set($event)"
-          />
-        </div>
-      }
-    }
     @for (item of bodyDashlets; track item.id) {
       <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
     }
-  </div>
-  <div step-modal-window-buttons>
-    <step-btn-group class="btn-group-close">
-      @if (showCancel) {
-        <button type="button" mat-button mat-dialog-close>Cancel</button>
+    @if (!_commands.showHandledResults()) {
+      @if (error(); as error) {
+        <step-alert type="danger" role="alert">
+          <step-icon name="alert-circle" aria-hidden="true" />
+          <span class="sr-only">Error:</span>
+          {{ error }}
+        </step-alert>
       }
-    </step-btn-group>
-    <step-execution-actions
-      [tooltips]="tooltips()"
-      [isExecutionIsolated]="executionIsolation"
-      [disabled]="loading() || screenTemplateLoading()"
-      [availability]="_commands.availability()"
-      (execute)="execute($event)"
-      (schedule)="schedule()"
-      (copyLink)="copyExecutionServiceAsCurlToClipboard()"
-    />
+      @if (loading()) {
+        <step-icon name="step-refresh" class="icon-refresh-animate" />
+      }
+      @if (artefact(); as artefact) {
+        <div class="artefact-info">
+          <section>
+            @if (artefact.icon; as icon) {
+              <step-icon [name]="icon" />
+            }
+            <h4>{{ artefact.name }}</h4>
+            @if (repoRef.repositoryID !== 'local') {
+              <step-alt-execution-repository [repositoryParams]="repoRef" />
+            }
+          </section>
+          <step-custom-forms
+            [(stModel)]="executionParameters"
+            stScreen="executionParameters"
+            (loadingChange)="setScreenTemplateLoading($event)"
+          />
+        </div>
+        @if (artefact.type === 'TestSet') {
+          <div class="testcase-selection" [hidden]="!_commands.showTestcases()">
+            <hr />
+            <step-repository-plan-testcase-list
+              #testCases
+              [repoRef]="repoRef"
+              [explicitTestCases]="explicitTestCases"
+              (includedTestCasesChange)="testcases.set($event)"
+            />
+          </div>
+        }
+      }
+    }
+  </div>
+  <div step-modal-window-buttons [class.result-actions]="_commands.showHandledResults()">
+    @if (_commands.showHandledResults()) {
+      <button type="button" mat-button mat-dialog-close>Close</button>
+    } @else {
+      <step-btn-group class="btn-group-close">
+        @if (showCancel) {
+          <button type="button" mat-button mat-dialog-close [disabled]="_commands.submitting()">Cancel</button>
+        }
+      </step-btn-group>
+      <step-execution-actions
+        [tooltips]="tooltips()"
+        [isExecutionIsolated]="executionIsolation"
+        [disabled]="loading() || screenTemplateLoading()"
+        [availability]="_commands.availability()"
+        (execute)="execute($event)"
+        (schedule)="schedule()"
+        (copyLink)="copyExecutionServiceAsCurlToClipboard()"
+      />
+    }
   </div>
 </step-modal-window>

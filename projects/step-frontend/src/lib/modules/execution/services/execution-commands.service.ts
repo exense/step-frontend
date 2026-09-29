@@ -1,5 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, DOCUMENT } from '@angular/core';
-import { EMPTY, from, map, Observable, switchMap } from 'rxjs';
+import { EMPTY, finalize, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
   CommonEntitiesUrlsService,
@@ -28,6 +28,8 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
   private readonly selectedStrategyInternal = signal<ExecutionStrategy>(this._localStrategy);
 
   readonly selectedStrategy = this.selectedStrategyInternal.asReadonly();
+  readonly showHandledResults = signal(false);
+  readonly submitting = signal(false);
   readonly availability = computed(() => {
     const strategy = this.selectedStrategy();
     return strategy.availability();
@@ -57,20 +59,26 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
   execute(simulate: boolean): void {
     const strategy = this.selectedStrategy();
     const availability = strategy.availability();
-    if (!(simulate ? availability.simulate : availability.execute)) {
+    if (this.submitting() || !(simulate ? availability.simulate : availability.execute)) {
       return;
     }
 
     const currentEId = this.context.getExecution()?.id;
+    this.submitting.set(true);
     strategy
       .execute(this.context, { simulate })
-      .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(
+        finalize(() => this.submitting.set(false)),
+        takeUntilDestroyed(this._destroyRef),
+      )
       .subscribe((result) => {
         if (result.kind === 'LOCAL') {
           if (currentEId && this._executionTabManager) {
             this._executionTabManager.handleTabClose(currentEId, false);
           }
           this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(result.executionId, false));
+        } else if (result.showResults) {
+          this.showHandledResults.set(true);
         }
       });
   }

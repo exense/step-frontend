@@ -16,7 +16,7 @@ export const ALL_EXECUTION_ACTIONS_AVAILABLE: ExecutionActionAvailability = {
   schedule: true,
 };
 
-export type ExecutionLaunchResult = { kind: 'LOCAL'; executionId: string } | { kind: 'HANDLED' };
+export type ExecutionLaunchResult = { kind: 'LOCAL'; executionId: string } | { kind: 'HANDLED'; showResults?: boolean };
 
 export interface ExecutionStrategy {
   readonly availability: Signal<ExecutionActionAvailability>;

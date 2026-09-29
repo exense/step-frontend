@@ -11,10 +11,11 @@ import { inject, NgModule } from '@angular/core';
 import { of } from 'rxjs';
 import { IDE_MENU_ITEMS } from './shared/ide-menu-items';
 import { IdeHeaderBarComponent } from './components/ide-header-bar/ide-header-bar.component';
+import { IdeEmptyStateComponent } from './components/ide-empty-state/ide-empty-state.component';
 import { IdeStateService } from './services/ide-state.service';
 
 @NgModule({
-  imports: [StepCoreModule, IdeHeaderBarComponent],
+  imports: [StepCoreModule, IdeHeaderBarComponent, IdeEmptyStateComponent],
 })
 export class IdeModeModule {
   private _isIdeMode = inject(IDE_MODE);
@@ -41,6 +42,8 @@ export class IdeModeModule {
   private registerDashlets(): void {
     this._dashletRegistry.registerDashlet('IdeHeaderBar', IdeHeaderBarComponent);
     this._viewRegistry.registerDashlet('ide/bar', '', 'IdeHeaderBar', 'IdeHeaderBar');
+    this._dashletRegistry.registerDashlet('IdeEmptyState', IdeEmptyStateComponent);
+    this._viewRegistry.registerDashlet('ide/empty', '', 'IdeEmptyState', 'IdeEmptyState');
   }
 
   private registerRule(): void {
