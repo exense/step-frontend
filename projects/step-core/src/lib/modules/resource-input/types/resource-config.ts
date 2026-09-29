@@ -3,6 +3,7 @@ export interface ResourceConfig {
   readonly searchTypes?: string[];
   readonly isBounded?: boolean;
   readonly supportsDirectory?: boolean;
+  readonly allowDirectorySelection?: boolean;
   readonly withChooseExistingResourceButton?: boolean;
   readonly withClearButton?: boolean;
   readonly disableServerPath?: boolean;

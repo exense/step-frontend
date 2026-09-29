@@ -69,6 +69,7 @@
 @if (isApResource()) {
   <step-automation-package-resource
     [apId]="automationPackageId()!"
+    [allowDirectorySelection]="!!conf.allowDirectorySelection"
     [label]="label()"
     [showRequiredMarker]="showRequiredMarker()"
     [helpIconTooltip]="helpIconTooltip()"

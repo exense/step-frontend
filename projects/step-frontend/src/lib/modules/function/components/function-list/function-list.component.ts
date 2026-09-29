@@ -9,7 +9,6 @@ import {
   FunctionConfigurationApiService,
   DialogParentService,
   IsUsedByDialogService,
-  CustomCellRegistryService,
   tableColumnsConfigProvider,
   entitySelectionStateProvider,
 } from '@exense/step-core';
@@ -45,28 +44,27 @@ export class FunctionListComponent implements DialogParentService {
   private _keywordExecutor = inject(KeywordExecutorService);
   private _isUsedByDialog = inject(IsUsedByDialogService);
 
-  readonly _hasPackages = !!inject(CustomCellRegistryService).getItemInfo('functionPackageLink');
-  readonly dataSource = this._functionApiService.createFilteredTableDataSource();
+  protected readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly returnParentUrl = '/functions';
-  readonly AutomationPackagePermission = AutomationPackagePermission;
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
   }
 
-  editFunction(keyword: Keyword): void {
+  protected editFunction(keyword: Keyword): void {
     this._functionActions.openFunctionEditor(keyword).subscribe();
   }
 
-  executeFunction(id: string): void {
+  protected executeFunction(id: string): void {
     this._keywordExecutor.executeKeyword(id);
   }
 
-  duplicateFunction(id: string): void {
+  protected duplicateFunction(id: string): void {
     this._functionApiService.cloneFunction(id).subscribe(() => this.dataSource.reload());
   }
 
-  deleteFunction(id: string, name: string): void {
+  protected deleteFunction(id: string, name: string): void {
     this._functionActions.openDeleteFunctionDialog(id, name).subscribe((result) => {
       if (result) {
         this.dataSource.reload();
@@ -74,7 +72,7 @@ export class FunctionListComponent implements DialogParentService {
     });
   }
 
-  lookUp(id: string, name: string): void {
+  protected lookUp(id: string, name: string): void {
     this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 }

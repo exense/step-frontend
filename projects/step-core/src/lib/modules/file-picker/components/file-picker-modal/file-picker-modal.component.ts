@@ -2,15 +2,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   inject,
   linkedSignal,
   OnInit,
   signal,
   untracked,
+  ViewEncapsulation,
 } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, Subscription, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FilePickerDataProviderService } from '../../injectables/file-picker-data-provider.service';
 import { DialogsService, signalFromFormControl, StepBasicsModule } from '../../../basics/step-basics.module';
@@ -25,6 +28,7 @@ import { SelectionMode } from '../../types/selection-mode.enum';
   styleUrl: './file-picker-modal.component.scss',
   imports: [StepBasicsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class FilePickerModalComponent implements OnInit {
   protected _dialogRef = inject<MatDialogRef<FilePickerModalComponent, FilePickerModalResult>>(MatDialogRef);
@@ -32,6 +36,9 @@ export class FilePickerModalComponent implements OnInit {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _filePickerDataProviderService = inject(FilePickerDataProviderService);
   private _fb = inject(FormBuilder).nonNullable;
+  private _destroyRef = inject(DestroyRef);
+  private directorySubscription?: Subscription;
+  protected readonly loading = signal(false);
 
   protected readonly currentDirectory = signal<string | null>(null);
   protected readonly parentDirectory = signal<string | null>(null);
@@ -45,6 +52,12 @@ export class FilePickerModalComponent implements OnInit {
   });
 
   protected readonly canApply = computed(() => {
+    if (this.loading()) {
+      return false;
+    }
+    if (this._data.selectionMode === SelectionMode.DIRECTORY && this.location() !== (this.currentDirectory() ?? '')) {
+      return !!this.location().trim();
+    }
     const file = this.selectedFile();
     if (!file) {
       return false;
@@ -87,7 +100,7 @@ export class FilePickerModalComponent implements OnInit {
   protected loadLocation(): void {
     const directory = this.removeTrailingSlash(this.locationControl.value.trim());
     if (directory) {
-      this.locationControl.setValue(directory, { emitEvent: false });
+      this.locationControl.setValue(directory);
       this.loadDirectory(directory);
     }
   }
@@ -106,6 +119,7 @@ export class FilePickerModalComponent implements OnInit {
       return;
     }
     this.selectedFile.set(file);
+    this.locationControl.setValue(this.currentDirectory() ?? '');
   }
 
   protected handleLoadDirectory(directory?: FileDescriptor): void {
@@ -116,6 +130,16 @@ export class FilePickerModalComponent implements OnInit {
   }
 
   protected apply(): void {
+    if (
+      this._data.selectionMode === SelectionMode.DIRECTORY &&
+      this.locationControl.value !== (this.currentDirectory() ?? '')
+    ) {
+      const directory = this.removeTrailingSlash(this.locationControl.value.trim());
+      if (directory) {
+        this.loadDirectory(directory, { applyAfterLoad: true });
+      }
+      return;
+    }
     const file = untracked(() => this.selectedFile());
     const canApply = untracked(() => this.canApply());
 
@@ -170,19 +194,31 @@ export class FilePickerModalComponent implements OnInit {
       });
   }
 
-  private loadDirectory(directory: string): void {
+  private loadDirectory(directory: string, { applyAfterLoad = false }: { applyAfterLoad?: boolean } = {}): void {
+    this.directorySubscription?.unsubscribe();
+    const locationAtStart = this.locationControl.value;
+    this.loading.set(true);
     this.selectedFile.set(null);
-    this.listDirectory(directory).subscribe({
-      next: (result) => {
-        this.showingRoots.set(false);
-        this.updateStateFromResult(result, directory);
-      },
-      error: () => {
-        const currentDirectory = this.currentDirectory() ?? '';
-        this.locationControl.setValue(currentDirectory, { emitEvent: false });
-        this.isLocationButtonDisabled.set(!currentDirectory);
-      },
-    });
+    this.directorySubscription = this.listDirectory(directory)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (result) => {
+          const pendingLocation = this.locationControl.value;
+          const locationEdited = pendingLocation !== locationAtStart;
+          this.showingRoots.set(false);
+          this.updateStateFromResult(result, directory);
+          if (locationEdited) {
+            this.locationControl.setValue(pendingLocation);
+          }
+          this.loading.set(false);
+          if (applyAfterLoad && !locationEdited) {
+            this.apply();
+          }
+        },
+        error: () => {
+          this.loading.set(false);
+        },
+      });
   }
 
   private listDirectory(directory: string): Observable<DirectoryListing> {
@@ -191,11 +227,13 @@ export class FilePickerModalComponent implements OnInit {
   }
 
   private showRoots(): void {
+    this.directorySubscription?.unsubscribe();
+    this.loading.set(false);
     this.selectedFile.set(null);
     this.showingRoots.set(true);
     this.currentDirectory.set(null);
     this.parentDirectory.set(null);
-    this.locationControl.setValue('', { emitEvent: false });
+    this.locationControl.setValue('');
     this.isLocationButtonDisabled.set(false);
     this.files.set(this.roots());
   }
@@ -203,10 +241,13 @@ export class FilePickerModalComponent implements OnInit {
   private updateStateFromResult(result: DirectoryListing, baseDirectory: string = '/'): void {
     const currentDirectory = result.path ?? baseDirectory;
     this.currentDirectory.set(currentDirectory);
-    this.locationControl.setValue(currentDirectory, { emitEvent: false });
+    this.locationControl.setValue(currentDirectory);
     this.isLocationButtonDisabled.set(!currentDirectory);
     this.parentDirectory.set(result.parentPath || null);
     this.files.set(result.entries || []);
+    if (this._data.selectionMode === SelectionMode.DIRECTORY) {
+      this.selectedFile.set({ path: currentDirectory, directory: true });
+    }
   }
 
   private removeTrailingSlash(directory: string): string {

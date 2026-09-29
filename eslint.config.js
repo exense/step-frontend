@@ -60,4 +60,70 @@ module.exports = defineConfig([
   {
     ignores: ['projects/step-core/src/lib/client/generated/**/*'],
   },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/execution/components/alt-execution-progress/alt-execution-progress.component.ts',
+    ],
+    rules: {
+      // This component is also provided as these services, so their contracts must remain public.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            {
+              interfaceName: 'AltExecutionStateService',
+              exclusions: [
+                'timeRangeSelection$',
+                'timeRangeOptions',
+                'executionId$',
+                'execution$',
+                'keywordParameters$',
+                'keywordsDataSource$',
+                'errors$',
+                'availableErrorTypes$',
+                'testCases$',
+                'testCasesDataSource$',
+                'testCasesTableParameters$',
+                'testCasesDisplayMode$',
+                'currentOperations$',
+                'timeRange$',
+                'treeInProgress$',
+                'errorsDisplayInProgress$',
+                'toggleTestCasesDisplayMode',
+                'updateTimeRangeSelection',
+                'selectFullRange',
+              ],
+            },
+            { interfaceName: 'EntityRefService', exclusions: ['currentEntity'] },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/function/components/function-configuration-dialog/function-configuration-dialog.component.ts',
+    ],
+    rules: {
+      // The form and keyword are exposed through FunctionTypeParentFormService.
+      'step-lint/component-public-fields': [
+        'warn',
+        { exclusions: [{ interfaceName: 'FunctionTypeParentFormService', exclusions: ['keyword', 'formGroup'] }] },
+      ],
+    },
+  },
+  {
+    files: ['projects/step-frontend/src/lib/modules/function/components/function-list/function-list.component.ts'],
+    rules: {
+      // DialogParentService consumers use these public members for navigation and refresh.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            { interfaceName: 'DialogParentService', exclusions: ['returnParentUrl', 'dialogSuccessfullyClosed'] },
+          ],
+        },
+      ],
+    },
+  },
 ]);

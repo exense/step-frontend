@@ -427,3 +427,4 @@ export * from './injectables/ide-mode.token';
 export * from './components/chart-skeleton/chart-skeleton.component';
 export * from './components/button-spinner/button-spinner.component';
 export * from './utils/signal-from-form-control';
+export * from './injectables/click-guard.service';

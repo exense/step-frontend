@@ -1,5 +1,5 @@
-import { inject, InjectionToken } from '@angular/core';
-import { DOCUMENT, Location } from '@angular/common';
+import { inject, InjectionToken, DOCUMENT } from '@angular/core';
+import { Location } from '@angular/common';
 import { AppConfigContainerService } from './app-config-container.service';
 
 export const APP_HOST = new InjectionToken<string>('Application host', {

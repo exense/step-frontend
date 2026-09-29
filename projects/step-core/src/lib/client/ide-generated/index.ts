@@ -1,6 +1,7 @@
 export * from './models/CreateDirectoryRequest';
 export type { Includes as IdeIncludes } from './models/Includes';
 export * from './models/AutomationPackageDescriptor';
+export * from './models/ProposeDirectoryResponse';
 
 export * from './schemas/$CreateDirectoryRequest';
 export { $Includes as $IdeIncludes } from './schemas/$Includes';

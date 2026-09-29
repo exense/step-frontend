@@ -26,6 +26,7 @@ export class AutomationPackageResourceComponent {
   private _apPickerDataProviderService = inject(ApResourcePickerDataProviderService);
 
   readonly apId = input.required<string>();
+  readonly allowDirectorySelection = input(false);
   readonly isDisabled = input(false);
   readonly isInvalid = input(false);
   readonly isTouched = input(false);
@@ -69,12 +70,11 @@ export class AutomationPackageResourceComponent {
   }
 
   protected openApResourceChooser(): void {
-    this._apFilePicker
-      .showFilePicker('Select Automation Package Resource', { selectionMode: SelectionMode.FILE })
-      .subscribe((res) => {
-        if (res !== undefined) {
-          this.handleApPathChange(res.filePath);
-        }
-      });
+    const selectionMode = this.allowDirectorySelection() ? SelectionMode.BOTH : SelectionMode.FILE;
+    this._apFilePicker.showFilePicker('Select Automation Package Resource', { selectionMode }).subscribe((res) => {
+      if (res !== undefined) {
+        this.handleApPathChange(res.filePath);
+      }
+    });
   }
 }

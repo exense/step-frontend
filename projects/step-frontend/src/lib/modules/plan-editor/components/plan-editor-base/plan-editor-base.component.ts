@@ -40,7 +40,6 @@ import {
   CommonEntitiesUrlsService,
   PlanContext,
   AuthService,
-  ExecutionParameters,
   PlanReferencePolicyService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
@@ -423,7 +422,7 @@ export class PlanEditorBaseComponent
     this.planTypeControl.valueChanges
       .pipe(
         map((item) => {
-          const context = this._planEditorService.planContext();
+          const context = untracked(() => this._planEditorService.planContext());
           return { item, context };
         }),
         filter(({ item, context }) => !!item && !!context),

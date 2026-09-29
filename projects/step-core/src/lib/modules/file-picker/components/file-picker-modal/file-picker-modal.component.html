@@ -61,6 +61,7 @@
             mat-button
             [attr.data-directory]="item.path"
             [class.selected]="selectedPath() === item.path"
+            [disabled]="loading()"
             (click)="selectFile(item)"
             (dblclick)="handleLoadDirectory(item)"
           >
@@ -82,6 +83,8 @@
         Create Folder
       </button>
     }
-    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!canApply()">Select</button>
+    <button type="button" mat-flat-button color="primary" (click)="apply()" [disabled]="!canApply()">
+      {{ _data.confirmButtonLabel ?? 'Select' }}
+    </button>
   </div>
 </step-modal-window>

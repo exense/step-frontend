@@ -7,17 +7,19 @@
 </ng-template>
 
 <ng-template #contentTemplate>
-  <div class="link-content" [ngSwitch]="linkDisplayType">
-    <ng-container *ngSwitchCase="LinkDisplayType.ICON_ONLY">
-      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
-    </ng-container>
-    <ng-container *ngSwitchCase="LinkDisplayType.TEXT_ONLY">
-      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
-      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
-    </ng-container>
+  <div class="link-content">
+    @switch (linkDisplayType()) {
+      @case (LinkDisplayType.ICON_ONLY) {
+        <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
+      }
+      @case (LinkDisplayType.TEXT_ONLY) {
+        <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
+      }
+      @default {
+        <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
+        <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
+      }
+    }
   </div>
 </ng-template>
 
@@ -27,9 +29,14 @@
   </a>
 </ng-template>
 
-<ng-container *ngIf="noLink$ | async; then contentTemplate; else linkTemplate"></ng-container>
-@if (showAiGeneratedBadge) {
+@if (noLink$ | async) {
+  <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+} @else {
+  <ng-container *ngTemplateOutlet="linkTemplate"></ng-container>
+}
+@if (_isIdeMode && linkDisplayType() !== LinkDisplayType.ICON_ONLY && isAiGenerated) {
   <step-ai-generated-badge />
 }
-<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.root?.description">
-</step-description-hint>
+@if (!(noDescriptionHint$ | async)) {
+  <step-description-hint [description]="context?.root?.description"></step-description-hint>
+}

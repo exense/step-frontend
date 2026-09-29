@@ -12,9 +12,10 @@ import {
   Input,
   Output,
   TemplateRef,
+  DOCUMENT,
 } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { DOCUMENT } from '@angular/common';
+
 import { Mutable } from '../../../basics/step-basics.module';
 import { EditableLabelTemplateDirective } from '../../directives/editable-label-template.directive';
 

@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { CreateDirectoryRequest } from '../models/CreateDirectoryRequest';
+import type { ProposeDirectoryResponse } from '../models/ProposeDirectoryResponse';
 
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 import { DirectoryListing, FileDescriptor } from '../../generated';
@@ -12,6 +13,17 @@ import { DirectoryListing, FileDescriptor } from '../../generated';
 @Injectable({ providedIn: 'root' })
 export class FilesystemService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  public proposeApDirectory(params: {
+    existingParentDirectory: string;
+    apName: string;
+  }): Observable<ProposeDirectoryResponse> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/local/fs/proposeAPDirectory',
+      query: params,
+    });
+  }
 
   /**
    * @param requestBody
