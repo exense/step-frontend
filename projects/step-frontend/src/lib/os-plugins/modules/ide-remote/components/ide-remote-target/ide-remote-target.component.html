@@ -1,0 +1,30 @@
+<div class="target">
+  @if (label()) {
+    <div class="target-heading">{{ label() }}</div>
+  }
+  <div class="target-detail">
+    <span>Server URL</span><strong>{{ target().url || 'Not specified' }}</strong>
+  </div>
+  @if (executionTarget(); as executionTarget) {
+    @if (executionTarget.projectName !== target().projectName) {
+      @if (target().projectName) {
+        <div class="target-detail">
+          <span>Deploy project</span><strong>{{ target().projectName }}</strong>
+        </div>
+      }
+      @if (executionTarget.projectName) {
+        <div class="target-detail">
+          <span>Execute project</span><strong>{{ executionTarget.projectName }}</strong>
+        </div>
+      }
+    } @else if (target().projectName) {
+      <div class="target-detail">
+        <span>Project</span><strong>{{ target().projectName }}</strong>
+      </div>
+    }
+  } @else if (target().projectName) {
+    <div class="target-detail">
+      <span>Project</span><strong>{{ target().projectName }}</strong>
+    </div>
+  }
+</div>

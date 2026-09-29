@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.cli-options {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #d4e3ed;
+  border-radius: 0.5rem;
+}
+
+h3,
+p {
+  margin: 0;
+}
+
+h3 {
+  font-size: 1rem;
+}
+
+p,
+.option span {
+  color: #667d8d;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
+}

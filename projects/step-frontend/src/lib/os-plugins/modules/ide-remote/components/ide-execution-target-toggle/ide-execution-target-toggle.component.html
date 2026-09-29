@@ -1,0 +1,41 @@
+@if (launchContext()?.allowExecutionTargetSelection) {
+  <section class="execution-target" aria-label="Execution target">
+    <div class="target-controls">
+      <button
+        type="button"
+        mat-stroked-button
+        [class.selected]="selectedTarget() === 'LOCAL'"
+        [disabled]="_strategy.busy()"
+        (click)="selectTarget('LOCAL')"
+      >
+        Locally
+      </button>
+      <button
+        type="button"
+        mat-stroked-button
+        [class.selected]="selectedTarget() === 'REMOTE'"
+        [disabled]="_strategy.busy()"
+        [matMenuTriggerFor]="remoteTargets"
+        aria-label="Select remote execution target"
+      >
+        Remotely <span aria-hidden="true">▾</span>
+      </button>
+    </div>
+    <mat-menu #remoteTargets="matMenu">
+      <div class="remote-menu-heading">Select a remote</div>
+      @if (_defaults.executeTarget(); as target) {
+        <button type="button" mat-menu-item class="remote-option" (click)="selectTarget('REMOTE')">
+          <span class="remote-option-details">
+            <strong>{{ target.url || 'Remote URL not specified' }}</strong>
+            @if (target.projectName) {
+              <span>Project: {{ target.projectName }}</span>
+            }
+          </span>
+          <span class="remote-option-arrow" aria-hidden="true">→</span>
+        </button>
+      } @else {
+        <div class="no-remote">No remote configured</div>
+      }
+    </mat-menu>
+  </section>
+}

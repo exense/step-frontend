@@ -1,0 +1,20 @@
+@if (parameters().length || options().length) {
+  <section class="cli-options" aria-label="CLI execution defaults">
+    <h3>CLI execution defaults</h3>
+    @if (planExecution()) {
+      <p>Values entered in the plan form override matching CLI parameters.</p>
+    }
+    @for (option of options(); track option.label) {
+      <div class="option">
+        <span>{{ option.label }}</span
+        ><strong>{{ option.value }}</strong>
+      </div>
+    }
+    @for (parameter of parameters(); track parameter[0]) {
+      <div class="option">
+        <span>{{ parameter[0] }}</span
+        ><strong>{{ parameter[1] }}</strong>
+      </div>
+    }
+  </section>
+}
