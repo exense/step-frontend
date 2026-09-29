@@ -3,6 +3,7 @@ import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
   ControllerService,
+  CustomFormComponent,
   IncludeTestcases,
   PlanEditorService,
   RepositoryObjectReference,
@@ -68,18 +69,19 @@ export class AltExecutionLaunchDialogComponent
   protected readonly showCancel = !this._data.hideCancel;
   protected readonly executionIsolation = !!this._data.isolateExecution;
 
-  private testCasesComponent = viewChild('testCases', { read: RepositoryPlanTestcaseListComponent });
+  private readonly testCasesComponent = viewChild('testCases', { read: RepositoryPlanTestcaseListComponent });
+  private readonly customForm = viewChild(CustomFormComponent);
 
-  protected loading = signal(false);
-  protected error = signal<string | undefined>(undefined);
-  protected artefact = signal<ArtefactInfo | undefined>(undefined);
-  protected testcases = signal<IncludeTestcases | undefined>(undefined);
+  protected readonly loading = signal(false);
+  protected readonly error = signal<string | undefined>(undefined);
+  protected readonly artefact = signal<ArtefactInfo | undefined>(undefined);
+  protected readonly testcases = signal<IncludeTestcases | undefined>(undefined);
 
   ngAfterViewInit(): void {
     this.loadArtefact();
   }
 
-  override setupExecutionParameters(): void {
+  protected override setupExecutionParameters(): void {
     this.executionParameters$
       .pipe(
         map((executionParameters) => executionParameters ?? {}),
@@ -97,8 +99,13 @@ export class AltExecutionLaunchDialogComponent
       });
   }
 
+  /* eslint-disable step-lint/component-public-fields -- Public overrides implement ExecutionCommandsContext and the base execution actions. */
   override getIncludedTestcases(): IncludeTestcases | null | undefined {
     return this.testcases();
+  }
+
+  override getCustomForms(): CustomFormComponent | undefined {
+    return this.customForm();
   }
 
   override getDescription(): string | undefined {
@@ -113,11 +120,12 @@ export class AltExecutionLaunchDialogComponent
     return this.executionIsolation;
   }
 
-  override schedule() {
+  override schedule(): void {
     this._commands.prefillScheduledTask().subscribe((task) => {
       this._schedulerInvoker?.openScheduler(task);
     });
   }
+  /* eslint-enable step-lint/component-public-fields */
 
   private loadArtefact(): void {
     if (!this.repoRef) {

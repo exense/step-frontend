@@ -29,7 +29,7 @@ export class AttachmentUtilsService {
 
     if (attachment.type === STREAMING_ATTACHMENT_META && !this.hasLines(attachment)) {
       const streamingAttachmentMeta = attachment as StreamingAttachmentMeta;
-      if (streamingAttachmentMeta.status === 'COMPLETED' && result === AttachmentType.TRACE) {
+      if (streamingAttachmentMeta.status === 'COMPLETED' && result) {
         return result;
       }
       return AttachmentType.STREAMING_BINARY;

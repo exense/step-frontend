@@ -125,11 +125,7 @@ step-aggregated-tree-node-iteration-list {
     }
   }
 
-  step-alert {
-    margin-bottom: 0;
-    padding: 0.5rem;
-    .warning-explanation {
-      margin-left: 0.5rem;
-    }
+  .warning-explanation {
+    color: var.$orange;
   }
 }

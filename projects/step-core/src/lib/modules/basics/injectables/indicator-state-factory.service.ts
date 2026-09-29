@@ -1,5 +1,4 @@
-import { inject, Injectable, NgZone, signal, Signal } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, NgZone, signal, Signal, DOCUMENT } from '@angular/core';
 
 export interface IndicatorState {
   show(): void;

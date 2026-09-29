@@ -24,6 +24,8 @@ step-attachment-preview {
       position: static !important;
       width: auto !important;
       height: auto !important;
+      min-width: 7rem;
+      min-height: 7rem;
       max-width: 35rem;
       max-height: 35rem;
       object-fit: contain;

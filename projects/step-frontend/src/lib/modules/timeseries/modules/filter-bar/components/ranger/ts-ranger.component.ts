@@ -12,6 +12,7 @@ import {
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
+  DOCUMENT,
 } from '@angular/core';
 import { TSRangerSettings } from './ts-ranger-settings';
 
@@ -20,7 +21,7 @@ import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
 import { TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, TimeSeriesConfig, UPlotUtilsService } from '../../../_common';
-import { DOCUMENT } from '@angular/common';
+
 import UPlot from '../../../_common/types/uPlot';
 
 /**

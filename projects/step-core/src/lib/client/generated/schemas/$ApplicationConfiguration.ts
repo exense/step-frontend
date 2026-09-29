@@ -51,5 +51,8 @@ export const $ApplicationConfiguration = {
     forceLegacyReporting: {
       type: 'boolean',
     },
+    disableLegacyReporting: {
+      type: 'boolean',
+    },
   },
 } as const;

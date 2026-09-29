@@ -1,4 +1,15 @@
-import { Component, computed, inject, input, linkedSignal, OnDestroy, OnInit, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  input,
+  linkedSignal,
+  OnDestroy,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { AugmentedScreenService, Input as StInput, ScreenInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
@@ -8,13 +19,14 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
 import { ActivatedRoute } from '@angular/router';
 import {
   BehaviorSubject,
+  catchError,
   debounceTime,
   distinctUntilChanged,
+  EMPTY,
   filter,
   finalize,
   groupBy,
   map,
-  merge,
   mergeMap,
   Observable,
   of,
@@ -22,7 +34,7 @@ import {
   tap,
 } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 interface CustomFormInputsSchema {
   ids: string[];
@@ -50,6 +62,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
+  private _destroyRef = inject(DestroyRef);
 
   private readonly valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
   private readonly valueChangeDebounced$ = this.valueChange$.pipe(
@@ -57,13 +70,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     mergeMap((group) => group.pipe(debounceTime(500))),
   );
 
-  private readonly changeStart$ = this.valueChange$.pipe(map(() => true));
-  private readonly changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
-
-  private readonly changeInProgress = toSignal(merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged()), {
-    initialValue: false,
-  });
-  private readonly changeInProgress$ = toObservable(this.changeInProgress);
+  private pendingChanges = new Set<string | undefined>([undefined]);
+  private changeInProgressState$ = new BehaviorSubject(true);
+  // eslint-disable-next-line step-lint/component-public-fields -- Preserve the public form readiness API.
+  readonly changeInProgress$ = this.changeInProgressState$.pipe(distinctUntilChanged());
+  // eslint-disable-next-line step-lint/component-public-fields -- Preserve the public form readiness API.
+  readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
 
   readonly stEditableLabelMode = input(false);
   readonly stInline = input(false);
@@ -78,16 +90,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   readonly customInputTouch = output<void>();
   readonly loadingChange = output<boolean>();
 
+  protected readonly activationFailed = signal(false);
+
   private activeExpressionInputsKeys = new Set<string>();
   private readonly orderedIds = signal<string[]>([]);
   private readonly originalInputs = signal<Record<string, StInput>>({});
   private readonly visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
-  private readonly visibilityFlagsJson = computed(() => JSON.stringify(this.visibilityFlags()));
   private readonly screenTemplateLoading = signal(false);
-  private readonly screenTemplateLoading$ = toObservable(this.screenTemplateLoading);
 
   private readonly internalModel = linkedSignal(() => this.stModel());
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Parent templates use the visible input count.
   readonly inputs = computed(() => {
     const orderedIds = this.orderedIds();
     const originalInputs = this.originalInputs();
@@ -119,15 +132,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.valueChange$.complete();
+    this.changeInProgressState$.complete();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Submit handlers wait for the form through this API.
   readyToProceed(): Observable<void> {
-    if (!this.changeInProgress() && !this.screenTemplateLoading()) {
+    if (!this.changeInProgress()) {
       return of(undefined);
     }
 
-    return merge(this.changeInProgress$, this.screenTemplateLoading$).pipe(
-      filter(() => !this.changeInProgress() && !this.screenTemplateLoading()),
+    return this.changeInProgress$.pipe(
+      filter((inProgress) => !inProgress),
       take(1),
       map(() => undefined),
     );
@@ -139,11 +154,20 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     }
 
     const inputId = input.id!;
+    this.pendingChanges.add(inputId);
+    this.changeInProgressState$.next(true);
     this.valueChange$.next({ inputId, value });
   }
 
   protected onCustomInputTouched(): void {
     this.customInputTouch.emit();
+  }
+
+  protected retryActivation(): void {
+    this.startScreenTemplateLoading();
+    this.pendingChanges.add(undefined);
+    this.changeInProgressState$.next(true);
+    this.valueChange$.next(undefined);
   }
 
   private determineCustomFormInputSchema(screenInputs: ScreenInput[]): CustomFormInputsSchema {
@@ -199,8 +223,8 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .getScreenInputsByScreenIdWithCache(this.stScreen())
       .pipe(
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
-        tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe({
         next: (schema) => {
@@ -208,6 +232,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           this.originalInputs.set(schema.inputs);
           this.activeExpressionInputsKeys = schema.activeExpressionInputsKeys;
           if (!this.activeExpressionInputsKeys.size) {
+            this.setDefaultValues(schema.ids.map((id) => ({ input: schema.inputs[id] })));
             this.visibilityFlags.set({});
             this.setupValueChange();
             this.finishScreenTemplateLoading();
@@ -223,14 +248,18 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   }
 
   private setupValueChange(): void {
-    this.valueChangeDebounced$.pipe(filter((valueChange) => !!valueChange)).subscribe((valueChange) => {
-      const changedModel = this._objectUtils.setObjectFieldValue(
-        this.internalModel(),
-        valueChange!.inputId,
-        valueChange!.value,
-      );
-      this.internalModel.set(changedModel);
-      this.stModelChange.emit(changedModel);
+    this.valueChangeDebounced$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((valueChange) => {
+      if (valueChange) {
+        const changedModel = this._objectUtils.setObjectFieldValue(
+          this.internalModel(),
+          valueChange.inputId,
+          valueChange.value,
+        );
+        this.internalModel.set(changedModel);
+        this.stModelChange.emit(changedModel);
+      }
+      this.pendingChanges.delete(valueChange?.inputId);
+      this.changeInProgressState$.next(!!this.pendingChanges.size);
     });
   }
 
@@ -238,6 +267,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     this.valueChangeDebounced$
       .pipe(
         map((valueChange) => {
+          this.pendingChanges.delete(valueChange?.inputId);
           if (!valueChange) {
             return undefined;
           }
@@ -250,19 +280,30 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           this.stModelChange.emit(changedModel);
           return changedModel;
         }),
-        switchMap((model) => {
+        switchMap((changedModel) => {
           this.startScreenTemplateLoading();
+          this.activationFailed.set(false);
           return this._screensService
-            .getScreenInputsForScreenPost(this.stScreen(), model ?? this.internalModel())
-            .pipe(finalize(() => this.finishScreenTemplateLoading()));
+            .getActivatedScreenInputs(this.stScreen(), changedModel ?? this.internalModel())
+            .pipe(
+              finalize(() => this.finishScreenTemplateLoading()),
+              catchError(() => {
+                this.activationFailed.set(true);
+                return EMPTY;
+              }),
+            );
         }),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
+        tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
         ),
-        filter((visibilityFlags) => JSON.stringify(visibilityFlags) !== this.visibilityFlagsJson()),
+        takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
+      .subscribe((visibilityFlags) => {
+        this.visibilityFlags.set(visibilityFlags);
+        this.changeInProgressState$.next(!!this.pendingChanges.size);
+      });
   }
 
   private startScreenTemplateLoading(): void {

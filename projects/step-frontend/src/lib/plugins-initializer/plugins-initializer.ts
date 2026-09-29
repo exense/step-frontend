@@ -23,7 +23,11 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
       console.log('received plugins', plugin);
 
       if (plugin.entryPoint && plugin.entryPoint !== DEFAULT_ENTRY_POINT) {
-        plugin.entryPoint += '?v=${project.version}';
+        if (plugin.entryPoint.endsWith('.js')) {
+          plugin.entryPoint = plugin.entryPoint.replace('.js', '.json');
+        }
+        // TODO think about how to solve it properly. For now this string breaks the local run
+        // plugin.entryPoint += '?v=${project.version}';
       }
 
       return plugin;
@@ -39,11 +43,11 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
 };
 
 const registerPlugins = () => {
-  const injector = inject(Injector);
-  const registry = inject(PluginInfoRegistryService);
-  const globalIndicator = inject(GLOBAL_INDICATOR);
+  const _injector = inject(Injector);
+  const _registry = inject(PluginInfoRegistryService);
+  const _globalIndicator = inject(GLOBAL_INDICATOR);
 
-  globalIndicator.showMessage('Loading plugins...');
+  _globalIndicator.showMessage('Loading plugins...');
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
     if (pluginDefinitions.length === 0) {
@@ -60,14 +64,14 @@ const registerPlugins = () => {
       }
     });
 
-    registry.register(...pluginNames);
+    _registry.register(...pluginNames);
 
-    globalIndicator.showMessage('Initializing plugins...');
+    _globalIndicator.showMessage('Initializing plugins...');
     await Promise.all([
-      registerMicrofrontendPlugins(Array.from(entryPoints), injector),
-      registerOsPlugins(injector),
+      registerMicrofrontendPlugins(Array.from(entryPoints), _injector),
+      registerOsPlugins(_injector),
     ]).then(() => {
-      globalIndicator.showMessage('Starting Step...');
+      _globalIndicator.showMessage('Starting Step...');
     });
   };
 };

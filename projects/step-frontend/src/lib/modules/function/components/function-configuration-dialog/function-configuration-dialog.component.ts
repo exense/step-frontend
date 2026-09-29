@@ -13,7 +13,6 @@ import {
 import { FormBuilder, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
-  AlertType,
   AuthService,
   DialogsService,
   FunctionConfigurationDialogData,
@@ -65,7 +64,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
-  protected readonly AlertType = AlertType;
   protected readonly schemaErrorsDictionary: Record<string, string> = {
     format: 'The schema must be in a JSON format',
     required: 'This field is required',
