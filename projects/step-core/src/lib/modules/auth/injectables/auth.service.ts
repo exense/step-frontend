@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, Injector, OnDestroy, signal, DOCUMENT } from '@angular/core';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import {

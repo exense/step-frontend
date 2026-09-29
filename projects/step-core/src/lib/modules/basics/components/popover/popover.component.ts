@@ -4,7 +4,6 @@ import {
   DestroyRef,
   ElementRef,
   TemplateRef,
-  ViewChild,
   ViewEncapsulation,
   ViewContainerRef,
   forwardRef,
@@ -12,14 +11,16 @@ import {
   input,
   output,
   computed,
+  viewChild,
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
 import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy, ConnectedPosition } from '@angular/cdk/overlay';
+import { ESCAPE, hasModifierKey } from '@angular/cdk/keycodes';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime } from 'rxjs';
+import { debounceTime, filter, Subject, takeUntil } from 'rxjs';
 
 export enum PopoverMode {
   BOTH,
@@ -50,10 +51,10 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   private readonly _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _scrollDispatcher = inject(ScrollDispatcher);
   private readonly _destroyRef = inject(DestroyRef);
-  private readonly overlay = inject(Overlay);
-  private readonly vcr = inject(ViewContainerRef);
+  private readonly _overlay = inject(Overlay);
+  private readonly _vcr = inject(ViewContainerRef);
 
-  @ViewChild('popoverTemplate', { static: true }) popoverTemplate!: TemplateRef<unknown>;
+  private readonly popoverTemplate = viewChild.required<TemplateRef<unknown>>('popoverTemplate');
 
   readonly xPosition = input<'before' | 'after'>('after');
   readonly yPosition = input<'above' | 'below'>('below');
@@ -63,7 +64,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   readonly smallFont = input(true);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
   readonly toggledEvent = output<boolean>();
-  readonly PopoverMode = PopoverMode;
+  protected readonly PopoverMode = PopoverMode;
 
   private toggled = false;
   private isPopoverFrozen = false;
@@ -73,6 +74,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
 
   private overlayRef?: OverlayRef;
   private positionStrategy?: FlexibleConnectedPositionStrategy;
+  private terminator$?: Subject<void>;
 
   private readonly passiveBackdropClass = 'step-popover-backdrop--passive';
   private readonly activeBackdropClass = 'step-popover-backdrop--active';
@@ -89,12 +91,16 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   ngOnDestroy(): void {
     // Clear timeout to prevent overlay creation, if it was scheduled
     clearTimeout(this.tooltipTimeout);
+    this.terminate();
+    this.overlayRef?.dispose();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Imperative API used by popover consumers.
   openPopover(): void {
     this.createOverlay();
     if (this.overlayRef && !this.overlayRef.hasAttached()) {
-      this.overlayRef.attach(new TemplatePortal(this.popoverTemplate, this.vcr));
+      this.setupOverlaySubscriptions();
+      this.overlayRef.attach(new TemplatePortal(this.popoverTemplate(), this._vcr));
     }
     this.overlayRef?.updatePosition();
 
@@ -102,11 +108,13 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
     this.toggledEvent.emit(this.toggled);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Imperative API used by popover consumers.
   closePopover(): void {
     if (this.overlayRef?.hasAttached?.()) {
       this.setBackdropActive(false);
       this.overlayRef.detach();
     }
+    this.terminate();
     this.toggled = false;
     this.toggledEvent.emit(false);
   }
@@ -116,7 +124,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
 
     const positions = this.buildPositions();
 
-    this.positionStrategy = this.overlay
+    this.positionStrategy = this._overlay
       .position()
       .flexibleConnectedTo(this._el)
       .withPositions(positions)
@@ -127,21 +135,49 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
       requestAnimationFrame(() => this.applyStyleFromRenderedPosition(connectionPair));
     });
 
-    this.overlayRef = this.overlay.create({
+    this.overlayRef = this._overlay.create({
       positionStrategy: this.positionStrategy,
       panelClass: ['step-popover-pane'],
       hasBackdrop: true,
       backdropClass: this.passiveBackdropClass,
-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      scrollStrategy: this._overlay.scrollStrategies.reposition(),
     });
 
     this.positionStrategy.positionChanges.subscribe(({ connectionPair }) => {
       this.setBackdropActive(this.toggled);
     });
+  }
 
-    this.overlayRef.backdropClick().subscribe(() => {
-      if (!this.isPopoverFrozen) this.closePopover();
-    });
+  private setupOverlaySubscriptions(): void {
+    if (!this.overlayRef) return;
+
+    this.terminate();
+    this.terminator$ = new Subject<void>();
+
+    this.overlayRef
+      .backdropClick()
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => {
+        if (!this.isPopoverFrozen) this.closePopover();
+      });
+
+    this.overlayRef
+      .keydownEvents()
+      .pipe(
+        filter((event) => event.keyCode === ESCAPE && !hasModifierKey(event)),
+        takeUntil(this.terminator$),
+      )
+      .subscribe((event) => {
+        if (!this.toggled || this.isPopoverFrozen) return;
+        event.preventDefault();
+        this.closePopover();
+      });
+  }
+
+  private terminate(): void {
+    this.terminator$?.next();
+    this.terminator$?.complete();
+    this.terminator$ = undefined;
   }
 
   private buildPositions(): ConnectedPosition[] {
@@ -233,7 +269,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
     }, 400);
   }
 
-  private applyStyleFromRenderedPosition(pair: ConnectedPosition) {
+  private applyStyleFromRenderedPosition(pair: ConnectedPosition): void {
     if (!this.overlayRef?.hasAttached()) return;
 
     const originRect = this._el.nativeElement.getBoundingClientRect();
@@ -261,10 +297,12 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
     }
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- PopoverService contract.
   freezePopover(): void {
     this.isPopoverFrozen = true;
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- PopoverService contract.
   unfreezePopover(): void {
     this.isPopoverFrozen = false;
   }

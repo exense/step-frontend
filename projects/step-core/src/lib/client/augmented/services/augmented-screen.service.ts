@@ -1,6 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Input, ScreenInput, ScreensService } from '../../generated';
-import { map, Observable, of, OperatorFunction, pipe, tap, UnaryFunction } from 'rxjs';
+import { map, Observable, of, OperatorFunction, pipe, switchMap, tap, UnaryFunction } from 'rxjs';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
@@ -33,6 +33,7 @@ export class AugmentedScreenService
     this.cachedScreenInput = undefined;
   }
 
+  // eslint-disable-next-line @angular-eslint/prefer-inject -- The generated base service requires this constructor dependency.
   constructor(httpRequest: BaseHttpRequest) {
     super(httpRequest);
     this._globalReload.register(this);
@@ -105,11 +106,11 @@ export class AugmentedScreenService
   }
 
   getDefaultParametersByScreenId(screenId: string): Observable<Record<string, string>> {
-    return this.getScreenInputsByScreenId(screenId).pipe(
+    return this.getActivatedScreenInputs(screenId).pipe(
       map((inputs) =>
         inputs
-          .map((x) => x.input)
-          .filter((x) => !!x)
+          .map((item) => item.input)
+          .filter((input) => !!input)
           .reduce(
             (res, input) => {
               const defaultValue = input?.defaultValue;
@@ -129,6 +130,52 @@ export class AugmentedScreenService
             {} as Record<string, any>,
           ),
       ),
+    );
+  }
+
+  getActivatedScreenInputs(screenId: string, parameters: Record<string, unknown> = {}): Observable<ScreenInput[]> {
+    return this.getScreenInputsByScreenIdWithCache(screenId).pipe(
+      switchMap((definitions) => {
+        const defaults = definitions.reduce(
+          (result, { input }) => {
+            const value = input?.type === 'CHECKBOX' ? (input.defaultValue ?? false) : input?.defaultValue;
+            if (input?.id && value !== undefined && value !== null) {
+              result[input.id] = value;
+            }
+            return result;
+          },
+          {} as Record<string, unknown>,
+        );
+        return this.getScreenInputsForScreenPost(screenId, { ...defaults, ...parameters });
+      }),
+    );
+  }
+
+  filterInactiveParameters(
+    screenId: string,
+    parameters: Record<string, string> = {},
+  ): Observable<Record<string, string>> {
+    return this.getScreenInputsByScreenIdWithCache(screenId).pipe(
+      switchMap((definitions) => {
+        const conditionalKeys = definitions
+          .filter((item) => !!item.input?.activationExpression)
+          .map((item) => item.input!.id!);
+        if (!conditionalKeys.length) {
+          return of(parameters);
+        }
+        return this.getActivatedScreenInputs(screenId, parameters).pipe(
+          map((inputs) => {
+            const activeKeys = new Set(inputs.map((item) => item.input?.id));
+            const result = { ...parameters };
+            conditionalKeys.forEach((key) => {
+              if (!activeKeys.has(key)) {
+                delete result[key];
+              }
+            });
+            return result;
+          }),
+        );
+      }),
     );
   }
 

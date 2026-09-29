@@ -33,9 +33,6 @@ export const $Function = {
         type: 'string',
       },
     },
-    managed: {
-      type: 'boolean',
-    },
     activationExpression: {
       type: 'Expression',
     },

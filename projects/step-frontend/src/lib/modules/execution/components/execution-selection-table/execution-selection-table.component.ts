@@ -6,7 +6,6 @@ import {
   entitySelectionStateProvider,
   Execution,
   FilterConditionFactoryService,
-  FunctionPackage,
   SearchColDirective,
   TableComponent,
 } from '@exense/step-core';
@@ -23,11 +22,11 @@ export class ExecutionSelectionTableComponent extends BaseEntitySelectionTableCo
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   protected _dataSource = inject(AugmentedExecutionsService).getExecutionsTableDataSource();
 
-  protected tableRef = viewChild('tableRef', { read: TableComponent<FunctionPackage> });
+  protected readonly tableRef = viewChild('tableRef', { read: TableComponent<Execution> });
 
   protected readonly DateFormat = DateFormat;
 
-  searchByDate(col: SearchColDirective, date?: DateTime): void {
+  protected searchByDate(col: SearchColDirective, date?: DateTime): void {
     const condition = this._filterConditionFactory.singleDateFilterCondition(date);
     col.search(condition);
   }

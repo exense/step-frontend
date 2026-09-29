@@ -1,4 +1,4 @@
-import { ComponentHarness, TestElement } from '@angular/cdk/testing';
+import { ComponentHarness, TestElement, TestKey } from '@angular/cdk/testing';
 
 export class PopoverHarness extends ComponentHarness {
   static hostSelector = 'step-popover';
@@ -31,6 +31,11 @@ export class PopoverHarness extends ComponentHarness {
   async click(): Promise<void> {
     const triggerWrapper = await this.getTriggerWrapper();
     await triggerWrapper.click();
+  }
+
+  async pressEscape(): Promise<void> {
+    const triggerWrapper = await this.getTriggerWrapper();
+    await triggerWrapper.sendKeys(TestKey.ESCAPE);
   }
 
   async backdropClick(): Promise<void> {

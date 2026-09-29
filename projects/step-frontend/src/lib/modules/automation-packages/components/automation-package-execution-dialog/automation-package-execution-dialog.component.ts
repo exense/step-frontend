@@ -1,16 +1,17 @@
-import { Component, computed, DestroyRef, inject, model, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, model, OnInit, signal, viewChild } from '@angular/core';
 import {
   AugmentedScreenService,
   AutomationPackage,
   AutomationPackageExecutionParameters,
   AutomationPackagesService,
+  CustomFormComponent,
   PlanFilter,
   PlanFiltersFactoryService,
   StepCoreModule,
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, Validators } from '@angular/forms';
-import { finalize, startWith } from 'rxjs';
+import { finalize, of, startWith, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
@@ -52,6 +53,7 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
   private readonly defaultParametersLoading = signal(true);
   private readonly screenTemplateLoading = signal(false);
   protected readonly isLoading = computed(() => this.defaultParametersLoading() || this.screenTemplateLoading());
+  private readonly customForm = viewChild(CustomFormComponent);
 
   ngOnInit(): void {
     this._screenTemplates
@@ -77,10 +79,18 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
 
     this.isExecuting = true;
     this._dialogRef.disableClose = true;
-    const params = this.createPackageExecutionParameters();
-    this._automationPackageApi
-      .executeDeployedAutomationPackage(this._automationPackage.id!, params)
+    const isReady$ = this.customForm()?.readyToProceed() ?? of(undefined);
+    isReady$
       .pipe(
+        switchMap(() =>
+          this._screenTemplates.filterInactiveParameters('executionParameters', this.executionParameters()),
+        ),
+        switchMap((customParameters) =>
+          this._automationPackageApi.executeDeployedAutomationPackage(this._automationPackage.id!, {
+            ...this.createPackageExecutionParameters(),
+            customParameters,
+          }),
+        ),
         finalize(() => {
           this.isExecuting = false;
           this._dialogRef.disableClose = false;

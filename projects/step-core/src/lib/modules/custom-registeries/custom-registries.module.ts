@@ -42,7 +42,6 @@ export * from './components/item-component/custom-cell.component';
 export * from './components/item-component/custom-search-cell.component';
 export * from './components/item-component/dashlet.component';
 export * from './components/item-component/execution-custom-panel.component';
-export * from './services/function-package-type-registry.service';
 export * from './services/function-type-registry.service';
 export * from './services/plan-type-registry.service';
 export * from './services/custom-registry.service';

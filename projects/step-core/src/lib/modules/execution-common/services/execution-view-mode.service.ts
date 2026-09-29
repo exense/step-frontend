@@ -27,11 +27,16 @@ export class ExecutionViewModeService {
   getExecutionMode(execution: Execution): Observable<ExecutionViewMode> {
     return this.checkForceLegacyReporting().pipe(
       map((isForceLegacy) =>
-        this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution) || isForceLegacy
+        !this.isNewExecutionAvailable(execution) ||
+        (!this.isLegacyReportingDisabled() && (this.isLocalStorageForcingLegacy() || isForceLegacy))
           ? ExecutionViewMode.LEGACY
           : ExecutionViewMode.NEW,
       ),
     );
+  }
+
+  isLegacyReportingDisabled(): boolean {
+    return !!this._serviceContext.conf?.disableLegacyReporting;
   }
 
   isNewExecutionAvailable(execution: Execution): boolean {
