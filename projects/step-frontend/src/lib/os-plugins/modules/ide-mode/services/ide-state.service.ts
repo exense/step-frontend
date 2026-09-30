@@ -174,7 +174,7 @@ export class IdeStateService {
                 .showWarning(upgradeRequiredMessage, {
                   confirmButtonLabel: 'Upgrade',
                   confirmationMessage:
-                    'Upgrading will rewrite files in this automation package. This action cannot be undone in the IDE; make a backup before continuing.',
+                    'Upgrading will rewrite files in this automation package. This action cannot be undone in Step Studio.',
                   maxWidth: 'min(600px, calc(100vw - 32px))',
                   panelClass: 'step-compact-confirmation-dialog',
                 })
