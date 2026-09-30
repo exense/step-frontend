@@ -1,13 +1,15 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-ide-header-bar {
-  padding: 1rem 5rem 1rem 2.5rem;
+  padding: 1rem 2.5rem;
   gap: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   .package {
+    flex: 1;
+    min-width: 0;
     color: var.$white;
     align-self: stretch;
     display: flex;
@@ -39,6 +41,13 @@ step-ide-header-bar {
       display: flex;
       flex-direction: column;
       gap: 0.1rem;
+      min-width: 0;
+    }
+
+    .package-info > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .package-directory {
@@ -79,7 +88,7 @@ step-ide-header-bar {
   }
 
   section > button {
-    margin-left: 1rem;
+    margin-left: 0;
 
     step-icon,
     span {
@@ -92,6 +101,25 @@ step-ide-header-bar {
       span {
         color: var.$muted !important;
       }
+    }
+  }
+
+  section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    padding: 1rem;
+
+    .package {
+      flex-basis: 100%;
+    }
+
+    section {
+      width: 100%;
     }
   }
 }

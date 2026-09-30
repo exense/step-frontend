@@ -5,6 +5,7 @@
 @use 'core-variables' as var;
 
 @forward 'components/theme-config';
+@forward 'components/studio-theme';
 @forward 'components/report-node-status';
 @forward 'components/report-node';
 @forward 'components/step-table';
