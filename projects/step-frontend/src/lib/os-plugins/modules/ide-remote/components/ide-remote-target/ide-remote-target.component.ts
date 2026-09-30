@@ -10,5 +10,4 @@ import { IdeRemoteTarget } from '../../services/ide-remote-defaults.service';
 export class IdeRemoteTargetComponent {
   readonly label = input('Remote target');
   readonly target = input.required<IdeRemoteTarget>();
-  readonly executionTarget = input<IdeRemoteTarget>();
 }

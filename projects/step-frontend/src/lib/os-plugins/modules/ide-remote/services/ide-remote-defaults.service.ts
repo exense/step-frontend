@@ -42,7 +42,7 @@ export class IdeRemoteDefaultsService {
 
   getOperationError(operation: IdeRemoteOperation): string | undefined {
     if (!this._ideMode) {
-      return 'Remote operations are available only in IDE mode.';
+      return 'Remote operations are available only in Step Studio.';
     }
     if (this.loading()) {
       return 'Remote defaults are loading.';

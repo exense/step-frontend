@@ -80,14 +80,24 @@
   </button>
 </mat-menu>
 
-<mat-menu #configurationMenu class="ide-remote-menu">
+<mat-menu #configurationMenu class="ide-remote-menu ide-remote-config-menu">
   <div class="ide-remote-menu-details">
     <strong>Configure remote</strong>
-    <span>Configure <code>stepUrl</code> by default in <code>~/stepcli.properties</code>.</span>
-    @for (item of configurationDashlets; track item.id) {
-      <step-dashlet [itemKey]="item.template" />
-    }
-    <span>Restart the IDE after changing the CLI properties file.</span>
+    <ol class="ide-remote-configuration-steps">
+      <li>
+        <span class="ide-remote-step-number" aria-hidden="true">1.</span>
+        <div class="ide-remote-step-description">
+          <span>Configure your remote server in <code>~/stepcli.properties</code>.</span>
+          @for (item of configurationDashlets; track item.id) {
+            <step-dashlet [itemKey]="item.template" />
+          }
+        </div>
+      </li>
+      <li>
+        <span class="ide-remote-step-number" aria-hidden="true">2.</span>
+        <span>Restart Step Studio to apply the CLI property changes.</span>
+      </li>
+    </ol>
   </div>
   <mat-divider />
   <a

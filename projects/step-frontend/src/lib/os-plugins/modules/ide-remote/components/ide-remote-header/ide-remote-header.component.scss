@@ -127,7 +127,39 @@ step-ide-remote-header {
     color: var.$gray-550;
   }
 
+  .ide-remote-configuration-steps {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0.2rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 0.5rem;
+      align-items: start;
+    }
+
+    .ide-remote-step-number {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .ide-remote-step-description {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 0;
+    }
+  }
+
   code {
     white-space: nowrap;
   }
+}
+
+.ide-remote-menu.ide-remote-config-menu {
+  max-width: min(30rem, calc(100vw - 2rem)) !important;
 }

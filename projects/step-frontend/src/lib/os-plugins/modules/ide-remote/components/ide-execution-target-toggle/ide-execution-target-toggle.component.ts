@@ -1,7 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, signal } from '@angular/core';
-import { CustomComponent, ExecutionLaunchDashletContext, StepCoreModule } from '@exense/step-core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
+import { CustomComponent, ExecutionLaunchDashletContext, StepCoreModule, Tab } from '@exense/step-core';
 import { RemoteExecutionStrategyService } from '../../services/remote-execution-strategy.service';
-import { IdeRemoteDefaultsService } from '../../services/ide-remote-defaults.service';
+
+type ExecutionTarget = 'LOCAL' | 'REMOTE';
 
 @Component({
   selector: 'step-ide-execution-target-toggle',
@@ -10,11 +19,15 @@ import { IdeRemoteDefaultsService } from '../../services/ide-remote-defaults.ser
   templateUrl: './ide-execution-target-toggle.component.html',
   styleUrl: './ide-execution-target-toggle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class IdeExecutionTargetToggleComponent implements CustomComponent, OnDestroy {
   protected readonly _strategy = inject(RemoteExecutionStrategyService);
-  protected readonly _defaults = inject(IdeRemoteDefaultsService);
   protected readonly launchContext = signal<ExecutionLaunchDashletContext | undefined>(undefined);
+  protected readonly targets: Tab<ExecutionTarget>[] = [
+    { id: 'LOCAL', label: 'Locally', tooltip: 'Execute locally' },
+    { id: 'REMOTE', label: 'Remotely', tooltip: 'Execute on the configured remote' },
+  ];
   protected readonly selectedTarget = computed(() => {
     const launchContext = this.launchContext();
     const selectedStrategy = launchContext?.commands?.selectedStrategy();
@@ -40,7 +53,7 @@ export class IdeExecutionTargetToggleComponent implements CustomComponent, OnDes
     }
   }
 
-  protected selectTarget(target: 'LOCAL' | 'REMOTE'): void {
+  protected selectTarget(target: ExecutionTarget): void {
     const commands = this.launchContext()?.commands;
     if (!commands || this._strategy.busy()) {
       return;

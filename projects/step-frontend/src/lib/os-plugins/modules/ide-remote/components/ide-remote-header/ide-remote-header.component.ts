@@ -39,7 +39,7 @@ export class IdeRemoteHeaderComponent implements CustomComponent {
     const currentPackage = this._ideState.currentPackage();
     const inProgress = this._ideState.inProgress();
     if (!this._ideMode) {
-      return 'Remote operations are available only in IDE mode.';
+      return 'Remote operations are available only in Step Studio.';
     }
     if (inProgress) {
       return 'Wait for the automation package operation to finish.';

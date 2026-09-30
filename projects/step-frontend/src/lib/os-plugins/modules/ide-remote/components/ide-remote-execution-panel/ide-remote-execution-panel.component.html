@@ -1,12 +1,15 @@
 @if (strategy(); as strategy) {
   <section class="remote-execution-panel" aria-label="Remote execution">
     @if (_defaults.executeTarget(); as target) {
-      <step-ide-remote-target [target]="target" label="" />
+      <step-ide-remote-target [target]="target" label="">
+        @if (strategy.results() === undefined) {
+          <step-ide-remote-execution-options [request]="executionRequest()" [planExecution]="true" />
+        }
+      </step-ide-remote-target>
     }
     @if (strategy.results() !== undefined) {
       <step-ide-remote-results [results]="strategy.results()" />
     } @else {
-      <step-ide-remote-execution-options [request]="executionRequest()" [planExecution]="true" />
       @if (strategy.readinessError(); as error) {
         <step-alert type="warning" role="status">{{ error }}</step-alert>
       }

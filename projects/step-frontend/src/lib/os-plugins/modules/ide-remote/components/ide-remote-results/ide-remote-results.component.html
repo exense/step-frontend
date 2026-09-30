@@ -1,5 +1,5 @@
 @if (rows(); as rows) {
-  @if (rows.length === 0) {
+  @if (rows.length === 0 && results() !== undefined) {
     <step-alert type="warning" role="status">No remote executions were returned.</step-alert>
   } @else {
     <div class="result-list">
@@ -16,12 +16,12 @@
               View execution on remote server <span aria-hidden="true">↗</span>
             </a>
           } @else {
-            <span>Result URL unavailable</span>
+            <span class="result-status">{{ row.status }}</span>
           }
         </div>
       }
     </div>
-    @if (missingUrls()) {
+    @if (results() !== undefined && missingUrls()) {
       <step-alert type="warning" role="status">Some remote executions have no result URL.</step-alert>
     }
   }

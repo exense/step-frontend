@@ -28,10 +28,22 @@
       </p>
     }
     @if (target(); as target) {
-      <step-ide-remote-target [target]="target" />
+      <step-ide-remote-target [target]="target">
+        @if (operation === 'EXECUTE' && !completed()) {
+          <step-ide-remote-execution-options [request]="executionRequest()" />
+        }
+      </step-ide-remote-target>
     }
-    @if (operation === 'EXECUTE' && !completed() && !busy()) {
-      <step-ide-remote-execution-options [request]="executionRequest()" />
+    @if (operation === 'EXECUTE' && planNames(); as names) {
+      <h3 class="result-heading">{{ completed() ? 'Execution results' : 'Plans to execute' }} ({{ names.length }})</h3>
+      <step-ide-remote-results
+        [planNames]="names"
+        [results]="executionResults()"
+        [wrapIntoTestSet]="executionRequest()?.wrapIntoTestSet ?? false"
+      />
+    }
+    @if (plansLoading()) {
+      <div role="status">Loading plans from this Automation Package…</div>
     }
     @if (readinessError(); as error) {
       <step-alert type="warning" role="status">{{ error }}</step-alert>
@@ -58,10 +70,6 @@
         <step-alert type="warning" role="status">{{ warning.text }}</step-alert>
       }
     }
-    @if (operation === 'EXECUTE' && executionResults() !== undefined) {
-      <h3 class="result-heading">Executions on the remote server</h3>
-      <step-ide-remote-results [results]="executionResults()" />
-    }
   </div>
   <div step-modal-window-buttons>
     @if (completed()) {
@@ -72,7 +80,7 @@
         type="button"
         mat-flat-button
         color="primary"
-        [disabled]="!!readinessError() || busy()"
+        [disabled]="!!readinessError() || plansLoading() || busy()"
         [attr.aria-busy]="busy()"
         (click)="submit()"
       >

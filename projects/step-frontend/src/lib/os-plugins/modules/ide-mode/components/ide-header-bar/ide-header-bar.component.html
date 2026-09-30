@@ -1,32 +1,26 @@
 <div class="package-area">
   <div class="package-control">
     @if (_ideState.currentPackage(); as package) {
-      <span class="package-details" [matTooltip]="'AP path: ' + package.directory">
-        @if (_ideState.inProgress()) {
-          <step-icon name="refresh-cw" class="spin-animation" />
-        } @else {
-          <step-icon name="file" />
-        }
-        <span class="package-name">{{ package.name }}</span>
-      </span>
       <button
         type="button"
-        class="package-icon-action package-configure"
+        class="package-details package-menu-trigger"
+        [matTooltip]="'AP path: ' + package.directory"
         [matMenuTriggerFor]="packageMenu"
-        matTooltip="Configure package"
-        aria-label="Configure package {{ package.name }}"
+        aria-label="Package actions for {{ package.name }}"
       >
-        <step-icon name="settings" />
+        <step-icon name="file" />
+        <span class="package-name">{{ package.name }}</span>
+        <step-icon name="chevron-down" class="package-chevron" />
       </button>
       <button
         type="button"
-        class="package-icon-action package-close"
-        matTooltip="Close package"
-        aria-label="Close package"
+        class="package-refresh"
+        matTooltip="Reload package"
+        aria-label="Reload package {{ package.name }}"
         [disabled]="_ideState.inProgress()"
-        (click)="_ideState.close()"
+        (click)="_ideState.reload()"
       >
-        <step-icon name="x" />
+        <step-icon name="refresh-cw" [class.spin-animation]="_ideState.inProgress()" />
       </button>
     } @else {
       <span class="package-details package-empty">

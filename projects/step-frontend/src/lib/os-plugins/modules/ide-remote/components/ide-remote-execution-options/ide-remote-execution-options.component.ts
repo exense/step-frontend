@@ -23,6 +23,7 @@ export class IdeRemoteExecutionOptionsComponent {
         options.push({ label, value: Array.isArray(value) ? value.join(', ') : String(value) });
       }
     };
+    add('Step user', request.connection?.stepUser);
     add('Library', request.library);
     if (!this.planExecution()) {
       add('Included plans', request.includePlans);
@@ -30,7 +31,10 @@ export class IdeRemoteExecutionOptionsComponent {
     add('Excluded plans', request.excludePlans);
     add('Included categories', request.includeCategories);
     add('Excluded categories', request.excludeCategories);
-    add('Wrap into test set', request.wrapIntoTestSet ? 'Yes' : undefined);
+    add(
+      'Wrap into test set',
+      request.wrapIntoTestSet === undefined ? undefined : request.wrapIntoTestSet ? 'Yes' : 'No',
+    );
     add('Threads', request.numberOfThreads);
     return options;
   });
