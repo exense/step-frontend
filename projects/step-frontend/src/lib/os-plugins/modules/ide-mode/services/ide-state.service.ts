@@ -173,7 +173,7 @@ export class IdeStateService {
             upgradeRequiredMessage === undefined
               ? of(result)
               : this._dialogs
-                  .showWarning(upgradeRequiredMessage, { confirmButtonLabel: 'Confirm' })
+                  .showWarning(upgradeRequiredMessage, { confirmButtonLabel: 'Upgrade' })
                   .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
           ),
         );
@@ -196,7 +196,10 @@ export class IdeStateService {
       return undefined;
     }
     const { errorName, errorMessage } = (body ?? {}) as { errorName?: string; errorMessage?: string };
-    return errorName && UPGRADE_REQUIRED_ERROR_NAMES.includes(errorName) ? (errorMessage ?? '') : undefined;
+    return errorName && UPGRADE_REQUIRED_ERROR_NAMES.includes(errorName)
+      ? errorMessage?.trim() ||
+          'This automation package needs a schema upgrade before it can be opened. Upgrade it now?'
+      : undefined;
   }
 
   private openPicker(title: string): Observable<FilePickerModalResult | undefined> {
