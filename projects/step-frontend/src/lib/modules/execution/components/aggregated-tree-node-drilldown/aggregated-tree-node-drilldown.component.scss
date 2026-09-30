@@ -5,6 +5,37 @@
 step-aggregated-tree-node-drilldown {
   background: var.$white;
 
+  step-stack-view {
+    background: var.$white;
+  }
+
+  step-split-gutter {
+    background: var.$white;
+  }
+
+  step-split-area {
+    > section > step-view-item > section,
+    > section > step-view-group > section {
+      background: var.$white;
+    }
+
+    &:first-of-type {
+      > section > step-view-item > section,
+      > section > step-view-group > section {
+        border-top-left-radius: 1rem;
+        border-bottom-left-radius: 1rem;
+      }
+    }
+
+    &:last-of-type {
+      > section > step-view-item > section,
+      > section > step-view-group > section {
+        border-top-right-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+      }
+    }
+  }
+
   .stack-view-title {
     display: flex;
     align-items: center;
