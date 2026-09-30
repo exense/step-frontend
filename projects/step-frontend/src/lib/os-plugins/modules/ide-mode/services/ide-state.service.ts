@@ -166,17 +166,21 @@ export class IdeStateService {
           return of(new HttpResponse({ body: null }));
         }),
       );
-      return this._ideApi
-        .useExistingAp(directory)
-        .pipe(
-          switchMap((result) =>
-            upgradeRequiredMessage === undefined
-              ? of(result)
-              : this._dialogs
-                  .showWarning(upgradeRequiredMessage, { confirmButtonLabel: 'Upgrade' })
-                  .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
-          ),
-        );
+      return this._ideApi.useExistingAp(directory).pipe(
+        switchMap((result) =>
+          upgradeRequiredMessage === undefined
+            ? of(result)
+            : this._dialogs
+                .showWarning(upgradeRequiredMessage, {
+                  confirmButtonLabel: 'Upgrade',
+                  confirmationMessage:
+                    'Upgrading will rewrite files in this automation package. This action cannot be undone in the IDE; make a backup before continuing.',
+                  maxWidth: 'min(600px, calc(100vw - 32px))',
+                  panelClass: 'step-compact-confirmation-dialog',
+                })
+                .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
+        ),
+      );
     });
   }
 
