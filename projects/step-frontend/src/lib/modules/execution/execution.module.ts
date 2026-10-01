@@ -65,6 +65,7 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { RECREATE_ON_EXECUTION_CHANGE } from './services/execution-route-reuse-strategy';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
@@ -657,6 +658,7 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
+          data: { [RECREATE_ON_EXECUTION_CHANGE]: true },
           providers: [
             AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
