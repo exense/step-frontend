@@ -7,20 +7,22 @@
   aria-describedby="ide-remote-target-tooltip"
 >
   <step-icon name="globe" />
-  @if (_defaults.loading()) {
-    <span>Loading…</span>
-  } @else if (target(); as target) {
+  <span class="remote-selection">
     <span class="remote-trigger-label">
-      @if (target.projectName) {
-        Project: {{ target.projectName }}
+      @if (_defaults.loading()) {
+        Loading…
+      } @else if (target(); as target) {
+        @if (target.projectName) {
+          Project: {{ target.projectName }}
+        } @else {
+          Remote configured
+        }
       } @else {
-        Remote configured
+        Not configured
       }
     </span>
-  } @else {
-    <span>Not configured</span>
-  }
-  <step-icon name="chevron-down" class="remote-chevron" />
+    <step-icon name="chevron-down" class="remote-chevron" />
+  </span>
 </button>
 <div id="ide-remote-target-tooltip" class="ide-remote-target-tooltip" role="tooltip">
   @if (_defaults.loading()) {

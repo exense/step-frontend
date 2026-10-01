@@ -9,8 +9,10 @@
         aria-label="Package actions for {{ package.name }}"
       >
         <step-icon name="file" />
-        <span class="package-name">{{ package.name }}</span>
-        <step-icon name="chevron-down" class="package-chevron" />
+        <span class="package-selection">
+          <span class="package-name">{{ package.name }}</span>
+          <step-icon name="chevron-down" class="package-chevron" />
+        </span>
       </button>
       <button
         type="button"
