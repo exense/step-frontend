@@ -65,7 +65,7 @@ step-file-picker-modal {
       text-align: left;
 
       &.selected {
-        background: var.$blue-15;
+        background: var(--step-accent-subtle-color, var.$blue-15);
       }
     }
   }

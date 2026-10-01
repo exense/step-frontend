@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Step Studio">
-  <rect width="64" height="64" rx="14" fill="#6248b5"/>
-  <text x="32" y="46" fill="#f3f0fc" font-family="Roboto, Arial, sans-serif" font-size="43" font-weight="700" text-anchor="middle">S</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Step Studio">
+  <g fill="#6248b5">
+    <circle cx="7" cy="16" r="4"/>
+    <circle cx="16" cy="16" r="4"/>
+    <circle cx="25" cy="16" r="4"/>
+  </g>
 </svg>

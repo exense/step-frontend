@@ -192,7 +192,7 @@ step-grid-layout-tabs {
     outline: none;
 
     &:focus {
-      border-color: var.$blue-600;
+      border-color: var(--step-accent-color, var.$blue-600);
     }
   }
 

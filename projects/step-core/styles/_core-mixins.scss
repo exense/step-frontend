@@ -68,7 +68,7 @@
   .unset-item {
     text-decoration: underline;
     font-style: italic;
-    color: var.$blue-650;
+    color: var(--step-accent-color, var.$blue-650);
     min-height: 3rem;
     font-size: 1.4rem;
     padding-left: calc(100% - 5rem);
@@ -81,7 +81,7 @@
     height: 4rem;
 
     &.active-list-item {
-      background: var.$blue-600 !important;
+      background: var(--step-accent-color, var.$blue-600) !important;
 
       .mdc-list-item__content,
       .mdc-list-item__content > .mdc-list-item__primary-text {

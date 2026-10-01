@@ -13,7 +13,7 @@
   position: relative;
   display: block;
   z-index: 1000;
-  background: var.$blue-700;
+  background: var(--step-surface-dark-color, var.$blue-700);
   color: var.$gray-200;
   padding: 1.5rem;
   transition: opacity 150ms ease-in-out;
@@ -43,7 +43,7 @@
 
   &.white-background {
     background: #fff;
-    color: var.$blue-700;
+    color: var(--step-text-color, var.$blue-700);
 
     &.right .step-popover__arrow,
     &.left .step-popover__arrow {
@@ -76,7 +76,7 @@
       left: 1.6rem;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-bottom: 8px solid var.$blue-700;
+      border-bottom: 8px solid var(--step-surface-dark-color, var.$blue-700);
       filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.12));
     }
   }
@@ -89,7 +89,7 @@
       right: 1.6rem;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-bottom: 8px solid var.$blue-700;
+      border-bottom: 8px solid var(--step-surface-dark-color, var.$blue-700);
       filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.12));
     }
   }
@@ -102,7 +102,7 @@
       right: 1.6rem;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-top: 8px solid var.$blue-700;
+      border-top: 8px solid var(--step-surface-dark-color, var.$blue-700);
       filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.12));
     }
   }
@@ -115,7 +115,7 @@
       left: 1.6rem;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-top: 8px solid var.$blue-700;
+      border-top: 8px solid var(--step-surface-dark-color, var.$blue-700);
       filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.12));
     }
   }
