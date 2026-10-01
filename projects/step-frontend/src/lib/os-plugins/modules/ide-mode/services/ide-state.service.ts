@@ -10,6 +10,7 @@ import {
   SelectionMode,
   IdeService,
   FilePickerModalResult,
+  IdeStateStrategy,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, defer, EMPTY, filter, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
@@ -25,7 +26,7 @@ const UPGRADE_REQUIRED_ERROR_NAMES = [
 @Injectable({
   providedIn: 'root',
 })
-export class IdeStateService {
+export class IdeStateService implements IdeStateStrategy {
   private _ideApi = inject(IdeService);
   private _dialogs = inject(DialogsService);
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);

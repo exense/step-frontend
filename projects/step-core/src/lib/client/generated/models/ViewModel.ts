@@ -4,6 +4,7 @@
 
 export type ViewModel = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   viewId?: string;
   executionId?: string;
   id?: string;

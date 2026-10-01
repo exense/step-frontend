@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, inject, ViewEncapsulation} from '@angular/core';
-import {CustomComponent, StepCoreModule} from '@exense/step-core';
-import {IdeStateService} from '../../services/ide-state.service';
-import {ApAccessHistoryService} from '../../services/ap-access-history.service';
+import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
+import { CustomComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { IdeStateService } from '../../services/ide-state.service';
+import { ApAccessHistoryService } from '../../services/ap-access-history.service';
 
 @Component({
   selector: 'step-ide-header-bar',
@@ -9,13 +9,12 @@ import {ApAccessHistoryService} from '../../services/ap-access-history.service';
   templateUrl: './ide-header-bar.component.html',
   styleUrl: './ide-header-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class IdeHeaderBarComponent implements CustomComponent {
-
   protected readonly _ideState = inject(IdeStateService);
   protected readonly _apAccessHistory = inject(ApAccessHistoryService);
+  protected readonly remoteDashlets = inject(ViewRegistryService).getDashlets('ide/bar/remote');
 
   context?: unknown;
-
 }

@@ -7,6 +7,7 @@ import type { PlanFilter } from './PlanFilter';
 
 export type AutomationPackageExecutionParameters = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   customParameters?: Record<string, string>;
   userID?: string;
