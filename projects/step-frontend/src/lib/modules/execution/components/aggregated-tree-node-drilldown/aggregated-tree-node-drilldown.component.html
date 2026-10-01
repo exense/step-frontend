@@ -166,13 +166,18 @@
             <span>Iterations of {{ $any(item).data.name }}</span>
           </div>
           <ng-container *stepStackViewItemTitle>
-            <step-alt-iteration-list-title [node]="$any(item).data" />
+            <step-alt-iteration-list-title
+              [node]="$any(item).data"
+              [selectedStatuses]="$any(item).searchStatuses"
+              (statusClick)="handleTitleStatusClick(item.id, $event.status)"
+            />
           </ng-container>
           <section *stepStackViewItemContent>
             <step-aggregated-tree-node-iteration-list
               [node]="$any(item).data!"
               [partialTreeRootNodeId]="$any(item).partialTreeRootNodeId"
-              [initialStatus]="$any(item).searchStatus"
+              [statusFilter]="$any(item).searchStatuses"
+              (statusFilterChange)="handleStatusFilterChange(item.id, $event)"
               (showDetails)="handleOpenDetails($event, item.id)"
             />
           </section>
