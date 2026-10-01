@@ -1,24 +1,34 @@
 import { inject, Injectable, Injector, signal, untracked } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import {
   AutomationPackageDescriptor,
+  DialogsService,
   FilePickerDataProviderService,
   FilePickerService,
   GlobalReloadService,
+  HttpOverrideResponseInterceptorService,
   SelectionMode,
   IdeService,
   FilePickerModalResult,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
+import { catchError, defer, EMPTY, filter, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ApAccessHistoryService } from './ap-access-history.service';
 import { ApFsDataProviderService } from './ap-fs-data-provider.service';
 import { CreatePackageDialogComponent } from '../components/create-package-dialog/create-package-dialog.component';
+
+const UPGRADE_REQUIRED_ERROR_NAMES = [
+  'LegacyAutomationPackageSchemaVersionSetException',
+  'NoAutomationPackageSchemaVersionSetException',
+];
 
 @Injectable({
   providedIn: 'root',
 })
 export class IdeStateService {
   private _ideApi = inject(IdeService);
+  private _dialogs = inject(DialogsService);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _reloadable = inject(GlobalReloadService);
   private _accessHistory = inject(ApAccessHistoryService);
   private _injector = inject(Injector);
@@ -104,7 +114,7 @@ export class IdeStateService {
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
-        switchMap(({ filePath }) => this._ideApi.useExistingAp(filePath)),
+        switchMap(({ filePath }) => this.useExistingAp(filePath)),
         switchMap(() => this._ideApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
@@ -119,8 +129,7 @@ export class IdeStateService {
 
   openFromPath(directory: string): void {
     this.inProgressInternal.set(true);
-    this._ideApi
-      .useExistingAp(directory)
+    this.useExistingAp(directory)
       .pipe(
         switchMap(() => this._ideApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
@@ -139,6 +148,62 @@ export class IdeStateService {
     if (directory && !this.inProgress()) {
       this.openFromPath(directory);
     }
+  }
+
+  /**
+   * A package of an older schema version, or declaring none, is only opened once the user confirmed its upgrade: the
+   * returned observable completes without emitting when the upgrade is declined
+   */
+  private useExistingAp(directory: string): Observable<unknown> {
+    return defer(() => {
+      let upgradeRequiredMessage: string | undefined;
+      this._interceptorOverride.overrideInterceptor(
+        catchError((error: unknown) => {
+          upgradeRequiredMessage = this.getUpgradeRequiredMessage(error);
+          if (upgradeRequiredMessage === undefined) {
+            throw error;
+          }
+          return of(new HttpResponse({ body: null }));
+        }),
+      );
+      return this._ideApi.useExistingAp(directory).pipe(
+        switchMap((result) =>
+          upgradeRequiredMessage === undefined
+            ? of(result)
+            : this._dialogs
+                .showWarning(upgradeRequiredMessage, {
+                  confirmButtonLabel: 'Upgrade',
+                  confirmationMessage:
+                    'Upgrading will rewrite files in this automation package. This action cannot be undone in Step Studio.',
+                  maxWidth: 'min(600px, calc(100vw - 32px))',
+                  panelClass: 'step-compact-confirmation-dialog',
+                })
+                .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
+        ),
+      );
+    });
+  }
+
+  private getUpgradeRequiredMessage(error: unknown): string | undefined {
+    if (!(error instanceof HttpErrorResponse)) {
+      return undefined;
+    }
+    let body: unknown = error.error;
+    try {
+      if (body instanceof ArrayBuffer) {
+        body = new TextDecoder('utf-8').decode(new Uint8Array(body));
+      }
+      if (typeof body === 'string') {
+        body = JSON.parse(body);
+      }
+    } catch {
+      return undefined;
+    }
+    const { errorName, errorMessage } = (body ?? {}) as { errorName?: string; errorMessage?: string };
+    return errorName && UPGRADE_REQUIRED_ERROR_NAMES.includes(errorName)
+      ? errorMessage?.trim() ||
+          'This automation package needs a schema upgrade before it can be opened. Upgrade it now?'
+      : undefined;
   }
 
   private openPicker(title: string): Observable<FilePickerModalResult | undefined> {
