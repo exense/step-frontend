@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
 :host {
   display: block;
 }
@@ -12,9 +14,28 @@ p {
 }
 
 summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   cursor: pointer;
   padding: 0.25rem 0;
-  font-weight: 600;
+  font-weight: 400;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.properties-chevron {
+  @include core.step-icon-size(12px);
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.cli-options[open] .properties-chevron {
+  transform: rotate(90deg);
 }
 
 .cli-options-content {

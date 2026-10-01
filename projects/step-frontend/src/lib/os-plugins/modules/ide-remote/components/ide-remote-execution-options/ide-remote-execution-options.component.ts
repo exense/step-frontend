@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { RemoteExecutionRequest } from '@exense/step-core';
+import { RemoteExecutionRequest, StepIconsModule } from '@exense/step-core';
 
 @Component({
   selector: 'step-ide-remote-execution-options',
   templateUrl: './ide-remote-execution-options.component.html',
   styleUrl: './ide-remote-execution-options.component.scss',
+  imports: [StepIconsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IdeRemoteExecutionOptionsComponent {

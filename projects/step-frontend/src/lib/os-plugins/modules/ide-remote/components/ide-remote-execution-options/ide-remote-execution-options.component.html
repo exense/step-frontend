@@ -1,6 +1,9 @@
 @if (request()) {
   <details class="cli-options">
-    <summary>Remote execution properties</summary>
+    <summary>
+      <step-icon name="chevron-right" class="properties-chevron" aria-hidden="true" />
+      <span>Remote execution properties</span>
+    </summary>
     <div class="cli-options-content">
       @if (options().length || parameters().length) {
         @for (option of options(); track option.label) {
