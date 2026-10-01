@@ -1,11 +1,36 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { CommonEntitiesUrlsService, ControllerService, Execution, PopoverMode } from '@exense/step-core';
-import { catchError, filter, map, of, shareReplay, startWith, switchMap, take } from 'rxjs';
+import {
+  CommonEntitiesUrlsService,
+  ControllerService,
+  Execution,
+  PopoverMode,
+  RepositoryObjectReference,
+} from '@exense/step-core';
+import { catchError, distinctUntilChanged, map, of, shareReplay, startWith, switchMap } from 'rxjs';
 
 interface RepositoryLinkItem {
   label: string;
   url: string;
+}
+
+function sameRepository(
+  previous: RepositoryObjectReference | undefined,
+  current: RepositoryObjectReference | undefined,
+): boolean {
+  if (!previous || !current) {
+    return previous === current;
+  }
+  if (previous.repositoryID !== current.repositoryID) {
+    return false;
+  }
+  const previousParameters = previous?.repositoryParameters ?? {};
+  const currentParameters = current?.repositoryParameters ?? {};
+  const previousKeys = Object.keys(previousParameters);
+  return (
+    previousKeys.length === Object.keys(currentParameters).length &&
+    previousKeys.every((key) => previousParameters[key] === currentParameters[key])
+  );
 }
 
 @Component({
@@ -55,9 +80,11 @@ export class AltExecutionRepositoryLinkComponent {
   });
 
   private readonly repositoryLinks$ = toObservable(this.externalLinkRepository).pipe(
-    filter((repository) => !!repository),
-    take(1),
+    distinctUntilChanged(sameRepository),
     switchMap((repository) => {
+      if (!repository) {
+        return of([] as RepositoryLinkItem[]);
+      }
       return this._controllerService.getArtefactLinks(repository).pipe(
         map((artefactLinks) =>
           (artefactLinks.links ?? [])
@@ -71,9 +98,9 @@ export class AltExecutionRepositoryLinkComponent {
             }),
         ),
         catchError(() => of([])),
+        startWith([] as RepositoryLinkItem[]),
       );
     }),
-    startWith([]),
     shareReplay(1),
   );
 
