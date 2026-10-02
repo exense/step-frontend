@@ -10,7 +10,7 @@ import {
 import { BehaviorSubject, catchError, filter, map, noop, Observable, retry, switchMap, take, throwError } from 'rxjs';
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { ConnectionError } from '../shared/connection-error';
-import { AlertsService, AlertType } from '@exense/step-core';
+import { AlertsService, AlertType, ErrorMessageHandlerService, SKIP_CONNECTION_RETRY } from '@exense/step-core';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
 
 const MSG_CONNECTION_ERROR =
@@ -24,6 +24,7 @@ export class ConnectionErrorInterceptor implements HttpInterceptor, OnDestroy {
   private _alerts = inject(AlertsService);
   private _http = inject(HttpClient);
   private _errorLogger = inject(HttpErrorLoggerService);
+  private _errorMessageHandler = inject(ErrorMessageHandlerService);
 
   private handledRequest$ = new BehaviorSubject<HttpRequest<any> | undefined>(undefined);
   private continue$ = this.handledRequest$.pipe(
@@ -41,6 +42,11 @@ export class ConnectionErrorInterceptor implements HttpInterceptor, OnDestroy {
     return next.handle(req).pipe(
       catchError((error) => {
         if (!(error instanceof ConnectionError) || req.context.has(CHECK_CONNECTION_REQUEST)) {
+          return throwError(() => error);
+        }
+
+        if (req.context.get(SKIP_CONNECTION_RETRY)) {
+          this._errorMessageHandler.showError(MSG_CONNECTION_ERROR);
           return throwError(() => error);
         }
 

@@ -1,0 +1,131 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ide-empty-state {
+  display: block;
+  min-height: 100%;
+  color: var.$white;
+
+  .ide-empty-content {
+    box-sizing: border-box;
+    width: min(100%, 76rem);
+    margin: 0 auto;
+    padding: clamp(12rem, 20vh, 20rem) 3rem 8rem;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2.8rem;
+    font-weight: 600;
+  }
+
+  .ide-empty-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.6rem;
+    margin-top: 3.2rem;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      min-width: 18rem;
+      min-height: 5.6rem;
+      padding: 1.2rem 2rem;
+      border: 1px solid rgb(255 255 255 / 65%);
+      border-radius: 0.8rem;
+      color: var.$white;
+      background: rgb(255 255 255 / 10%);
+      font: inherit;
+      font-size: 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover,
+      &:focus-visible {
+        background: rgb(255 255 255 / 20%);
+      }
+
+      step-icon {
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+  }
+
+  .ide-empty-progress {
+    margin: 3.2rem 0 0;
+    color: var.$gray-300;
+    font-size: 1.5rem;
+  }
+
+  .ide-recent-packages {
+    margin-top: 7.2rem;
+    text-align: left;
+
+    h2 {
+      margin: 0 0 1.2rem;
+      color: var.$gray-300;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      border: 1px solid rgb(255 255 255 / 24%);
+      border-radius: 0.8rem;
+      list-style: none;
+      overflow: hidden;
+    }
+
+    li + li {
+      border-top: 1px solid rgb(255 255 255 / 16%);
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      width: 100%;
+      min-height: 5.8rem;
+      padding: 1rem 1.6rem;
+      border: 0;
+      color: var.$white;
+      background: rgb(255 255 255 / 6%);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover,
+      &:focus-visible {
+        background: rgb(255 255 255 / 14%);
+      }
+
+      > step-icon:last-child {
+        margin-left: auto;
+        color: var.$gray-300;
+      }
+    }
+  }
+
+  .ide-recent-package-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+
+    strong,
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span {
+      color: var.$gray-300;
+      font-size: 1.2rem;
+    }
+  }
+}

@@ -1,0 +1,20 @@
+.remote-execution-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.remote-progress {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--step-accent-subtle-color, #b8d5e8);
+  border-radius: 0.5rem;
+  background: var(--step-accent-soft-color, #f3f8fb);
+}
+
+.remote-progress span {
+  color: var(--step-text-color, #667d8d);
+}

@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 #mainView {
   height: auto;
   max-height: 100%;
@@ -9,4 +11,33 @@
 
 .icon-bookmark {
   cursor: pointer;
+}
+
+:host .ide-empty-shell {
+  > step-sidebar,
+  > #project-select {
+    display: none;
+  }
+
+  #main.ide-empty-main {
+    margin-left: 0;
+  }
+
+  header.app-header::after {
+    display: none;
+  }
+
+  #step-main-scrollable-content.ide-empty-scroll {
+    padding-top: 0;
+    background: var(--step-surface-dark-color, var.$blue-700);
+  }
+
+  .ide-empty-view {
+    display: block;
+    min-height: 100%;
+  }
+}
+
+.main-workspace-content[hidden] {
+  display: none;
 }

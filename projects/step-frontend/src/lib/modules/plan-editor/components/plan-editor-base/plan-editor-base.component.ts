@@ -98,6 +98,7 @@ export interface ActionsConfig {
   ],
   standalone: false,
 })
+/* eslint-disable step-lint/component-public-fields -- This editor exposes its existing template API and implements injected editor service contracts. */
 export class PlanEditorBaseComponent
   implements
     OnInit,
@@ -184,8 +185,10 @@ export class PlanEditorBaseComponent
 
   private readonly initialPlanContextEffect = effect(() => {
     const context = this.initialPlanContext();
-    this.initializeContext(context ?? undefined, true);
-    this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(context?.id);
+    untracked(() => {
+      this.initializeContext(context ?? undefined, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(context?.id);
+    });
   });
 
   ngOnInit(): void {
@@ -444,3 +447,4 @@ export class PlanEditorBaseComponent
     this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }
+/* eslint-enable step-lint/component-public-fields */

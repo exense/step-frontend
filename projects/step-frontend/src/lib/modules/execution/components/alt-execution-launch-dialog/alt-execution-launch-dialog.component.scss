@@ -4,6 +4,33 @@ div[step-modal-window-body] {
   flex-direction: column;
 }
 
+.launch-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.launch-target-selector {
+  flex: 0 0 auto;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.testcase-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
 .artefact-info {
   gap: 1rem;
   & > section {
@@ -22,11 +49,15 @@ hr {
 }
 
 div[step-modal-window-body] {
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
 div[step-modal-window-buttons] {
   justify-content: space-between;
+
+  &.result-actions {
+    justify-content: flex-end;
+  }
 }
 
 .btn-group-close {
