@@ -1,8 +1,8 @@
 @if (_isIdeMode) {
   <step-alert class="scheduler-warning" [type]="AlertType.INFO">
     <span>
-      Schedules are never triggered here. Their active state is saved with the Automation Package and applies once it is
-      deployed to a Step instance.
+      Schedules are never triggered in the Studio. Their active state is saved with the Automation Package and applies
+      once it is deployed to a Step instance.
     </span>
   </step-alert>
 } @else if (isSchedulerDisabled()) {
