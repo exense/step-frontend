@@ -17,6 +17,9 @@
           {{ option.label }}
         </mat-checkbox>
       }
+      @if (!editMode()) {
+        <button type="button" mat-button mat-stroked-button (click)="resetDefaults()">Reset defaults</button>
+      }
     </section>
   </step-popover-content>
 </step-popover>
