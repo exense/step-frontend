@@ -39,7 +39,7 @@
   $size: calc(50% - 1.2rem);
   display: grid;
   grid-template-columns: $size $size;
-  column-gap: 2.4rem;
+  column-gap: 1.6rem;
   row-gap: 1.6rem;
   padding-bottom: 1.6rem;
 
@@ -50,8 +50,17 @@
 
 .dashlet {
   position: relative;
+  min-width: 0;
+  padding: 1.6rem;
+  background: var.$white;
   border: 1px solid var.$gray-200;
+  border-radius: 0.8rem;
+  overflow: hidden;
   transition: width 400ms ease-in-out;
+}
+
+.dashlet.chart-dashlet {
+  padding: 0.5rem;
 }
 
 .add-dashlet-container {
@@ -176,7 +185,8 @@ step-time-range-picker {
   gap: 1rem;
 }
 
-.full-width-grow {
+.full-width-grow,
+.dual-columns-container {
   flex-grow: 1;
   flex-basis: 0;
   min-width: 0;
