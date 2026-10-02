@@ -85,9 +85,11 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
 import { ChartSkeletonComponent } from './components/chart-skeleton/chart-skeleton.component';
 import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
+import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
 
 @NgModule({
   imports: [
+    NonIdeDirective,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -179,6 +181,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
     StrategyClickDirective,
   ],
   exports: [
+    NonIdeDirective,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

@@ -26,7 +26,7 @@
       entity="tasks"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
-      <step-btn-group class="import-export">
+      <step-btn-group *stepNonIde class="import-export">
         <a
           data-step-testid="import-schedule-btn"
           type="button"
@@ -239,6 +239,7 @@
       Delete schedule
     </button>
     <a
+      *stepNonIde
       data-step-testid="export-schedule-btn"
       mat-menu-item
       [disabled]="!('task-read' | hasRight | async)"

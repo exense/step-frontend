@@ -6,7 +6,7 @@
       entity="functions"
     />
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
-      <step-btn-group class="import-keyword-button-group">
+      <step-btn-group *stepNonIde class="import-keyword-button-group">
         <a
           data-step-testid="import-keyword-btn"
           type="button"
@@ -32,6 +32,7 @@
       </step-btn-group>
       <step-btn-group class="create-keyword-button-group">
         <a
+          *stepNonIde
           stepTestId="upload-package-btn"
           mat-flat-button
           color="primary"
@@ -110,7 +111,7 @@
             data-step-testid="execute-keyword-btn"
             mat-icon-button
             matTooltip="Execute keyword"
-            [disabled]="!('kw-execute' | hasRight | async)"
+            [disabled]="_isIdeMode || !('kw-execute' | hasRight | async)"
             (click)="executeFunction(element.id)"
           >
             <step-icon name="play" />
@@ -165,6 +166,7 @@
     </button>
 
     <a
+      *stepNonIde
       data-step-testid="export-keyword-btn"
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"

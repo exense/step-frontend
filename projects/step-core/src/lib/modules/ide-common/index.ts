@@ -1,4 +1,5 @@
 export * from './injectables/ide-mode.token';
+export * from './directives/non-ide.directive';
 export * from './injectables/ide-state-strategy.service';
 export * from './types/execution-commands-context.interface';
 export * from './types/execution-launch-dashlet-context';

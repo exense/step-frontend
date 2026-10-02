@@ -6,7 +6,7 @@
       entity="parameters"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-btn-group>
+      <step-btn-group *stepNonIde>
         <a
           data-step-testid="import-parameter-btn"
           mat-icon-button
@@ -30,6 +30,7 @@
       </step-btn-group>
       <step-btn-group class="create-button-group">
         <a
+          *stepNonIde
           stepTestId="upload-package-btn"
           mat-flat-button
           color="primary"

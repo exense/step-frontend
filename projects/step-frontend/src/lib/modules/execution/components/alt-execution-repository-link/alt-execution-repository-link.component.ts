@@ -54,6 +54,7 @@ export class AltExecutionRepositoryLinkComponent {
     const repository = execution.executionParameters?.repositoryObject;
 
     if (
+      execution.executionParameters?.isolatedExecution ||
       repository?.repositoryID === 'Artifact' ||
       repository?.repositoryParameters?.['wrapPlans'] === 'true' ||
       !execution?.planId
@@ -68,6 +69,7 @@ export class AltExecutionRepositoryLinkComponent {
     const execution = this.execution();
     const repository = execution.executionParameters?.repositoryObject;
     if (
+      execution.executionParameters?.isolatedExecution ||
       !execution.planId ||
       !repository ||
       repository.repositoryID === 'Artifact' ||
