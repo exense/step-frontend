@@ -35,6 +35,10 @@
       <step-icon name="external-link" />
     </a>
   }
+} @else if (planLinkDisabledReason(); as disabledReason) {
+  <span class="plan-link plan-link-disabled" [matTooltip]="disabledReason" matTooltipPosition="right">
+    <step-icon name="external-link" />
+  </span>
 }
 @if (automationPackageLinkParams(); as params) {
   <a

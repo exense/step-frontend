@@ -24,6 +24,18 @@
       >
         <step-icon name="refresh-cw" [class.spin-animation]="_ideState.inProgress()" />
       </button>
+      @if (package.warnings?.length) {
+        <button
+          type="button"
+          class="package-warning"
+          data-step-testid="ide-package-warnings-btn"
+          [matMenuTriggerFor]="warningsMenu"
+          aria-label="Warnings for package {{ package.name }}"
+        >
+          <step-icon name="alert-triangle" />
+          <span>Limited support</span>
+        </button>
+      }
     } @else {
       <span class="package-details package-empty">
         <step-icon name="file" />
@@ -60,6 +72,11 @@
       <step-icon name="x" />
       <span>Close package</span>
     </button>
+  }
+</mat-menu>
+<mat-menu #warningsMenu>
+  @for (warning of _ideState.currentPackage()?.warnings ?? []; track warning) {
+    <div class="step-ide-package-warning">{{ warning }}</div>
   }
 </mat-menu>
 <mat-menu #openMenu>
