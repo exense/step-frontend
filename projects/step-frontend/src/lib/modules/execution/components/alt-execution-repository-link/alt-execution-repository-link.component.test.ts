@@ -1,9 +1,11 @@
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import {
   ArtefactLinks,
+  AugmentedPlansService,
   CommonEntitiesUrlsService,
   ControllerService,
   Execution,
+  IDE_MODE,
   RepositoryObjectReference,
 } from '@exense/step-core';
 import { of, Subject } from 'rxjs';
@@ -31,6 +33,8 @@ describe('Execution plan navigation', () => {
       providers: [
         { provide: ControllerService, useValue: { getArtefactLinks } },
         { provide: CommonEntitiesUrlsService, useValue: { planEditorUrl: (id: string) => `/plans/${id}` } },
+        { provide: AugmentedPlansService, useValue: { findPlansByAttributes: () => of([]) } },
+        { provide: IDE_MODE, useValue: false },
       ],
     })
       .overrideComponent(AltExecutionRepositoryLinkComponent, {
