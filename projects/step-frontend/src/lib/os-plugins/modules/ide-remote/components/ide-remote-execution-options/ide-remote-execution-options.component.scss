@@ -1,0 +1,57 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  display: block;
+}
+
+.cli-options {
+  padding-top: 0.35rem;
+  border-top: 1px solid #d4e3ed;
+}
+
+p {
+  margin: 0;
+}
+
+summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  font-weight: 400;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.properties-chevron {
+  @include core.step-icon-size(12px);
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.cli-options[open] .properties-chevron {
+  transform: rotate(90deg);
+}
+
+.cli-options-content {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+p,
+.option span {
+  color: #667d8d;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
+}

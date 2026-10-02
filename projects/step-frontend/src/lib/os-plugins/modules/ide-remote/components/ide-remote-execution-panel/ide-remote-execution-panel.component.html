@@ -1,0 +1,28 @@
+@if (strategy(); as strategy) {
+  <section class="remote-execution-panel" aria-label="Remote execution">
+    @if (_defaults.executeTarget(); as target) {
+      <step-ide-remote-target [target]="target" label="">
+        @if (strategy.results() === undefined) {
+          <step-ide-remote-execution-options [request]="executionRequest()" [planExecution]="true" />
+        }
+      </step-ide-remote-target>
+    }
+    @if (strategy.results() !== undefined) {
+      <step-ide-remote-results [results]="strategy.results()" />
+    } @else {
+      @if (strategy.readinessError(); as error) {
+        <step-alert type="warning" role="status">{{ error }}</step-alert>
+      }
+      @if (strategy.submissionError(); as error) {
+        <step-alert type="danger" role="alert">{{ error }}</step-alert>
+      }
+      @if (strategy.busy()) {
+        <div class="remote-progress" role="status" aria-live="polite">
+          <strong>Starting the remote execution…</strong>
+          <span>Submitting this plan to the remote server.</span>
+          <mat-progress-bar mode="indeterminate" />
+        </div>
+      }
+    }
+  </section>
+}

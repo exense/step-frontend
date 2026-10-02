@@ -12,7 +12,7 @@ export class DialogRouteOpenStateService {
   private _doc = inject(DOCUMENT);
   private _router = inject(Router);
 
-  private isOpenInternal = signal(false);
+  private readonly isOpenInternal = signal(false);
   readonly isOpen = this.isOpenInternal.asReadonly();
 
   private effectOpenStateChange = effect(() => {

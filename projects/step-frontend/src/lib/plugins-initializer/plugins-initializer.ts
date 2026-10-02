@@ -10,11 +10,16 @@ const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
   // Add object like this {name: 'pluginName', entryPoint: 'pluginName/remoteEntry.js' }
 ];
 
+const ENTERPRISE_PLUGIN: MicrofrontendPluginDefinition = {
+  name: 'stepEnterpriseCore',
+  entryPoint: 'step-enterprise-core/remoteEntry.js',
+};
+
 // The entry point name for the OS plugins.
 // Should be ignored during the registration
 const DEFAULT_ENTRY_POINT = 'default';
 
-const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
+const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[] | undefined> => {
   let result: MicrofrontendPluginDefinition[] = [];
   try {
     const pluginsResponse = await fetch('rest/app/plugins');
@@ -36,8 +41,14 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
     if (ADDITIONAL_PLUGINS.length > 0) {
       result = [...result, ...ADDITIONAL_PLUGINS];
     }
+
+    const globalWindow = window as Window & { STEP_ENTERPRISE_MODE?: boolean };
+    if (globalWindow.STEP_ENTERPRISE_MODE && !result.some((plugin) => plugin.name === ENTERPRISE_PLUGIN.name)) {
+      result = [...result, ENTERPRISE_PLUGIN];
+    }
   } catch (e) {
     console.log('Fetch plugin definitions failed', e);
+    return undefined;
   }
   return result;
 };
@@ -50,6 +61,11 @@ const registerPlugins = () => {
   _globalIndicator.showMessage('Loading plugins...');
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
+    if (pluginDefinitions === undefined) {
+      _globalIndicator.showErrorMessage('Plugins load failed. Reload the page or contact an administrator.');
+      throw new Error('Plugins load failed');
+    }
+
     if (pluginDefinitions.length === 0) {
       return;
     }
@@ -67,12 +83,9 @@ const registerPlugins = () => {
     _registry.register(...pluginNames);
 
     _globalIndicator.showMessage('Initializing plugins...');
-    await Promise.all([
-      registerMicrofrontendPlugins(Array.from(entryPoints), _injector),
-      registerOsPlugins(_injector),
-    ]).then(() => {
-      _globalIndicator.showMessage('Starting Step...');
-    });
+    await registerOsPlugins(_injector);
+    await registerMicrofrontendPlugins(Array.from(entryPoints), _injector);
+    _globalIndicator.showMessage('Starting Step...');
   };
 };
 

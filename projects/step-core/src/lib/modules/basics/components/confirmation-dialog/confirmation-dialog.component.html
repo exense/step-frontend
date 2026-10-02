@@ -2,6 +2,9 @@
   <div step-modal-window-body>
     <form (submit)="onSubmit()">
       <step-alert [type]="AlertType.DANGER">{{ _dialogData.message }}</step-alert>
+      @if (_dialogData.confirmationMessage) {
+        <p class="confirmation-message">{{ _dialogData.confirmationMessage }}</p>
+      }
 
       <div class="dialog-actions">
         @if ((_dialogData.cancelButtonAppearance ?? 'stroked') === 'flat') {

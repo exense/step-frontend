@@ -16,7 +16,7 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);
   protected _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
-  protected abstract form: NgForm | FormGroup;
+  protected abstract form: NgForm | FormGroup | undefined;
 
   private artefactChangeSubscription?: Subscription;
 
@@ -36,7 +36,10 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
     this._artefactFormChangeHelper.setupFormBehavior(form, () => this.context.save());
   }
 
-  protected determineEmptyGroup(fields: DynamicValue[], emptyValues: SimpleValue[] = [undefined, null, '', 0, false]) {
+  protected determineEmptyGroup(
+    fields: DynamicValue[],
+    emptyValues: SimpleValue[] = [undefined, null, '', 0, false],
+  ): boolean {
     const extractValue = (field: DynamicValue): SimpleValue => {
       if (!this._dynamicValueUtils.isDynamicValue(field)) {
         return field as SimpleValue;
@@ -59,12 +62,13 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
   }
 
   private getFormGroup(): FormGroup | undefined {
-    if (!this.form) {
+    const form = this.form;
+    if (!form) {
       return undefined;
     }
-    if (this.form instanceof NgForm) {
-      return this.form.form;
+    if (form instanceof NgForm) {
+      return form.form;
     }
-    return this.form;
+    return form;
   }
 }

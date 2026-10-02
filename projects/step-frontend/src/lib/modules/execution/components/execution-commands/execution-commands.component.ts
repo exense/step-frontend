@@ -1,6 +1,5 @@
 import { Component, viewChild, ViewEncapsulation } from '@angular/core';
-import { CustomFormComponent } from '@exense/step-core';
-import { ExecutionCommandsContext } from '../../shared/execution-commands-context.interface';
+import { CustomFormComponent, ExecutionCommandsContext } from '@exense/step-core';
 import { ExecutionCommandsService } from '../../services/execution-commands.service';
 import { ExecutionCommandsDirective } from '../../directives/execution-commands.directive';
 
@@ -14,8 +13,9 @@ import { ExecutionCommandsDirective } from '../../directives/execution-commands.
 })
 export class ExecutionCommandsComponent extends ExecutionCommandsDirective implements ExecutionCommandsContext {
   /** @ViewChild() **/
-  private customForms = viewChild(CustomFormComponent);
+  private readonly customForms = viewChild(CustomFormComponent);
 
+  // eslint-disable-next-line step-lint/component-public-fields -- The override implements the public execution context contract.
   override getCustomForms(): CustomFormComponent | undefined {
     return this.customForms();
   }

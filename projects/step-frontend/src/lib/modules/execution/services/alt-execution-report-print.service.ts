@@ -12,9 +12,9 @@ export class AltExecutionReportPrintService implements OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _inProgress$ = inject(ALT_EXECUTION_REPORT_IN_PROGRESS).pipe(takeUntilDestroyed());
 
-  private handleAfterPrint = () => this.afterPrint();
+  private handleAfterPrint = (): void => this.afterPrint();
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this._doc.defaultView?.removeEventListener('afterprint', this.handleAfterPrint);
   }
 

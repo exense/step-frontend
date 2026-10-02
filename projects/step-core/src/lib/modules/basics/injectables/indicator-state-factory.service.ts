@@ -15,7 +15,7 @@ class IndicatorStateImpl implements IndicatorState {
 
   private timerId?: number;
   private hideRequested = false;
-  private isVisibleInternal = signal(false);
+  private readonly isVisibleInternal = signal(false);
   readonly isVisible = this.isVisibleInternal.asReadonly();
 
   show(): void {

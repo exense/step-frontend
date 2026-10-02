@@ -65,6 +65,13 @@
             "development": {
               "target": "@exense/step-app:esbuild:development",
               "dev": true
+            },
+            "dev-ide": {
+              "target": "@exense/step-app:esbuild:development,dev-ide",
+              "dev": true
+            },
+            "prod-ide": {
+              "target": "@exense/step-app:esbuild:production,prod-ide"
             }
           },
           "defaultConfiguration": "production"
@@ -77,6 +84,12 @@
             },
             "local": {
               "target": "@exense/step-app:serve-original:local"
+            },
+            "ide": {
+              "target": "@exense/step-app:serve-original:ide"
+            },
+            "local-ide": {
+              "target": "@exense/step-app:serve-original:local-ide"
             },
             "prod": {
               "target": "@exense/step-app:serve-original:production"
@@ -177,6 +190,26 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "dev-ide": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/step-app/src/environments/environment.ts",
+                  "with": "projects/step-app/src/environments/environment.ide.ts"
+                }
+              ]
+            },
+            "prod-ide": {
+              "outputPath": {
+                "base": "dist/step-ide",
+                "browser": ""
+              },
+              "fileReplacements": [
+                {
+                  "replace": "projects/step-app/src/environments/environment.ts",
+                  "with": "projects/step-app/src/environments/environment.ide.prod.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -193,6 +226,14 @@
             },
             "local": {
               "buildTarget": "@exense/step-app:esbuild:development",
+              "proxyConfig": "projects/step-app/proxy-local.conf.json"
+            },
+            "ide": {
+              "buildTarget": "@exense/step-app:esbuild:development,dev-ide",
+              "proxyConfig": "projects/step-app/proxy.conf.json"
+            },
+            "local-ide": {
+              "buildTarget": "@exense/step-app:esbuild:development,dev-ide",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },

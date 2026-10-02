@@ -13,6 +13,7 @@
         routerLinkActive
         #rla="routerLinkActive"
         [active]="rla.isActive"
+        [matTooltip]="tab.tooltip"
       >
         <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />
       </a>
@@ -26,6 +27,7 @@
         mat-tab-link
         stepTestId="tab-selector-{{ tab.id }}"
         [active]="tab.id === activeTabId()"
+        [matTooltip]="tab.tooltip"
         (click)="selectTab(tab); (false)"
       >
         <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />

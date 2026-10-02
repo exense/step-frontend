@@ -22,8 +22,8 @@
     @if (_planEditorService.planContext(); as planContext) {
       <step-plan-editor-actions
         [planContext]="planContext"
-        [showExecuteButton]="actionsConfig?.showExecuteButton"
-        [showExportSourceButton]="actionsConfig?.showExportSourceButton"
+        [showExecuteButton]="actionsConfig()?.showExecuteButton"
+        [showExportSourceButton]="actionsConfig()?.showExportSourceButton"
         [hasUndo]="_planEditorService.hasUndo()"
         [hasRedo]="_planEditorService.hasRedo()"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
@@ -58,7 +58,7 @@
         (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
       >
         <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true" />
-        <div class="tab-content" [ngSwitch]="selectedTab">
+        <div class="tab-content">
           @switch (selectedTab) {
             @case ('controls') {
               <step-plan-artefact-list (onSelection)="addControl($event)" />

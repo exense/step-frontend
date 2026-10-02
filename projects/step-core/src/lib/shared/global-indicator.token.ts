@@ -5,6 +5,7 @@ export interface GlobalIndicator {
   showMessage(message: string): void;
   setFallbackMessage(fallbackMessage: string): void;
   setFallbackMessageTimeout(timeout: number): void;
+  showErrorMessage(message: string): void;
 }
 
 class FallbackGlobalIndicator implements GlobalIndicator {
@@ -12,6 +13,7 @@ class FallbackGlobalIndicator implements GlobalIndicator {
   showMessage(message: string): void {}
   setFallbackMessage(fallbackMessage: string): void {}
   setFallbackMessageTimeout(timeout: number): void {}
+  showErrorMessage(message: string): void {}
 }
 
 export const GLOBAL_INDICATOR = new InjectionToken<GlobalIndicator>('Global indicator', {

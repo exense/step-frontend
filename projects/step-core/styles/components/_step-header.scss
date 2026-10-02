@@ -30,7 +30,7 @@ $default-color: dc.default-colors();
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      height: 3.2rem;
+      min-height: 3.2rem;
     }
 
     .app-header-nav {

@@ -1,35 +1,44 @@
-<section>
+<section [class.ide-empty-shell]="isIdeEmpty()">
   <step-dashlet id="project-select" itemKey="projectSelect" />
   <step-sidebar />
-  <div id="main">
+  <div id="main" [class.ide-empty-main]="isIdeEmpty()">
     <header class="app-header">
       <section class="content">
-        <div></div>
-        <div class="app-header-nav">
-          @for (item of navBarRightMenuItems; track item.id) {
-            <step-dashlet [itemKey]="item.template" />
-          }
-          <a class="icon-bookmark" (click)="addBookmark()">
-            <step-icon [matTooltip]="'Bookmark this view'" name="bookmark" />
-          </a>
-          <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
-            <step-icon name="user" />
-            @if (_authService.context$ | async; as ctx) {
-              {{ ctx.userID }} [{{ ctx.role }}]
+        @if (ideBar) {
+          <step-dashlet class="ide-bar" [itemKey]="ideBar.template" />
+        } @else {
+          <div></div>
+          <div class="app-header-nav">
+            @for (item of navBarRightMenuItems; track item.id) {
+              <step-dashlet [itemKey]="item.template" />
             }
-          </a>
-        </div>
+            <a class="icon-bookmark" (click)="addBookmark()">
+              <step-icon [matTooltip]="'Bookmark this view'" name="bookmark" />
+            </a>
+            <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
+              <step-icon name="user" />
+              @if (_authService.context$ | async; as ctx) {
+                {{ ctx.userID }} [{{ ctx.role }}]
+              }
+            </a>
+          </div>
+        }
       </section>
     </header>
-    <div #mainScrollableContent id="step-main-scrollable-content" cdkScrollable>
-      <step-info-banner />
-      <step-dashlet id="project-alerts" itemKey="projectAlerts" />
-      @for (alert of adminAlerts; track alert.id) {
-        <step-dashlet [itemKey]="alert.template" />
+    <div #mainScrollableContent id="step-main-scrollable-content" [class.ide-empty-scroll]="isIdeEmpty()" cdkScrollable>
+      @if (isIdeEmpty() && ideEmptyView) {
+        <step-dashlet class="ide-empty-view" [itemKey]="ideEmptyView.template" />
       }
-      <step-alerts-container />
-      <div id="mainView">
-        <router-outlet />
+      <div class="main-workspace-content" [hidden]="isIdeEmpty()">
+        <step-info-banner />
+        <step-dashlet id="project-alerts" itemKey="projectAlerts" />
+        @for (alert of adminAlerts; track alert.id) {
+          <step-dashlet [itemKey]="alert.template" />
+        }
+        <step-alerts-container />
+        <div id="mainView">
+          <router-outlet />
+        </div>
       </div>
     </div>
   </div>

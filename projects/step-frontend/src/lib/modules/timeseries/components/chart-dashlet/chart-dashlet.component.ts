@@ -206,6 +206,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     return groupingSelection;
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by the public ChartDashlet contract.
   public refresh(blur?: boolean): Observable<any> {
     if (blur) {
       this.chart()?.setBlur(true);
@@ -456,14 +457,17 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnDes
     this.syncGroupSubscription?.unsubscribe();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by the public ChartDashlet contract.
   public getType(): 'TABLE' | 'CHART' {
     return 'CHART';
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by the public ChartDashlet contract.
   public getContext(): TimeSeriesContext {
     return this.context();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by the public ChartDashlet contract.
   public getItem(): DashboardItem {
     return this.item();
   }

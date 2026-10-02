@@ -9,6 +9,7 @@ export type ReportLayout = {
   visibility?: 'Preset' | 'Private' | 'Shared';
   reportType?: 'SingleExecution' | 'CrossExecution';
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   creationDate?: string;
   creationUser?: string;

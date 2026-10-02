@@ -20,7 +20,7 @@ export class TraceViewerComponent {
 
   private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
-  private traceViewerUrl = computed(() => {
+  private readonly traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
     const finalUrl = !reportUrl
       ? this.traceViewerPath

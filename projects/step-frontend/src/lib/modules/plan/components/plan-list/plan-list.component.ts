@@ -11,6 +11,7 @@ import {
   tableColumnsConfigProvider,
   ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
+  IDE_MODE,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
 import { SchedulerInvokerService } from '../../../execution/services/scheduler-invoker.service';
@@ -45,6 +46,7 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
+  readonly _isIdeMode = inject(IDE_MODE);
 
   readonly _plansApiService = inject(AugmentedPlansService);
 

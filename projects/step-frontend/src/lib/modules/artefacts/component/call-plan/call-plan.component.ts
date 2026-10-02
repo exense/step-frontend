@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import {
   ArtefactFormChangeHelperService,
   AugmentedPlansService,
@@ -7,6 +7,7 @@ import {
   LinkProcessorService,
   Plan,
   PlanDialogsService,
+  PlanReferencePolicyService,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { from, map } from 'rxjs';
@@ -26,14 +27,22 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   private _linkProcessor = inject(LinkProcessorService);
   private _dialogs = inject(DialogsService);
   private _router = inject(Router);
+  private _planReferencePolicy = inject(PlanReferencePolicyService);
 
   planName = '';
   planProject = '';
+  protected isReferencedPlanActionDisabled = false;
 
-  @ViewChild('form')
-  form!: NgForm;
+  protected readonly formReference = viewChild<NgForm>('form');
+
+  protected get form(): NgForm | undefined {
+    return this.formReference();
+  }
 
   selectPlan(): void {
+    if (this.isReferencedPlanActionDisabled) {
+      return;
+    }
     this._planDialogs.selectPlan().subscribe((plan) => {
       this.context.artefact!.planId = plan.id;
       this.savePlanAttributes(plan);
@@ -43,7 +52,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   }
 
   gotoPlan(): void {
-    if (!this.context.artefact?.planId) {
+    if (!this.context.artefact?.planId || this.isReferencedPlanActionDisabled) {
       return;
     }
     from(this._linkProcessor.process(this.planProject))
@@ -54,8 +63,9 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
       });
   }
 
-  override contextChange() {
+  override contextChange(): void {
     super.contextChange();
+    this.isReferencedPlanActionDisabled = !this._planReferencePolicy.canChangeReferencedPlan(this.context.artefact);
     this.loadPlan();
   }
 

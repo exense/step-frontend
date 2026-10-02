@@ -1,0 +1,114 @@
+<button
+  type="button"
+  class="remote-trigger"
+  [class.remote-trigger-muted]="!_ideState.currentPackage() || !target()"
+  [matMenuTriggerFor]="remoteMenu"
+  aria-label="Remote target options"
+  aria-describedby="ide-remote-target-tooltip"
+>
+  <step-icon name="globe" />
+  <span class="remote-selection">
+    <span class="remote-trigger-label">
+      @if (_defaults.loading()) {
+        Loading…
+      } @else if (target(); as target) {
+        @if (target.projectName) {
+          Project: {{ target.projectName }}
+        } @else {
+          Remote configured
+        }
+      } @else {
+        Not configured
+      }
+    </span>
+    <step-icon name="chevron-down" class="remote-chevron" />
+  </span>
+</button>
+<div id="ide-remote-target-tooltip" class="ide-remote-target-tooltip" role="tooltip">
+  @if (_defaults.loading()) {
+    <span>Loading remote configuration…</span>
+  } @else if (target(); as target) {
+    <p>Deploying or executing APs remotely will use this server as the target.</p>
+    <dl>
+      <div>
+        <dt>URL</dt>
+        <dd>{{ target.url }}</dd>
+      </div>
+      @if (target.projectName) {
+        <div>
+          <dt>Project</dt>
+          <dd>{{ target.projectName }}</dd>
+        </div>
+      }
+    </dl>
+  } @else {
+    <span>No remote configured. Configure a remote target to use remote operations.</span>
+  }
+</div>
+
+<mat-menu #remoteMenu class="ide-remote-menu">
+  <div class="ide-remote-menu-details">
+    @if (target(); as target) {
+      <strong>Remote target</strong>
+      <span class="ide-remote-menu-url">{{ target.url }}</span>
+      @if (target.projectName) {
+        <span>Project: {{ target.projectName }}</span>
+      }
+    } @else if (_defaults.loading()) {
+      <span>Loading remote configuration…</span>
+    } @else if (_defaults.error(); as error) {
+      <span>{{ error }}</span>
+    } @else {
+      <strong>No remote configured</strong>
+      <span>Configure a remote target to use remote operations.</span>
+    }
+    @if (menuHint(); as hint) {
+      <span class="ide-remote-menu-hint" role="status">{{ hint }}</span>
+    }
+  </div>
+  <mat-divider />
+  <button type="button" mat-menu-item [disabled]="!canDeploy()" (click)="openOperation('DEPLOY')">
+    <step-icon name="upload" />
+    <span>Deploy Automation Package</span>
+  </button>
+  <button type="button" mat-menu-item [disabled]="!canExecute()" (click)="openOperation('EXECUTE')">
+    <step-icon name="play" />
+    <span>Execute Automation Package</span>
+  </button>
+  <mat-divider />
+  <button type="button" mat-menu-item [matMenuTriggerFor]="configurationMenu">
+    <step-icon name="settings" />
+    <span>Configure remote…</span>
+  </button>
+</mat-menu>
+
+<mat-menu #configurationMenu class="ide-remote-menu ide-remote-config-menu">
+  <div class="ide-remote-menu-details">
+    <strong>Configure remote</strong>
+    <ol class="ide-remote-configuration-steps">
+      <li>
+        <span class="ide-remote-step-number" aria-hidden="true">1.</span>
+        <div class="ide-remote-step-description">
+          <span>Configure your remote server in <code>~/stepcli.properties</code>.</span>
+          @for (item of configurationDashlets; track item.id) {
+            <step-dashlet [itemKey]="item.template" />
+          }
+        </div>
+      </li>
+      <li>
+        <span class="ide-remote-step-number" aria-hidden="true">2.</span>
+        <span>Restart Step Studio to apply the CLI property changes.</span>
+      </li>
+    </ol>
+  </div>
+  <mat-divider />
+  <a
+    mat-menu-item
+    href="https://step.dev/knowledgebase/devops/automation-package-cli/step-cli/#cli-configuration-files"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <step-icon name="external-link" />
+    <span>CLI configuration guide</span>
+  </a>
+</mat-menu>

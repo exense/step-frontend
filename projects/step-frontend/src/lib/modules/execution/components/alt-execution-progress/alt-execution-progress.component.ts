@@ -44,6 +44,9 @@ import {
   Execution,
   EXECUTION_REPORT_GRID,
   ExecutionCloseHandleService,
+  EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
+  ExecutionReportStaticLayoutRegistryService,
   GRID_ELEMENT_HEADER_ACTIONS,
   GridEditableService,
   GridPersistenceStateService,
@@ -240,6 +243,7 @@ export class AltExecutionProgressComponent
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _staticLayouts = inject(ExecutionReportStaticLayoutRegistryService);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _plansApi = inject(AugmentedPlansService);
@@ -259,6 +263,10 @@ export class AltExecutionProgressComponent
   protected readonly isLayoutEditMode = inject(GridEditableService).editMode;
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
+  protected readonly isCompactReport = !!this._staticLayouts.get(
+    (this._activatedRoute.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
+      (this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined),
+  )?.compactHeader;
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -291,7 +299,10 @@ export class AltExecutionProgressComponent
 
   readonly executionId$ = this._activeExecutionContext.executionId$.pipe(shareReplay(1), takeUntilDestroyed());
 
-  readonly activeExecution$ = this._activeExecutionContext.activeExecution$.pipe(shareReplay(1), takeUntilDestroyed());
+  protected readonly activeExecution$ = this._activeExecutionContext.activeExecution$.pipe(
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((active) => active.execution$),
@@ -347,14 +358,14 @@ export class AltExecutionProgressComponent
     this.updateTimeRangeSelection(selection);
   }
 
-  readonly executionPlan$ = this.execution$.pipe(
+  protected readonly executionPlan$ = this.execution$.pipe(
     map((execution) => execution.planId),
     switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
-  readonly resolvedParameters$ = this.execution$.pipe(
+  protected readonly resolvedParameters$ = this.execution$.pipe(
     map((execution) => {
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
@@ -399,11 +410,11 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
-  readonly displayStatus$ = this.execution$.pipe(
+  protected readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
   );
 
-  readonly isFullRangeSelected$ = this.timeRangeSelection$.pipe(
+  protected readonly isFullRangeSelected$ = this.timeRangeSelection$.pipe(
     map((selection) => {
       return selection.type === 'FULL';
     }),
@@ -427,9 +438,9 @@ export class AltExecutionProgressComponent
     shareReplay(1),
   ) as Observable<TimeRangeExt>;
 
-  readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
+  protected readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
 
-  readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
+  protected readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
   readonly testCases$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TEST_CASES_TABLE),
@@ -864,11 +875,11 @@ export class AltExecutionProgressComponent
       });
   }
 
-  relaunchExecution(): void {
+  protected relaunchExecution(): void {
     this._router.navigate([{ outlets: { modal: ['launch'] } }], { relativeTo: this._activatedRoute });
   }
 
-  manualRefresh(): void {
+  protected manualRefresh(): void {
     this._activeExecutionContext.manualRefresh();
   }
 

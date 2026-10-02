@@ -1,0 +1,28 @@
+@if (rows(); as rows) {
+  @if (rows.length === 0 && results() !== undefined) {
+    <step-alert type="warning" role="status">No remote executions were returned.</step-alert>
+  } @else {
+    <div class="result-list">
+      @for (row of rows; track row.key) {
+        <div class="result-item">
+          <strong>{{ row.label }}</strong>
+          @if (row.url; as url) {
+            <a
+              [href]="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open {{ row.label }} on the remote server"
+            >
+              View execution on remote server <span aria-hidden="true">↗</span>
+            </a>
+          } @else {
+            <span class="result-status">{{ row.status }}</span>
+          }
+        </div>
+      }
+    </div>
+    @if (results() !== undefined && missingUrls()) {
+      <step-alert type="warning" role="status">Some remote executions have no result URL.</step-alert>
+    }
+  }
+}

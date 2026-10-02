@@ -8,7 +8,7 @@ import {
 } from '../../../client/step-client-module';
 import { Router } from '@angular/router';
 import { AdditionalRightRuleService } from './additional-right-rule.service';
-import { GlobalReloadService, Reloadable, SESSION_STORAGE } from '../../basics/step-basics.module';
+import { GlobalReloadService, IDE_MODE, Reloadable, SESSION_STORAGE } from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
 import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
@@ -31,6 +31,7 @@ export class AuthService implements OnDestroy, Reloadable {
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
   private _globalReloadService = inject(GlobalReloadService);
+  private _isIdeMode = inject(IDE_MODE);
 
   private triggerRightCheckInternal$ = new BehaviorSubject<unknown>(undefined);
 
@@ -42,7 +43,7 @@ export class AuthService implements OnDestroy, Reloadable {
 
   readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
-  private isOidcInternal = signal(false);
+  private readonly isOidcInternal = signal(false);
   readonly isOidc = this.isOidcInternal.asReadonly();
 
   readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
@@ -76,7 +77,7 @@ export class AuthService implements OnDestroy, Reloadable {
     this.triggerRightCheck();
   }
 
-  private setContext(context: AuthContext) {
+  private setContext(context: AuthContext): void {
     this.contextInternal$.next(context);
   }
 
@@ -143,13 +144,17 @@ export class AuthService implements OnDestroy, Reloadable {
 
   hasRight(right: string, injector?: Injector, ignoreEntity?: boolean): boolean {
     const conf = this.getConf();
-    if (!!conf && !conf.authentication) {
+    if (!!conf && !conf.authentication && !this._isIdeMode) {
       return true;
     }
 
     const additionalRulesCheckResult = this._additionalRightRules.checkRight(right, injector, ignoreEntity);
     if (!additionalRulesCheckResult) {
       return false;
+    }
+
+    if (this._isIdeMode) {
+      return true;
     }
 
     const context = this.contextInternal$.value;

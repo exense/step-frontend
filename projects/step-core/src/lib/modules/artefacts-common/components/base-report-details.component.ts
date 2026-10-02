@@ -11,11 +11,11 @@ export abstract class BaseReportDetailsComponent<R extends ReportNode> implement
   protected _formatter = inject(JsonViewerFormatterService);
   protected _clipboard = inject(DOCUMENT).defaultView?.navigator?.clipboard;
 
-  private contextInternal = signal<R | undefined>(undefined);
+  private readonly contextInternal = signal<R | undefined>(undefined);
 
   protected node = this.contextInternal.asReadonly();
 
-  contextChange(previousContext?: R, currentContext?: R) {
+  contextChange(previousContext?: R, currentContext?: R): void {
     this.contextInternal.set(currentContext);
   }
 
