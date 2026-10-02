@@ -1,3 +1,8 @@
+.plan-link-disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .plan-links-popover {
   display: flex;
   flex-direction: column;
