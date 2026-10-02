@@ -11,12 +11,15 @@ import {
   IdeService,
   FilePickerModalResult,
   IdeStateStrategy,
+  DEFAULT_PAGE,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
-import { catchError, defer, EMPTY, filter, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, defer, EMPTY, filter, finalize, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ApAccessHistoryService } from './ap-access-history.service';
 import { ApFsDataProviderService } from './ap-fs-data-provider.service';
 import { CreatePackageDialogComponent } from '../components/create-package-dialog/create-package-dialog.component';
+import { IDE_HOME_ROUTE } from '../shared/ide-home-route';
 
 const UPGRADE_REQUIRED_ERROR_NAMES = [
   'LegacyAutomationPackageSchemaVersionSetException',
@@ -34,6 +37,8 @@ export class IdeStateService implements IdeStateStrategy {
   private _accessHistory = inject(ApAccessHistoryService);
   private _injector = inject(Injector);
   private _matDialog = inject(MatDialog);
+  private readonly _router = inject(Router);
+  private readonly _defaultPage = inject(DEFAULT_PAGE);
 
   private filePickerInjector = Injector.create({
     providers: [
@@ -58,6 +63,9 @@ export class IdeStateService implements IdeStateStrategy {
   private setPackage(automationPackage: AutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
+    if (automationPackage && this._router.url === `/${IDE_HOME_ROUTE}`) {
+      void this._router.navigateByUrl(this._defaultPage(true));
+    }
   }
 
   get hasPackage(): boolean {
@@ -80,9 +88,12 @@ export class IdeStateService implements IdeStateStrategy {
 
   close(): void {
     this.inProgressInternal.set(true);
-    this._ideApi
-      .closeAp()
-      .pipe(finalize(() => this.inProgressInternal.set(false)))
+    from(this._router.navigateByUrl(`/${IDE_HOME_ROUTE}`, { replaceUrl: true }))
+      .pipe(
+        filter((navigated) => navigated),
+        switchMap(() => this._ideApi.closeAp()),
+        finalize(() => this.inProgressInternal.set(false)),
+      )
       .subscribe(() => this.setPackage(undefined));
   }
 
