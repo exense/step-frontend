@@ -9,6 +9,7 @@ import {
   FilterConditionFactoryService,
   tableColumnsConfigProvider,
   entitySelectionStateProvider,
+  IDE_MODE,
 } from '@exense/step-core';
 import { filter, switchMap } from 'rxjs';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
@@ -36,7 +37,8 @@ export class ParameterListComponent implements DialogParentService, OnInit {
   private _dialogs = inject(DialogsService);
   private _parametersService = inject(AugmentedParametersService);
   private _dialogCommunicationService = inject(DialogCommunicationService);
-  private destroyRef = inject(DestroyRef);
+  private _destroyRef = inject(DestroyRef);
+  protected readonly _isIdeMode = inject(IDE_MODE);
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
@@ -45,7 +47,7 @@ export class ParameterListComponent implements DialogParentService, OnInit {
   readonly dataSource = this._parametersService.createDataSource();
 
   ngOnInit(): void {
-    this._dialogCommunicationService.dialogAction$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+    this._dialogCommunicationService.dialogAction$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
       this.dataSource.reload();
     });
   }

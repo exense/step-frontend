@@ -6,42 +6,46 @@
       entity="functions"
     />
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
-      <step-btn-group class="import-keyword-button-group">
-        <a
-          data-step-testid="import-keyword-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Import keyword"
-          matTooltipPosition="below"
-          [disabled]="!('kw-write' | hasRight | async)"
-          routerLink="/functions/import"
-        >
-          <step-icon name="download" />
-        </a>
-        <a
-          data-step-testid="export-keywords-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Export all keywords"
-          matTooltipPosition="below"
-          [disabled]="!('kw-read' | hasRight | async)"
-          routerLink="/functions/export/all"
-        >
-          <step-icon name="upload" />
-        </a>
-      </step-btn-group>
+      @if (!_isIdeMode) {
+        <step-btn-group class="import-keyword-button-group">
+          <a
+            data-step-testid="import-keyword-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Import keyword"
+            matTooltipPosition="below"
+            [disabled]="!('kw-write' | hasRight | async)"
+            routerLink="/functions/import"
+          >
+            <step-icon name="download" />
+          </a>
+          <a
+            data-step-testid="export-keywords-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Export all keywords"
+            matTooltipPosition="below"
+            [disabled]="!('kw-read' | hasRight | async)"
+            routerLink="/functions/export/all"
+          >
+            <step-icon name="upload" />
+          </a>
+        </step-btn-group>
+      }
       <step-btn-group class="create-keyword-button-group">
-        <a
-          stepTestId="upload-package-btn"
-          mat-flat-button
-          color="primary"
-          class="header-btn"
-          matTooltip="Add entities by uploading an Automation Package"
-          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
-          routerLink="/automation-package/list/upload/new/"
-        >
-          Upload Package
-        </a>
+        @if (!_isIdeMode) {
+          <a
+            stepTestId="upload-package-btn"
+            mat-flat-button
+            color="primary"
+            class="header-btn"
+            matTooltip="Add entities by uploading an Automation Package"
+            [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+            routerLink="/automation-package/list/upload/new/"
+          >
+            Upload Package
+          </a>
+        }
         <a
           data-step-testid="new-keyword-btn"
           type="button"
@@ -109,9 +113,10 @@
           <button
             data-step-testid="execute-keyword-btn"
             mat-icon-button
-            matTooltip="Execute keyword"
-            [disabled]="!('kw-execute' | hasRight | async)"
-            (click)="executeFunction(element.id)"
+            [matTooltip]="_isIdeMode ? 'Executing a keyword is not yet supported in the Studio' : 'Execute keyword'"
+            [disabled]="_isIdeMode || !('kw-execute' | hasRight | async)"
+            [disabledInteractive]="_isIdeMode"
+            (click)="!_isIdeMode && executeFunction(element.id)"
           >
             <step-icon name="play" />
           </button>
@@ -164,15 +169,17 @@
       Duplicate keyword
     </button>
 
-    <a
-      data-step-testid="export-keyword-btn"
-      mat-menu-item
-      [disabled]="!('kw-read' | hasRight | async)"
-      [routerLink]="['/', 'functions', 'export', element.id]"
-    >
-      <step-icon name="upload" />
-      Export keyword
-    </a>
+    @if (!_isIdeMode) {
+      <a
+        data-step-testid="export-keyword-btn"
+        mat-menu-item
+        [disabled]="!('kw-read' | hasRight | async)"
+        [routerLink]="['/', 'functions', 'export', element.id]"
+      >
+        <step-icon name="upload" />
+        Export keyword
+      </a>
+    }
 
     <button
       data-step-testid="functions-find-usages-btn"

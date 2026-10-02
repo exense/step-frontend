@@ -6,40 +6,44 @@
       entity="parameters"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-btn-group>
-        <a
-          data-step-testid="import-parameter-btn"
-          mat-icon-button
-          matTooltipPosition="below"
-          matTooltip="Import parameter"
-          [disabled]="!('param-write' | hasRight | async)"
-          routerLink="/parameters/import"
-        >
-          <step-icon name="download" />
-        </a>
-        <a
-          data-step-testid="export-parameters-btn"
-          mat-icon-button
-          matTooltipPosition="below"
-          matTooltip="Export all parameters"
-          [disabled]="!('param-read' | hasRight | async)"
-          routerLink="/parameters/export"
-        >
-          <step-icon name="upload" />
-        </a>
-      </step-btn-group>
+      @if (!_isIdeMode) {
+        <step-btn-group>
+          <a
+            data-step-testid="import-parameter-btn"
+            mat-icon-button
+            matTooltipPosition="below"
+            matTooltip="Import parameter"
+            [disabled]="!('param-write' | hasRight | async)"
+            routerLink="/parameters/import"
+          >
+            <step-icon name="download" />
+          </a>
+          <a
+            data-step-testid="export-parameters-btn"
+            mat-icon-button
+            matTooltipPosition="below"
+            matTooltip="Export all parameters"
+            [disabled]="!('param-read' | hasRight | async)"
+            routerLink="/parameters/export"
+          >
+            <step-icon name="upload" />
+          </a>
+        </step-btn-group>
+      }
       <step-btn-group class="create-button-group">
-        <a
-          stepTestId="upload-package-btn"
-          mat-flat-button
-          color="primary"
-          class="header-btn"
-          matTooltip="Add entities by uploading an Automation Package"
-          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
-          routerLink="/automation-package/list/upload/new/"
-        >
-          Upload Package
-        </a>
+        @if (!_isIdeMode) {
+          <a
+            stepTestId="upload-package-btn"
+            mat-flat-button
+            color="primary"
+            class="header-btn"
+            matTooltip="Add entities by uploading an Automation Package"
+            [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+            routerLink="/automation-package/list/upload/new/"
+          >
+            Upload Package
+          </a>
+        }
         <a
           data-step-testid="new-parameter-btn"
           type="button"
@@ -77,7 +81,7 @@
           [class]="{
             'scope-global': element.scope === 'GLOBAL',
             'scope-application': element.scope === 'APPLICATION',
-            'scope-function': element.scope === 'FUNCTION'
+            'scope-function': element.scope === 'FUNCTION',
           }"
         >
           {{ element.scope === 'GLOBAL' ? element.scope : element.scopeEntity || element.scope }}

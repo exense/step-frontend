@@ -6,42 +6,46 @@
       entity="plans"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-btn-group class="import-export">
-        <a
-          data-step-testid="import-plan-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Import plan"
-          matTooltipPosition="below"
-          [disabled]="!('plan-write' | hasRight | async)"
-          routerLink="/plans/list/import"
-        >
-          <step-icon name="download" />
-        </a>
-        <a
-          data-step-testid="export-plans-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Export all plans"
-          matTooltipPosition="below"
-          [disabled]="!('plan-read' | hasRight | async)"
-          routerLink="/plans/export/all"
-        >
-          <step-icon name="upload" />
-        </a>
-      </step-btn-group>
+      @if (!_isIdeMode) {
+        <step-btn-group class="import-export">
+          <a
+            data-step-testid="import-plan-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Import plan"
+            matTooltipPosition="below"
+            [disabled]="!('plan-write' | hasRight | async)"
+            routerLink="/plans/list/import"
+          >
+            <step-icon name="download" />
+          </a>
+          <a
+            data-step-testid="export-plans-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Export all plans"
+            matTooltipPosition="below"
+            [disabled]="!('plan-read' | hasRight | async)"
+            routerLink="/plans/export/all"
+          >
+            <step-icon name="upload" />
+          </a>
+        </step-btn-group>
+      }
       <step-btn-group class="create-button-group">
-        <a
-          stepTestId="upload-package-btn"
-          mat-flat-button
-          color="primary"
-          class="header-btn"
-          matTooltip="Add entities by uploading an Automation Package"
-          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
-          routerLink="/automation-package/list/upload/new/"
-        >
-          Upload Package
-        </a>
+        @if (!_isIdeMode) {
+          <a
+            stepTestId="upload-package-btn"
+            mat-flat-button
+            color="primary"
+            class="header-btn"
+            matTooltip="Add entities by uploading an Automation Package"
+            [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+            routerLink="/automation-package/list/upload/new/"
+          >
+            Upload Package
+          </a>
+        }
         <a
           data-step-testid="add-plan-btn"
           type="button"
@@ -155,15 +159,17 @@
       <step-icon name="clock" aria-hidden="true" />
       Schedule this plan
     </button>
-    <a
-      data-step-testid="export-plan-btn"
-      mat-menu-item
-      [disabled]="!('plan-read' | hasRight | async)"
-      [routerLink]="['/', 'plans', 'list', 'export', element.id]"
-    >
-      <step-icon name="upload" aria-hidden="true" />
-      Export plan
-    </a>
+    @if (!_isIdeMode) {
+      <a
+        data-step-testid="export-plan-btn"
+        mat-menu-item
+        [disabled]="!('plan-read' | hasRight | async)"
+        [routerLink]="['/', 'plans', 'list', 'export', element.id]"
+      >
+        <step-icon name="upload" aria-hidden="true" />
+        Export plan
+      </a>
+    }
     <button
       data-step-testid="find-usages-btn"
       mat-menu-item

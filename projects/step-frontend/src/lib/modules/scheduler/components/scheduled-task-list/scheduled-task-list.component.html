@@ -1,4 +1,11 @@
-@if (isSchedulerDisabled()) {
+@if (_isIdeMode) {
+  <step-alert class="scheduler-warning" [type]="AlertType.INFO">
+    <span>
+      Schedules are never triggered here. Their active state is saved with the Automation Package and applies once it is
+      deployed to a Step instance.
+    </span>
+  </step-alert>
+} @else if (isSchedulerDisabled()) {
   <step-alert class="scheduler-warning" [type]="AlertType.WARNING">
     <span>Schedule execution is disabled and will not run until reactivated in</span>
     <span>
@@ -26,30 +33,32 @@
       entity="tasks"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
-      <step-btn-group class="import-export">
-        <a
-          data-step-testid="import-schedule-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Import schedule"
-          matTooltipPosition="below"
-          [disabled]="!('task-write' | hasRight | async)"
-          routerLink="/scheduler/import/task"
-        >
-          <step-icon name="download" />
-        </a>
-        <a
-          data-step-testid="export-schedules-btn"
-          type="button"
-          mat-icon-button
-          matTooltip="Export all schedules"
-          matTooltipPosition="below"
-          [disabled]="!('task-read' | hasRight | async)"
-          routerLink="/scheduler/export/all"
-        >
-          <step-icon name="upload" />
-        </a>
-      </step-btn-group>
+      @if (!_isIdeMode) {
+        <step-btn-group class="import-export">
+          <a
+            data-step-testid="import-schedule-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Import schedule"
+            matTooltipPosition="below"
+            [disabled]="!('task-write' | hasRight | async)"
+            routerLink="/scheduler/import/task"
+          >
+            <step-icon name="download" />
+          </a>
+          <a
+            data-step-testid="export-schedules-btn"
+            type="button"
+            mat-icon-button
+            matTooltip="Export all schedules"
+            matTooltipPosition="below"
+            [disabled]="!('task-read' | hasRight | async)"
+            routerLink="/scheduler/export/all"
+          >
+            <step-icon name="upload" />
+          </a>
+        </step-btn-group>
+      }
       <step-btn-group>
         <a
           data-step-testid="new-schedule-btn"
@@ -63,17 +72,19 @@
           <step-icon name="plus" />
         </a>
       </step-btn-group>
-      <a
-        data-step-testid="configure-scheduler-btn"
-        type="button"
-        mat-icon-button
-        matTooltip="Configure scheduler"
-        matTooltipPosition="below"
-        [disabled]="!('scheduler-manage' | hasRight | async) || !('admin-ui-menu' | hasRight | async)"
-        [routerLink]="settingsUrl"
-      >
-        <step-icon name="settings" />
-      </a>
+      @if (!_isIdeMode) {
+        <a
+          data-step-testid="configure-scheduler-btn"
+          type="button"
+          mat-icon-button
+          matTooltip="Configure scheduler"
+          matTooltipPosition="below"
+          [disabled]="!('scheduler-manage' | hasRight | async) || !('admin-ui-menu' | hasRight | async)"
+          [routerLink]="settingsUrl"
+        >
+          <step-icon name="settings" />
+        </a>
+      }
     </section>
     <ng-container data-step-testid="schedules-bulk-selection" matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
@@ -238,15 +249,17 @@
       <step-icon name="trash-2" />
       Delete schedule
     </button>
-    <a
-      data-step-testid="export-schedule-btn"
-      mat-menu-item
-      [disabled]="!('task-read' | hasRight | async)"
-      [routerLink]="['/', 'scheduler', 'export', element.id]"
-    >
-      <step-icon name="upload" />
-      Export schedule
-    </a>
+    @if (!_isIdeMode) {
+      <a
+        data-step-testid="export-schedule-btn"
+        mat-menu-item
+        [disabled]="!('task-read' | hasRight | async)"
+        [routerLink]="['/', 'scheduler', 'export', element.id]"
+      >
+        <step-icon name="upload" />
+        Export schedule
+      </a>
+    }
   </ng-container>
 </step-entity-menu>
 <router-outlet />

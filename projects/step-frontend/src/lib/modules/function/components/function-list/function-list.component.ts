@@ -11,6 +11,7 @@ import {
   IsUsedByDialogService,
   tableColumnsConfigProvider,
   entitySelectionStateProvider,
+  IDE_MODE,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
@@ -43,6 +44,7 @@ export class FunctionListComponent implements DialogParentService {
   private _functionActions = inject(FunctionActionsService);
   private _keywordExecutor = inject(KeywordExecutorService);
   private _isUsedByDialog = inject(IsUsedByDialogService);
+  protected readonly _isIdeMode = inject(IDE_MODE);
 
   protected readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly returnParentUrl = '/functions';
