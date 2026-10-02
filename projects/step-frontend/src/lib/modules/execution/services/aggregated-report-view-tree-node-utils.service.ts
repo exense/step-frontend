@@ -65,7 +65,10 @@ export class AggregatedReportViewTreeNodeUtilsService implements TreeNodeUtilsSe
 
     const iconClassName = this._useLargeView ? ['larger-icon'] : [];
     const statuses = Object.keys(item?.countByStatus ?? {}) as Status[];
-    const priorityStatus = chooseStatusWithMostPriority(...statuses);
+    const priorityStatus =
+      (item.countByStatus?.[Status.RUNNING] ?? 0) > 0
+        ? Status.RUNNING
+        : chooseStatusWithMostPriority(...statuses.filter((status) => (item.countByStatus?.[status] ?? 0) > 0));
     if (priorityStatus) {
       iconClassName.push(`step-icon-${priorityStatus}`);
     }
