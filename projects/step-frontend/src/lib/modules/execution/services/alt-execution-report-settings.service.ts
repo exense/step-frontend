@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal, signal, untracked } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, Signal, untracked } from '@angular/core';
 import { GridEditableService, WidgetsPersistenceStateService } from '@exense/step-core';
 import {
   ALT_EXECUTION_REPORT_DETAIL_KEYS,
@@ -17,9 +17,10 @@ export class AltExecutionReportSettingsService {
   private _gridEditable = inject(GridEditableService);
   private _widgetsPersistence = inject(WidgetsPersistenceStateService);
 
-  private readonly viewOverrides = signal<
-    Partial<Record<AltExecutionReportWidgetType, AltExecutionReportWidgetSettings>>
-  >({});
+  private readonly viewOverrides = linkedSignal({
+    source: this._widgetsPersistence.selectedPreset,
+    computation: (): Partial<Record<AltExecutionReportWidgetType, AltExecutionReportWidgetSettings>> => ({}),
+  });
 
   readonly detailOptions = ALT_EXECUTION_REPORT_DETAIL_KEYS;
 
