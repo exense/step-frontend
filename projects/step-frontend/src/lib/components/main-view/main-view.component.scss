@@ -29,7 +29,7 @@
 
   #step-main-scrollable-content.ide-empty-scroll {
     padding-top: 0;
-    background: var.$blue-700;
+    background: var(--step-surface-dark-color, var.$blue-700);
   }
 
   .ide-empty-view {

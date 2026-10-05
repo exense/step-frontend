@@ -103,8 +103,8 @@ step-grid-layout {
   .preview {
     border-style: solid;
     border-width: 0.1rem;
-    background: var.$blue-50;
-    border-color: var.$blue-600;
+    background: var(--step-accent-muted-color, var.$blue-50);
+    border-color: var(--step-accent-color, var.$blue-600);
     opacity: 0.5;
     border-radius: 0.5rem;
     position: absolute;
@@ -201,7 +201,7 @@ step-grid-layout {
     }
 
     step-grid-drag-handle > section {
-      background: var.$blue-15;
+      background: var(--step-accent-subtle-color, var.$blue-15);
       opacity: 1;
     }
   }

@@ -22,7 +22,7 @@ step-autorefresh-toggle {
     }
 
     &.off span {
-      background: var(--main-header-bg-color, var.$blue-700);
+      background: var(--main-header-bg-color, var(--step-surface-dark-color, var.$blue-700));
       color: var.$white;
     }
 

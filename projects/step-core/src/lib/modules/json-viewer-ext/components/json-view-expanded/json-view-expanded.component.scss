@@ -24,7 +24,7 @@
   border-radius: 1rem;
   cursor: pointer;
   &:hover {
-    border: solid 0.1rem var.$blue-600;
+    border: solid 0.1rem var(--step-accent-color, var.$blue-600);
     margin-left: 0rem;
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
@@ -58,7 +58,7 @@ button.btn-more {
   top: auto !important;
   bottom: -0.8rem;
   height: 3rem;
-  border-color: var.$blue-600 !important;
+  border-color: var(--step-accent-color, var.$blue-600) !important;
   background: var.$white;
   &:not(.visible) {
     opacity: 0;
