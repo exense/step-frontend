@@ -110,9 +110,11 @@
           <button
             data-step-testid="execute-keyword-btn"
             mat-icon-button
-            matTooltip="Execute keyword"
+            [matTooltip]="_isIdeMode ? 'Executing a keyword is not yet supported in the Studio' : 'Execute keyword'"
+            aria-label="Execute keyword"
             [disabled]="_isIdeMode || !('kw-execute' | hasRight | async)"
-            (click)="executeFunction(element.id)"
+            [disabledInteractive]="_isIdeMode"
+            (click)="!_isIdeMode && executeFunction(element.id)"
           >
             <step-icon name="play" />
           </button>

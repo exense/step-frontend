@@ -24,6 +24,29 @@
       >
         <step-icon name="refresh-cw" [class.spin-animation]="_ideState.inProgress()" />
       </button>
+      @if (package.warnings?.length) {
+        <step-popover [mode]="PopoverMode.CLICK" [noPadding]="true" [whiteBackground]="true" [smallFont]="false">
+          <button
+            type="button"
+            mat-icon-button
+            class="package-warning"
+            data-step-testid="ide-package-warnings-btn"
+            matTooltip="Limited support"
+            aria-label="Warnings for package {{ package.name }}"
+          >
+            <step-icon name="alert-triangle" />
+          </button>
+          <step-popover-content>
+            <step-display-alert class="step-ide-package-warnings" type="warning" title="Package Warnings">
+              <ul>
+                @for (warning of package.warnings; track warning) {
+                  <li>{{ warning }}</li>
+                }
+              </ul>
+            </step-display-alert>
+          </step-popover-content>
+        </step-popover>
+      }
     } @else {
       <span class="package-details package-empty">
         <step-icon name="file" />

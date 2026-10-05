@@ -18,6 +18,10 @@ import { ApAccessHistoryService } from './ap-access-history.service';
 import { ApFsDataProviderService } from './ap-fs-data-provider.service';
 import { CreatePackageDialogComponent } from '../components/create-package-dialog/create-package-dialog.component';
 
+interface IdeAutomationPackageDescriptor extends AutomationPackageDescriptor {
+  warnings?: string[];
+}
+
 const UPGRADE_REQUIRED_ERROR_NAMES = [
   'LegacyAutomationPackageSchemaVersionSetException',
   'NoAutomationPackageSchemaVersionSetException',
@@ -51,11 +55,11 @@ export class IdeStateService implements IdeStateStrategy {
   private readonly inProgressInternal = signal(false);
   readonly inProgress = this.inProgressInternal.asReadonly();
 
-  private readonly currentPackageInternal = signal<AutomationPackageDescriptor | undefined>(undefined);
+  private readonly currentPackageInternal = signal<IdeAutomationPackageDescriptor | undefined>(undefined);
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private setPackage(automationPackage: AutomationPackageDescriptor | undefined): void {
+  private setPackage(automationPackage: IdeAutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
   }

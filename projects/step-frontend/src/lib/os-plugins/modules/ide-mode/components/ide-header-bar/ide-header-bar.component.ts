@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
-import { CustomComponent, StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { CustomComponent, PopoverMode, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { IdeStateService } from '../../services/ide-state.service';
 import { ApAccessHistoryService } from '../../services/ap-access-history.service';
 
@@ -15,6 +15,7 @@ export class IdeHeaderBarComponent implements CustomComponent {
   protected readonly _ideState = inject(IdeStateService);
   protected readonly _apAccessHistory = inject(ApAccessHistoryService);
   protected readonly remoteDashlets = inject(ViewRegistryService).getDashlets('ide/bar/remote');
+  protected readonly PopoverMode = PopoverMode;
 
   context?: unknown;
 }

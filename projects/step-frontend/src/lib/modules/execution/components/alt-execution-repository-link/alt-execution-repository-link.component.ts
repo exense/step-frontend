@@ -48,13 +48,22 @@ export class AltExecutionRepositoryLinkComponent {
   readonly execution = input.required<Execution>();
   protected readonly PopoverMode = PopoverMode;
 
+  private readonly isIsolatedExecution = computed(() => {
+    const execution = this.execution();
+    const parameters = execution.executionParameters;
+    return (
+      !!parameters?.isolatedExecution || parameters?.repositoryObject?.repositoryID === 'isolatedAutomationPackage'
+    );
+  });
+
   protected readonly planLink = computed(() => {
     const execution = this.execution();
+    const isIsolatedExecution = this.isIsolatedExecution();
 
     const repository = execution.executionParameters?.repositoryObject;
 
     if (
-      execution.executionParameters?.isolatedExecution ||
+      isIsolatedExecution ||
       repository?.repositoryID === 'Artifact' ||
       repository?.repositoryParameters?.['wrapPlans'] === 'true' ||
       !execution?.planId
@@ -65,11 +74,27 @@ export class AltExecutionRepositoryLinkComponent {
     return this._commonEntitiesUrl.planEditorUrl(execution.planId);
   });
 
-  protected readonly externalLinkRepository = computed(() => {
+  protected readonly planLinkDisabledReason = computed(() => {
     const execution = this.execution();
+    const isIsolatedExecution = this.isIsolatedExecution();
     const repository = execution.executionParameters?.repositoryObject;
     if (
-      execution.executionParameters?.isolatedExecution ||
+      !isIsolatedExecution ||
+      !execution.planId ||
+      repository?.repositoryID === 'Artifact' ||
+      repository?.repositoryParameters?.['wrapPlans'] === 'true'
+    ) {
+      return undefined;
+    }
+    return 'Viewing the plan of an isolated execution is not yet supported';
+  });
+
+  protected readonly externalLinkRepository = computed(() => {
+    const execution = this.execution();
+    const isIsolatedExecution = this.isIsolatedExecution();
+    const repository = execution.executionParameters?.repositoryObject;
+    if (
+      isIsolatedExecution ||
       !execution.planId ||
       !repository ||
       repository.repositoryID === 'Artifact' ||
