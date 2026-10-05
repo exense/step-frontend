@@ -44,7 +44,6 @@ export const fetchRepositoryTestRuns = (
   );
 };
 
-// Report nodes without a matching repository test case (e.g. nested test cases) are ignored
 export const mergeRelaunchTestCases = (
   runs: TestRunStatus[],
   testCaseNodes: ReportNode[],
