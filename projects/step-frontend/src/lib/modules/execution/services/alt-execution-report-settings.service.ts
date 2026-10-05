@@ -21,8 +21,6 @@ export class AltExecutionReportSettingsService {
     Partial<Record<AltExecutionReportWidgetType, AltExecutionReportWidgetSettings>>
   >({});
 
-  readonly editMode = this._gridEditable.editMode;
-
   readonly detailOptions = ALT_EXECUTION_REPORT_DETAIL_KEYS;
 
   details(widgetType: AltExecutionReportWidgetType): Signal<AltExecutionReportDetailKey[]> {
@@ -35,14 +33,6 @@ export class AltExecutionReportSettingsService {
 
   isDetailEnabled(widgetType: AltExecutionReportWidgetType, key: AltExecutionReportDetailKey): boolean {
     return this.getDetails(widgetType).includes(key);
-  }
-
-  unsetOverrides(widgetType: AltExecutionReportWidgetType): void {
-    this.viewOverrides.update((currentOverrides) => {
-      const nextOverrides = { ...currentOverrides };
-      delete nextOverrides[widgetType];
-      return nextOverrides;
-    });
   }
 
   updateDetail(widgetType: AltExecutionReportWidgetType, key: AltExecutionReportDetailKey, enabled: boolean): void {
@@ -62,15 +52,10 @@ export class AltExecutionReportSettingsService {
       return;
     }
 
-    this.viewOverrides.update((currentOverrides) => {
-      const nextOverrides = { ...currentOverrides };
-      if (!nextSettings) {
-        delete nextOverrides[widgetType];
-      } else {
-        nextOverrides[widgetType] = nextSettings;
-      }
-      return nextOverrides;
-    });
+    this.viewOverrides.update((currentOverrides) => ({
+      ...currentOverrides,
+      [widgetType]: nextSettings,
+    }));
   }
 
   private getDetails(

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { PopoverMode } from '@exense/step-core';
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionReportDetailKey, AltExecutionReportWidgetType } from '../../shared/alt-execution-report-details';
@@ -15,7 +15,6 @@ export class AltExecutionReportSettingsComponent {
 
   readonly widgetType = input.required<AltExecutionReportWidgetType>();
   protected readonly pendingDetailOptions = signal<Partial<Record<AltExecutionReportDetailKey, boolean>>>({});
-  protected readonly editMode = this._settings.editMode;
 
   private readonly details = computed(() => {
     const widgetType = this.widgetType();
@@ -40,11 +39,6 @@ export class AltExecutionReportSettingsComponent {
     this.toggleVersions.set(key, version);
     this.pendingDetailOptions.update((pending) => ({ ...pending, [key]: checked }));
     this.scheduleAfterNextPaint(() => this.applyToggle(key, checked, version));
-  }
-
-  protected resetDefaults(): void {
-    const widgetType = untracked(() => this.widgetType());
-    this._settings.unsetOverrides(widgetType);
   }
 
   private applyToggle(key: AltExecutionReportDetailKey, checked: boolean, version: number): void {
