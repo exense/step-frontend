@@ -17,6 +17,7 @@ import {
   canLeaveComponent,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  ControllerService,
   DashletRegistryService,
   DialogParentService,
   dialogRoute,
@@ -25,18 +26,15 @@ import {
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
-  IncludeTestcases,
   MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
-  ReportNode,
   schedulePlanRoute,
   SearchPaginatorComponent,
   sequenceCanActivateGuards,
   SimpleOutletComponent,
   stepRouteAdditionalConfig,
-  TestRunStatus,
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
@@ -103,7 +101,8 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap, take } from 'rxjs';
+import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from './shared/relaunch-test-cases';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -824,46 +823,31 @@ export class ExecutionModule {
                 testCases: () => {
                   const _context = inject(ActiveExecutionContextService);
                   const _executionsApi = inject(AugmentedExecutionsService);
+                  const _controllerService = inject(ControllerService);
                   return _context.execution$.pipe(
                     take(1),
-                    map((execution) => execution?.id),
-                    switchMap((id) => {
-                      if (!id) {
-                        return of([]);
+                    switchMap((execution) => {
+                      const id = execution?.id;
+                      const repoRef = execution?.executionParameters?.repositoryObject;
+                      if (!id || !repoRef) {
+                        return of(undefined);
                       }
-                      return _executionsApi.getReportNodesByExecutionId(
-                        id,
-                        'step.artefacts.reports.TestCaseReportNode',
-                        500,
+                      return forkJoin({
+                        runs: fetchRepositoryTestRuns(_controllerService, repoRef),
+                        testCaseNodes: _executionsApi.getReportNodesByExecutionId(
+                          id,
+                          'step.artefacts.reports.TestCaseReportNode',
+                          500,
+                        ),
+                      }).pipe(
+                        map(({ runs, testCaseNodes }) =>
+                          !runs
+                            ? undefined
+                            : mergeRelaunchTestCases(runs, testCaseNodes ?? [], repoRef.repositoryID === 'local'),
+                        ),
                       );
                     }),
                     catchError(() => of(undefined)),
-                    map((testCases: ReportNode[] | undefined) => {
-                      const items = testCases?.map?.(
-                        (item) =>
-                          ({
-                            id: item.artefactID,
-                            testplanName: item.name,
-                            status: item.status,
-                          }) as TestRunStatus,
-                      );
-
-                      let list = testCases
-                        ?.filter((item) => !!item && item?.status !== 'SKIPPED')
-                        ?.map((item) => item?.artefactID!);
-                      if (list?.length === testCases?.length) {
-                        list = undefined;
-                      }
-
-                      const selection: IncludeTestcases | undefined = !list?.length
-                        ? undefined
-                        : {
-                            list,
-                            by: 'id',
-                          };
-
-                      return { items, selection };
-                    }),
                   );
                 },
               },
