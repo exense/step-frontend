@@ -42,7 +42,7 @@
         min-width: 100px !important;
         text-decoration: none;
         height: 38px;
-        color: var.$blue-700 !important;
+        color: var(--step-text-color, var.$blue-700) !important;
 
         &:first-child {
           margin-left: 0;
