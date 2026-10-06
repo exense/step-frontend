@@ -6,15 +6,20 @@ import {
   ControllerService,
   Execution,
   IDE_MODE,
+  IdeStateStrategyService,
   PopoverMode,
   RepositoryObjectReference,
 } from '@exense/step-core';
 import { catchError, distinctUntilChanged, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { isExecutionFromDifferentAutomationPackage } from '../../shared/execution-automation-package.utils';
 
 const ISOLATED_AUTOMATION_PACKAGE_REPOSITORY = 'isolatedAutomationPackage';
+const LOAD_AUTOMATION_PACKAGE_REASON = 'Load the Automation Package containing this plan in order to open it';
 
 interface IsolatedPlanLookup {
   name?: string;
+  packageDirectory?: string;
+  differentPackage: boolean;
 }
 
 interface PlanLinkState {
@@ -59,9 +64,16 @@ export class AltExecutionRepositoryLinkComponent {
   private _controllerService = inject(ControllerService);
   private _isIdeMode = inject(IDE_MODE);
   private _plansService = this._isIdeMode ? inject(AugmentedPlansService) : undefined;
+  private readonly _ideState = this._isIdeMode ? inject(IdeStateStrategyService) : undefined;
 
   readonly execution = input.required<Execution>();
   protected readonly PopoverMode = PopoverMode;
+
+  private readonly isDifferentPackage = computed(() => {
+    const execution = this.execution();
+    const currentPackage = this._ideState?.currentPackage();
+    return this._isIdeMode && isExecutionFromDifferentAutomationPackage(execution, currentPackage);
+  });
 
   private readonly isIsolatedExecution = computed(() => {
     const execution = this.execution();
@@ -93,6 +105,8 @@ export class AltExecutionRepositoryLinkComponent {
   private readonly isolatedPlanLookup = computed<IsolatedPlanLookup | undefined>(() => {
     const execution = this.execution();
     const isIsolatedExecution = this.isIsolatedExecution();
+    const differentPackage = this.isDifferentPackage();
+    const currentPackage = this._ideState?.currentPackage();
     const repository = execution.executionParameters?.repositoryObject;
     if (
       !this._isIdeMode ||
@@ -103,15 +117,24 @@ export class AltExecutionRepositoryLinkComponent {
       return undefined;
     }
     const name = repository.repositoryParameters?.['includePlans'];
-    return { name: name || undefined };
+    return { name: name || undefined, differentPackage, packageDirectory: currentPackage?.directory };
   });
 
   private readonly isolatedPlanLinkState = toSignal(
     toObservable(this.isolatedPlanLookup).pipe(
-      distinctUntilChanged((previous, current) => previous?.name === current?.name && !!previous === !!current),
+      distinctUntilChanged(
+        (previous, current) =>
+          previous?.name === current?.name &&
+          previous?.differentPackage === current?.differentPackage &&
+          previous?.packageDirectory === current?.packageDirectory &&
+          !!previous === !!current,
+      ),
       switchMap((lookup): Observable<PlanLinkState> => {
         if (!lookup || !this._plansService) {
           return of({});
+        }
+        if (lookup.differentPackage || !lookup.packageDirectory) {
+          return of({ disabledReason: LOAD_AUTOMATION_PACKAGE_REASON });
         }
         const name = lookup.name;
         if (!name) {
@@ -140,6 +163,10 @@ export class AltExecutionRepositoryLinkComponent {
   protected readonly planLink = computed(() => {
     const persistedPlanLink = this.persistedPlanLink();
     const isolatedPlanLinkState = this.isolatedPlanLinkState();
+    const differentPackage = this.isDifferentPackage();
+    if (differentPackage) {
+      return undefined;
+    }
     return persistedPlanLink ?? isolatedPlanLinkState.link;
   });
 
@@ -149,7 +176,11 @@ export class AltExecutionRepositoryLinkComponent {
     const planLink = this.planLink();
     const lookup = this.isolatedPlanLookup();
     const lookupState = this.isolatedPlanLinkState();
+    const differentPackage = this.isDifferentPackage();
     const repository = execution.executionParameters?.repositoryObject;
+    if (differentPackage) {
+      return LOAD_AUTOMATION_PACKAGE_REASON;
+    }
     if (
       planLink ||
       !isIsolatedExecution ||

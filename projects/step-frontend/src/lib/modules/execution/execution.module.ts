@@ -160,6 +160,7 @@ import { SchedulerPageComponent } from './components/schedule-overview/scheduler
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
+import { AltExecutionPackageWarningComponent } from './components/alt-execution-package-warning/alt-execution-package-warning.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
@@ -495,6 +496,7 @@ import { AltReportNodePerformanceComponent } from './components/alt-report-node-
     NoticeBadgeLabelPipe,
   ],
   imports: [
+    AltExecutionPackageWarningComponent,
     StepCommonModule,
     OperationsModule,
     ReportNodesModule,
