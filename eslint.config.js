@@ -60,4 +60,11 @@ module.exports = defineConfig([
   {
     ignores: ['projects/step-core/src/lib/client/generated/**/*'],
   },
+  {
+    files: ['projects/step-core/src/lib/modules/resource-input/components/resource-input/resource-input.component.ts'],
+    rules: {
+      // Parent components read these resource validation signals through template references.
+      'step-lint/component-public-fields': ['warn', { exclusions: ['isResource', 'resourceNotExisting'] }],
+    },
+  },
 ]);
