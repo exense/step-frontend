@@ -22,8 +22,9 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   protected readonly execution = toSignal(this.execution$.pipe(takeUntilDestroyed()), { initialValue: undefined });
 
-  readonly DateFormat = DateFormat;
+  protected readonly DateFormat = DateFormat;
 
+  /* eslint-disable @angular-eslint/prefer-signals -- Preserve the report-node component's existing mutable input API and OnChanges handling. */
   @Input() node!: ReportNode | any | { measures: Measure[] };
   @Input() children!: ReportNode[];
 
@@ -31,6 +32,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   @Input() hideMeasures: boolean = false;
   @Input() hideRouting: boolean = true;
+  /* eslint-enable @angular-eslint/prefer-signals */
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
@@ -39,7 +41,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     }
   }
 
-  navigateToAnalyticsView(measure: Measure): void {
+  protected navigateToAnalyticsView(measure: Measure): void {
     const execution = this.execution();
     if (!execution) {
       return;

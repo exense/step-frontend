@@ -14,7 +14,7 @@
   margin-top: 1.4rem;
   font-size: 1.6rem;
   font-weight: 600;
-  color: var.$blue-700;
+  color: var(--step-text-color, var.$blue-700);
   text-align: center;
   pointer-events: none;
   user-select: none;

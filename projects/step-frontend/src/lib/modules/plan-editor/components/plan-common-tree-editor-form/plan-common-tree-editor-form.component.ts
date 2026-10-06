@@ -16,7 +16,7 @@ import {
   DropInfo,
   PlanReferencePolicyService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -103,7 +103,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   ngOnDestroy(): void {
     this.planContextChange$.complete();
-    this._planEditor.removeStrategy();
+    this._planEditor.removeStrategy(this);
   }
 
   addControl(artefactTypeId: string): void {

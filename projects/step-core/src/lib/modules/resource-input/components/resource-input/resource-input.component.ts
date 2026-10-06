@@ -64,7 +64,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   private readonly fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
 
-  readonly uploadProgress = this._resourceInputService.uploadProgress;
+  protected readonly uploadProgress = this._resourceInputService.uploadProgress;
 
   readonly label = input<string | undefined>(undefined);
   readonly helpIconTooltip = input<string | undefined>(undefined);
@@ -84,7 +84,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   protected readonly downloadResourceUrl = computed(() => this._resourceInputService.getDownloadUrl(this.resourceId()));
 
-  readonly isResource = computed(() => this._utils.isResourceValue(this.modelInternal()));
+  protected readonly isResource = computed(() => this._utils.isResourceValue(this.modelInternal()));
 
   protected readonly automationPackageId = computed(() => {
     const config = this._config.config();
@@ -115,7 +115,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
   });
 
   private readonly resource = signal<Resource | undefined>(undefined);
-  readonly resourceNotExisting = computed(() => !this.resource());
+  protected readonly resourceNotExisting = computed(() => !this.resource());
   protected readonly resourceFilename = computed(() => this.resource()?.resourceName ?? '');
 
   private initResourceSubscription = toObservable(this.resourceId)

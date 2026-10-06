@@ -17,7 +17,7 @@ export class PlanSourceDialogComponent {
 
   protected readonly AceMode = AceMode;
 
-  copyToClipboard(): void {
+  protected copyToClipboard(): void {
     from(this._clipboard.writeText(this._planSource)).subscribe(() => {
       this._snackBar.open(`Plan's YAML copied to clipboard.`, 'dismiss');
     });

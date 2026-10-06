@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal, signal, untracked } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, Signal, untracked } from '@angular/core';
 import { GridEditableService, WidgetsPersistenceStateService } from '@exense/step-core';
 import {
   ALT_EXECUTION_REPORT_DETAIL_KEYS,
@@ -17,9 +17,10 @@ export class AltExecutionReportSettingsService {
   private _gridEditable = inject(GridEditableService);
   private _widgetsPersistence = inject(WidgetsPersistenceStateService);
 
-  private readonly viewOverrides = signal<
-    Partial<Record<AltExecutionReportWidgetType, AltExecutionReportWidgetSettings>>
-  >({});
+  private readonly viewOverrides = linkedSignal({
+    source: this._widgetsPersistence.selectedPreset,
+    computation: (): Partial<Record<AltExecutionReportWidgetType, AltExecutionReportWidgetSettings>> => ({}),
+  });
 
   readonly detailOptions = ALT_EXECUTION_REPORT_DETAIL_KEYS;
 
@@ -45,22 +46,17 @@ export class AltExecutionReportSettingsService {
     }
 
     const details = ALT_EXECUTION_REPORT_DETAIL_KEYS.filter((detailKey) => current.has(detailKey));
-    const nextSettings = details.length ? ({ details } as AltExecutionReportWidgetSettings) : undefined;
+    const nextSettings = { details } as AltExecutionReportWidgetSettings;
 
     if (editMode) {
       this._widgetsPersistence.updateWidgetSettings(widgetType, nextSettings);
       return;
     }
 
-    this.viewOverrides.update((currentOverrides) => {
-      const nextOverrides = { ...currentOverrides };
-      if (!nextSettings) {
-        delete nextOverrides[widgetType];
-      } else {
-        nextOverrides[widgetType] = nextSettings;
-      }
-      return nextOverrides;
-    });
+    this.viewOverrides.update((currentOverrides) => ({
+      ...currentOverrides,
+      [widgetType]: nextSettings,
+    }));
   }
 
   private getDetails(

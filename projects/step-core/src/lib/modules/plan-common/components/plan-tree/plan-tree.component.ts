@@ -62,20 +62,20 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
   private _planPersistenceState = inject(PlanEditorPersistenceStateService);
-  readonly _planEditorService = inject(PlanEditorService);
+  protected readonly _planEditorService = inject(PlanEditorService);
   private _planReferencePolicy = inject(PlanReferencePolicyService);
-  readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
+  protected readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
+  protected readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
 
   /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();
 
   readonly isReadonly = input(false);
 
-  readonly splitAreaElementRef = viewChild<ElementRef<HTMLElement>>('area');
+  protected readonly splitAreaElementRef = viewChild<ElementRef<HTMLElement>>('area');
 
-  readonly tree = viewChild<TreeComponent<ArtefactTreeNode>>(TreeComponent);
+  protected readonly tree = viewChild<TreeComponent<ArtefactTreeNode>>(TreeComponent);
 
   /** @ViewChild **/
   private readonly dragData = viewChild(DragDataService);
@@ -156,7 +156,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     );
   }
 
-  openTreeMenu(event: MouseEvent, nodeId: string): void {
+  protected openTreeMenu(event: MouseEvent, nodeId: string): void {
     const tree = this.tree();
     if (!tree) {
       return;
@@ -174,7 +174,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     return node?.nodeType === undefined;
   }
 
-  handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
+  protected handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
     if (!this.canOpenArtefact(node.originalArtefact) || !this._planArtefactResolver) {
       return;
     }
@@ -182,7 +182,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     this._planArtefactResolver.openArtefact(node.originalArtefact);
   }
 
-  handleDragOver(event: DropInfo): void {
+  protected handleDragOver(event: DropInfo): void {
     if (!this._treeState.rootNodeId()) {
       return;
     }
@@ -194,7 +194,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     this._treeState.notifyPotentialInsert?.(newParentId);
   }
 
-  handleDropNode(event: DropInfo): void {
+  protected handleDropNode(event: DropInfo): void {
     if (!this._treeState.rootNodeId()) {
       this._treeState.notifyInsertionComplete?.();
       return;
@@ -224,7 +224,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     this._treeState.notifyInsertionComplete?.();
   }
 
-  proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
+  protected proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
     const artefact = multipleNodes ? undefined : node?.originalArtefact;
     const forceSkip = actionId === PlanTreeAction.DISABLE;
     switch (actionId) {
@@ -267,7 +267,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     }
   }
 
-  handlePlanChange(): void {
+  protected handlePlanChange(): void {
     // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
     // a plan change
     setTimeout(() => {
@@ -276,11 +276,11 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     }, 200);
   }
 
-  handleTreeSizeChange(size: number): void {
+  protected handleTreeSizeChange(size: number): void {
     this._planPersistenceState.setPanelSize(TREE_SIZE, size);
   }
 
-  handleArtefactDetailsSizeChange(size: number): void {
+  protected handleArtefactDetailsSizeChange(size: number): void {
     this._planPersistenceState.setPanelSize(ARTEFACT_DETAILS_SIZE, size);
   }
 

@@ -79,6 +79,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   init(root?: T, options: TreeStateInitOptions = {}): void {
     const { selectedNodeIds, expandAllByDefault, hideRoot } = { ...DEFAULT_OPTIONS, ...options };
     this.hideRootInternal.set(!!hideRoot);
+    const previousRootId = this.rootNode()?.id;
     this.originalRoot = root;
     const rootNode = !!root ? this._treeNodeUtils.convertItem(root) : undefined;
     this.rootNode.set(rootNode);
@@ -87,7 +88,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
-    if (!this.selectedInsertionParentId()) {
+    if (!this.selectedInsertionParentId() || previousRootId !== rootNode.id) {
       this.selectedInsertionParentId.set(rootNode.id);
     }
 

@@ -2,14 +2,14 @@ import {
   Component,
   DestroyRef,
   effect,
-  EventEmitter,
   forwardRef,
   inject,
   Injector,
   input,
   OnDestroy,
   OnInit,
-  Output,
+  output,
+  Type,
   untracked,
   viewChild,
   ViewEncapsulation,
@@ -38,11 +38,14 @@ import {
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   CommonEntitiesUrlsService,
+  CustomComponent,
+  CustomRegistryService,
+  CustomRegistryType,
   PlanContext,
   AuthService,
   PlanReferencePolicyService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -124,6 +127,7 @@ export class PlanEditorBaseComponent
   private _destroyRef = inject(DestroyRef);
   private _auth = inject(AuthService);
   private _injector = inject(Injector);
+  private _customRegistryService = inject(CustomRegistryService);
   public _planEditorService = inject(PlanEditorService);
   private _planReferencePolicy = inject(PlanReferencePolicyService);
 
@@ -135,22 +139,22 @@ export class PlanEditorBaseComponent
   }
 
   private get currentPlanId(): string | undefined {
-    return this.initialPlanContext()?.id;
+    return untracked(() => this.initialPlanContext())?.id;
   }
 
   readonly initialPlanContext = input<PlanContext | null>();
-  readonly actionsConfig = input<ActionsConfig>({
+  readonly actionsConfig = input<ActionsConfig | undefined>({
     showExecuteButton: true,
     showExportSourceButton: true,
   });
-  @Output() runPlan = new EventEmitter<void>();
+  readonly runPlan = output();
 
   selectedTab = 'controls';
 
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
   readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
 
-  planTypes$ = this._planApi.getArtefactTemplates().pipe(
+  readonly planTypes$ = this._planApi.getArtefactTemplates().pipe(
     map((planTypes) => {
       return planTypes.map((planType) => ({
         planType,
@@ -167,7 +171,7 @@ export class PlanEditorBaseComponent
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  private readonly keywords = viewChild(KeywordCallsComponent);
+  private readonly keywords = viewChild('keywordCalls', { read: KeywordCallsComponent });
 
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
@@ -198,6 +202,7 @@ export class PlanEditorBaseComponent
 
   ngOnDestroy(): void {
     this.terminatePlanTypeChanges();
+    this._planEditorService.removeStrategy();
   }
 
   handlePlanSizeChange(size: number): void {
@@ -346,7 +351,8 @@ export class PlanEditorBaseComponent
     }
 
     this._interactiveSession.execute(this.currentPlanId!, artefactIds).subscribe(() => {
-      this.keywords()?._leafReportsDataSource.reload();
+      const keywords = untracked(() => this.keywords());
+      keywords?._leafReportsDataSource?.reload?.();
     });
   }
 
@@ -359,7 +365,6 @@ export class PlanEditorBaseComponent
       this.synchronizeDynamicName(context.plan.root);
     }
 
-    this.planClass = context.plan._class;
     this.terminatePlanTypeChanges();
     this.planTypeControl.setValue(
       {
@@ -372,7 +377,7 @@ export class PlanEditorBaseComponent
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
     const artefactId = preselectArtefact ? (planOpenState?.artefactId ?? this.artefactIdFromUrl) : undefined;
-    this._planEditorService.init(context!, artefactId);
+    this.initializeEditorContext(context, artefactId);
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
@@ -438,9 +443,28 @@ export class PlanEditorBaseComponent
         takeUntil(this.planTypeChangeTerminator$),
       )
       .subscribe((context) => {
-        this.planClass = context!.plan!._class;
-        this._planEditorService.init(context);
+        this.initializeEditorContext(context);
       });
+  }
+
+  private resolveEditorComponent(planClass?: string): Type<CustomComponent> | undefined {
+    if (!planClass) {
+      return undefined;
+    }
+
+    return this._customRegistryService.getRegisteredItem(CustomRegistryType.PLAN_TYPE, planClass)?.component;
+  }
+
+  private initializeEditorContext(context: PlanContext, selectedArtefactId?: string): void {
+    const previousComponent = this.resolveEditorComponent(this.planClass);
+    const nextComponent = this.resolveEditorComponent(context.plan._class);
+
+    if (previousComponent !== nextComponent) {
+      this._planEditorService.removeStrategy();
+    }
+
+    this.planClass = context.plan._class;
+    this._planEditorService.init(context, selectedArtefactId);
   }
 
   setTargetExecutionParameters(executionParameters: Record<string, string>): void {

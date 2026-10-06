@@ -36,7 +36,7 @@
   line-height: 1.4;
 
   a {
-    color: var.$blue-600;
+    color: var(--step-link-color, var.$blue-600);
   }
 }
 

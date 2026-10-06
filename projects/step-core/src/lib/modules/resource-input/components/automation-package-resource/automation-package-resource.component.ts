@@ -36,6 +36,7 @@ export class AutomationPackageResourceComponent {
   readonly showRequiredMarker = input(false);
   readonly value = input<string | undefined>();
   readonly valueChange = output<string | undefined>();
+  // eslint-disable-next-line @angular-eslint/no-output-native -- Resource controls expose the same blur event to their shared form handler.
   readonly blur = output<void>();
 
   protected readonly apResourcePath = computed(() => {

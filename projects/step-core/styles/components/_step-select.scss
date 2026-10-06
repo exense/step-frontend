@@ -14,7 +14,7 @@
     .mdc-list-item__primary-text {
       margin-right: 0;
       pointer-events: none;
-      color: var.$blue-650 !important;
+      color: var(--step-accent-color, var.$blue-650) !important;
       padding-right: 0.5rem;
     }
   }

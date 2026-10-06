@@ -33,6 +33,7 @@ export class TraceViewerComponent {
     return this._sanitizer.bypassSecurityTrustResourceUrl(url);
   });
 
+  // eslint-disable-next-line step-lint/component-public-fields -- AttachmentDialogComponent invokes this method on its child viewer.
   openInSeparateTab(): void {
     const url = this.traceViewerUrl();
     this._doc.defaultView!.open(url, '_blank');

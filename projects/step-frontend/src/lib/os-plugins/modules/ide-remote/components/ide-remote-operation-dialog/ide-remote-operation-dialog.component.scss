@@ -19,12 +19,12 @@
   display: grid;
   gap: 0.5rem;
   padding: 1rem;
-  border: 1px solid #b8d5e8;
+  border: 1px solid var(--step-accent-subtle-color, #b8d5e8);
   border-radius: 0.5rem;
-  background: #f3f8fb;
+  background: var(--step-accent-soft-color, #f3f8fb);
 
   span {
-    color: #667d8d;
+    color: var(--step-text-color, #667d8d);
   }
 }
 

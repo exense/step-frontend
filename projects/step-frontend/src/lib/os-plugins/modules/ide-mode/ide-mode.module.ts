@@ -6,10 +6,12 @@ import {
   MenuItemsOverrideConfigService,
   StepCoreModule,
   ViewRegistryService,
+  SimpleOutletComponent,
 } from '@exense/step-core';
 import { inject, NgModule } from '@angular/core';
 import { of } from 'rxjs';
 import { IDE_MENU_ITEMS } from './shared/ide-menu-items';
+import { IDE_HOME_ROUTE } from './shared/ide-home-route';
 import { IdeHeaderBarComponent } from './components/ide-header-bar/ide-header-bar.component';
 import { IdeEmptyStateComponent } from './components/ide-empty-state/ide-empty-state.component';
 import { IdeStateService } from './services/ide-state.service';
@@ -40,6 +42,7 @@ export class IdeModeModule {
 
   constructor() {
     if (this._isIdeMode) {
+      this._viewRegistry.registerRoute({ path: IDE_HOME_ROUTE, component: SimpleOutletComponent });
       this.setupMenuItems();
       this.registerDashlets();
       this.registerRule();
