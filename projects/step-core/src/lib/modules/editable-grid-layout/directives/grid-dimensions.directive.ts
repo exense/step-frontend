@@ -1,6 +1,6 @@
-import { computed, Directive, ElementRef, forwardRef, inject, untracked } from '@angular/core';
+import { computed, Directive, ElementRef, forwardRef, inject, untracked, DOCUMENT } from '@angular/core';
 import { ElementSizeDirective } from '../../basics/step-basics.module';
-import { DOCUMENT } from '@angular/common';
+
 import { GridDimensionsService } from '../injectables/grid-dimensions.service';
 
 @Directive({

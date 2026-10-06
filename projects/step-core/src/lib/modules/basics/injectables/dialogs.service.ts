@@ -26,6 +26,9 @@ import { AlertType } from '../types/alert-type.enum';
 export interface WarningDialogOptions {
   cancelButtonLabel?: string;
   confirmButtonLabel?: string;
+  confirmationMessage?: string;
+  maxWidth?: string;
+  panelClass?: string;
   cancelButtonAppearance?: 'flat' | 'stroked';
   confirmButtonAppearance?: 'flat' | 'stroked';
   cancelButtonColor?: 'primary';
@@ -38,13 +41,19 @@ export interface ErrorDialogOptions {
   disableClose?: boolean;
 }
 
+export interface EnterValueOptions {
+  confirmButtonLabel?: string;
+  multiline?: boolean;
+  subtitle?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class DialogsService {
   private _matDialog = inject(MatDialog);
 
-  enterValue(title: string, value: string, multiline?: boolean): Observable<string> {
+  enterValue(title: string, value: string, options?: EnterValueOptions): Observable<string> {
     const dialogRef = this._matDialog.open<
       EnterTextValueDialogComponent,
       EnterTextValueDialogData,
@@ -53,7 +62,7 @@ export class DialogsService {
       data: {
         title,
         value,
-        multiline,
+        ...options,
       },
     });
 
@@ -62,14 +71,17 @@ export class DialogsService {
   }
 
   showWarning(message: string, options?: WarningDialogOptions): Observable<boolean> {
+    const { maxWidth, panelClass, ...dialogOptions } = options ?? {};
     const dialogRef = this._matDialog.open<
       ConfirmationDialogComponent,
       ConfirmationDialogData,
       ConfirmationDialogResult
     >(ConfirmationDialogComponent, {
+      ...(maxWidth ? { maxWidth } : {}),
+      ...(panelClass ? { panelClass } : {}),
       data: {
         message,
-        ...options,
+        ...dialogOptions,
       },
     });
 

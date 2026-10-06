@@ -190,7 +190,7 @@ step-table {
         tr > th,
         tr > td {
           &:nth-child(#{$i}) {
-            border-left: solid 0.2rem var.$dark-blue !important;
+            border-left: solid 0.2rem var(--step-accent-color, var.$dark-blue) !important;
           }
         }
       }
@@ -198,7 +198,7 @@ step-table {
         tr > th,
         tr > td {
           &:nth-child(#{$i}) {
-            border-right: solid 0.2rem var.$dark-blue !important;
+            border-right: solid 0.2rem var(--step-accent-color, var.$dark-blue) !important;
           }
         }
       }

@@ -1,12 +1,13 @@
 # Open-Source Frontend
 
 OS must not depend on enterprise implementations. Add matching EE dependencies when adding OS dependencies.
-Only commit or push when explicitly instructed by the user.
+Never commit or push changes.
 See [TESTING.md](TESTING.md) for test commands, shared browser helpers, and scenario coverage.
 
 # Test-First Bug Fixes
 
-- Before changing production code for a bug fix, add or extend a focused Jest regression test that reproduces the reported behavior. Prefer the existing scenario suite for that feature.
+- Add new tests only when the task's opening user request reports an existing Step bug or the user explicitly requests tests. Later feedback during feature work does not change that scope. If the opening request mixes feature work and a possible bug, ask before adding tests.
+- For qualifying bug-report tasks, before changing production code add or extend a focused Jest regression test that reproduces the reported behavior. Prefer the existing scenario suite for that feature.
 - Run that test against the unfixed implementation and verify that it fails for the expected behavioral reason. Compilation errors, missing providers, and broken mocks are not valid reproductions. Do not implement the fix before observing this failure.
 - Make the smallest fix, rerun the same test, and retain it as a regression test. Refactor only after it passes. Report the failing behavior and the passing verification in the handoff.
 - If Jest cannot reproduce the bug (for example, actual browser layout or native drag hit-testing), explain the limitation and use an appropriate executable browser reproducer before fixing it. Do not silently skip the reproducer or claim an unobserved red/green result.

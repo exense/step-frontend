@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.result-list {
+  display: grid;
+}
+
+.result-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--step-accent-subtle-color, #d4e3ed);
+
+  &:last-child {
+    border-bottom: 1px solid var(--step-accent-subtle-color, #d4e3ed);
+  }
+}
+
+.result-status {
+  color: var(--step-text-color, #667d8d);
+}
+
+a {
+  overflow-wrap: anywhere;
+  font-weight: 600;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}

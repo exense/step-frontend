@@ -15,5 +15,8 @@ export const $DynamicValueBoolean = {
     expressionType: {
       type: 'string',
     },
+    interpolationResult: {
+      type: 'EvaluationResult',
+    },
   },
 } as const;

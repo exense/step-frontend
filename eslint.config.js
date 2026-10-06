@@ -58,6 +58,176 @@ module.exports = defineConfig([
     },
   },
   {
-    ignores: ['projects/step-core/src/lib/client/generated/**/*'],
+    ignores: [
+      'projects/step-core/src/lib/client/generated/**/*',
+      'projects/step-core/src/lib/client/ide-generated/**/*',
+    ],
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/execution/components/alt-execution-progress/alt-execution-progress.component.ts',
+    ],
+    rules: {
+      // This component is also provided as these services, so their contracts must remain public.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            {
+              interfaceName: 'AltExecutionStateService',
+              exclusions: [
+                'timeRangeSelection$',
+                'timeRangeOptions',
+                'executionId$',
+                'execution$',
+                'keywordParameters$',
+                'keywordsDataSource$',
+                'errors$',
+                'availableErrorTypes$',
+                'testCases$',
+                'testCasesDataSource$',
+                'testCasesTableParameters$',
+                'testCasesDisplayMode$',
+                'currentOperations$',
+                'timeRange$',
+                'treeInProgress$',
+                'errorsDisplayInProgress$',
+                'toggleTestCasesDisplayMode',
+                'updateTimeRangeSelection',
+                'selectFullRange',
+              ],
+            },
+            { interfaceName: 'EntityRefService', exclusions: ['currentEntity'] },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/function/components/function-configuration-dialog/function-configuration-dialog.component.ts',
+    ],
+    rules: {
+      // The form and keyword are exposed through FunctionTypeParentFormService.
+      'step-lint/component-public-fields': [
+        'warn',
+        { exclusions: [{ interfaceName: 'FunctionTypeParentFormService', exclusions: ['keyword', 'formGroup'] }] },
+      ],
+    },
+  },
+  {
+    files: ['projects/step-frontend/src/lib/modules/function/components/function-list/function-list.component.ts'],
+    rules: {
+      // DialogParentService consumers use these public members for navigation and refresh.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            { interfaceName: 'DialogParentService', exclusions: ['returnParentUrl', 'dialogSuccessfullyClosed'] },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['projects/step-core/src/lib/modules/tree/components/tree/tree.component.ts'],
+    rules: {
+      // Parent plan and execution trees read menu state and invoke these child tree methods.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            'openContextMenu',
+            'openedMenuNodeId',
+            'scrollToNode',
+            {
+              interfaceName: 'TreeNodeTemplateContainerService',
+              exclusions: ['treeNodeTemplate', 'treeNodeNameTemplate', 'treeNodeDetailsTemplate'],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/timeseries/modules/filter-bar/components/ranger/ts-ranger.component.ts',
+    ],
+    rules: {
+      // The time selection component drives its ranger through these methods.
+      'step-lint/component-public-fields': ['warn', { exclusions: ['resizeChart', 'selectRange', 'resetSelect'] }],
+    },
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/execution/components/execution-progress/execution-progress.component.ts',
+    ],
+    rules: {
+      // Execution consumers inject these services from the component's providers.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            {
+              interfaceName: 'ExecutionStateService',
+              exclusions: [
+                'executionId',
+                'testCasesProgress',
+                'progress',
+                'execution',
+                'testCases',
+                'testCasesDataSource',
+                'setupTableSelectionList',
+                'keywordSearch',
+                'drillDownTestCase',
+                'searchStepByError',
+                'currentOperations',
+                'countByErrorMsg',
+                'errorDistribution',
+                'countByErrorCode',
+                'selectedErrorDistributionToggle',
+                'showNodeInTree',
+                'showTestCase',
+              ],
+            },
+            { interfaceName: 'ExecutionCloseHandleService', exclusions: ['closeExecution'] },
+            { interfaceName: 'EntityRefService', exclusions: ['currentEntity'] },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['projects/step-frontend/src/lib/modules/plan/components/plan-editor/plan-editor.component.ts'],
+    rules: {
+      // Scheduling and entity consumers inject these public service contracts.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            { interfaceName: 'SchedulerInvokerService', exclusions: ['openScheduler'] },
+            { interfaceName: 'EntityRefService', exclusions: ['currentEntity'] },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'projects/step-frontend/src/lib/modules/plan/components/plan-list/plan-list.component.ts',
+      'projects/step-frontend/src/lib/modules/scheduler/components/scheduled-task-list/scheduled-task-list.component.ts',
+    ],
+    rules: {
+      // Dialog and scheduling services require these public members.
+      'step-lint/component-public-fields': [
+        'warn',
+        {
+          exclusions: [
+            { interfaceName: 'DialogParentService', exclusions: ['returnParentUrl', 'dialogSuccessfullyClosed'] },
+            { interfaceName: 'SchedulerInvokerService', exclusions: ['openScheduler'] },
+          ],
+        },
+      ],
+    },
   },
 ]);

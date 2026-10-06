@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   provideStepApi,
   StepCoreModule,
@@ -20,7 +19,7 @@ import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
 import { PLUGINS_INITIALIZER } from './plugins-initializer/plugins-initializer';
 import { Settings } from 'luxon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, RouteReuseStrategy } from '@angular/router';
 import { RootComponent } from './components/root/root.component';
 import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
@@ -31,6 +30,8 @@ import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './mo
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 import { InProgressComponent } from './components/in-progress/in-progress.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ExecutionRouteReuseStrategy } from './modules/execution/services/execution-route-reuse-strategy';
 
 Settings.defaultLocale = 'en';
 
@@ -45,6 +46,7 @@ const MODULES_INITIALIZERS = [
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
   imports: [
     StepCommonModule,
+    BrowserAnimationsModule.withConfig({ disableAnimations: true }),
     BrowserModule,
     StepCoreModule,
     ...ERRORS_VIEW_IMPORTS,
@@ -53,7 +55,6 @@ const MODULES_INITIALIZERS = [
     FunctionModule,
     ...AUTOMATION_PACKAGE_IMPORTS,
     ExecutionModule,
-    BrowserAnimationsModule,
     SchedulerModule,
     ParameterModule,
     GridModule,
@@ -67,6 +68,7 @@ const MODULES_INITIALIZERS = [
   ],
   exports: [RootComponent],
   providers: [
+    { provide: RouteReuseStrategy, useClass: ExecutionRouteReuseStrategy },
     provideStepApi(),
     LEGACY_URL_HANDLER,
     ...MODULES_INITIALIZERS,

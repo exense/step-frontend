@@ -1,0 +1,13 @@
+@if (launchContext()?.allowExecutionTargetSelection) {
+  <section class="execution-target" aria-label="Execution target">
+    <step-tabs
+      class="target-tabs"
+      [tabs]="targets"
+      [shrink]="true"
+      [activeTabId]="selectedTarget()"
+      [attr.inert]="_strategy.busy() ? '' : null"
+      [attr.aria-disabled]="_strategy.busy()"
+      (activeTabIdChange)="selectTarget($event)"
+    />
+  </section>
+}

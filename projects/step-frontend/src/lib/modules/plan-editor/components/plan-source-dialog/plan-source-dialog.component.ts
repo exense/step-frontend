@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, DOCUMENT } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AceMode } from '@exense/step-core';
@@ -18,7 +17,7 @@ export class PlanSourceDialogComponent {
 
   protected readonly AceMode = AceMode;
 
-  copyToClipboard(): void {
+  protected copyToClipboard(): void {
     from(this._clipboard.writeText(this._planSource)).subscribe(() => {
       this._snackBar.open(`Plan's YAML copied to clipboard.`, 'dismiss');
     });

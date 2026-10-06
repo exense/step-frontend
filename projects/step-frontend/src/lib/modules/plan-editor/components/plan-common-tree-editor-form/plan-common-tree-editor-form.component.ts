@@ -14,8 +14,9 @@ import {
   PlanContextApiService,
   PlanContext,
   DropInfo,
+  PlanReferencePolicyService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -40,6 +41,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private _dialogs = inject(DialogsService);
   private _copyBuffer = inject(CopyBufferService);
   private _artefactsFactory = inject(ArtefactsFactoryService);
+  private _planReferencePolicy = inject(PlanReferencePolicyService);
   private _destroyRef = inject(DestroyRef);
 
   context?: any;
@@ -68,7 +70,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
         artefact$ = this._artefactsFactory.createCallKeywordArtefact(controlDropInfo.id);
         break;
       case ControlType.PLAN:
-        artefact$ = this._artefactsFactory.createCallPlanArtefact(controlDropInfo.id);
+        artefact$ = this.createCallPlanArtefact(controlDropInfo.id);
         break;
       default:
         break;
@@ -130,9 +132,15 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
-    const artefactsCreation = planIds.map((id) => this._artefactsFactory.createCallPlanArtefact(id));
+    const artefactsCreation = planIds.map((id) => this.createCallPlanArtefact(id));
     forkJoin(artefactsCreation).subscribe((artefacts) => {
       this._treeState.addChildrenToSelectedNode(...artefacts);
+    });
+  }
+
+  private createCallPlanArtefact(planId: string): Observable<AbstractArtefact> {
+    return this._artefactsFactory.createCallPlanArtefact(planId, {
+      referenceMode: this._planReferencePolicy.planInsertionMode,
     });
   }
 
@@ -319,13 +327,21 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
         switchMap((context) => this._planEditorApi.savePlan(context!)),
+        switchMap((savedContext) => {
+          if (!savedContext.forceRefresh) {
+            return of(savedContext);
+          }
+          return this.selectedNode$.pipe(
+            first(),
+            tap((node) => this.init(savedContext, node?.id)),
+            map(() => undefined),
+          );
+        }),
+        filter((savedContext): savedContext is PlanContext => !!savedContext),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((savedContext) => {
-        const forceRefresh = savedContext.forceRefresh;
-        if (forceRefresh) {
-          this.initContextWithSelectedNode(savedContext);
-        } else if (this.planContext()) {
+        if (this.planContext()) {
           this.planContextInternal.update((ctx) => ({
             ...ctx!,
             entity: {
@@ -335,10 +351,6 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
           }));
         }
       });
-  }
-
-  private initContextWithSelectedNode(context: PlanContext): void {
-    this.selectedNode$.pipe(first()).subscribe((node) => this.init(context, node?.id));
   }
 
   private cloneArtefactsFromBuffer(): Observable<AbstractArtefact[] | undefined> {

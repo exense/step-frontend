@@ -1,5 +1,5 @@
 import { Component, computed, contentChild, inject, signal, ViewEncapsulation } from '@angular/core';
-import { filter, map, Observable, of, switchMap, take } from 'rxjs';
+import { filter, finalize, map, Observable, of, switchMap, take } from 'rxjs';
 import { DialogsService, FileDownloaderService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { TAB_EXPORTS } from '../../../tabs';
 import { WidgetsPersistenceStateService } from '../../injectables/widgets-persistence-state.service';
@@ -38,6 +38,9 @@ interface LayoutEditState {
   templateUrl: './grid-layout-tabs.component.html',
   styleUrl: './grid-layout-tabs.component.scss',
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '(window:keyup.escape)': 'handleEscape()',
+  },
   imports: [
     StepBasicsModule,
     TAB_EXPORTS,
@@ -57,6 +60,7 @@ export class GridLayoutTabsComponent {
   private _reportLayoutApi = inject(ReportLayoutService);
   private _fileDownloader = inject(FileDownloaderService);
   private _gridLayoutExternalTabs = inject(GridLayoutExternalTabsService, { optional: true });
+  private isCancelConfirmationOpen = false;
 
   protected readonly layoutPresets = this._widgetsPersistence.gridPresets;
   protected readonly selectedPreset = this._widgetsPersistence.selectedPreset;
@@ -238,13 +242,16 @@ export class GridLayoutTabsComponent {
       });
   }
 
+  protected handleEscape(): void {
+    if (!this.editState() || this.isCancelConfirmationOpen) {
+      return;
+    }
+    this.cancelEdit();
+  }
+
   protected cancelEdit(): void {
     const hasChanges = this._gridEditable.hasChanges();
-    const confirmed$ = !hasChanges
-      ? of(true)
-      : this._dialogs.showWarning(
-          'You have unsaved changes in current preset. If you cancel edit mode, changes will be lost. Do you want to continue?',
-        );
+    const confirmed$ = this.confirmCancel(hasChanges);
 
     confirmed$.pipe(take(1)).subscribe((isConfirmed) => {
       if (!isConfirmed) {
@@ -257,6 +264,19 @@ export class GridLayoutTabsComponent {
         this.selectTab(previousTarget);
       }
     });
+  }
+
+  private confirmCancel(hasChanges: boolean): Observable<boolean> {
+    if (!hasChanges) {
+      return of(true);
+    }
+
+    this.isCancelConfirmationOpen = true;
+    return this._dialogs
+      .showWarning(
+        'You have unsaved changes in current preset. If you cancel edit mode, changes will be lost. Do you want to continue?',
+      )
+      .pipe(finalize(() => (this.isCancelConfirmationOpen = false)));
   }
 
   private initializeDuplicatePreset(

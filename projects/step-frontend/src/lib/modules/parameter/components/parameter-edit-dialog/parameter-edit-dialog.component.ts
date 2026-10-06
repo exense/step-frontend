@@ -15,7 +15,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { combineLatest, delay, map, Observable, of, switchMap, take, throwError } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
 import { catchError } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
@@ -29,6 +28,8 @@ interface ParameterEditDialogData {
   selector: 'step-parameter-edit-dialog',
   templateUrl: './parameter-edit-dialog.component.html',
   styleUrls: ['./parameter-edit-dialog.component.scss'],
+  //todo reimplement with css
+  /*
   animations: [
     trigger('fadeInOut', [
       state('visible', style({ opacity: 1 })),
@@ -36,13 +37,14 @@ interface ParameterEditDialogData {
       transition('hidden <=> visible', animate('300ms ease-in-out')),
     ]),
   ],
+*/
   hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ParameterEditDialogComponent implements OnInit {
-  private form = viewChild('parameterForm', { read: NgForm });
+  private readonly form = viewChild('parameterForm', { read: NgForm });
 
-  animationState: 'visible' | 'hidden' = 'visible';
+  protected animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
   private _authService = inject(AuthService);
   private _allScopeItems = inject(SCOPE_ITEMS);
@@ -57,22 +59,22 @@ export class ParameterEditDialogComponent implements OnInit {
 
   protected parameter = this._dialogData.entity;
 
-  readonly DateFormat = DateFormat;
-  readonly isEditMode = !this._dialogData.isNew;
+  protected readonly DateFormat = DateFormat;
+  protected readonly isEditMode = !this._dialogData.isNew;
 
   protected scopeItems: ScopeItem[] = [];
   protected selectedScope?: ScopeItem;
   protected protectedParameter = false;
   protected error?: string;
 
-  readonly modalTitle = `${this.isEditMode ? 'Edit' : 'New'} Parameter`;
+  protected readonly modalTitle = `${this.isEditMode ? 'Edit' : 'New'} Parameter`;
 
   ngOnInit(): void {
     this.initParameter();
     this.initScopeItems();
   }
 
-  saveInternal(event?: KeyboardEvent): Observable<Parameter> {
+  protected saveInternal(event?: KeyboardEvent): Observable<Parameter> {
     if (
       (!!event?.target && event?.target instanceof HTMLTextAreaElement) ||
       (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write'))
@@ -91,13 +93,13 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   @HostListener('keydown.enter', ['$event'])
-  save(event?: KeyboardEvent): void {
+  protected save(event?: KeyboardEvent): void {
     this.saveInternal(event).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
   }
 
-  saveAndNext() {
+  protected saveAndNext(): void {
     this.animationState = 'hidden';
     this.saveInternal()
       .pipe(
@@ -125,7 +127,7 @@ export class ParameterEditDialogComponent implements OnInit {
       });
   }
 
-  addCondition(type?: 'AND' | 'OR') {
+  protected addCondition(type?: 'AND' | 'OR'): void {
     this._screenService
       .getScreenInputsByScreenId('executionParameters')
       .pipe(
@@ -150,7 +152,7 @@ export class ParameterEditDialogComponent implements OnInit {
       });
   }
 
-  selectScope(scopeItem: ScopeItem): void {
+  protected selectScope(scopeItem: ScopeItem): void {
     if (!this.parameter) {
       return;
     }
@@ -189,7 +191,7 @@ export class ParameterEditDialogComponent implements OnInit {
       .subscribe((scopeItems) => (this.scopeItems = scopeItems));
   }
 
-  onKeyChange(key: string) {
+  protected onKeyChange(key: string): void {
     if (!this.parameter) {
       return;
     }
@@ -200,7 +202,7 @@ export class ParameterEditDialogComponent implements OnInit {
     }
   }
 
-  setProtectedValue(protectedValue: boolean) {
+  protected setProtectedValue(protectedValue: boolean): void {
     this.parameter.protectedValue = protectedValue;
 
     //as dynamic expressions don't work with protected parameters we have to migrate to value

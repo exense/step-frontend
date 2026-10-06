@@ -185,7 +185,7 @@
    </style>
   `;
 
-  const getHtml = (initialMessage: string) => `
+  const getHtml = (initialMessage: string): string => `
 <section class="global-indicator-container">
   ${STYLE}
   <svg width="100" height="100" viewBox="0 0 24 24" fill="#0082cb" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
@@ -211,15 +211,15 @@
     `(press F5 or the reload button)`;
 
   class GlobalIndicatorElement extends HTMLElement {
-    static get observedAttributes() {
-      return ['message', 'fallback-message', 'timeout'];
+    static get observedAttributes(): string[] {
+      return ['message', 'fallback-message', 'timeout', 'error-message'];
     }
 
     private timerId?: number;
     private timeout = DEFAULT_TIMEOUT;
     private fallbackMessage = DEFAULT_FALLBACK_MESSAGE;
 
-    connectedCallback() {
+    connectedCallback(): void {
       const initialMessage = this.getAttribute('message') ?? '';
       this.innerHTML = getHtml(initialMessage);
     }
@@ -246,12 +246,23 @@
         case 'message':
           this.showMessage(newValue as string);
           break;
+        case 'error-message':
+          this.showErrorMessage(newValue as string);
+          break;
       }
     }
 
     private showMessage(message: string): void {
       this.printMessageInDivContainer('.global-indicator-container__message', message);
       this.showFallbackMessage();
+    }
+
+    private showErrorMessage(message: string): void {
+      if (this.timerId !== undefined) {
+        clearTimeout(this.timerId);
+      }
+      this.timerId = undefined;
+      this.printMessageInDivContainer('.global-indicator-container__timeout-message', message);
     }
 
     private showFallbackMessage(): void {
@@ -292,6 +303,10 @@
 
     setFallbackMessageTimeout(timeout: number): void {
       this.indicatorElement?.setAttribute?.('timeout', timeout.toString());
+    }
+
+    showErrorMessage(message: string): void {
+      this.indicatorElement?.setAttribute?.('error-message', message);
     }
 
     private get indicatorElement(): HTMLElement | null {

@@ -1,10 +1,9 @@
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, DOCUMENT } from '@angular/core';
 import { DateFormat, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 import { of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-call-function-report-node',
@@ -23,8 +22,9 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   protected readonly execution = toSignal(this.execution$.pipe(takeUntilDestroyed()), { initialValue: undefined });
 
-  readonly DateFormat = DateFormat;
+  protected readonly DateFormat = DateFormat;
 
+  /* eslint-disable @angular-eslint/prefer-signals -- Preserve the report-node component's existing mutable input API and OnChanges handling. */
   @Input() node!: ReportNode | any | { measures: Measure[] };
   @Input() children!: ReportNode[];
 
@@ -32,6 +32,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   @Input() hideMeasures: boolean = false;
   @Input() hideRouting: boolean = true;
+  /* eslint-enable @angular-eslint/prefer-signals */
 
   ngOnChanges(changes: SimpleChanges): void {
     const cNode = changes['node'];
@@ -40,7 +41,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     }
   }
 
-  navigateToAnalyticsView(measure: Measure): void {
+  protected navigateToAnalyticsView(measure: Measure): void {
     const execution = this.execution();
     if (!execution) {
       return;

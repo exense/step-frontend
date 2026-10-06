@@ -1,7 +1,6 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation, DOCUMENT } from '@angular/core';
 import { ViewerFormat } from '../../shared/viewer-format.enum';
 import { JsonViewerFormatterService } from '../../services/json-viewer-formatter.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-json-viewer',
@@ -14,10 +13,12 @@ export class JsonViewerComponent implements OnChanges {
   private _formatter = inject(JsonViewerFormatterService);
   private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
 
+  /* eslint-disable @angular-eslint/prefer-signals -- Keep the existing mutable input API, including the toolbox's two-way format binding. */
   @Input() json?: unknown;
   @Input() format: ViewerFormat = ViewerFormat.JSON;
+  /* eslint-enable @angular-eslint/prefer-signals */
 
-  readonly ViewFormat = ViewerFormat;
+  protected readonly ViewFormat = ViewerFormat;
 
   protected isExtendedView = false;
   protected hasContent = false;
@@ -29,11 +30,11 @@ export class JsonViewerComponent implements OnChanges {
     }
   }
 
-  toggleExtended(): void {
+  protected toggleExtended(): void {
     this.isExtendedView = !this.isExtendedView;
   }
 
-  copyToClipboard(): void {
+  protected copyToClipboard(): void {
     const valueToCopy = this.getFormattedString();
     this._clipboard.writeText(valueToCopy);
   }

@@ -764,11 +764,13 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   protected isRefreshInProgress = false;
 
-  protected refresh(): void {
+  protected refresh(options: { emitTreeUpdate?: boolean } = {}): void {
     this.isRefreshInProgress = true;
     const root = this._treeNodeUtils.convertItem(this.originalRoot!);
     this.rootNode.set(root);
-    this.treeUpdateInternal$.next(this.originalRoot!);
+    if (options.emitTreeUpdate !== false) {
+      this.treeUpdateInternal$.next(this.originalRoot!);
+    }
     setTimeout(() => (this.isRefreshInProgress = false), 500);
   }
 

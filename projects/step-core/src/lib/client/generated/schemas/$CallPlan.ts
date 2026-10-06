@@ -9,6 +9,12 @@ export const $CallPlan = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     attributes: {
       type: 'dictionary',
       contains: {
@@ -23,12 +29,6 @@ export const $CallPlan = {
     },
     description: {
       type: 'string',
-    },
-    children: {
-      type: 'array',
-      contains: {
-        type: 'AbstractArtefact',
-      },
     },
     customAttributes: {
       type: 'dictionary',
@@ -54,6 +54,12 @@ export const $CallPlan = {
     },
     before: {
       type: 'ChildrenBlock',
+    },
+    children: {
+      type: 'array',
+      contains: {
+        type: 'AbstractArtefact',
+      },
     },
     after: {
       type: 'ChildrenBlock',

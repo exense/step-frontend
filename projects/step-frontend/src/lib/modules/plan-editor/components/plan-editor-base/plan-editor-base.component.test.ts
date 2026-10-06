@@ -166,6 +166,7 @@ class PlanEditorHarnessComponent implements OnInit {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _planEditor = inject(PlanEditorService);
 
+  // eslint-disable-next-line step-lint/component-public-fields -- The navigation scenarios assign context directly on this harness.
   context?: PlanContext;
 
   ngOnInit(): void {
@@ -205,7 +206,6 @@ describe('PlanEditorBaseComponent strategy handoff', () => {
     fixture!.detectChanges();
     await fixture!.whenStable();
     fixture!.detectChanges();
-    TestBed.flushEffects();
   };
 
   const openContext = async (context: PlanContext): Promise<void> => {
@@ -435,7 +435,7 @@ describe('PlanEditorBaseComponent strategy handoff', () => {
     ).planTypeControl;
 
     control.setValue({ planType: 'SavedVisualRoot', icon: '' });
-    TestBed.flushEffects();
+    await stabilize();
 
     expect(currentEditor()).toBe(visualInstance);
     expect(tracker.callsFor('visual').map((call) => call.context.id)).toEqual(['A', 'A-saved']);
@@ -460,7 +460,6 @@ describe('PlanEditorBaseComponent strategy handoff', () => {
 
     fixture!.destroy();
     fixture = undefined;
-    TestBed.flushEffects();
     expect(planEditor.planContext()).toBeUndefined();
 
     createHost();
@@ -490,12 +489,11 @@ describe('PlanEditorBaseComponent strategy handoff', () => {
     expect(() => harnessFixture.detectChanges()).not.toThrow();
     await harnessFixture.whenStable();
     harnessFixture.detectChanges();
-    TestBed.flushEffects();
 
     harness.context = createContext('B', SOURCE_PLAN);
     expect(() => harnessFixture.detectChanges()).not.toThrow();
     await harnessFixture.whenStable();
-    TestBed.flushEffects();
+    harnessFixture.detectChanges();
 
     expect(tracker.callsFor('visual').map((call) => call.context.id)).toEqual(['A']);
     expect(tracker.callsFor('source').map((call) => call.context.id)).toEqual(['B']);

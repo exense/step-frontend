@@ -1,0 +1,91 @@
+<step-modal-window
+  [title]="
+    completed()
+      ? operation === 'DEPLOY'
+        ? 'Deployment Complete'
+        : 'Remote Execution Started'
+      : operation === 'DEPLOY'
+        ? 'Deploy Automation Package'
+        : 'Execute Automation Package'
+  "
+>
+  <div step-modal-window-body class="operation-body">
+    @if (completed()) {
+      <p class="intro">
+        {{
+          operation === 'DEPLOY'
+            ? 'This Automation Package was deployed to the remote server.'
+            : 'This Automation Package was submitted for execution on the remote server.'
+        }}
+      </p>
+    } @else {
+      <p class="intro">
+        {{
+          operation === 'DEPLOY'
+            ? 'Deploy this Automation Package to the remote server.'
+            : 'Execute this Automation Package on the remote server.'
+        }}
+      </p>
+    }
+    @if (target(); as target) {
+      <step-ide-remote-target [target]="target">
+        @if (operation === 'EXECUTE' && !completed()) {
+          <step-ide-remote-execution-options [request]="executionRequest()" />
+        }
+      </step-ide-remote-target>
+    }
+    @if (operation === 'EXECUTE' && planNames(); as names) {
+      <h3 class="result-heading">{{ completed() ? 'Execution results' : 'Plans to execute' }} ({{ names.length }})</h3>
+      <step-ide-remote-results
+        [planNames]="names"
+        [results]="executionResults()"
+        [wrapIntoTestSet]="executionRequest()?.wrapIntoTestSet ?? false"
+      />
+    }
+    @if (plansLoading()) {
+      <div role="status">Loading plans from this Automation Package…</div>
+    }
+    @if (readinessError(); as error) {
+      <step-alert type="warning" role="status">{{ error }}</step-alert>
+    }
+    @if (submissionError(); as error) {
+      <step-alert type="danger" role="alert">{{ error }}</step-alert>
+    }
+    @if (busy()) {
+      <div class="operation-progress" role="status" aria-live="polite">
+        <strong>{{
+          operation === 'DEPLOY' ? 'Deploying the Automation Package…' : 'Starting the remote execution…'
+        }}</strong>
+        <span>This can take a moment. Keep this dialog open until it finishes.</span>
+        <mat-progress-bar mode="indeterminate" />
+      </div>
+    }
+    @if (deploymentSucceeded()) {
+      @if (deploymentResult()?.status === 'UPDATE_DELAYED') {
+        <step-alert type="warning" role="status"> Deployment succeeded, but the package update is delayed. </step-alert>
+      } @else {
+        <step-alert type="success" role="status">Deployment succeeded.</step-alert>
+      }
+      @for (warning of deploymentWarnings(); track warning.id) {
+        <step-alert type="warning" role="status">{{ warning.text }}</step-alert>
+      }
+    }
+  </div>
+  <div step-modal-window-buttons>
+    @if (completed()) {
+      <button type="button" mat-flat-button color="primary" mat-dialog-close>Close</button>
+    } @else {
+      <button type="button" mat-stroked-button mat-dialog-close [disabled]="busy()">Cancel</button>
+      <button
+        type="button"
+        mat-flat-button
+        color="primary"
+        [disabled]="!!readinessError() || plansLoading() || busy()"
+        [attr.aria-busy]="busy()"
+        (click)="submit()"
+      >
+        {{ operation === 'DEPLOY' ? 'Deploy' : 'Execute' }}
+      </button>
+    }
+  </div>
+</step-modal-window>

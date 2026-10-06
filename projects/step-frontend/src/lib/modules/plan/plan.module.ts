@@ -76,13 +76,14 @@ export class PlanModule {
                   dialogComponent: AltExecutionLaunchDialogComponent,
                   resolve: {
                     repoRef: (route: ActivatedRouteSnapshot) => {
-                      const planContextApi = inject(PurePlanContextApiService);
+                      const _planContextApi = inject(PurePlanContextApiService);
                       const planId = route.params['id'];
-                      return planContextApi.createRepositoryObjectReference(planId);
+                      return _planContextApi.createRepositoryObjectReference(planId);
                     },
                   },
                   data: {
                     title: 'Execute Plan',
+                    allowExecutionTargetSelection: true,
                   },
                 }),
               ],
@@ -121,9 +122,9 @@ export class PlanModule {
                   resolve: {
                     id: (route: ActivatedRouteSnapshot) => route.params['id'],
                     filename: (route: ActivatedRouteSnapshot) => {
-                      const api = inject(AugmentedPlansService);
+                      const _api = inject(AugmentedPlansService);
                       const id = route.params['id'];
-                      return api.getPlanById(id).pipe(
+                      return _api.getPlanById(id).pipe(
                         map((plan) => plan.attributes!['name']),
                         map((name) => `${name}.sta`),
                       );
@@ -202,6 +203,7 @@ export class PlanModule {
                 },
                 data: {
                   title: 'Execute Plan',
+                  allowExecutionTargetSelection: true,
                 },
               }),
             ],

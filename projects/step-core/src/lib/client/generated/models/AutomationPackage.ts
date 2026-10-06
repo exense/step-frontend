@@ -6,12 +6,13 @@ import type { Expression } from './Expression';
 
 export type AutomationPackage = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   creationDate?: string;
   creationUser?: string;
   lastModificationDate?: string;
   lastModificationUser?: string;
-  status?: 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED';
+  status?: 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED' | 'EDITING';
   versionName?: string;
   activationExpression?: Expression;
   automationPackageResource?: string;

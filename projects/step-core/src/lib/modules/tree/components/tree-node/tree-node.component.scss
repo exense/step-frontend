@@ -2,7 +2,7 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 .step-tree-node-container .tree-node.tree-node-selected step-tree-node-name {
-  background: var.$gray-100;
+  background: var(--step-selection-background-color, var.$gray-100);
 }
 
 .step-tree-node-container {

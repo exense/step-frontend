@@ -17,6 +17,7 @@
 @use 'print';
 @use 'material-overrides' as mat-ov;
 @use 'step-skeleton' as skeleton;
+@use 'step-spin' as spin;
 @use '../core-variables' as var;
 
 @forward 'step-sidebar' show step-define-sidebar-config;
@@ -160,6 +161,7 @@ $light-primary-text: var.$white;
 
   $inputs-config: step-inputs.step-define-inputs-config(
     $primary-color: $primary-color,
+    $primary-text-color: $text-color,
   );
 
   @include step-inputs.inputs($inputs-config);
@@ -176,7 +178,7 @@ $light-primary-text: var.$white;
   @include step-ts-marker.timeseries-marker();
 
   .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
-    color: var.$blue-600;
+    color: var(--step-accent-color, var.$blue-600);
   }
 
   .cdk-overlay-pane {
@@ -213,7 +215,7 @@ $light-primary-text: var.$white;
     height: 3.6rem;
     min-width: 3.6rem;
     min-height: 3.6rem;
-    --mdc-icon-button-state-layer-size: 3.6rem;
+    --mat-icon-button-state-layer-size: 3.6rem;
   }
 
   .mat-mdc-button-base {
@@ -283,4 +285,5 @@ $light-primary-text: var.$white;
 
   @include print.print-overrides;
   @include skeleton.skeleton-animations;
+  @include spin.step-spin;
 }

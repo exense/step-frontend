@@ -6,11 +6,9 @@ import {
   inject,
   Injector,
   input,
-  model,
   OnDestroy,
   OnInit,
   output,
-  signal,
   Type,
   untracked,
   viewChild,
@@ -45,9 +43,9 @@ import {
   CustomRegistryType,
   PlanContext,
   AuthService,
-  ExecutionParameters,
+  PlanReferencePolicyService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -103,6 +101,7 @@ export interface ActionsConfig {
   ],
   standalone: false,
 })
+/* eslint-disable step-lint/component-public-fields -- This editor exposes its existing template API and implements injected editor service contracts. */
 export class PlanEditorBaseComponent
   implements
     OnInit,
@@ -130,6 +129,7 @@ export class PlanEditorBaseComponent
   private _injector = inject(Injector);
   private _customRegistryService = inject(CustomRegistryService);
   public _planEditorService = inject(PlanEditorService);
+  private _planReferencePolicy = inject(PlanReferencePolicyService);
 
   private planTypeChangeTerminator$?: Subject<void>;
 
@@ -176,14 +176,6 @@ export class PlanEditorBaseComponent
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
 
-  private readonly initializeContextEffect = effect(() => {
-    const context = this.initialPlanContext();
-    untracked(() => {
-      this.initializeContext(context ?? undefined, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(context?.id);
-    });
-  });
-
   private effectCheckAccessToPlanTypeControl = effect(() => {
     const planEditorType = this._planEditorService.plan();
     untracked(() => {
@@ -192,6 +184,14 @@ export class PlanEditorBaseComponent
       } else {
         this.planTypeControl.disable({ emitEvent: false });
       }
+    });
+  });
+
+  private readonly initialPlanContextEffect = effect(() => {
+    const context = this.initialPlanContext();
+    untracked(() => {
+      this.initializeContext(context ?? undefined, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(context?.id);
     });
   });
 
@@ -284,6 +284,10 @@ export class PlanEditorBaseComponent
     const artefact = this._treeState.getSelectedNodes()[0]?.originalArtefact;
     const isPlan = artefact?._class === 'CallPlan';
     const isKeyword = artefact?._class === 'CallKeyword';
+
+    if (isPlan && !this._planReferencePolicy.canNavigateToReferencedPlan(artefact)) {
+      return;
+    }
 
     const NO_DATA = 'NO_DATA';
 
@@ -426,7 +430,7 @@ export class PlanEditorBaseComponent
     this.planTypeControl.valueChanges
       .pipe(
         map((item) => {
-          const context = this._planEditorService.planContext();
+          const context = untracked(() => this._planEditorService.planContext());
           return { item, context };
         }),
         filter(({ item, context }) => !!item && !!context),
@@ -467,3 +471,4 @@ export class PlanEditorBaseComponent
     this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }
+/* eslint-enable step-lint/component-public-fields */

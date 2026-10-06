@@ -1,27 +1,42 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { map, of } from 'rxjs';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../../table/table.module';
-import { StepBasicsModule, LinkDisplayType } from '../../../basics/step-basics.module';
+import { StepBasicsModule, LinkDisplayType, IDE_MODE } from '../../../basics/step-basics.module';
 import { Plan } from '../../../../client/step-client-module';
 import { PlanUrlPipe } from '../../pipes/plan-url.pipe';
+import { isAiGeneratedEntity } from '../../types/entity-origin';
+import { AiGeneratedBadgeComponent } from '../ai-generated-badge/ai-generated-badge.component';
 
 @Component({
   selector: 'step-plan-link',
   templateUrl: './plan-link.component.html',
   styleUrls: ['./plan-link.component.scss'],
-  imports: [StepBasicsModule, PlanUrlPipe],
+  imports: [StepBasicsModule, PlanUrlPipe, AiGeneratedBadgeComponent],
 })
-export class PlanLinkComponent implements CustomComponent {
+export class PlanLinkComponent implements CustomComponent, OnChanges {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
+  protected readonly _isIdeMode = inject(IDE_MODE);
   private readonly options$ = this._customColumnOptions?.options$ ?? of([]);
 
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- CustomComponent renderers assign context directly.
   @Input() context?: Plan;
-  @Input() linkDisplayType: LinkDisplayType = LinkDisplayType.TEXT_ONLY;
+  readonly linkDisplayType = input(LinkDisplayType.TEXT_ONLY);
 
-  readonly LinkDisplayType = LinkDisplayType;
+  protected readonly LinkDisplayType = LinkDisplayType;
+  protected isAiGenerated = false;
 
-  readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
+  protected readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
 
-  readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
+  protected readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['context']) {
+      this.isAiGenerated = isAiGeneratedEntity(this.context);
+    }
+  }
+
+  contextChange(_previousContext?: Plan, currentContext?: Plan): void {
+    this.isAiGenerated = isAiGeneratedEntity(currentContext);
+  }
 }

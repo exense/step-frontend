@@ -6,6 +6,7 @@ import { NodePluginModule } from './modules/node-plugin/node-plugin.module';
 import { JmeterPluginModule } from './modules/jmeter-plugin/jmeter-plugin.module';
 import { MavenRepositoryModule } from './modules/maven-repository/maven-repository.module';
 import { YamlPlanEditorModule } from './modules/yaml-plan-editor/yaml-plan-editor.module';
+import { IdeModeModule } from './modules/ide-mode/ide-mode.module';
 
 @NgModule({
   declarations: [],
@@ -24,6 +25,10 @@ export class PluginModule extends PluginLazyLoad {
       yamlPlanEditor: {
         isForceLoad: true,
         load: () => Promise.resolve({ Module: YamlPlanEditorModule }),
+      },
+      ideMode: {
+        isForceLoad: true,
+        load: () => Promise.resolve({ Module: IdeModeModule }),
       },
     };
   }
