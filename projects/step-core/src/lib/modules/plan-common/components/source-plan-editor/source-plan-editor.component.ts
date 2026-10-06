@@ -49,11 +49,11 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
 
   readonly mode = input.required<AceMode>();
 
-  private editorElement = viewChild<ElementRef<HTMLDivElement>>('editor');
+  private readonly editorElement = viewChild<ElementRef<HTMLDivElement>>('editor');
 
   private editor?: ace.Ace.Editor;
 
-  private planContextInternal = signal<PlanContext | undefined>(undefined);
+  private readonly planContextInternal = signal<PlanContext | undefined>(undefined);
 
   readonly planContext = this.planContextInternal.asReadonly();
 
@@ -62,7 +62,7 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
   protected editorSize = this._planEditorPersistenceState.getPanelSize(EDITOR_SIZE);
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
 
-  private parseCallback = () => {
+  private parseCallback = (): void => {
     if (this.updateEditorWithoutSave) {
       return;
     }
@@ -182,7 +182,7 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
       });
   }
 
-  init(planContext: PlanContext, selectedArtefactId?: string, updateEditor: boolean = true) {
+  init(planContext: PlanContext, selectedArtefactId?: string, updateEditor: boolean = true): void {
     if (this.editor && updateEditor) {
       this.updateEditorWithoutSave = true;
       this.editor.setValue((planContext.plan as any).source, 1);
@@ -201,7 +201,7 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
   }
 
   ngOnDestroy(): void {
-    this._planEditorService.removeStrategy();
+    this._planEditorService.removeStrategy(this);
     this.editor!.getSession().off('change', this.parseCallback);
     this.editor!.destroy();
   }
@@ -280,10 +280,14 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
       } else {
         const context = this.planContext()!;
         context.plan = completionResult.plan!;
-        this._planContextApi.savePlan(context).subscribe((updatedContext) => {
-          this.init(updatedContext, undefined, false);
-        });
+        this.savePlan(context);
       }
+    });
+  }
+
+  private savePlan(context: PlanContext): void {
+    this._planContextApi.savePlan(context).subscribe((updatedContext) => {
+      this.init(updatedContext, undefined, false);
     });
   }
 }

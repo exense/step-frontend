@@ -46,11 +46,11 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
-  readonly _isIdeMode = inject(IDE_MODE);
+  protected readonly _isIdeMode = inject(IDE_MODE);
 
-  readonly _plansApiService = inject(AugmentedPlansService);
+  protected readonly _plansApiService = inject(AugmentedPlansService);
 
-  readonly dataSource = this._plansApiService.getPlansTableDataSource();
+  protected readonly dataSource = this._plansApiService.getPlansTableDataSource();
 
   readonly returnParentUrl = '/plans/list';
 
@@ -66,7 +66,7 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
     this.dataSource.reload();
   }
 
-  duplicatePlan(id: string): void {
+  protected duplicatePlan(id: string): void {
     this._plansApiService
       .clonePlan(id)
       .pipe(
@@ -76,7 +76,7 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
       .subscribe();
   }
 
-  deletePlan(plan: Plan): void {
+  protected deletePlan(plan: Plan): void {
     const name = plan.attributes?.['name'];
     this._dialogs
       .showDeleteWarning(1, `Plan "${name}"`)
@@ -89,7 +89,7 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
       .subscribe();
   }
 
-  lookUp(id: string, name: string): void {
+  protected lookUp(id: string, name: string): void {
     this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
   }
 

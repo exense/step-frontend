@@ -1,4 +1,4 @@
-import {MenuEntry} from '@exense/step-core';
+import { MenuEntry } from '@exense/step-core';
 
 const ideMenuItem = (item: Omit<MenuEntry, 'isVisibleFunction' | 'isEnabledFunction'>): MenuEntry => ({
   ...item,
