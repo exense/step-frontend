@@ -15,6 +15,7 @@
               <step-aggregated-status
                 [hasDescendantInvocations]="node?.hasDescendantInvocations"
                 [countByStatus]="node?.countByStatus"
+                [interactive]="true"
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
               <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{

@@ -18,10 +18,10 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
 
   private strategySyncEffects: EffectRef[] = [];
 
-  private planContextInternal = signal<PlanContext | undefined>(undefined);
-  private hasRedoInternal = signal(false);
-  private hasUndoInternal = signal(false);
-  private targetExecutionParametersInternal = signal<Record<string, string>>({});
+  private readonly planContextInternal = signal<PlanContext | undefined>(undefined);
+  private readonly hasRedoInternal = signal(false);
+  private readonly hasUndoInternal = signal(false);
+  private readonly targetExecutionParametersInternal = signal<Record<string, string>>({});
 
   readonly hasRedo = this.hasRedoInternal.asReadonly();
   readonly hasUndo = this.hasUndoInternal.asReadonly();
@@ -71,22 +71,31 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
 
     this.strategySyncEffects.push(effectUndo, effectRedo, effectPlanContext);
 
-    if (this.planContextInit) {
-      this.strategy.init(this.planContextInit, this.selectedArtefactIdInit);
-      this.planContextInit = undefined;
-      this.selectedArtefactIdInit = undefined;
+    const context = this.planContextInit;
+    const selectedArtefactId = this.selectedArtefactIdInit;
+    this.planContextInit = undefined;
+    this.selectedArtefactIdInit = undefined;
+
+    if (context) {
+      strategy.init(context, selectedArtefactId);
     }
     this.strategyChangedInternal$.next();
   }
 
-  removeStrategy(): void {
+  removeStrategy(expectedStrategy?: PlanEditorStrategy): void {
+    if (expectedStrategy && this.strategy !== expectedStrategy) {
+      return;
+    }
+
     this.terminateStrategySubscriptions();
     this.strategy = undefined;
-    this.strategyChangedInternal$.next();
+    this.planContextInit = undefined;
+    this.selectedArtefactIdInit = undefined;
     this.hasUndoInternal.set(false);
     this.hasRedoInternal.set(false);
     this.planContextInternal.set(undefined);
     this.targetExecutionParametersInternal.set({});
+    this.strategyChangedInternal$.next();
   }
 
   addControl(artefactTypeId: string): void {
@@ -102,7 +111,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategy.addKeywords(keywordIds);
   }
 
-  moveOut(node?: AbstractArtefact) {
+  moveOut(node?: AbstractArtefact): void {
     if (!this.strategy) {
       return;
     }

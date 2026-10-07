@@ -1,0 +1,73 @@
+<step-modal-window title="Create Package" [disableCloseByEsc]="creating()">
+  <form step-modal-window-body id="create-package-form" [formGroup]="form" (ngSubmit)="create()">
+    <step-form-field [showRequiredMarker]="true">
+      <step-label>Package name</step-label>
+      <input
+        id="package-name"
+        aria-label="Package name"
+        type="text"
+        formControlName="name"
+        [class.has-errors]="errors().length > 0"
+        [class.has-warnings]="!errors().length && proposal()?.warnings?.length"
+        aria-describedby="package-feedback"
+      />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <step-error>
+          @if (form.controls.name.errors?.['required']) {
+            A package name is required
+          } @else if (form.controls.name.errors?.['pattern']) {
+            Enter a package name other than "." or "..".
+          }
+        </step-error>
+      }
+    </step-form-field>
+    <step-form-field [showRequiredMarker]="true">
+      <step-label>Location</step-label>
+      <input
+        id="package-location"
+        aria-label="Location"
+        type="text"
+        formControlName="location"
+        [class.has-errors]="errors().length > 0"
+        [class.has-warnings]="!errors().length && proposal()?.warnings?.length"
+        aria-describedby="package-directory package-feedback"
+      />
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-stroked-button
+          aria-label="Browse for location"
+          matTooltip="Browse for location"
+          (click)="browse()"
+          [disabled]="creating()"
+        >
+          <step-icon name="folder" />
+        </button>
+      </step-suffix>
+      @if (form.controls.location.touched && form.controls.location.invalid) {
+        <step-error>Enter the containing folder.</step-error>
+      }
+    </step-form-field>
+    <div id="package-directory" class="package-directory" aria-live="polite">
+      @if (proposal()?.directory; as directory) {
+        The automation package will be created in {{ directory }}
+      } @else if (validating()) {
+        Checking package location…
+      }
+    </div>
+    <div id="package-feedback" aria-live="polite">
+      @for (error of errors(); track error) {
+        <p class="error"><step-icon name="alert-circle" />{{ error }}</p>
+      }
+      @for (warning of proposal()?.warnings ?? []; track warning) {
+        <p class="warning"><step-icon name="alert-triangle" />{{ warning }}</p>
+      }
+    </div>
+  </form>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="_dialogRef.close()" [disabled]="creating()">Cancel</button>
+    <button type="submit" form="create-package-form" mat-flat-button color="primary" [disabled]="creating()">
+      {{ creating() ? 'Creating…' : 'Create' }}
+    </button>
+  </div>
+</step-modal-window>

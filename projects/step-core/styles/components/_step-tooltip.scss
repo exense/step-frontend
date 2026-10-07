@@ -3,7 +3,7 @@
 @mixin tooltip($text-color) {
   .mat-mdc-tooltip > div {
     white-space: pre-line;
-    background-color: var.$blue-700;
+    background-color: var(--step-surface-dark-color, var.$blue-700);
     color: var.$gray-200;
     box-shadow:
       0px 2px 4px -1px rgba(0, 0, 0, 0.2),

@@ -1,0 +1,110 @@
+<div class="package-area">
+  <div class="package-control">
+    @if (_ideState.currentPackage(); as package) {
+      <button
+        type="button"
+        class="package-details package-menu-trigger"
+        [matTooltip]="'AP path: ' + package.directory"
+        [matMenuTriggerFor]="packageMenu"
+        aria-label="Package actions for {{ package.name }}"
+      >
+        <step-icon name="file" />
+        <span class="package-selection">
+          <span class="package-name">{{ package.name }}</span>
+          <step-icon name="chevron-down" class="package-chevron" />
+        </span>
+      </button>
+      <button
+        type="button"
+        class="package-refresh"
+        matTooltip="Reload package"
+        aria-label="Reload package {{ package.name }}"
+        [disabled]="_ideState.inProgress()"
+        (click)="_ideState.reload()"
+      >
+        <step-icon name="refresh-cw" [class.spin-animation]="_ideState.inProgress()" />
+      </button>
+      @if (package.warnings?.length) {
+        <step-popover [mode]="PopoverMode.CLICK" [noPadding]="true" [whiteBackground]="true" [smallFont]="false">
+          <button
+            type="button"
+            mat-icon-button
+            class="package-warning"
+            data-step-testid="ide-package-warnings-btn"
+            matTooltip="Limited support"
+            aria-label="Warnings for package {{ package.name }}"
+          >
+            <step-icon name="alert-triangle" />
+          </button>
+          <step-popover-content>
+            <step-display-alert class="step-ide-package-warnings" type="warning" title="Package Warnings">
+              <ul>
+                @for (warning of package.warnings; track warning) {
+                  <li>{{ warning }}</li>
+                }
+              </ul>
+            </step-display-alert>
+          </step-popover-content>
+        </step-popover>
+      }
+    } @else {
+      <span class="package-details package-empty">
+        <step-icon name="file" />
+        <span class="package-name">No package opened</span>
+      </span>
+    }
+  </div>
+</div>
+
+<div class="remote-area">
+  @for (item of remoteDashlets; track item.id) {
+    <step-dashlet class="remote-extension" [itemKey]="item.template" />
+  }
+</div>
+
+<mat-menu #packageMenu>
+  @if (_ideState.currentPackage(); as package) {
+    <div class="step-ide-package-path">{{ package.directory }}</div>
+    <mat-divider />
+    <button type="button" mat-menu-item (click)="_ideState.reload()" [disabled]="_ideState.inProgress()">
+      <step-icon name="refresh-cw" />
+      <span>Reload package</span>
+    </button>
+    <button type="button" mat-menu-item [matMenuTriggerFor]="openMenu" [disabled]="_ideState.inProgress()">
+      <step-icon name="folder" />
+      <span>Open another package</span>
+    </button>
+    <button type="button" mat-menu-item (click)="_ideState.create()" [disabled]="_ideState.inProgress()">
+      <step-icon name="plus" />
+      <span>New package</span>
+    </button>
+    <mat-divider />
+    <button type="button" mat-menu-item (click)="_ideState.close()" [disabled]="_ideState.inProgress()">
+      <step-icon name="x" />
+      <span>Close package</span>
+    </button>
+  }
+</mat-menu>
+<mat-menu #openMenu>
+  <button type="button" mat-menu-item (click)="_ideState.openWithPicker()">
+    <step-icon name="folder" />
+    <span>Open from filesystem</span>
+  </button>
+  @if (_apAccessHistory.history().length > 0) {
+    <mat-divider />
+    <div class="step-ide-history-label">Recent packages</div>
+    @for (item of _apAccessHistory.history(); track item.directory) {
+      <button
+        type="button"
+        class="step-ide-history-item"
+        mat-menu-item
+        (click)="_ideState.openFromPath(item.directory!)"
+      >
+        <div class="step-ide-history-content">
+          <span>{{ item.name }}</span>
+          <span>{{ item.directory }}</span>
+        </div>
+      </button>
+    }
+  }
+</mat-menu>

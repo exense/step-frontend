@@ -9,6 +9,12 @@ export const $MetricType = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     name: {
       type: 'string',
       isRequired: true,

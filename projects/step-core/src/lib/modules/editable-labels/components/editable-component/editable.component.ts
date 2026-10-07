@@ -12,9 +12,10 @@ import {
   Input,
   Output,
   TemplateRef,
+  DOCUMENT,
 } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { DOCUMENT } from '@angular/common';
+
 import { Mutable } from '../../../basics/step-basics.module';
 import { EditableLabelTemplateDirective } from '../../directives/editable-label-template.directive';
 
@@ -39,17 +40,19 @@ export abstract class EditableComponent<T> implements ControlValueAccessor {
   protected _document = inject(DOCUMENT);
 
   /** @Input('labelTemplate') **/
-  labelTemplateInput = input<TemplateRef<{}> | undefined>(undefined, {
+  readonly labelTemplateInput = input<TemplateRef<{}> | undefined>(undefined, {
     alias: 'labelTemplate',
   });
 
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Preserve the existing mutable input API of this shared base component.
   @Input() tooltip: string = '';
 
   @Output() stateChange = new EventEmitter<EditableComponentState>();
 
   /** @ContentChild(EditableLabelTemplateDirective) **/
-  private labelTemplateDirective = contentChild(EditableLabelTemplateDirective);
+  private readonly labelTemplateDirective = contentChild(EditableLabelTemplateDirective);
 
+  // eslint-disable-next-line step-lint/component-public-fields -- LabelTemplateAccessor exposes this public template accessor.
   readonly labelTemplate = computed(() => this.labelTemplateDirective()?.templateRef ?? this.labelTemplateInput()!);
 
   protected readonly State = EditableComponentState;

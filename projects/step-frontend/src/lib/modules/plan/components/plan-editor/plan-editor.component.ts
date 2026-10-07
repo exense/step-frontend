@@ -9,6 +9,7 @@ import {
   ScheduledTaskTemporaryStorageService,
   ReloadableDirective,
   EntityRefService,
+  provideResourceApId,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SchedulerInvokerService } from '../../../execution/execution.module';
@@ -27,6 +28,10 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
       provide: EntityRefService,
       useExisting: forwardRef(() => PlanEditorComponent),
     },
+    provideResourceApId(() => {
+      const _entityRef = inject<EntityRefService<Plan>>(EntityRefService);
+      return _entityRef.currentEntity;
+    }),
   ],
   standalone: false,
 })
@@ -38,9 +43,9 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService, Ent
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
-  readonly _planEditorService = inject(PlanEditorService);
+  protected readonly _planEditorService = inject(PlanEditorService);
 
-  readonly initialPlanContext$ = this._activatedRoute.data.pipe(
+  protected readonly initialPlanContext$ = this._activatedRoute.data.pipe(
     map((data) => data['plan'] as Plan),
     map((plan) => this._purePlanContextApi.createContext(plan)),
   );
@@ -51,7 +56,7 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService, Ent
       .subscribe(() => this._cd.detectChanges());
   }
 
-  launchPlan(): void {
+  protected launchPlan(): void {
     this._router.navigate(['.', 'launch'], { relativeTo: this._activatedRoute });
   }
 

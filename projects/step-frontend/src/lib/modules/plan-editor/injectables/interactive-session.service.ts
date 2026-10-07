@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedScreenService,
@@ -50,7 +50,7 @@ export class InteractiveSessionService implements OnDestroy {
       repositoryObject,
       userID: '',
       mode: 'RUN',
-      customParameters: this.executionParameters(),
+      customParameters: untracked(() => this.executionParameters()),
     };
 
     return this._screenTemplates

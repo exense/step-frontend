@@ -14,6 +14,7 @@ import {
   tableColumnsConfigProvider,
   AlertType,
   entitySelectionStateProvider,
+  IDE_MODE,
   DateFormat,
   StepDataSource,
 } from '@exense/step-core';
@@ -57,6 +58,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
   private _schedulerService = inject(AugmentedSchedulerService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  protected readonly _isIdeMode = inject(IDE_MODE);
   private _changeDetectorRef = inject(ChangeDetectorRef);
 
   private updateDataSourceAfterChange = pipe(
@@ -67,10 +69,10 @@ export class ScheduledTaskListComponent implements DialogParentService {
     }),
   );
 
-  readonly ActiveLabels = ActiveLabels;
-  readonly DateFormat = DateFormat;
+  protected readonly ActiveLabels = ActiveLabels;
+  protected readonly DateFormat = DateFormat;
 
-  readonly dataSource = this._schedulerService.createDataSource() as StepDataSource<ScheduledTask>;
+  protected readonly dataSource = this._schedulerService.createDataSource() as StepDataSource<ScheduledTask>;
   readonly returnParentUrl = '/scheduler';
 
   protected readonly isSchedulerDisabled = toSignal(
@@ -81,16 +83,16 @@ export class ScheduledTaskListComponent implements DialogParentService {
     { initialValue: false },
   );
 
-  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+  protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
-  readonly settingsUrl = '/admin/controller/scheduler';
+  protected readonly settingsUrl = '/admin/controller/scheduler';
 
-  readonly statusItems: StatusItem[] = [
+  protected readonly statusItems: StatusItem[] = [
     { key: true.toString(), value: this.ActiveLabels.ACTIVE },
     { key: false.toString(), value: this.ActiveLabels.INACTIVE },
   ];
 
-  readonly extractor: ArrayItemLabelValueExtractor<StatusItem> = {
+  protected readonly extractor: ArrayItemLabelValueExtractor<StatusItem> = {
     getValue: (item) => item.key,
     getLabel: (item) => item.value,
   };
@@ -99,13 +101,13 @@ export class ScheduledTaskListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
-  executeTask(scheduledTask: ExecutiontTaskParameters): void {
+  protected executeTask(scheduledTask: ExecutiontTaskParameters): void {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
       this._router.navigateByUrl(this._commonEntitiesUrls.executionUrl(executionId));
     });
   }
 
-  switchActive(scheduledTask: ScheduledTask): void {
+  protected switchActive(scheduledTask: ScheduledTask): void {
     this._schedulerService
       .getExecutionTaskById(scheduledTask.id!)
       .pipe(
@@ -141,7 +143,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
     this._changeDetectorRef.markForCheck();
   }
 
-  deleteTask(scheduledTask: ExecutiontTaskParameters): void {
+  protected deleteTask(scheduledTask: ExecutiontTaskParameters): void {
     const paramName: string = scheduledTask.attributes!['name']!;
 
     this._dialogs

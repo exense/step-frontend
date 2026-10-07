@@ -1,0 +1,48 @@
+<section class="ide-empty-content" aria-labelledby="ide-empty-title">
+  <div class="ide-studio-brand" role="img" aria-label="Step Studio">
+    <div class="sidebar-logo" aria-hidden="true"></div>
+  </div>
+  <h1 id="ide-empty-title">Welcome To The Step Studio</h1>
+  <p class="ide-empty-description">Open or create an Automation Package to get started.</p>
+
+  @if (_ideState.inProgress()) {
+    <p class="ide-empty-progress" role="status">Loading automation package…</p>
+  } @else {
+    <div class="ide-empty-actions">
+      <button type="button" (click)="_ideState.openWithPicker()">
+        <step-icon name="folder" />
+        <span>Open package</span>
+      </button>
+      <button type="button" (click)="_ideState.create()">
+        <step-icon name="plus" />
+        <span>New package</span>
+      </button>
+    </div>
+
+    @if (recentPackages().length > 0) {
+      <section class="ide-recent-packages" aria-labelledby="ide-recent-title">
+        <h2 id="ide-recent-title">Recently opened packages</h2>
+        <ul>
+          @for (item of recentPackages(); track item.directory) {
+            @if (item.directory; as directory) {
+              <li>
+                <button
+                  type="button"
+                  (click)="_ideState.openFromPath(directory)"
+                  [attr.aria-label]="'Open package ' + item.name"
+                >
+                  <step-icon name="file" />
+                  <span class="ide-recent-package-info">
+                    <strong>{{ item.name }}</strong>
+                    <span [title]="directory">{{ directory }}</span>
+                  </span>
+                  <step-icon name="chevron-right" />
+                </button>
+              </li>
+            }
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

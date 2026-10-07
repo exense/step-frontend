@@ -78,7 +78,7 @@ export class AltExecutionDrilldownNavigationUtilsService {
         case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
           return [
             DrillDownStackItemType.AGGREGATED_REPORT_NODE,
-            `${item.nodeId};${item?.searchStatus ?? ''};${item?.searchStatusCount ?? ''}`,
+            `${item.nodeId};${item.searchStatuses?.join(',') ?? ''}`,
           ];
         case DrillDownStackItemType.REPORT_NODE:
           return [DrillDownStackItemType.REPORT_NODE, item.nodeId];

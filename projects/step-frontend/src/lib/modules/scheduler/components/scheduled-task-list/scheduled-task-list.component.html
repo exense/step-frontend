@@ -1,4 +1,9 @@
-@if (isSchedulerDisabled()) {
+@if (_isIdeMode) {
+  <step-alert class="scheduler-warning" [type]="AlertType.INFO">
+    Schedules are never triggered in the Studio. Their active state is saved with the Automation Package and applies
+    once it is deployed to a Step instance.
+  </step-alert>
+} @else if (isSchedulerDisabled()) {
   <step-alert class="scheduler-warning" [type]="AlertType.WARNING">
     <span>Schedule execution is disabled and will not run until reactivated in</span>
     <span>
@@ -26,7 +31,7 @@
       entity="tasks"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
-      <step-btn-group class="import-export">
+      <step-btn-group *stepNonIde class="import-export">
         <a
           data-step-testid="import-schedule-btn"
           type="button"
@@ -64,6 +69,7 @@
         </a>
       </step-btn-group>
       <a
+        *stepNonIde
         data-step-testid="configure-scheduler-btn"
         type="button"
         mat-icon-button
@@ -180,15 +186,17 @@
           >
             <step-icon name="play" />
           </button>
-          <a
-            stepTestId="cross-execution-schedule-btn"
-            mat-icon-button
-            matTooltip="Open scheduled execution report"
-            [disabled]="!('execution-read' | hasRight | async)"
-            [routerLink]="element | taskReportPageUrl"
-          >
-            <step-icon name="file-07" />
-          </a>
+          @if (!_isIdeMode) {
+            <a
+              stepTestId="cross-execution-schedule-btn"
+              mat-icon-button
+              matTooltip="Open scheduled execution report"
+              [disabled]="!('execution-read' | hasRight | async)"
+              [routerLink]="element | taskReportPageUrl"
+            >
+              <step-icon name="file-07" />
+            </a>
+          }
           <step-entity-menu-button
             data-step-testid="task-entity-menu-btn"
             [entityItem]="element"
@@ -237,6 +245,7 @@
       Delete schedule
     </button>
     <a
+      *stepNonIde
       data-step-testid="export-schedule-btn"
       mat-menu-item
       [disabled]="!('task-read' | hasRight | async)"

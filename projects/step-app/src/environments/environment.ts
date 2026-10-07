@@ -4,6 +4,8 @@
 
 export const environment = {
   production: false,
+  ideMode: false,
+  enterpriseMode: false,
 };
 
 /*

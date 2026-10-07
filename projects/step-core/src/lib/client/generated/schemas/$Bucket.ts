@@ -9,6 +9,12 @@ export const $Bucket = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     begin: {
       type: 'number',
       format: 'int64',
@@ -49,6 +55,10 @@ export const $Bucket = {
         type: 'number',
         format: 'int64',
       },
+    },
+    average: {
+      type: 'number',
+      format: 'int64',
     },
     id: {
       type: 'string',

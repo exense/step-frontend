@@ -1,8 +1,7 @@
 import { TraceViewerComponent } from './trace-viewer.component';
 import { TestBed } from '@angular/core/testing';
 import { APP_HOST } from '../../../../client/_common';
-import { ComponentRef } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { ComponentRef, DOCUMENT } from '@angular/core';
 
 describe('Trace Viewer', () => {
   let componentRef: ComponentRef<TraceViewerComponent>;
@@ -36,7 +35,7 @@ describe('Trace Viewer', () => {
     componentRef.setInput('reportUrl', 'https://step.ch/reports/1');
 
     const doc = TestBed.inject(DOCUMENT);
-    const spyWindowOpen = jest.spyOn(doc.defaultView!, 'open').mockImplementation(() => {});
+    const spyWindowOpen = jest.spyOn(doc.defaultView!, 'open').mockImplementation(() => null);
 
     expect(spyWindowOpen).not.toHaveBeenCalled();
     componentRef.instance.openInSeparateTab();

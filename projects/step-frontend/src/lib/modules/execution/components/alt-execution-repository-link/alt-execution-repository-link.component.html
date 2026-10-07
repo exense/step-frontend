@@ -35,6 +35,18 @@
       <step-icon name="external-link" />
     </a>
   }
+} @else if (planLinkDisabledReason(); as disabledReason) {
+  <a
+    class="plan-link plan-link-disabled"
+    role="link"
+    tabindex="0"
+    aria-disabled="true"
+    aria-label="Navigate to plan (unavailable)"
+    [matTooltip]="disabledReason"
+    matTooltipPosition="right"
+  >
+    <step-icon name="external-link" />
+  </a>
 }
 @if (automationPackageLinkParams(); as params) {
   <a

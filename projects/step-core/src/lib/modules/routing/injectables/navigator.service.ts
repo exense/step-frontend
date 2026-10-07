@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, DOCUMENT } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
 import { filter, first, map, Observable, shareReplay, startWith } from 'rxjs';
@@ -42,7 +42,9 @@ export class NavigatorService {
     return this.activeUrl$.pipe(
       startWith(this._router.url),
       map((url) =>
-        view.isActiveFunction ? view.isActiveFunction(url) : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
+        view.isActiveFunction
+          ? view.isActiveFunction(url)
+          : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
       ),
     );
   }

@@ -1,5 +1,4 @@
-import { inject, Injectable, NgZone, signal, Signal } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, NgZone, signal, Signal, DOCUMENT } from '@angular/core';
 
 export interface IndicatorState {
   show(): void;
@@ -16,7 +15,7 @@ class IndicatorStateImpl implements IndicatorState {
 
   private timerId?: number;
   private hideRequested = false;
-  private isVisibleInternal = signal(false);
+  private readonly isVisibleInternal = signal(false);
   readonly isVisible = this.isVisibleInternal.asReadonly();
 
   show(): void {

@@ -1,4 +1,14 @@
-import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  forwardRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewEncapsulation,
+  DOCUMENT,
+} from '@angular/core';
 import {
   AlertType,
   AugmentedExecutionsService,
@@ -40,7 +50,7 @@ import {
   EXECUTION_TREE_PAGING_SETTINGS,
   ExecutionTreePagingService,
 } from '../../services/execution-tree-paging.service';
-import { DOCUMENT } from '@angular/common';
+
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
@@ -107,7 +117,7 @@ export class ExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _viewRegistry = inject(ViewRegistryService);
   private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
-  public _executionPanels = inject(SingleExecutionPanelsService);
+  protected _executionPanels = inject(SingleExecutionPanelsService);
   private _testCasesSelectionState =
     inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
   private _treeUtils = inject(ReportTreeNodeUtilsService);
@@ -118,25 +128,25 @@ export class ExecutionProgressComponent
   private _destroyRef = inject(DestroyRef);
   private _currentExecutionTerminator$?: Subject<void>;
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
   private isTreeInitialized = false;
 
-  readonly Panels = Panels;
-  readonly AlertType = AlertType;
+  protected readonly Panels = Panels;
+  protected readonly AlertType = AlertType;
 
-  tabs: Dashlet[] = [];
-  activeTab?: Dashlet;
+  protected tabs: Dashlet[] = [];
+  protected activeTab?: Dashlet;
 
   private readonly executionInternal = signal<Execution | undefined>(undefined);
   execution?: Execution;
   testCases?: ReportNode[];
-  selectedTestCases?: ReportNode[];
+  protected selectedTestCases?: ReportNode[];
   testCasesDataSource?: TableDataSource<ReportNode>;
   keywordSearch?: string;
 
-  readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/legacy/messages');
+  protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/legacy/messages');
 
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
@@ -146,7 +156,7 @@ export class ExecutionProgressComponent
   currentOperations: Operation[] = [];
   selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
-  showAutoRefreshButton = false;
+  protected showAutoRefreshButton = false;
 
   private selectionList?: SelectionList<string, ReportNode>;
 
@@ -160,7 +170,7 @@ export class ExecutionProgressComponent
 
   readonly currentEntity = this.executionInternal.asReadonly();
 
-  readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(
+  protected readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(
     map((ids) => {
       const testCases = this.testCases || [];
       if (ids.length === testCases.length) {
@@ -178,7 +188,7 @@ export class ExecutionProgressComponent
   );
 
   executionId?: string;
-  activeExecution?: ActiveExecution;
+  protected activeExecution?: ActiveExecution;
   protected activeTabId?: string;
 
   showNodeInTree(nodeId: string): void {
@@ -245,7 +255,7 @@ export class ExecutionProgressComponent
     this.keywordSearch = escapeRegExp(error);
   }
 
-  selectTab(tabId: string, isInitialize?: boolean): void {
+  protected selectTab(tabId: string, isInitialize?: boolean): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
     const routeUrl = this._activatedRoute.snapshot.url;
@@ -263,7 +273,7 @@ export class ExecutionProgressComponent
     this._executionTabManager.handleTabClose(executionId, openList);
   }
 
-  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+  protected handleTaskSchedule(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
   }

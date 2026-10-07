@@ -12,7 +12,7 @@
 
 .error-message {
   font-style: italic;
-  color: var.$blue-700;
+  color: var(--step-text-color, var.$blue-700);
   white-space: pre-wrap;
   grid-column: 1/3;
 }

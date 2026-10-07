@@ -1,0 +1,195 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-ide-header-bar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  width: 100%;
+  min-width: 0;
+  padding: 1rem 2.5rem;
+
+  .package-area,
+  .remote-area {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .package-area {
+    flex: 0 1 auto;
+  }
+
+  .remote-area {
+    justify-content: flex-end;
+    margin-left: auto;
+    max-width: 100%;
+  }
+
+  .remote-extension {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .package-control {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .package-details {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var.$white;
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+
+    .package-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 24rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+  }
+
+  .package-empty {
+    color: var.$gray-400;
+
+    .package-name {
+      font-weight: 500;
+    }
+  }
+
+  .package-menu-trigger,
+  .package-refresh {
+    display: inline-flex;
+    align-items: center;
+    color: var.$white;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 0.5rem;
+  }
+
+  .package-warning {
+    color: var.$orange-100;
+    flex: 0 0 auto;
+  }
+
+  .package-menu-trigger {
+    min-width: 0;
+    padding-right: 0.4rem;
+
+    .package-selection {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-width: 0;
+    }
+
+    .package-chevron {
+      display: flex;
+      align-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      min-width: 1.5rem;
+      min-height: 1.5rem;
+      flex: 0 0 auto;
+      opacity: 0.8;
+    }
+  }
+
+  .package-refresh {
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.8rem;
+    height: 2.8rem;
+    padding: 0;
+
+    step-icon {
+      display: flex;
+      align-items: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      min-width: 1.6rem;
+      min-height: 1.6rem;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  .package-menu-trigger:hover,
+  .package-menu-trigger:focus-visible,
+  .package-refresh:hover:not(:disabled),
+  .package-refresh:focus-visible {
+    background: rgb(255 255 255 / 12%);
+  }
+
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    padding: 0.8rem 1.2rem;
+
+    .remote-area {
+      margin-left: 0;
+    }
+  }
+}
+
+.step-ide-package-path {
+  max-width: 32rem;
+  padding: 1rem 1.6rem;
+  color: var.$gray-550;
+  overflow-wrap: anywhere;
+}
+
+.step-ide-package-warnings {
+  display: block;
+  max-width: min(40rem, calc(100vw - 3.2rem));
+  overflow-wrap: anywhere;
+
+  ul {
+    margin: 0;
+    padding-left: 1.6rem;
+  }
+
+  li + li {
+    margin-top: 0.6rem;
+  }
+}
+
+.step-ide-history-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+
+  span:last-child {
+    font-size: 1.1rem;
+    color: var.$gray-550;
+  }
+}
+
+.step-ide-history-label {
+  color: var.$gray-525;
+  font-size: 1rem;
+  margin: 0.8rem 0 0 0.8rem;
+}
+
+step-sidebar {
+  #sidebar-home-and-settings {
+    margin-top: 6.5rem !important;
+  }
+
+  #sidebar-categories {
+    margin-top: 12.8rem !important;
+  }
+}

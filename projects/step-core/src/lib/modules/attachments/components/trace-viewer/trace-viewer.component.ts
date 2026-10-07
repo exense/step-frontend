@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, DOCUMENT } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DOCUMENT, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { APP_HOST } from '../../../../client/step-client-module';
 
 @Component({
@@ -20,7 +20,7 @@ export class TraceViewerComponent {
 
   private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
-  private traceViewerUrl = computed(() => {
+  private readonly traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
     const finalUrl = !reportUrl
       ? this.traceViewerPath
@@ -33,6 +33,7 @@ export class TraceViewerComponent {
     return this._sanitizer.bypassSecurityTrustResourceUrl(url);
   });
 
+  // eslint-disable-next-line step-lint/component-public-fields -- AttachmentDialogComponent invokes this method on its child viewer.
   openInSeparateTab(): void {
     const url = this.traceViewerUrl();
     this._doc.defaultView!.open(url, '_blank');

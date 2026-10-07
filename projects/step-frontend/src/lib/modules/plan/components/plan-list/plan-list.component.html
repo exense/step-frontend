@@ -6,7 +6,7 @@
       entity="plans"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-btn-group class="import-export">
+      <step-btn-group *stepNonIde class="import-export">
         <a
           data-step-testid="import-plan-btn"
           type="button"
@@ -32,6 +32,7 @@
       </step-btn-group>
       <step-btn-group class="create-button-group">
         <a
+          *stepNonIde
           stepTestId="upload-package-btn"
           mat-flat-button
           color="primary"
@@ -109,15 +110,17 @@
           >
             <step-icon name="copy" />
           </button>
-          <a
-            stepTestId="cross-execution-plan-btn"
-            mat-icon-button
-            matTooltip="Open plan report"
-            [disabled]="!('plan-read' | hasRight | async)"
-            [routerLink]="element.id | crossExecutionPlanUrl"
-          >
-            <step-icon name="file-07" />
-          </a>
+          @if (!_isIdeMode) {
+            <a
+              stepTestId="cross-execution-plan-btn"
+              mat-icon-button
+              matTooltip="Open plan report"
+              [disabled]="!('plan-read' | hasRight | async)"
+              [routerLink]="element.id | crossExecutionPlanUrl"
+            >
+              <step-icon name="file-07" />
+            </a>
+          }
           <button
             data-step-testid="delete-plan-btn"
             mat-icon-button
@@ -154,6 +157,7 @@
       Schedule this plan
     </button>
     <a
+      *stepNonIde
       data-step-testid="export-plan-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"

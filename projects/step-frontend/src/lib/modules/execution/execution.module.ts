@@ -1,4 +1,4 @@
-import { inject, NgModule } from '@angular/core';
+import { inject, NgModule, DOCUMENT } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -17,6 +17,7 @@ import {
   canLeaveComponent,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  ControllerService,
   DashletRegistryService,
   DialogParentService,
   dialogRoute,
@@ -25,18 +26,15 @@ import {
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
-  IncludeTestcases,
   MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
-  ReportNode,
   schedulePlanRoute,
   SearchPaginatorComponent,
   sequenceCanActivateGuards,
   SimpleOutletComponent,
   stepRouteAdditionalConfig,
-  TestRunStatus,
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
@@ -68,6 +66,7 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { RECREATE_ON_EXECUTION_CHANGE } from './services/execution-route-reuse-strategy';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
@@ -103,8 +102,9 @@ import { AltExecutionParametersComponent } from './components/alt-execution-para
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot, Router, Routes } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { ActivatedRouteSnapshot, Route, Router, Routes } from '@angular/router';
+import { catchError, forkJoin, map, of, switchMap, take } from 'rxjs';
+import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from './shared/relaunch-test-cases';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -159,6 +159,7 @@ import { SchedulerPageComponent } from './components/schedule-overview/scheduler
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
+import { AltExecutionPackageWarningComponent } from './components/alt-execution-package-warning/alt-execution-package-warning.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
@@ -169,8 +170,162 @@ import { GradientLegendComponent } from './components/schedule-overview/cross-ex
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
-import { DOCUMENT } from '@angular/common';
+
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
+
+const createAltExecutionNodeDetailsRoute = (): Route => ({
+  path: 'node-details',
+  component: SimpleOutletComponent,
+  children: [
+    {
+      matcher: (url) => {
+        if (
+          url.length > 0 &&
+          (url[0].path === DrilldownRootType.TREE ||
+            url[0].path === DrilldownRootType.TESTCASES ||
+            url[0].path === DrilldownRootType.KEYWORDS)
+        ) {
+          return { consumed: url };
+        }
+        return null;
+      },
+      canActivate: [
+        () => {
+          inject(AltExecutionRefreshActivityService).setupRefreshActivity(
+            AltExecutionRefreshActivity.TREE,
+            AltExecutionRefreshActivity.KEYWORDS_TABLE,
+            AltExecutionRefreshActivity.TEST_CASES_TABLE,
+          );
+          return true;
+        },
+      ],
+      resolve: {
+        drilldownState: (route: ActivatedRouteSnapshot) => {
+          const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
+          const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
+
+          const url = route.url;
+
+          const rootType = url[0].path as DrilldownRootType;
+
+          const result: DrillDownStackItemConfig[] = [
+            {
+              type: DrillDownStackItemType.ROOT,
+              rootType,
+              nodeId: DRILL_DOWN_ROOT_ID,
+            },
+          ];
+
+          for (let i = 1; i < url.length; i += 2) {
+            let type: DrillDownStackItemTypeWORoot;
+            switch (url[i].path) {
+              case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
+              case DrillDownStackItemType.REPORT_NODE:
+              case DrillDownStackItemType.PARTIAL_TREE:
+                type = url[i].path as DrillDownStackItemTypeWORoot;
+                break;
+              default:
+                type = DrillDownStackItemType.REPORT_NODE;
+                break;
+            }
+
+            const value = url[i + 1].path;
+            if (type === DrillDownStackItemType.REPORT_NODE) {
+              const nodeId = value;
+              result.push({ type, nodeId });
+            } else {
+              const [nodeId, searchStatuses] = value.split(';');
+              const selectedStatuses = searchStatuses
+                ? (searchStatuses.split(',') as Status[]).filter((status) => status !== Status.RUNNING)
+                : undefined;
+              result.push({
+                type,
+                nodeId,
+                searchStatuses: selectedStatuses?.length ? selectedStatuses : undefined,
+                partialTreeRootNodeId,
+              });
+            }
+          }
+
+          return result;
+        },
+      },
+      component: AggregatedTreeNodeDrilldownComponent,
+    },
+  ],
+});
+
+const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
+  path,
+  component: AltExecutionProgressComponent,
+  data: { [EXECUTION_REPORT_LAYOUT_ROUTE_DATA]: layoutId, [RECREATE_ON_EXECUTION_CHANGE]: true },
+  providers: [
+    ActiveExecutionsService,
+    AltExecutionRefreshActivityService,
+    AggregatedReportViewTreeNodeUtilsService,
+    { provide: DialogParentService, useClass: ExecutionViewDialogUrlCleanupService },
+    { provide: TreeNodeUtilsService, useExisting: AggregatedReportViewTreeNodeUtilsService },
+    { provide: AGGREGATED_TREE_WIDGET_STATE, useClass: AggregatedReportViewTreeStateService },
+    AltReportNodeDetailsStateService,
+    ActiveExecutionContextService,
+    AggregatedReportViewTreeStateContextService,
+  ],
+  canActivate: [
+    sequenceCanActivateGuards([
+      checkEntityGuardFactory({
+        entityType: 'execution',
+        getEntity: (id) => inject(AugmentedExecutionsService).getExecutionViaOverviewCached(id),
+        getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
+        isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
+        getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
+      }),
+      altExecutionGuard,
+    ]),
+    () => {
+      const _ctx = inject(AggregatedReportViewTreeStateContextService);
+      const _treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+      _ctx.setState(_treeState);
+      return true;
+    },
+  ],
+  resolve: {
+    setupActiveExecutionContext: (route: ActivatedRouteSnapshot) => {
+      inject(ActiveExecutionContextService).setupExecutionId(route.params['id']);
+      return true;
+    },
+  },
+  canDeactivate: [
+    () => {
+      inject(AugmentedExecutionsService).cleanupCache();
+      inject(MultipleProjectsService).cleanupProjectMessage();
+      return true;
+    },
+    () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+    () => inject(AltReportNodeDetailsStateService).cleanup(),
+    () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
+  ],
+  children: [
+    {
+      path: '',
+      component: AltExecutionReportComponent,
+      data: { mode: ViewMode.VIEW },
+      canActivate: [
+        () => {
+          inject(AltExecutionRefreshActivityService).setupRefreshActivity(...ALL_ALT_EXECUTION_REFRESH_ACTIVITY);
+          return true;
+        },
+      ],
+      canDeactivate: [canLeaveComponent],
+    },
+    {
+      path: 'report',
+      redirectTo: '',
+      pathMatch: 'full',
+    },
+    createAltExecutionNodeDetailsRoute(),
+  ],
+});
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
 import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
@@ -218,6 +373,7 @@ import {
 import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
+import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
 
 @NgModule({
   declarations: [
@@ -285,6 +441,7 @@ import { CrossExecutionTabsComponent } from './components/schedule-overview/cros
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
+    AltReportNodePerformanceComponent,
     AltExecutionLaunchDialogComponent,
     AltExecutionRepositoryLinkComponent,
     AltIterationListTitleComponent,
@@ -338,6 +495,7 @@ import { CrossExecutionTabsComponent } from './components/schedule-overview/cros
     NoticeBadgeLabelPipe,
   ],
   imports: [
+    AltExecutionPackageWarningComponent,
     StepCommonModule,
     OperationsModule,
     ReportNodesModule,
@@ -434,6 +592,7 @@ export class ExecutionModule {
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
     private _gridSettingsRegistry: GridSettingsRegistryService,
+    _staticLayouts: ExecutionReportStaticLayoutRegistryService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {
@@ -441,6 +600,9 @@ export class ExecutionModule {
       this.registerEntities();
       this.registerDashlets();
       this.registerRoutes();
+      _staticLayouts.setRouteRegistrar((route) =>
+        this._viewRegistry.registerRoute(staticAltExecutionReportRoute(route.path, route.layoutId)),
+      );
       this.registerInfoBanners();
       this.registerGridLayout();
       ExecutionModule._alreadyRegistered = true;
@@ -630,6 +792,7 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
+          data: { [RECREATE_ON_EXECUTION_CHANGE]: true },
           providers: [
             AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
@@ -795,131 +958,36 @@ export class ExecutionModule {
                 testCases: () => {
                   const _context = inject(ActiveExecutionContextService);
                   const _executionsApi = inject(AugmentedExecutionsService);
+                  const _controllerService = inject(ControllerService);
                   return _context.execution$.pipe(
                     take(1),
-                    map((execution) => execution?.id),
-                    switchMap((id) => {
-                      if (!id) {
-                        return of([]);
+                    switchMap((execution) => {
+                      const id = execution?.id;
+                      const repoRef = execution?.executionParameters?.repositoryObject;
+                      if (!id || !repoRef) {
+                        return of(undefined);
                       }
-                      return _executionsApi.getReportNodesByExecutionId(
-                        id,
-                        'step.artefacts.reports.TestCaseReportNode',
-                        500,
+                      return forkJoin({
+                        runs: fetchRepositoryTestRuns(_controllerService, repoRef),
+                        testCaseNodes: _executionsApi.getReportNodesByExecutionId(
+                          id,
+                          'step.artefacts.reports.TestCaseReportNode',
+                          500,
+                        ),
+                      }).pipe(
+                        map(({ runs, testCaseNodes }) =>
+                          !runs
+                            ? undefined
+                            : mergeRelaunchTestCases(runs, testCaseNodes ?? [], repoRef.repositoryID === 'local'),
+                        ),
                       );
                     }),
                     catchError(() => of(undefined)),
-                    map((testCases: ReportNode[] | undefined) => {
-                      const items = testCases?.map?.(
-                        (item) =>
-                          ({
-                            id: item.artefactID,
-                            testplanName: item.name,
-                            status: item.status,
-                          }) as TestRunStatus,
-                      );
-
-                      let list = testCases
-                        ?.filter((item) => !!item && item?.status !== 'SKIPPED')
-                        ?.map((item) => item?.artefactID!);
-                      if (list?.length === testCases?.length) {
-                        list = undefined;
-                      }
-
-                      const selection: IncludeTestcases | undefined = !list?.length
-                        ? undefined
-                        : {
-                            list,
-                            by: 'id',
-                          };
-
-                      return { items, selection };
-                    }),
                   );
                 },
               },
             }),
-            {
-              path: 'node-details',
-              component: SimpleOutletComponent,
-              children: [
-                {
-                  matcher: (url) => {
-                    if (
-                      url.length > 0 &&
-                      (url[0].path === DrilldownRootType.TREE ||
-                        url[0].path === DrilldownRootType.TESTCASES ||
-                        url[0].path === DrilldownRootType.KEYWORDS)
-                    ) {
-                      return { consumed: url };
-                    }
-                    return null;
-                  },
-                  canActivate: [
-                    () => {
-                      inject(AltExecutionRefreshActivityService).setupRefreshActivity(
-                        AltExecutionRefreshActivity.TREE,
-                        AltExecutionRefreshActivity.KEYWORDS_TABLE,
-                        AltExecutionRefreshActivity.TEST_CASES_TABLE,
-                      );
-                      return true;
-                    },
-                  ],
-                  resolve: {
-                    drilldownState: (route: ActivatedRouteSnapshot) => {
-                      const _aggregatedViewTreeStateContext = inject(AggregatedReportViewTreeStateContextService);
-                      const partialTreeRootNodeId = _aggregatedViewTreeStateContext.getState().partialTreeRootNodeId();
-
-                      const url = route.url;
-
-                      const rootType = url[0].path as DrilldownRootType;
-
-                      const result: DrillDownStackItemConfig[] = [
-                        {
-                          type: DrillDownStackItemType.ROOT,
-                          rootType,
-                          nodeId: DRILL_DOWN_ROOT_ID,
-                        },
-                      ];
-
-                      for (let i = 1; i < url.length; i += 2) {
-                        let type: DrillDownStackItemTypeWORoot;
-                        switch (url[i].path) {
-                          case DrillDownStackItemType.AGGREGATED_REPORT_NODE:
-                          case DrillDownStackItemType.REPORT_NODE:
-                          case DrillDownStackItemType.PARTIAL_TREE:
-                            type = url[i].path as DrillDownStackItemTypeWORoot;
-                            break;
-                          default:
-                            type = DrillDownStackItemType.REPORT_NODE;
-                            break;
-                        }
-
-                        const value = url[i + 1].path;
-                        if (type === DrillDownStackItemType.REPORT_NODE) {
-                          const nodeId = value;
-                          result.push({ type, nodeId });
-                        } else {
-                          const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
-                          let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
-                          searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
-                          result.push({
-                            type,
-                            nodeId,
-                            searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
-                            searchStatusCount,
-                            partialTreeRootNodeId,
-                          });
-                        }
-                      }
-
-                      return result;
-                    },
-                  },
-                  component: AggregatedTreeNodeDrilldownComponent,
-                },
-              ],
-            },
+            createAltExecutionNodeDetailsRoute(),
             {
               path: 'viz',
               redirectTo: 'analytics',
