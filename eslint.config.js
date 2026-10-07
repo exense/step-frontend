@@ -130,6 +130,13 @@ module.exports = defineConfig([
     },
   },
   {
+    files: ['projects/step-core/src/lib/modules/resource-input/components/resource-input/resource-input.component.ts'],
+    rules: {
+      // Parent components read these resource validation signals through template references.
+      'step-lint/component-public-fields': ['warn', { exclusions: ['isResource', 'resourceNotExisting'] }],
+    },
+  },
+  {
     files: ['projects/step-core/src/lib/modules/tree/components/tree/tree.component.ts'],
     rules: {
       // Parent plan and execution trees read menu state and invoke these child tree methods.

@@ -14,13 +14,14 @@ import {
   TableLocalDataSourceConfig,
   TestRunStatus,
 } from '@exense/step-core';
-import { filter, map, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
+import { filter, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
 import { ERROR_STATUSES, Status } from '../../../_common/step-common.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
+import { fetchRepositoryTestRuns } from '../../shared/relaunch-test-cases';
 
-const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
+const unique = <T>(item: T, index: number, self: T[]): boolean => self.indexOf(item) === index;
 
 @Component({
   selector: 'step-repository-plan-testcase-list',
@@ -31,7 +32,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit {
   private _selectionState = inject<EntitySelectionState<string, TestRunStatus>>(EntitySelectionState);
-  private listSelect = viewChild('listSelect', { read: SelectionList<string, TestRunStatus> });
+  private readonly listSelect = viewChild('listSelect', { read: SelectionList<string, TestRunStatus> });
 
   private _controllerService = inject(ControllerService);
 
@@ -52,23 +53,23 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   });
 
   private allData$ = toObservable(this.dataSource).pipe(switchMap((dataSource) => dataSource.allData$));
-  private allData = toSignal(this.allData$, { initialValue: [] });
+  private readonly allData = toSignal(this.allData$, { initialValue: [] });
 
-  protected statusItems = computed(() => {
+  protected readonly statusItems = computed(() => {
     const testRunStatusList = this.allData();
     return testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique);
   });
 
   private allErrorStatusesSet = new Set(ERROR_STATUSES);
 
-  private errorStatuses = computed(() => {
+  private readonly errorStatuses = computed(() => {
     const statusItems = this.statusItems();
     return statusItems.filter((item) => this.allErrorStatusesSet.has(item));
   });
 
   protected readonly hasErrorStatuses = computed(() => this.errorStatuses().length > 0);
 
-  private statusFilter = viewChild('statusFilter', { read: ArrayFilterComponent });
+  private readonly statusFilter = viewChild('statusFilter', { read: ArrayFilterComponent });
   private statusFilter$ = toObservable(this.statusFilter);
   private statusFilterValue$ = this.statusFilter$.pipe(
     switchMap((statusFilter) => {
@@ -79,7 +80,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       return ctrl.valueChanges.pipe(startWith(ctrl.value));
     }),
   );
-  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+  private readonly statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
 
   protected readonly isErrorFilterApplied = computed(() => {
     const statusFilterValue = this.statusFilterValue() ?? [];
@@ -92,7 +93,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     );
   });
 
-  private selectedItems = computed(() => {
+  private readonly selectedItems = computed(() => {
     const allData = this.allData();
     const selected = this._selectionState.selectedKeys();
     return allData.filter((item) => this._selectionState.isSelected(item));
@@ -103,7 +104,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     this.includedTestCasesChange.emit(includedTestCases);
   });
 
-  readonly includedTestCases = computed(() => {
+  private readonly includedTestCases = computed(() => {
     const repoRef = this.repoRef();
     const selectedItems = this.selectedItems();
     const allItems = this.allData();
@@ -139,6 +140,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       .subscribe((_) => this.listSelect()?.selectAll?.());
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Used by the launch dialog to restore the relaunch selection.
   reselect(idsToSelect: string[]): void {
     this.listSelect()?.selectIds(idsToSelect);
   }
@@ -171,32 +173,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   }
 
   private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[] | undefined> {
-    return of(repoRef).pipe(
-      switchMap((repoRef) => {
-        if (!repoRef) {
-          return of(undefined);
-        }
-
-        if (!repoRef?.repositoryParameters?.['planid']) {
-          return this._controllerService.getReport(repoRef).pipe(
-            map((value) => {
-              if (value?.runs?.length! > 0) {
-                value.runs!.forEach((run) => {
-                  if (!run.id) {
-                    run.id = run.testplanName;
-                  }
-                });
-              }
-              return value;
-            }),
-          );
-        }
-        return this._controllerService.getReport({
-          repositoryID: 'local',
-          repositoryParameters: { planid: repoRef?.repositoryParameters?.['planid'] },
-        });
-      }),
-      map((testSetStatusOverview) => testSetStatusOverview?.runs),
+    return fetchRepositoryTestRuns(this._controllerService, repoRef).pipe(
       tap(() => this.listSelect()?.clearSelection?.()),
       catchError((err) => {
         // error is handled in interceptor but let's return an empty array to satisfy Angular lifecycle hook
