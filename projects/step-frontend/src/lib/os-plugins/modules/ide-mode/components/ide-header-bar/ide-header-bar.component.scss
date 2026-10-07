@@ -77,6 +77,11 @@ step-ide-header-bar {
     border-radius: 0.5rem;
   }
 
+  .package-warning {
+    color: var.$orange-100;
+    flex: 0 0 auto;
+  }
+
   .package-menu-trigger {
     min-width: 0;
     padding-right: 0.4rem;
@@ -144,6 +149,21 @@ step-ide-header-bar {
   padding: 1rem 1.6rem;
   color: var.$gray-550;
   overflow-wrap: anywhere;
+}
+
+.step-ide-package-warnings {
+  display: block;
+  max-width: min(40rem, calc(100vw - 3.2rem));
+  overflow-wrap: anywhere;
+
+  ul {
+    margin: 0;
+    padding-left: 1.6rem;
+  }
+
+  li + li {
+    margin-top: 0.6rem;
+  }
 }
 
 .step-ide-history-content {

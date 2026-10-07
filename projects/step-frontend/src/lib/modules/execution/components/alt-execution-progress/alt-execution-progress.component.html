@@ -1,3 +1,4 @@
+<step-alt-execution-package-warning [execution]="execution$ | async" />
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)" [class.compact-report]="isCompactReport">
   @if (execution$ | async; as execution) {
     <div class="title">
