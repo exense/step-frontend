@@ -23,7 +23,6 @@ export class ActiveExecutionContextService {
   readonly executionId$: Observable<string> = this.executionIdInternal$.pipe(
     filter((id) => !!id),
     distinctUntilChanged((a, b) => a === b),
-    debounceTime(500),
   );
 
   readonly activeExecution$: Observable<ActiveExecution> = this.executionId$.pipe(
