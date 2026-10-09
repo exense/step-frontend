@@ -14,10 +14,14 @@
         <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
       </div>
       <step-popover-content>
-        <div class="popover-item">
+        <div class="step-auto-shrink-popover-item-content">
           <strong>{{ item.key }}</strong
           >&nbsp;
-          <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+          <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
+          &nbsp;
+          @if (itemAction()?.templateRef; as templateRef) {
+            <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item }" />
+          }
         </div>
       </step-popover-content>
     </step-popover>
@@ -68,13 +72,17 @@
           <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
             <div class="auto-shrink-popover-item">
               <strong>{{ item.key }}</strong>
-              <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+              <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
             </div>
             <step-popover-content>
-              <div class="popover-item">
+              <div class="step-auto-shrink-popover-item-content">
                 <strong>{{ item.key }}</strong
                 >&nbsp;
-                <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+                <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
+                &nbsp;
+                @if (itemAction()?.templateRef; as templateRef) {
+                  <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item }" />
+                }
               </div>
             </step-popover-content>
           </step-popover>

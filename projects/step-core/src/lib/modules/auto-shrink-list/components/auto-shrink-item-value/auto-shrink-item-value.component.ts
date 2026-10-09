@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
 import { KeyValue, NgTemplateOutlet } from '@angular/common';
-import { AutoShrinkItemActionTemplateDirective } from '../../directives/auto-shrink-item-action-template.directive';
 import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shrink-empty-value-template.directive';
 
 @Component({
@@ -14,5 +13,4 @@ import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shr
 export class AutoShrinkItemValueComponent {
   readonly item = input.required<KeyValue<string, string>>();
   readonly emptyValue = input<AutoShrinkEmptyValueTemplateDirective>();
-  readonly itemAction = input<AutoShrinkItemActionTemplateDirective>();
 }
