@@ -1,13 +1,5 @@
 step-auto-shrink-item-value {
-  display: inline-flex;
-  gap: 0.25rem;
-  align-items: center;
-  min-width: 0;
-
-  .auto-shrink-item-text {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .no-text-wrap {
+    text-wrap: nowrap !important;
   }
 }

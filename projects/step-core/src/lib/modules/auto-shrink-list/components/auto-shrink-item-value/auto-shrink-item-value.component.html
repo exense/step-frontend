@@ -1,10 +1,7 @@
 @if (item().value; as value) {
-  <span class="auto-shrink-item-text">{{ value }}</span>
+  <span class="no-text-wrap">{{ value }}</span>
 } @else {
   @if (emptyValue()?.templateRef; as templateRef) {
     <ng-container *ngTemplateOutlet="templateRef" />
   }
-}
-@if (itemAction()?.templateRef; as templateRef) {
-  <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item() }" />
 }

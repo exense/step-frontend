@@ -26,6 +26,8 @@ step-auto-shrink-list {
       display: block;
       white-space: nowrap;
       max-width: 15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
@@ -47,6 +49,8 @@ step-auto-shrink-list {
     display: block;
     white-space: nowrap;
     max-width: 15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -63,4 +67,11 @@ step-auto-shrink-list {
     min-height: 0;
     overflow: auto;
   }
+}
+
+.step-auto-shrink-popover-item-content {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: center;
 }
