@@ -17,6 +17,7 @@
   @if (outputItems(); as outputItems) {
     <step-artefact-inline-field-list
       class="bold-labels"
+      [class.has-header]="!inputItems()?.length"
       [items]="outputItems"
       hiddenItemsTooltipSuffix="additional output(s)"
     >
