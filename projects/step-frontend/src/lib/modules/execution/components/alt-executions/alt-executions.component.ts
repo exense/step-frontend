@@ -34,6 +34,10 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
   private activeExecutionId?: string;
 
   ngOnInit(): void {
+    this._activeExecutionsService.autoCloseExecution$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((executionId) => this.handleTabClose(executionId, executionId === this.activeExecutionId));
+
     this._router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -67,9 +71,11 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
       });
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- ExecutionTabManagerService requires this public method.
   handleTabClose(tabId: string, openList?: boolean): void {
     this._customMenuEntries.remove(`${URL_PREFIX}/${tabId}`);
     this._customMenuEntries.remove(`${LEGACY_URL_PREFIX}/${tabId}`);
+    this._activeExecutionsService.removeActiveExecution(tabId);
 
     if (openList) {
       this._router.navigateByUrl(`/${URL_PREFIX}/list`);
@@ -84,7 +90,10 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
 
     this.activeExecutionId = executionId;
 
-    if (this._customMenuEntries.has(executionId)) {
+    if (
+      this._customMenuEntries.has(`${URL_PREFIX}/${executionId}`) ||
+      this._customMenuEntries.has(`${LEGACY_URL_PREFIX}/${executionId}`)
+    ) {
       return;
     }
 
