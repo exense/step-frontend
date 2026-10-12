@@ -6,7 +6,7 @@
   gap: var(--inline-secondary-icon-gap, 0.5rem);
 }
 
-:host-context(.indent-call-keyword-inline) > *:not(:first-child) {
+:host-context(.indent-call-keyword-inline) > *:not(:first-child):not(.has-header) {
   margin-left: 2rem;
   max-width: calc(100% - 2rem);
 }
