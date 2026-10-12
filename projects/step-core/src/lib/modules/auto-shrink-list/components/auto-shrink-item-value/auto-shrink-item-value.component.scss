@@ -1,5 +1,39 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-auto-shrink-item-value {
-  .no-text-wrap {
-    text-wrap: nowrap !important;
+  display: block;
+  min-width: 0;
+
+  .value {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.multiline .value {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--style__display-lines);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .value[role='button'] {
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  &.openable {
+    border-radius: 1rem;
+
+    &:hover,
+    &:focus-within {
+      outline: solid 0.1rem var(--step-accent-color, var.$blue-600);
+      outline-offset: 0.2rem;
+    }
   }
 }

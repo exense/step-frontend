@@ -120,3 +120,15 @@
     }
   }
 }
+
+.step-popover-pane--constrained .step-popover {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: calc(100vw - 16px);
+
+  .step-popover__arrow {
+    left: var(--style__arrow-left, 1.6rem);
+    right: auto;
+    transform: translateX(-50%);
+  }
+}

@@ -1,5 +1,17 @@
 @if (item().value; as value) {
-  <span class="no-text-wrap">{{ value }}</span>
+  <span
+    #valueElement
+    class="value"
+    [attr.role]="isTruncated() ? 'button' : null"
+    [attr.tabindex]="isTruncated() ? 0 : null"
+    [attr.title]="isTruncated() ? 'Show full value' : null"
+    [attr.aria-label]="isTruncated() ? 'Show full value for ' + item().key : null"
+    stepUndraggedClick
+    (undraggedClick)="showFullValue($event)"
+    (keydown.enter)="showFullValue($event)"
+    (keydown.space)="showFullValue($event)"
+    >{{ value }}</span
+  >
 } @else {
   @if (emptyValue()?.templateRef; as templateRef) {
     <ng-container *ngTemplateOutlet="templateRef" />

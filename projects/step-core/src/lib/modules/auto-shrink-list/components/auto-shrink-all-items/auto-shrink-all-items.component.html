@@ -7,7 +7,7 @@
     <th mat-header-cell *matHeaderCellDef>Value</th>
     <td mat-cell *matCellDef="let element" class="item-cell">
       <div>
-        <step-auto-shrink-item-value [item]="element" [emptyValue]="emptyValue()" />
+        <step-auto-shrink-item-value [item]="element" [emptyValue]="emptyValue()" [displayLines]="3" />
         @if (itemAction()?.templateRef; as templateRef) {
           <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: element }" />
         }
