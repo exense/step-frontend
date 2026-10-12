@@ -7,6 +7,7 @@ import {
   StepCoreModule,
   ViewRegistryService,
   SimpleOutletComponent,
+  EntityRefService,
 } from '@exense/step-core';
 import { inject, NgModule } from '@angular/core';
 import { of } from 'rxjs';
@@ -79,12 +80,19 @@ export class IdeModeModule {
   }
 
   private registerRule(): void {
-    this._additionalRightRules.registerRule((right: string, isIgnoreEntity?: boolean) => {
-      if (this._ideState.hasPackage) {
+    this._additionalRightRules.registerRule((right: string, ignoreEntity?: boolean): boolean => {
+      if (!this._ideState.hasPackage) {
+        return !(right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'));
+      }
+
+      if (ignoreEntity || !(right.endsWith('-write') || right.endsWith('-delete'))) {
         return true;
       }
 
-      return !(right.endsWith('-write') || right.endsWith('-delete') || right.endsWith('-execute'));
+      const entity = inject(EntityRefService, { optional: true })?.currentEntity() as
+        | { customFields?: Record<string, unknown> }
+        | undefined;
+      return entity?.customFields?.['readOnly'] !== true;
     });
   }
 

@@ -177,9 +177,10 @@ export class PlanEditorBaseComponent
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
 
   private effectCheckAccessToPlanTypeControl = effect(() => {
-    const planEditorType = this._planEditorService.plan();
+    this._planEditorService.plan();
+    const isReadonly = this._planEditorService.isReadonly();
     untracked(() => {
-      if (this._auth.hasRight('plan-write', this._injector)) {
+      if (!isReadonly && this._auth.hasRight('plan-write', this._injector)) {
         this.planTypeControl.enable({ emitEvent: false });
       } else {
         this.planTypeControl.disable({ emitEvent: false });
@@ -433,7 +434,7 @@ export class PlanEditorBaseComponent
           const context = untracked(() => this._planEditorService.planContext());
           return { item, context };
         }),
-        filter(({ item, context }) => !!item && !!context),
+        filter(({ item, context }) => !!item && !!context && !this._planEditorService.isReadonly()),
         map(({ item, context }) => {
           const contextCopy = this._planEditorApi.createContextDuplicate(context!);
           contextCopy.plan.root!._class = item!.planType;

@@ -33,7 +33,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
   standalone: false,
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
-  private _planEditor = inject(PlanEditorService);
+  protected readonly _planEditor = inject(PlanEditorService);
   private _planEditorApi = inject(PlanContextApiService);
   private _planApi = inject(PlansService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
