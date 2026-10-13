@@ -42,6 +42,8 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 import { PlanNodesDragPreviewComponent } from './components/plan-nodes-drag-preview/plan-nodes-drag-preview.component';
 import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
+import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
+import { StepBasicsModule, ViewRegistryService } from '@exense/step-core';
 
 function context(id: string): PlanContext {
   return {
@@ -89,6 +91,7 @@ describe('Plan editor context lifecycle', () => {
         PlanArtefactListComponent,
         PlanNodesDragPreviewComponent,
         ArtefactDropInfoPipe,
+        PlanAlertsComponent,
       ],
       imports: [
         CommonModule,
@@ -98,10 +101,12 @@ describe('Plan editor context lifecycle', () => {
         StepMaterialModule,
         StepIconsModule,
         HasRightPipe,
+        StepBasicsModule,
       ],
       providers: [
         provideNoopAnimations(),
         { provide: REPOSITORY_PARAMETERS, useValue: [] },
+        { provide: ViewRegistryService, useValue: { getDashlets: () => [] } },
         provideRouter([{ path: 'plans/editor/:id', component: PlanEditorBaseComponent }]),
         { provide: PlanContextApiService, useValue: api },
         {
@@ -156,6 +161,7 @@ describe('Plan editor context lifecycle', () => {
     TestBed.overrideComponent(PlanEditorBaseComponent, {
       set: {
         template: `
+          <step-plan-alerts [planContext]="_planEditorService.planContext()" />
           <section stepDragDropGroupContainer stepDropAreaId="planTree">
             <step-plan-common-tree-editor-form />
             <step-plan-artefact-list />
@@ -171,7 +177,13 @@ describe('Plan editor context lifecycle', () => {
           <step-drag-drop-container stepDropAreaId="planTree">
             <step-tree #tree>
               <ng-container *stepTreeNodeTemplate="let node">
-                <step-tree-node-draggable [node]="node" (dragOver)="handleDragOver($event)" (dropNode)="handleDropNode($event)" />
+                <step-tree-node-draggable
+                  [node]="node"
+                  [dragDisabled]="isReadonly()"
+                  [dropDisabled]="isReadonly()"
+                  (dragOver)="handleDragOver($event)"
+                  (dropNode)="handleDropNode($event)"
+                />
               </ng-container>
             </step-tree>
           </step-drag-drop-container>
@@ -179,6 +191,68 @@ describe('Plan editor context lifecycle', () => {
       },
     });
   });
+
+  it('displays a plain-text plan and its reason without allowing edits, then opens an editable plan', fakeAsync(() => {
+    TestBed.overrideProvider(IDE_MODE, { useValue: true });
+    const fixture = TestBed.createComponent(PlanEditorBaseComponent);
+    const readOnlyContext = context('plainTestPlanNoRoot');
+    const reason = 'Plain text plans cannot be edited in the Studio. Edit the plain text file of the plan instead.';
+    readOnlyContext.plan.customFields = { readOnly: true, readOnlyReason: reason };
+    readOnlyContext.entity = readOnlyContext.plan;
+    fixture.componentRef.setInput('initialPlanContext', readOnlyContext);
+    settle(fixture);
+
+    const tree =
+      fixture.debugElement.injector.get<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
+    const editor = TestBed.inject(PlanEditorService);
+    const element: HTMLElement = fixture.nativeElement;
+    expect(tree.findNodeById('plainTestPlanNoRoot-child')).toBeDefined();
+
+    tree.selectNode('plainTestPlanNoRoot-child');
+    editor.addControl('Echo');
+    editor.addPlans(['referenced']);
+    editor.delete();
+    editor.toggleSkip();
+    editor.moveUp();
+    editor.handlePlanContextChange({
+      ...readOnlyContext,
+      plan: { ...readOnlyContext.plan, attributes: { name: 'Changed' } },
+    });
+    settle(fixture);
+    expect(api.savePlan).not.toHaveBeenCalled();
+    expect(editor.hasUndo()).toBe(false);
+    expect(tree.findNodeById('plainTestPlanNoRoot-child')).toBeDefined();
+    expect(tree.findNodeById('dropped')).toBeUndefined();
+    expect(editor.plan().attributes?.['name']).not.toBe('Changed');
+    expect(element.textContent).toContain(reason);
+    const node = element.querySelector<HTMLElement>('[data-tree-node-id="plainTestPlanNoRoot-child"] .node-content')!;
+    expect(node.getAttribute('draggable')).not.toBe('true');
+
+    const source = element.querySelector<HTMLElement>('step-plan-artefact-list tr.content-row')!;
+    const dragEvent = (type: string): Event => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'dataTransfer', { value: { setDragImage: jest.fn() } });
+      return event;
+    };
+    source.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    source.dispatchEvent(dragEvent('dragstart'));
+    node.dispatchEvent(dragEvent('dragover'));
+    node.dispatchEvent(dragEvent('drop'));
+    source.dispatchEvent(dragEvent('dragend'));
+    settle(fixture);
+    expect(api.savePlan).not.toHaveBeenCalled();
+    expect(tree.findNodeById('dropped')).toBeUndefined();
+
+    fixture.componentRef.setInput('initialPlanContext', context('editable'));
+    settle(fixture);
+    expect(element.textContent).not.toContain(reason);
+    editor.addControl('Echo');
+    settle(fixture);
+    expect(tree.findNodeById('dropped')).toBeDefined();
+    expect(api.savePlan).toHaveBeenCalledTimes(1);
+    fixture.destroy();
+    tick(1000);
+  }));
 
   it.each([false, true])('preserves drag state, plan references and input changes with IDE mode %s', (ideMode) => {
     TestBed.overrideProvider(IDE_MODE, { useValue: ideMode });

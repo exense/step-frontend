@@ -28,6 +28,11 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
 
   readonly planContext = this.planContextInternal.asReadonly();
 
+  readonly isReadonly = computed(() => {
+    const context = this.planContextInternal();
+    return context?.entity.customFields?.['readOnly'] === true;
+  });
+
   readonly plan = computed(() => {
     const planContext = this.planContextInternal();
     return planContext?.plan ?? ({} as Plan);
@@ -99,90 +104,90 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   }
 
   addControl(artefactTypeId: string): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.addControl(artefactTypeId);
   }
   addKeywords(keywordIds: string[]): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.addKeywords(keywordIds);
   }
 
   moveOut(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.moveOut(node);
   }
 
   moveUp(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.moveUp(node);
   }
 
   moveDown(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.moveDown(node);
   }
 
   moveInNextSibling(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.moveInNextSibling(node);
   }
 
   moveInPrevSibling(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.moveInPrevSibling(node);
   }
 
   handlePlanContextChange(planContext?: PlanContext): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.handlePlanContextChange(planContext);
   }
 
   addPlans(planIds: string[]): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.addPlans(planIds);
   }
 
   undo(): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.undo();
   }
 
   redo(): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.redo();
   }
 
   discardAll(): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.discardAll();
   }
 
   delete(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.delete(node);
@@ -196,35 +201,35 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   }
 
   paste(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.paste(node);
   }
 
   pasteAfter(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.pasteAfter(node);
   }
 
   duplicate(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.duplicate(node);
   }
 
   rename(node?: AbstractArtefact): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.rename(node);
   }
 
   toggleSkip(node?: AbstractArtefact, forceSkip?: boolean): void {
-    if (!this.strategy) {
+    if (!this.strategy || this.isReadonly()) {
       return;
     }
     this.strategy.toggleSkip(node, forceSkip);
