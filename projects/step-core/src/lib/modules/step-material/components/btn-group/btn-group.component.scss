@@ -69,6 +69,10 @@ step-btn-group {
       }
     }
 
+    .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
+      border-radius: inherit;
+    }
+
     &.shrink {
       .mat-mdc-button-base,
       .mat-mdc-outlined-button {
