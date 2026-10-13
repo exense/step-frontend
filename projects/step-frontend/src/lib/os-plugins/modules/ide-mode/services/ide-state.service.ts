@@ -67,7 +67,7 @@ export class IdeStateService implements IdeStateStrategy {
   private setPackage(automationPackage: IdeAutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
-    if (automationPackage && this._router.url === `/${IDE_HOME_ROUTE}`) {
+    if (automationPackage && this.isHomeRoute()) {
       void this._router.navigateByUrl(this._defaultPage(true));
     }
   }
@@ -168,10 +168,17 @@ export class IdeStateService implements IdeStateStrategy {
 
   private leavePackageView(): Observable<boolean> {
     return defer(() =>
-      this._router.url === `/${IDE_HOME_ROUTE}`
-        ? of(true)
-        : from(this._router.navigateByUrl(`/${IDE_HOME_ROUTE}`, { replaceUrl: true })),
+      this.isHomeRoute() ? of(true) : from(this._router.navigateByUrl(`/${IDE_HOME_ROUTE}`, { replaceUrl: true })),
     );
+  }
+
+  private isHomeRoute(): boolean {
+    return this._router.isActive(`/${IDE_HOME_ROUTE}`, {
+      paths: 'exact',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'exact',
+    });
   }
 
   /**
