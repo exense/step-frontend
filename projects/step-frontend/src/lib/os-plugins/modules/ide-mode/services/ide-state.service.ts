@@ -67,7 +67,7 @@ export class IdeStateService implements IdeStateStrategy {
   private setPackage(automationPackage: IdeAutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
-    if (automationPackage && this._router.url === `/${IDE_HOME_ROUTE}`) {
+    if (automationPackage && this.isHomeRoute()) {
       void this._router.navigateByUrl(this._defaultPage(true));
     }
   }
@@ -92,7 +92,7 @@ export class IdeStateService implements IdeStateStrategy {
 
   close(): void {
     this.inProgressInternal.set(true);
-    from(this._router.navigateByUrl(`/${IDE_HOME_ROUTE}`, { replaceUrl: true }))
+    this.leavePackageView()
       .pipe(
         filter((navigated) => navigated),
         switchMap(() => this._ideApi.closeAp()),
@@ -166,38 +166,56 @@ export class IdeStateService implements IdeStateStrategy {
     }
   }
 
+  private leavePackageView(): Observable<boolean> {
+    return defer(() =>
+      this.isHomeRoute() ? of(true) : from(this._router.navigateByUrl(`/${IDE_HOME_ROUTE}`, { replaceUrl: true })),
+    );
+  }
+
+  private isHomeRoute(): boolean {
+    return this._router.isActive(`/${IDE_HOME_ROUTE}`, {
+      paths: 'exact',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'exact',
+    });
+  }
+
   /**
    * A package of an older schema version, or declaring none, is only opened once the user confirmed its upgrade: the
    * returned observable completes without emitting when the upgrade is declined
    */
   private useExistingAp(directory: string): Observable<unknown> {
-    return defer(() => {
-      let upgradeRequiredMessage: string | undefined;
-      this._interceptorOverride.overrideInterceptor(
-        catchError((error: unknown) => {
-          upgradeRequiredMessage = this.getUpgradeRequiredMessage(error);
-          if (upgradeRequiredMessage === undefined) {
-            throw error;
-          }
-          return of(new HttpResponse({ body: null }));
-        }),
-      );
-      return this._ideApi.useExistingAp(directory).pipe(
-        switchMap((result) =>
-          upgradeRequiredMessage === undefined
-            ? of(result)
-            : this._dialogs
-                .showWarning(upgradeRequiredMessage, {
-                  confirmButtonLabel: 'Upgrade',
-                  confirmationMessage:
-                    'Upgrading will rewrite files in this automation package. This action cannot be undone in Step Studio.',
-                  maxWidth: 'min(600px, calc(100vw - 32px))',
-                  panelClass: 'step-compact-confirmation-dialog',
-                })
-                .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
-        ),
-      );
-    });
+    return this.leavePackageView().pipe(
+      filter((navigated) => navigated),
+      switchMap(() => {
+        let upgradeRequiredMessage: string | undefined;
+        this._interceptorOverride.overrideInterceptor(
+          catchError((error: unknown) => {
+            upgradeRequiredMessage = this.getUpgradeRequiredMessage(error);
+            if (upgradeRequiredMessage === undefined) {
+              throw error;
+            }
+            return of(new HttpResponse({ body: null }));
+          }),
+        );
+        return this._ideApi.useExistingAp(directory).pipe(
+          switchMap((result) =>
+            upgradeRequiredMessage === undefined
+              ? of(result)
+              : this._dialogs
+                  .showWarning(upgradeRequiredMessage, {
+                    confirmButtonLabel: 'Upgrade',
+                    confirmationMessage:
+                      'Upgrading will rewrite files in this automation package. This action cannot be undone in Step Studio.',
+                    maxWidth: 'min(600px, calc(100vw - 32px))',
+                    panelClass: 'step-compact-confirmation-dialog',
+                  })
+                  .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
+          ),
+        );
+      }),
+    );
   }
 
   private getUpgradeRequiredMessage(error: unknown): string | undefined {
