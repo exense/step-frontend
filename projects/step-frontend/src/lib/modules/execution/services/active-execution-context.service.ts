@@ -35,16 +35,21 @@ export class ActiveExecutionContextService {
   );
 
   manualRefresh(): void {
-    const executionId = this.executionIdInternal$.value;
-    this._activeExecutionsService.getActiveExecution(executionId)?.manualRefresh?.();
+    this.getCurrentActiveExecution()?.manualRefresh();
   }
 
   adjustAutoRefresh(requestDuration: number): void {
-    const executionId = this.executionIdInternal$.value;
-    this._activeExecutionsService.getActiveExecution(executionId)?.adjustAutoRefresh?.(requestDuration);
+    this.getCurrentActiveExecution()?.adjustAutoRefresh(requestDuration);
   }
 
   setupExecutionId(executionId: string): void {
     this.executionIdInternal$.next(executionId);
+  }
+
+  private getCurrentActiveExecution(): ActiveExecution | undefined {
+    const executionId = this.executionIdInternal$.value;
+    return this._activeExecutionsService.hasExecution(executionId)
+      ? this._activeExecutionsService.getActiveExecution(executionId)
+      : undefined;
   }
 }

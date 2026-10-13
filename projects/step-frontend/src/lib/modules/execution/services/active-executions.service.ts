@@ -11,7 +11,7 @@ import {
   Reloadable,
   GlobalReloadService,
 } from '@exense/step-core';
-import { BehaviorSubject, concatMap, filter, Observable, of, startWith, Subject } from 'rxjs';
+import { BehaviorSubject, concatMap, EMPTY, filter, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
@@ -44,10 +44,11 @@ class ActiveExecutionImpl implements ActiveExecution {
   constructor(
     readonly executionId: string,
     readonly autoRefreshModel: AutoRefreshModel,
-    private loadOverview: (eId: string) => Observable<ExecutionOverview>,
-  ) {
-    this.setupExecutionRefresh();
-  }
+    private loadOverview: (eId: string) => Observable<LoadedExecutionOverview>,
+  ) {}
+
+  private isDestroyed = false;
+  private readonly terminator$ = new Subject<void>();
   private timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
   readonly timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
   readonly performanceTabSettings: PerformanceTabSettings = { resolution: 0, compareModeEnabled: false };
@@ -68,14 +69,21 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   destroy(): void {
+    if (this.isDestroyed) {
+      return;
+    }
+    this.isDestroyed = true;
+    this.terminator$.next();
+    this.terminator$.complete();
     this.executionInternal$.complete();
     this.noticesInternal$.complete();
+    this.autoRefreshModel.setDisabled(true);
     this.autoRefreshModel.destroy();
     this.timeRangeSelectionInternal$.complete();
   }
 
-  private setupExecutionRefresh(): void {
-    if (this.executionId === 'open') {
+  start(): void {
+    if (this.isDestroyed || this.executionId === 'open') {
       return;
     }
 
@@ -97,12 +105,12 @@ class ActiveExecutionImpl implements ActiveExecution {
             ),
           );
         }),
+        takeUntil(this.terminator$),
       )
       .subscribe((overview) => {
-        const loadedOverview = requireExecution(overview);
-        const execution = loadedOverview.execution;
+        const execution = overview.execution;
         this.executionInternal$.next(execution);
-        this.noticesInternal$.next(loadedOverview.resolvedNotices ?? []);
+        this.noticesInternal$.next(overview.resolvedNotices ?? []);
         if (execution.status === 'ENDED') {
           this.autoRefreshModel.setDisabled(true);
           this.autoRefreshModel.setInterval(0);
@@ -114,7 +122,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   adjustAutoRefresh(requestDuration: number): void {
     // If auto-refresh has been disabled, don't set new interval
     // Otherwise it may restart the timer
-    if (this.autoRefreshModel.disabled) {
+    if (this.isDestroyed || this.autoRefreshModel.disabled) {
       return;
     }
 
@@ -149,12 +157,16 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   manualRefresh(): void {
-    this.loadOverview(this.executionId).subscribe((overview) => {
-      const loadedOverview = requireExecution(overview);
-      this.executionInternal$.next(loadedOverview.execution);
-      this.noticesInternal$.next(loadedOverview.resolvedNotices ?? []);
-      this.timeRangeSelectionInternal$.next(this.timeRangeSelectionInternal$.value);
-    });
+    if (this.isDestroyed) {
+      return;
+    }
+    this.loadOverview(this.executionId)
+      .pipe(takeUntil(this.terminator$))
+      .subscribe((overview) => {
+        this.executionInternal$.next(overview.execution);
+        this.noticesInternal$.next(overview.resolvedNotices ?? []);
+        this.timeRangeSelectionInternal$.next(this.timeRangeSelectionInternal$.value);
+      });
   }
 
   updateChartsResolution(resolution: number): void {
@@ -164,13 +176,6 @@ class ActiveExecutionImpl implements ActiveExecution {
   updateCompareModeEnabled(enabled: boolean): void {
     this.performanceTabSettings.compareModeEnabled = enabled;
   }
-}
-
-function requireExecution(overview: ExecutionOverview): LoadedExecutionOverview {
-  if (!overview.execution) {
-    throw new Error('Execution overview response does not include an execution.');
-  }
-  return overview as LoadedExecutionOverview;
 }
 
 @Injectable()
@@ -188,10 +193,14 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
   }
 
   getActiveExecution(executionId: string): ActiveExecution {
-    if (!this.executions.has(executionId)) {
-      this.executions.set(executionId, this.createActiveExecution(executionId));
+    const existing = this.executions.get(executionId);
+    if (existing) {
+      return existing;
     }
-    return this.executions.get(executionId)!;
+    const execution = this.createActiveExecution(executionId);
+    this.executions.set(executionId, execution);
+    execution.start();
+    return execution;
   }
 
   removeActiveExecution(executionId: string): void {
@@ -199,8 +208,9 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
       return;
     }
     const execution = this.executions.get(executionId)!;
-    execution.destroy();
     this.executions.delete(executionId);
+    execution.destroy();
+    this._executionService.cleanupCache(executionId);
   }
 
   hasExecution(executionId: string): boolean {
@@ -224,6 +234,7 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
   cleanup(): boolean {
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
+    this._executionService.cleanupCache();
     return true;
   }
 
@@ -234,29 +245,43 @@ export class ActiveExecutionsService implements OnDestroy, Reloadable {
     this.cleanup();
   }
 
-  private createActiveExecution(executionId: string): ActiveExecution {
+  private createActiveExecution(executionId: string): ActiveExecutionImpl {
     const autoRefreshModel = this._autoRefreshFactory.create();
     // The first load reuses the overview already fetched by the route guards (cached), so opening an
     // execution issues a single /overview request. Subsequent refreshes always fetch fresh data.
     let isFirstLoad = true;
-    return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) => {
+    const activeExecution = new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) => {
       const overview$ = isFirstLoad
         ? this._executionService.getExecutionOverviewCached(executionId)
         : this._executionService.getExecutionOverview(executionId);
       isFirstLoad = false;
       return overview$.pipe(
+        filter((overview): overview is LoadedExecutionOverview => {
+          if (!overview.execution) {
+            this.closeInvalidExecution(executionId, activeExecution);
+            return false;
+          }
+          return true;
+        }),
         catchError((error) => {
-          if (!(error instanceof ApiError)) {
-            throw error;
+          if (
+            error instanceof ApiError &&
+            (error.status === HttpStatusCode.Forbidden || error.status === HttpStatusCode.NotFound)
+          ) {
+            this.closeInvalidExecution(executionId, activeExecution);
           }
-
-          if (error.status === HttpStatusCode.Forbidden || error.status === HttpStatusCode.NotFound) {
-            this.autoCloseExecutionInternal$.next(executionId);
-          }
-
-          throw error;
+          return EMPTY;
         }),
       );
     });
+    return activeExecution;
+  }
+
+  private closeInvalidExecution(executionId: string, activeExecution: ActiveExecution): void {
+    if (this.executions.get(executionId) !== activeExecution) {
+      return;
+    }
+    this.removeActiveExecution(executionId);
+    this.autoCloseExecutionInternal$.next(executionId);
   }
 }
