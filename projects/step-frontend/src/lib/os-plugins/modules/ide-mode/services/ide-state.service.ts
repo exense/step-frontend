@@ -7,6 +7,7 @@ import {
   SelectionMode,
   IdeService,
   FilePickerModalResult,
+  NavigatorService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter, finalize, map, Observable, switchMap, tap } from 'rxjs';
@@ -23,6 +24,7 @@ export class IdeStateService {
   private _accessHistory = inject(ApAccessHistoryService);
   private _injector = inject(Injector);
   private _matDialog = inject(MatDialog);
+  private _navigator = inject(NavigatorService);
 
   private filePickerInjector = Injector.create({
     providers: [
@@ -91,12 +93,7 @@ export class IdeStateService {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result));
   }
 
   openWithPicker(): void {
@@ -109,15 +106,10 @@ export class IdeStateService {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result));
   }
 
-  openFromPath(directory: string): void {
+  openFromPath(directory: string, { navigateToHome = true }: { navigateToHome?: boolean } = {}): void {
     this.inProgressInternal.set(true);
     this._ideApi
       .useExistingAp(directory)
@@ -126,18 +118,26 @@ export class IdeStateService {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result, { navigateToHome }));
   }
 
   reload(): void {
     const directory = this.currentPackage()?.directory;
     if (directory && !this.inProgress()) {
-      this.openFromPath(directory);
+      this.openFromPath(directory, { navigateToHome: false });
+    }
+  }
+
+  private onPackageOpened(
+    automationPackage: AutomationPackageDescriptor | undefined,
+    { navigateToHome: shouldNavigateHome = true }: { navigateToHome?: boolean } = {},
+  ): void {
+    this.setPackage(automationPackage);
+    if (automationPackage) {
+      this._accessHistory.addToHistory(automationPackage);
+      if (shouldNavigateHome) {
+        this._navigator.navigateToHome({ forceClientUrl: true });
+      }
     }
   }
 
