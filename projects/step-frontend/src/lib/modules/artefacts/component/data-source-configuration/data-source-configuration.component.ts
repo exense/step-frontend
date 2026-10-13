@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, viewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { map } from 'rxjs';
@@ -30,20 +30,23 @@ export class DataSourceConfigurationComponent
 {
   private _poolApi = inject(PrivateDataPoolPluginService);
 
-  // @ts-ignore
-  @Input() override context!: ArtefactContext<DataSourceConfigurationArtefact>;
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- CustomComponent renderers assign the inherited context directly.
+  @Input() declare context: ArtefactContext<DataSourceConfigurationArtefact>;
 
-  @ViewChild('form')
-  protected form!: NgForm;
+  private readonly formReference = viewChild<NgForm>('form');
 
-  readonly DataSourceType = DataSourceType;
+  protected get form(): NgForm | undefined {
+    return this.formReference();
+  }
 
-  readonly dataSourceTypes: DataSourceTypeItem[] = [
+  protected readonly DataSourceType = DataSourceType;
+
+  protected readonly dataSourceTypes: DataSourceTypeItem[] = [
     createDataSourceTypeItem(DataSourceType.EXCEL, 'Excel'),
     createDataSourceTypeItem(DataSourceType.CSV, 'CSV'),
     createDataSourceTypeItem(DataSourceType.SQL, 'SQL'),
     createDataSourceTypeItem(DataSourceType.FILE, 'Flat file'),
-    createDataSourceTypeItem(DataSourceType.FOLDER, 'Dictionary'),
+    createDataSourceTypeItem(DataSourceType.FOLDER, 'Directory'),
     createDataSourceTypeItem(DataSourceType.SEQUENCE, 'Integer sequence'),
     createDataSourceTypeItem(DataSourceType.JSON_ARRAY, 'Json array'),
     createDataSourceTypeItem(DataSourceType.JSON, 'Json String (Legacy)'),
