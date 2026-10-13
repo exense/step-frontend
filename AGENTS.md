@@ -6,6 +6,7 @@ See [TESTING.md](TESTING.md) for test commands, shared browser helpers, and scen
 
 # Test-First Bug Fixes
 
+- Never add or run automated tests for purely visual improvements, such as styling, spacing, colors, or hover/ripple appearance. This includes Jest, browser regression tests, screenshot tests, and full test suites. Visual improvements are exempt from the test-first bug-fix and full-suite requirements below; use manual visual review and keep the required lint/format checks.
 - Add new tests only when the task's opening user request reports an existing Step bug or the user explicitly requests tests. Later feedback during feature work does not change that scope. If the opening request mixes feature work and a possible bug, ask before adding tests.
 - For qualifying bug-report tasks, before changing production code add or extend a focused Jest regression test that reproduces the reported behavior. Prefer the existing scenario suite for that feature.
 - Run that test against the unfixed implementation and verify that it fails for the expected behavioral reason. Compilation errors, missing providers, and broken mocks are not valid reproductions. Do not implement the fix before observing this failure.
