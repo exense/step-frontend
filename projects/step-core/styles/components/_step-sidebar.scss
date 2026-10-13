@@ -268,6 +268,21 @@ $menu-sub-item-height: 3.2rem;
             background-color: map.get($config, menu-color);
             border-radius: 0 0 0.8rem 0.8rem;
           }
+
+          &:has(> label.no-children) {
+            > label {
+              padding-bottom: 1.4rem;
+              border-radius: 0 0 0.8rem 0.8rem;
+
+              &::before {
+                border-radius: inherit;
+              }
+            }
+
+            &::after {
+              display: none;
+            }
+          }
         }
       }
     }
@@ -308,6 +323,28 @@ $menu-sub-item-height: 3.2rem;
       font-weight: bold;
       margin-top: 1px;
       max-width: 600px;
+
+      &--standalone {
+        margin-top: 0;
+
+        > label {
+          border-radius: 0.8rem;
+        }
+
+        > input:checked + label {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        > .content {
+          border-radius: 0 0 0.8rem 0.8rem;
+
+          > .sidebar-subtab:last-child {
+            height: $menu-sub-item-height + 0.8rem;
+            padding-bottom: 0.8rem;
+          }
+        }
+      }
 
       input {
         display: none;
