@@ -26,6 +26,8 @@ step-auto-shrink-list {
       display: block;
       white-space: nowrap;
       max-width: 15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
@@ -41,12 +43,20 @@ step-auto-shrink-list {
   gap: 0.5rem;
   flex-wrap: nowrap;
   align-items: center;
+  max-width: min(60rem, calc(100vw - 7rem));
 
   & > strong,
   & > step-auto-shrink-item-value {
     display: block;
     white-space: nowrap;
     max-width: 15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  & > step-auto-shrink-item-value {
+    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -62,5 +72,24 @@ step-auto-shrink-list {
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
+  }
+}
+
+.step-auto-shrink-popover-item-content {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: min(60rem, calc(100vw - 7rem));
+
+  & > strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    flex: 1 1 100%;
+  }
+
+  & > step-auto-shrink-item-value {
+    flex: 1;
+    min-width: 0;
   }
 }

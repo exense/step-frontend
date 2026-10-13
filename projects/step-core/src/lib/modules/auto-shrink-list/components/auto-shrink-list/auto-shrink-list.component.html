@@ -8,16 +8,18 @@
 </section>
 <section class="visible-items">
   @for (item of visibleItems(); track item.key) {
-    <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
+    <step-popover yPosition="below" [mode]="PopoverMode.BOTH" [constrainToViewport]="true">
       <div class="item">
         <strong>{{ item.key }}</strong>
         <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" />
       </div>
       <step-popover-content>
-        <div class="popover-item">
-          <strong>{{ item.key }}</strong
-          >&nbsp;
-          <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+        <div class="step-auto-shrink-popover-item-content">
+          <strong>{{ item.key }}</strong>
+          <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [displayLines]="3" />
+          @if (itemAction()?.templateRef; as templateRef) {
+            <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item }" />
+          }
         </div>
       </step-popover-content>
     </step-popover>
@@ -29,6 +31,7 @@
       (toggledEvent)="isAllVisible.set($event)"
       [whiteBackground]="true"
       [smallFont]="false"
+      [constrainToViewport]="true"
     >
       <button
         type="button"
@@ -58,23 +61,30 @@
       </step-popover-content>
     </step-popover>
   } @else if (hasHiddenItems()) {
-    <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
+    <step-popover
+      yPosition="below"
+      [mode]="PopoverMode.CLICK"
+      [constrainToViewport]="true"
+      (toggledEvent)="isHiddenVisible.set($event)"
+    >
       <button type="button" class="more" mat-button [matTooltip]="allTooltip()" matTooltipPosition="below">
         <div>more</div>
         <step-icon name="chevron-down" />
       </button>
       <step-popover-content>
         @for (item of hiddenItems(); track item.key; let isLast = $last) {
-          <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
+          <step-popover yPosition="below" [mode]="PopoverMode.BOTH" [constrainToViewport]="true">
             <div class="auto-shrink-popover-item">
               <strong>{{ item.key }}</strong>
-              <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+              <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [displayLines]="3" />
             </div>
             <step-popover-content>
-              <div class="popover-item">
-                <strong>{{ item.key }}</strong
-                >&nbsp;
-                <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [itemAction]="itemAction()" />
+              <div class="step-auto-shrink-popover-item-content">
+                <strong>{{ item.key }}</strong>
+                <step-auto-shrink-item-value [item]="item" [emptyValue]="emptyValue()" [displayLines]="3" />
+                @if (itemAction()?.templateRef; as templateRef) {
+                  <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: item }" />
+                }
               </div>
             </step-popover-content>
           </step-popover>

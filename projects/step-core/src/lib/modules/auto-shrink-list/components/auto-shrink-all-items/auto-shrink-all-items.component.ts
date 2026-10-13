@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableLocalDataSource, TableModule } from '../../../table/table.module';
@@ -12,6 +12,7 @@ import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shr
   templateUrl: './auto-shrink-all-items.component.html',
   styleUrl: './auto-shrink-all-items.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutoShrinkAllItemsComponent {
   readonly items = input<KeyValue<string, string>[]>([]);

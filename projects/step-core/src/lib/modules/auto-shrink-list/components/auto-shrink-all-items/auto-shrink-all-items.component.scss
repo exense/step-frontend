@@ -1,8 +1,26 @@
-:host {
+step-auto-shrink-all-items {
   display: block;
   width: min(60rem, calc(100vw - 7rem));
-}
+  max-width: 100%;
 
-.item-cell {
-  width: 50%;
+  .mat-mdc-table {
+    table-layout: fixed;
+  }
+
+  .item-cell {
+    width: 50%;
+    overflow-wrap: anywhere;
+
+    & > div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+
+      step-auto-shrink-item-value {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+  }
 }
