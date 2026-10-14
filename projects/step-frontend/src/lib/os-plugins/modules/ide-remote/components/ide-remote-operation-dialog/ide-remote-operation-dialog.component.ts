@@ -64,6 +64,7 @@ export class IdeRemoteOperationDialogComponent implements OnInit {
         const name = plan.attributes?.['name'];
         const categories = plan.categories ?? [];
         return (
+          plan.root?._class !== 'AssertionPlan' &&
           (!request?.includePlans || request.includePlans.includes(name ?? '')) &&
           (!request?.excludePlans || !request.excludePlans.includes(name ?? '')) &&
           (!request?.includeCategories ||
