@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
+/* eslint-disable */
 export const $RemoteExecutionRequest = {
   properties: {
     connection: {

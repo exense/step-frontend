@@ -6,7 +6,7 @@ import {
   FilePickerService,
   FilesystemService,
   HttpOverrideResponseInterceptorService,
-  IdeService,
+  StudioService,
   ProposeDirectoryResponse,
   SelectionMode,
 } from '@exense/step-core';
@@ -28,7 +28,7 @@ describe('CreatePackageDialogComponent', () => {
     TestBed.configureTestingModule({
       imports: [NoopAnimationsModule],
       providers: [
-        { provide: IdeService, useValue: api },
+        { provide: StudioService, useValue: api },
         { provide: FilesystemService, useValue: filesystem },
         { provide: FilePickerService, useValue: picker },
         { provide: MatDialogRef, useValue: dialog },
@@ -43,10 +43,7 @@ describe('CreatePackageDialogComponent', () => {
     filesystem.proposeApDirectory.mockReturnValue(of({ ...proposal, warnings: ['Directory name was sanitized'] }));
     component['form'].controls.name.setValue('Package/Name');
     tick(300);
-    expect(filesystem.proposeApDirectory).toHaveBeenCalledWith({
-      existingParentDirectory: '/home',
-      apName: 'Package/Name',
-    });
+    expect(filesystem.proposeApDirectory).toHaveBeenCalledWith('/home', 'Package/Name');
     component['create']();
     expect(api.initializeNewAp).toHaveBeenCalledWith('/home/Package_Name', 'Package/Name');
     expect(dialog.close).toHaveBeenCalledWith(true);
@@ -63,7 +60,7 @@ describe('CreatePackageDialogComponent', () => {
     expect(api.initializeNewAp).not.toHaveBeenCalled();
     expect(component['proposal']()).toBeUndefined();
     tick(300);
-    expect(filesystem.proposeApDirectory).toHaveBeenLastCalledWith({ existingParentDirectory: '/home', apName: 'New' });
+    expect(filesystem.proposeApDirectory).toHaveBeenLastCalledWith('/home', 'New');
   }));
 
   it('blocks backend errors and invalid names', fakeAsync(() => {

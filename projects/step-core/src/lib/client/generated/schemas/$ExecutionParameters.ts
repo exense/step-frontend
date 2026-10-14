@@ -54,6 +54,9 @@ export const $ExecutionParameters = {
     description: {
       type: 'string',
     },
+    sharedContextId: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
