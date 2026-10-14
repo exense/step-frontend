@@ -4,7 +4,7 @@ import { RemoteExecutionRequest, StepIconsModule } from '@exense/step-core';
 @Component({
   selector: 'step-ide-remote-execution-options',
   templateUrl: './ide-remote-execution-options.component.html',
-  styleUrl: './ide-remote-execution-options.component.scss',
+  styleUrl: '../ide-remote-options.scss',
   imports: [StepIconsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
