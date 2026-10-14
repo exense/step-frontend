@@ -1,9 +1,14 @@
 const { readFile } = require('node:fs/promises');
+const { parseArgs } = require('node:util');
 const shell = require('shelljs');
 const openapi = require('openapi-typescript-codegen');
 
-const STUDIO_MODE = process.argv.includes('--studio');
-const SPEC_URL = process.argv.slice(2).find((argument) => argument !== '--studio');
+const { values, positionals } = parseArgs({
+  options: { studio: { type: 'boolean' } },
+  allowPositionals: true,
+});
+const STUDIO_MODE = !!values.studio;
+const SPEC_URL = positionals[0];
 const GENERATED_CODE_LOCATION = './projects/step-core/src/lib/client/generated';
 const CLIENT_MODULE_NAME = 'StepGeneratedClientModule';
 

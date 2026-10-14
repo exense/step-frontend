@@ -9,6 +9,9 @@ const CLIENT_DIRECTORY = './projects/step-core/src/lib/client';
 const OUTPUT_DIRECTORY = `${CLIENT_DIRECTORY}/ide-generated`;
 
 async function generateStudioClient(schema) {
+  if (!schema?.paths) {
+    throw new Error('The schema is invalid or missing paths.');
+  }
   const paths = Object.fromEntries(
     Object.entries(schema.paths).filter(
       ([endpoint]) =>
@@ -30,7 +33,7 @@ async function generateStudioClient(schema) {
     if (reference?.startsWith('#/components/schemas/')) {
       const name = reference.slice('#/components/schemas/'.length);
       if (!schemas[name]) {
-        const definition = schema.components.schemas[name];
+        const definition = schema.components?.schemas?.[name];
         if (!definition) {
           throw new Error(`Missing schema definition: ${name}`);
         }
@@ -86,9 +89,11 @@ async function generateStudioClient(schema) {
       .join('\n');
     await fs.writeFile(indexFile, index);
     await fs.unlink(path.join(temporaryDirectory, 'StepStudioClientModule.ts'));
-    execFileSync('npx', ['prettier', '--write', `${temporaryDirectory}/**/*.ts`, '--config', './.prettierrc'], {
-      stdio: 'inherit',
-    });
+    execFileSync(
+      process.execPath,
+      [require.resolve('prettier/bin/prettier.cjs'), '--write', temporaryDirectory, '--config', './.prettierrc'],
+      { stdio: 'inherit' },
+    );
     await fs.rm(OUTPUT_DIRECTORY, { recursive: true, force: true });
     await fs.cp(temporaryDirectory, OUTPUT_DIRECTORY, { recursive: true });
     console.log('Studio client generated. Shared models and HTTP infrastructure are reused from the OS client.');
