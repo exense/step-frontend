@@ -11,6 +11,7 @@ export interface ExecutionReportStaticLayout {
     widgets: WidgetState[];
   };
   compactHeader?: boolean;
+  showAutomationPackageWarning?: boolean;
 }
 
 export interface ExecutionReportStaticRoute {
