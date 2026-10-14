@@ -29,8 +29,12 @@
     }
     @if (target(); as target) {
       <step-ide-remote-target [target]="target">
-        @if (operation === 'EXECUTE' && !completed()) {
-          <step-ide-remote-execution-options [request]="executionRequest()" />
+        @if (!completed()) {
+          @if (operation === 'DEPLOY') {
+            <step-ide-remote-deployment-options [request]="deploymentRequest()" />
+          } @else {
+            <step-ide-remote-execution-options [request]="executionRequest()" />
+          }
         }
       </step-ide-remote-target>
     }
