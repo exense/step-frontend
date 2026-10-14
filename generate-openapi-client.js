@@ -1,27 +1,24 @@
-const https = require('https');
-const http = require('http');
+const { readFile } = require('node:fs/promises');
 const shell = require('shelljs');
 const openapi = require('openapi-typescript-codegen');
 
-const SPEC_URL = process.argv[2];
+const STUDIO_MODE = process.argv.includes('--studio');
+const SPEC_URL = process.argv.slice(2).find((argument) => argument !== '--studio');
 const GENERATED_CODE_LOCATION = './projects/step-core/src/lib/client/generated';
 const CLIENT_MODULE_NAME = 'StepGeneratedClientModule';
 
-function fetchSchema() {
-  const service = (SPEC_URL ?? '').toLowerCase().startsWith('https') ? https : http;
-  return new Promise((resolve, reject) => {
-    service
-      .get(SPEC_URL, (resp) => {
-        let data = '';
-        resp.on('data', (chunk) => {
-          data += chunk;
-        });
-        resp.on('end', () => {
-          resolve(data);
-        });
-      })
-      .on('error', (err) => reject(err));
-  });
+async function fetchSchema() {
+  if (!SPEC_URL) {
+    throw new Error('Provide an OpenAPI URL or JSON file, optionally followed by --studio.');
+  }
+  if (!/^https?:\/\//i.test(SPEC_URL)) {
+    return JSON.parse(await readFile(SPEC_URL, 'utf8'));
+  }
+  const response = await fetch(SPEC_URL);
+  if (!response.ok) {
+    throw new Error(`Unable to fetch OpenAPI schema: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
 }
 
 function provideHttpContextFeatureToRequest() {
@@ -68,10 +65,13 @@ function extractOpenApiConfig() {
 }
 
 async function main() {
-  //downloading file before executing openapi to make sure it is already generated in the BE
-  await fetchSchema();
+  const schema = await fetchSchema();
+  if (STUDIO_MODE) {
+    await require('./generate-studio-openapi-client').generateStudioClient(schema);
+    return;
+  }
   await openapi.generate({
-    input: SPEC_URL,
+    input: schema,
     output: GENERATED_CODE_LOCATION,
     httpClient: 'angular',
     useUnionTypes: true,
@@ -93,4 +93,7 @@ async function main() {
   console.log('DONE');
 }
 
-main();
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import {
   AutomationPackageUpdateResult,
   HttpRequestContextHolderService,
-  IdeService,
+  StudioService,
   RemoteDefaults,
   RemoteDeploymentRequest,
   RemoteExecution,
@@ -14,27 +14,27 @@ import { defer, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class IdeRemoteApiService {
-  private readonly _ideApi = inject(IdeService);
+  private readonly _studioApi = inject(StudioService);
   private readonly _requestContextHolder = inject(HttpRequestContextHolderService);
 
   getRemoteDefaults(): Observable<RemoteDefaults> {
     return defer(() => {
       this.skipConnectionRetry();
-      return this._ideApi.getRemoteDefaults();
+      return this._studioApi.getRemoteDefaults();
     });
   }
 
   deployRemote(request: RemoteDeploymentRequest): Observable<AutomationPackageUpdateResult> {
     return defer(() => {
       this.skipConnectionRetry();
-      return this._ideApi.deployRemote(request);
+      return this._studioApi.deployRemote(request);
     });
   }
 
   executeRemote(request: RemoteExecutionRequest): Observable<RemoteExecution[]> {
     return defer(() => {
       this.skipConnectionRetry();
-      return this._ideApi.executeRemote(request);
+      return this._studioApi.executeRemote(request);
     });
   }
 
