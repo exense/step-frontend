@@ -268,21 +268,6 @@ $menu-sub-item-height: 3.2rem;
             background-color: map.get($config, menu-color);
             border-radius: 0 0 0.8rem 0.8rem;
           }
-
-          &:has(> label.no-children) {
-            > label {
-              padding-bottom: 1.4rem;
-              border-radius: 0 0 0.8rem 0.8rem;
-
-              &::before {
-                border-radius: inherit;
-              }
-            }
-
-            &::after {
-              display: none;
-            }
-          }
         }
       }
     }
@@ -339,9 +324,12 @@ $menu-sub-item-height: 3.2rem;
         > .content {
           border-radius: 0 0 0.8rem 0.8rem;
 
-          > .sidebar-subtab:last-child {
-            height: $menu-sub-item-height + 0.8rem;
-            padding-bottom: 0.8rem;
+          &::after {
+            display: block;
+            content: ' ';
+            height: 0.8rem;
+            background-color: transparent;
+            border-radius: 0 0 0.8rem 0.8rem;
           }
         }
       }
