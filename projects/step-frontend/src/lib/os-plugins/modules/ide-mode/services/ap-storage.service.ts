@@ -1,8 +1,8 @@
-import {inject, Injectable} from '@angular/core';
-import {LOCAL_STORAGE, StorageProxy} from '@exense/step-core';
+import { inject, Injectable } from '@angular/core';
+import { LOCAL_STORAGE, StorageProxy } from '@exense/step-core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApStorageService extends StorageProxy {
   constructor() {

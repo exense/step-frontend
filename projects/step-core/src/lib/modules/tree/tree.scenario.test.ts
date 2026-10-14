@@ -111,4 +111,20 @@ describe('Tree interaction', () => {
     expect(host.drops).toEqual([]);
     expect(element.querySelector('.drag-in-progress')).toBeNull();
   });
+
+  it('resets the insertion target when opening another tree', () => {
+    const fixture = TestBed.createComponent(TreeTestComponent);
+    const host = fixture.componentInstance;
+
+    host._state.init(node('plan-a-root', [node('plan-a-call-plan')]));
+    host._state.selectNode('plan-a-call-plan');
+    expect(host._state.selectedForInsertCandidate()).toBe('plan-a-call-plan');
+
+    host._state.init(node('plan-b-root'), { selectedNodeIds: ['plan-b-root'] });
+
+    expect(host._state.selectedNodeIds()).toEqual(['plan-b-root']);
+    expect(host._state.selectedForInsertCandidate()).toBe('plan-b-root');
+
+    fixture.destroy();
+  });
 });

@@ -6,6 +6,7 @@ import type { Preferences } from './Preferences';
 
 export type User = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   username?: string;
   password?: string;
   role?: string;

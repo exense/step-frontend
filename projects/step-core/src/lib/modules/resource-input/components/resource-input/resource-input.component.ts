@@ -64,7 +64,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   private readonly fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
 
-  readonly uploadProgress = this._resourceInputService.uploadProgress;
+  protected readonly uploadProgress = this._resourceInputService.uploadProgress;
 
   readonly label = input<string | undefined>(undefined);
   readonly helpIconTooltip = input<string | undefined>(undefined);

@@ -1,9 +1,10 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AlertType } from '../../types/alert-type.enum';
 
 export interface ConfirmationDialogData {
   message: string;
+  confirmationMessage?: string;
   cancelButtonLabel?: string;
   confirmButtonLabel?: string;
   cancelButtonAppearance?: 'flat' | 'stroked';
@@ -19,6 +20,9 @@ export type ConfirmationDialogResult = boolean | undefined;
   templateUrl: './confirmation-dialog.component.html',
   styleUrls: ['./confirmation-dialog.component.scss'],
   standalone: false,
+  host: {
+    '(keydown.enter)': 'onSubmit()',
+  },
 })
 export class ConfirmationDialogComponent {
   private _dialogRef = inject<MatDialogRef<ConfirmationDialogComponent, ConfirmationDialogResult>>(MatDialogRef);
@@ -26,8 +30,7 @@ export class ConfirmationDialogComponent {
   protected readonly _dialogData = inject<ConfirmationDialogData>(MAT_DIALOG_DATA);
   protected readonly AlertType = AlertType;
 
-  @HostListener('keydown.enter')
-  onSubmit(): void {
+  protected onSubmit(): void {
     this._dialogRef.close(true);
   }
 }

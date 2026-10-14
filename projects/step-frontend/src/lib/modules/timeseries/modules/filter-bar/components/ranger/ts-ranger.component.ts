@@ -10,7 +10,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewChild,
+  viewChild,
   ViewEncapsulation,
   DOCUMENT,
 } from '@angular/core';
@@ -44,10 +44,12 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   private readonly CHART_HEIGHT = 104;
 
-  @ViewChild('chart') private chartElement!: ElementRef;
+  private readonly chartElement = viewChild.required<ElementRef>('chart');
 
+  /* eslint-disable @angular-eslint/prefer-signals -- Preserve mutable chart settings and sync-key inputs used by the existing lifecycle handlers. */
   @Input() settings!: TSRangerSettings;
   @Input() syncKey!: string;
+  /* eslint-enable @angular-eslint/prefer-signals */
 
   /**
    * This should emit the following events only:
@@ -60,13 +62,13 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   @Output() chartLoaded = new EventEmitter<void>();
 
-  uplot!: UPlot;
-  previousRange: TimeRange | undefined;
+  protected uplot!: UPlot;
+  protected previousRange: TimeRange | undefined;
 
-  start!: number;
-  end!: number;
+  protected start!: number;
+  protected end!: number;
 
-  getSize = (): { width: number; height: number } => {
+  protected getSize = (): { width: number; height: number } => {
     return {
       width: this._element.nativeElement.parentElement.offsetWidth,
       height: this.CHART_HEIGHT,
@@ -77,7 +79,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.uplot?.destroy();
   }
 
-  redraw(): void {
+  protected redraw(): void {
     this.uplot.setData(this.uplot.data);
     this.uplot.setSize(this.getSize());
   }
@@ -109,7 +111,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0, height: this.CHART_HEIGHT }, false);
   }
 
-  init(settings: TSRangerSettings): void {
+  protected init(settings: TSRangerSettings): void {
     this.start = settings.xValues[0];
     this.end = settings.xValues[this.settings.xValues.length - 1];
   }
@@ -129,7 +131,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.emitSelectionToLinkedCharts();
   }
 
-  transformRangeToSelect(range: TimeRange): uPlot.Select {
+  protected transformRangeToSelect(range: TimeRange): uPlot.Select {
     const fromTimestamp = range.from;
     const toTimestamp = range.to;
     let left, width;
@@ -339,18 +341,16 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         ],
       },
     };
-    if (this.uplot) {
-      this.uplot.destroy();
-    }
+    this.uplot?.destroy();
     this.uplot = new uPlot(
       rangerOpts,
       [this.settings.xValues, ...this.settings.series.map((s) => s.data)],
-      this.chartElement.nativeElement,
+      this.chartElement().nativeElement,
     ) as unknown as UPlot;
     this.chartLoaded.emit();
   }
 
-  emitSelectionToLinkedCharts(): void {
+  protected emitSelectionToLinkedCharts(): void {
     const linkedCharts = uPlot.sync(this.syncKey).plots;
     const minMax = {
       min: this.uplot.posToVal(this.uplot.select.left, 'x'),
@@ -366,7 +366,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     });
   }
 
-  emitRangeEventIfChanged(): void {
+  protected emitRangeEventIfChanged(): void {
     const u = this.uplot;
     // keep these lines below if it's better to have an exact value from the X data
     // let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];

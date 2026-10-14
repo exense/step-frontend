@@ -8,7 +8,7 @@ import {
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
+import { defer, finalize, map, Observable, of, OperatorFunction, shareReplay, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
   SortDirection,
@@ -41,12 +41,19 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
 
   private cachedExecution?: Execution;
   private cachedOverview?: ExecutionOverview;
+  private readonly executionRequests = new Map<string, Observable<Execution>>();
+  private readonly overviewRequests = new Map<string, Observable<ExecutionOverview>>();
 
   getExecutionByIdCached(id: string): Observable<Execution> {
     if (this.cachedExecution && this.cachedExecution.id === id) {
       return of(this.cachedExecution);
     }
-    return super.getExecutionById(id).pipe(tap((plan) => (this.cachedExecution = plan)));
+    return this.shareCachedRequest(
+      id,
+      this.executionRequests,
+      () => super.getExecutionById(id),
+      (execution) => (this.cachedExecution = execution),
+    );
   }
 
   /**
@@ -58,7 +65,12 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     if (this.cachedOverview && this.cachedOverview.execution?.id === id) {
       return of(this.cachedOverview);
     }
-    return this.getExecutionOverview(id).pipe(tap((overview) => (this.cachedOverview = overview)));
+    return this.shareCachedRequest(
+      id,
+      this.overviewRequests,
+      () => this.getExecutionOverview(id),
+      (overview) => (this.cachedOverview = overview),
+    );
   }
 
   /** Like getExecutionOverviewCached, but exposes only the execution (for guards / entity checks). */
@@ -66,9 +78,51 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     return this.getExecutionOverviewCached(id).pipe(map((overview) => overview.execution));
   }
 
-  cleanupCache(): void {
-    this.cachedExecution = undefined;
-    this.cachedOverview = undefined;
+  cleanupCache(executionId?: string): void {
+    if (executionId === undefined) {
+      this.cachedExecution = undefined;
+      this.cachedOverview = undefined;
+      this.executionRequests.clear();
+      this.overviewRequests.clear();
+      return;
+    }
+
+    if (this.cachedExecution?.id === executionId) {
+      this.cachedExecution = undefined;
+    }
+    if (this.cachedOverview?.execution?.id === executionId) {
+      this.cachedOverview = undefined;
+    }
+    this.executionRequests.delete(executionId);
+    this.overviewRequests.delete(executionId);
+  }
+
+  private shareCachedRequest<T>(
+    executionId: string,
+    requests: Map<string, Observable<T>>,
+    load: () => Observable<T>,
+    cache: (value: T) => void,
+  ): Observable<T> {
+    const pendingRequest = requests.get(executionId);
+    if (pendingRequest) {
+      return pendingRequest;
+    }
+
+    const request$ = defer(load).pipe(
+      tap((value) => {
+        if (requests.get(executionId) === request$) {
+          cache(value);
+        }
+      }),
+      finalize(() => {
+        if (requests.get(executionId) === request$) {
+          requests.delete(executionId);
+        }
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
+    requests.set(executionId, request$);
+    return request$;
   }
 
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {

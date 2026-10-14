@@ -45,6 +45,8 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
+import { Status } from '../../../_common/shared/status.enum';
+import { areAllIterationStatusesSelected } from '../../shared/iteration-filter-statuses';
 
 interface DrilldownData {
   drilldownState: DrillDownStackItemConfig[];
@@ -223,16 +225,22 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
     params: PartialOpenIterationsParams = {},
   ): void {
     const singleReportNode = this._drilldownNavigationUtils.getSingleReportNode(node);
-    if (
-      (singleReportNode &&
-        !this.isPossibleToInsertItem(singleReportNode.id!, DrillDownStackItemType.REPORT_NODE, parentStackItemId)) ||
-      !this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.AGGREGATED_REPORT_NODE, parentStackItemId)
-    ) {
+    if (singleReportNode) {
+      this.handleOpenDetails(singleReportNode, parentStackItemId);
       return;
     }
 
-    if (singleReportNode) {
-      this.handleOpenDetails(singleReportNode, parentStackItemId);
+    const items = this.stackItemsUntracked;
+    const parentIndex = items.findIndex((item) => item.id === parentStackItemId);
+    const nextItem = items[parentIndex + 1];
+    const replacesOpenIterations =
+      parentIndex >= 0 &&
+      nextItem?.type === DrillDownStackItemType.AGGREGATED_REPORT_NODE &&
+      nextItem.nodeId === node.id;
+    if (
+      !replacesOpenIterations &&
+      !this.isPossibleToInsertItem(node.id!, DrillDownStackItemType.AGGREGATED_REPORT_NODE, parentStackItemId)
+    ) {
       return;
     }
 
@@ -243,8 +251,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
       nodeId: node.id!,
       data: node,
       id: v4(),
-      searchStatus: params.nodeStatus,
-      searchStatusCount: params.nodeStatusCount,
+      searchStatuses: params.nodeStatus && params.nodeStatus !== Status.RUNNING ? [params.nodeStatus] : undefined,
       partialTreeRootNodeId: untracked(() => this._treeStateContext.getState().partialTreeRootNodeId()),
     };
 
@@ -254,6 +261,58 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         this._drilldownNavigationUtils.changeDrilldownLocation(result);
         return result;
       });
+    });
+  }
+
+  protected handleTitleStatusClick(itemId: string, status: Status): void {
+    if (status === Status.RUNNING) {
+      return;
+    }
+    this.updateStackItems((items) => {
+      const index = items.findIndex((item) => item.id === itemId);
+      const item = items[index];
+      if (item?.type !== DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
+        return items;
+      }
+
+      const countByStatus =
+        this._treeStateContext.getState().findNodeById(item.nodeId)?.countByStatus ?? item.data.countByStatus;
+      const activeStatuses = item.searchStatuses ?? [];
+      const searchStatuses = areAllIterationStatusesSelected(item.searchStatuses, countByStatus)
+        ? [status]
+        : activeStatuses.includes(status)
+          ? activeStatuses.filter((activeStatus) => activeStatus !== status)
+          : [...activeStatuses, status];
+      const result = [...items];
+      result[index] = {
+        ...item,
+        searchStatuses:
+          !searchStatuses.length || areAllIterationStatusesSelected(searchStatuses, countByStatus)
+            ? undefined
+            : searchStatuses,
+      };
+      this._drilldownNavigationUtils.changeDrilldownLocation(result);
+      return result;
+    });
+  }
+
+  protected handleStatusFilterChange(itemId: string, statuses: Status[]): void {
+    this.updateStackItems((items) => {
+      const index = items.findIndex((item) => item.id === itemId);
+      const item = items[index];
+      if (item?.type !== DrillDownStackItemType.AGGREGATED_REPORT_NODE) {
+        return items;
+      }
+      const countByStatus =
+        this._treeStateContext.getState().findNodeById(item.nodeId)?.countByStatus ?? item.data.countByStatus;
+      const result = [...items];
+      result[index] = {
+        ...item,
+        searchStatuses:
+          !statuses.length || areAllIterationStatusesSelected(statuses, countByStatus) ? undefined : statuses,
+      };
+      this._drilldownNavigationUtils.changeDrilldownLocation(result);
+      return result;
     });
   }
 

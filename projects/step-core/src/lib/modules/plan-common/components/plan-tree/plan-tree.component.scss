@@ -39,23 +39,23 @@ step-plan-tree {
 
         &.node-displayed {
           font-weight: 500;
-          color: var.$blue-600;
+          color: var(--step-accent-color, var.$blue-600);
         }
       }
 
       &.skipped {
         .node-content .node-name.node-displayed {
-          color: var.$blue-50 !important;
+          color: var(--step-accent-muted-color, var.$blue-50) !important;
         }
       }
 
       &.tree-node-selected-for-insert {
         .node-content .node-icon {
-          border: 0.1rem solid var.$blue-600;
+          border: 0.1rem solid var(--step-accent-color, var.$blue-600);
         }
         &:not(.skipped) .node-content .node-icon {
           background: var.$white;
-          color: var.$blue-600;
+          color: var(--step-accent-color, var.$blue-600);
         }
       }
     }
@@ -63,16 +63,16 @@ step-plan-tree {
     .tree-node {
       .node-content.dragover {
         .node-icon {
-          border: 0.1rem solid var.$blue-600;
+          border: 0.1rem solid var(--step-accent-color, var.$blue-600);
         }
         .node-name {
-          color: var.$blue-600;
+          color: var(--step-accent-color, var.$blue-600);
           font-weight: 500;
         }
       }
       &:not(.skipped) .node-content.dragover .node-icon {
         background: var.$white;
-        color: var.$blue-600;
+        color: var(--step-accent-color, var.$blue-600);
       }
     }
 

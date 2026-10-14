@@ -6,7 +6,7 @@
       entity="parameters"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-btn-group>
+      <step-btn-group *stepNonIde>
         <a
           data-step-testid="import-parameter-btn"
           mat-icon-button
@@ -30,6 +30,7 @@
       </step-btn-group>
       <step-btn-group class="create-button-group">
         <a
+          *stepNonIde
           stepTestId="upload-package-btn"
           mat-flat-button
           color="primary"
@@ -77,7 +78,7 @@
           [class]="{
             'scope-global': element.scope === 'GLOBAL',
             'scope-application': element.scope === 'APPLICATION',
-            'scope-function': element.scope === 'FUNCTION'
+            'scope-function': element.scope === 'FUNCTION',
           }"
         >
           {{ element.scope === 'GLOBAL' ? element.scope : element.scopeEntity || element.scope }}

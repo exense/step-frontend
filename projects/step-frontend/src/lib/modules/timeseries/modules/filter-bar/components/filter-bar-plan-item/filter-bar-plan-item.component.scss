@@ -37,7 +37,7 @@
 }
 
 .add-btn {
-  color: var.$dark-blue;
+  color: var(--step-accent-color, var.$dark-blue);
   padding: 0;
   padding-right: 0.8rem;
   margin-top: 0.4rem;

@@ -1,0 +1,35 @@
+step-ide-execution-target-toggle {
+  display: block;
+  max-width: 100%;
+
+  .execution-target {
+    min-width: 0;
+  }
+
+  step-tabs.target-tabs.tab-mode-buttons.shrink {
+    width: auto;
+
+    nav.mat-mdc-tab-nav-bar {
+      border-bottom: none;
+
+      .mat-mdc-tab-links {
+        padding: 0.2rem;
+      }
+
+      .mat-mdc-tab-list {
+        margin-bottom: 0;
+      }
+
+      a.mdc-tab {
+        height: 3rem;
+        min-width: 4rem !important;
+        margin: 0;
+        font-size: 1.3rem;
+      }
+    }
+
+    &[aria-disabled='true'] {
+      opacity: 0.6;
+    }
+  }
+}

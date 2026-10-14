@@ -11,6 +11,8 @@
 step-execution-status {
   .status {
     @include core.status-shape();
+    min-width: 130px;
+    box-sizing: border-box;
   }
 
   @each $status, $color in var.$statuses {

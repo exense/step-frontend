@@ -28,7 +28,7 @@
 }
 
 .dialog-content {
-  color: var.$blue-700;
+  color: var(--step-text-color, var.$blue-700);
 }
 
 .project-scope-warning {

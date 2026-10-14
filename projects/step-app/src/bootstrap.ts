@@ -15,6 +15,12 @@ globalIndicator?.showMessage?.('Initializing application...');
 globalWindow[STEP_IDE_MODE] = environment.ideMode;
 globalWindow.STEP_ENTERPRISE_MODE = environment.enterpriseMode;
 
+if (environment.ideMode) {
+  document.body.classList.add('step-studio');
+  document.title = 'Step Studio';
+  document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.setAttribute('href', 'assets/studio-favicon.svg');
+}
+
 platformBrowserDynamic()
   .bootstrapModule(AppModule)
   .catch((err) => console.error(err));

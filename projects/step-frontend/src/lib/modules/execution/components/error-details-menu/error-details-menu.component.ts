@@ -15,7 +15,7 @@ import { catchError, finalize, map, of, switchMap } from 'rxjs';
 export class ErrorDetailsMenuComponent {
   private _doc = inject(DOCUMENT);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
-  readonly DateFormat = DateFormat;
+  protected readonly DateFormat = DateFormat;
 
   /** @Input() **/
   readonly executionIds = input<string[]>([]);

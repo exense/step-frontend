@@ -37,8 +37,7 @@ export interface DrillDownAggregatedReportNodeStackItemConfig {
   type: DrillDownStackItemType.AGGREGATED_REPORT_NODE;
   nodeId: string;
   partialTreeRootNodeId?: string;
-  searchStatus?: Status;
-  searchStatusCount?: number;
+  searchStatuses?: Status[];
 }
 
 export type DrillDownStackItemConfig =

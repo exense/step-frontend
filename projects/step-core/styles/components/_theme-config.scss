@@ -161,6 +161,7 @@ $light-primary-text: var.$white;
 
   $inputs-config: step-inputs.step-define-inputs-config(
     $primary-color: $primary-color,
+    $primary-text-color: $text-color,
   );
 
   @include step-inputs.inputs($inputs-config);
@@ -177,7 +178,7 @@ $light-primary-text: var.$white;
   @include step-ts-marker.timeseries-marker();
 
   .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
-    color: var.$blue-600;
+    color: var(--step-accent-color, var.$blue-600);
   }
 
   .cdk-overlay-pane {

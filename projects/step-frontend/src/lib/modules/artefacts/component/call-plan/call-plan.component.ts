@@ -29,8 +29,8 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   private _router = inject(Router);
   private _planReferencePolicy = inject(PlanReferencePolicyService);
 
-  planName = '';
-  planProject = '';
+  protected planName = '';
+  protected planProject = '';
   protected isReferencedPlanActionDisabled = false;
 
   protected readonly formReference = viewChild<NgForm>('form');
@@ -39,7 +39,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
     return this.formReference();
   }
 
-  selectPlan(): void {
+  protected selectPlan(): void {
     if (this.isReferencedPlanActionDisabled) {
       return;
     }
@@ -51,7 +51,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
     });
   }
 
-  gotoPlan(): void {
+  protected gotoPlan(): void {
     if (!this.context.artefact?.planId || this.isReferencedPlanActionDisabled) {
       return;
     }
@@ -63,6 +63,7 @@ export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
       });
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Custom component rendering invokes this public base-class hook.
   override contextChange(): void {
     super.contextChange();
     this.isReferencedPlanActionDisabled = !this._planReferencePolicy.canChangeReferencedPlan(this.context.artefact);

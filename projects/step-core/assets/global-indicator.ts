@@ -185,7 +185,7 @@
    </style>
   `;
 
-  const getHtml = (initialMessage: string) => `
+  const getHtml = (initialMessage: string): string => `
 <section class="global-indicator-container">
   ${STYLE}
   <svg width="100" height="100" viewBox="0 0 24 24" fill="#0082cb" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
@@ -211,7 +211,7 @@
     `(press F5 or the reload button)`;
 
   class GlobalIndicatorElement extends HTMLElement {
-    static get observedAttributes() {
+    static get observedAttributes(): string[] {
       return ['message', 'fallback-message', 'timeout', 'error-message'];
     }
 
@@ -219,7 +219,7 @@
     private timeout = DEFAULT_TIMEOUT;
     private fallbackMessage = DEFAULT_FALLBACK_MESSAGE;
 
-    connectedCallback() {
+    connectedCallback(): void {
       const initialMessage = this.getAttribute('message') ?? '';
       this.innerHTML = getHtml(initialMessage);
     }

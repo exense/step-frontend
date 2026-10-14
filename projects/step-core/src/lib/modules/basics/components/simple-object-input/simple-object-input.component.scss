@@ -11,7 +11,7 @@ step-simple-object-input {
     align-items: center;
     gap: 1rem;
     label {
-      color: var.$blue-700;
+      color: var(--step-text-color, var.$blue-700);
     }
   }
 

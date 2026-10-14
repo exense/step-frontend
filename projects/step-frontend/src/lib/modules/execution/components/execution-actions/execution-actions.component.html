@@ -4,7 +4,7 @@
       type="button"
       mat-icon-button
       aria-label="Left Align"
-      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !availability().copyRequest || !('plan-execute' | hasRight | async)"
       [matTooltip]="tooltips().link"
       matTooltipPosition="below"
       (click)="copyLink.emit()"
@@ -14,7 +14,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !availability().simulate || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().simulate"
       matTooltipPosition="below"
@@ -25,7 +25,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !availability().schedule || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().schedule"
       matTooltipPosition="below"
@@ -37,7 +37,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="disabled() || !('plan-execute' | hasRight | async)"
+        [disabled]="disabled() || !availability().execute || !('plan-execute' | hasRight | async)"
         aria-label="Left Align"
         [matTooltip]="tooltips().executeWithParams"
         matTooltipPosition="below"
@@ -60,7 +60,7 @@
       type="button"
       mat-icon-button
       class="mat-primary"
-      [disabled]="disabled() || !('plan-execute' | hasRight | async)"
+      [disabled]="disabled() || !availability().execute || !('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().execute"
       matTooltipPosition="below"

@@ -9,6 +9,19 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { SearchValue } from '../shared/search-value';
 import { isValidRegex } from '../../basics/step-basics.module';
 
+const isEmptySearchValue = (value?: SearchValue): boolean => {
+  if (value === undefined) {
+    return true;
+  }
+  if (typeof value === 'string') {
+    return value.length === 0;
+  }
+  if (value instanceof FilterCondition) {
+    return value.isEmpty();
+  }
+  return !value.value;
+};
+
 @Directive({
   selector: '[stepTablePartSearch]',
   providers: [
@@ -88,6 +101,7 @@ export class TablePartSearchDirective implements OnInit, TableSearch, HasFilter,
     let isForce: boolean;
     let hideProgress: boolean | undefined;
     let immediateHideProgress: boolean | undefined;
+    const searchParams = typeof searchValue === 'string' ? params : (regexOrParams as TableSearchParams | undefined);
     if (typeof searchValue === 'string') {
       regex = (regexOrParams as boolean | undefined) ?? true;
       resetPagination = params?.resetPagination ?? true;
@@ -96,7 +110,6 @@ export class TablePartSearchDirective implements OnInit, TableSearch, HasFilter,
       immediateHideProgress = params?.immediateHideProgress;
       searchCol = regex ? { value: searchValue, regex } : searchValue;
     } else {
-      const searchParams = regexOrParams as TableSearchParams | undefined;
       resetPagination = searchParams?.resetPagination ?? true;
       isForce = searchParams?.isForce ?? true;
       hideProgress = searchParams?.hideProgress;
@@ -108,6 +121,9 @@ export class TablePartSearchDirective implements OnInit, TableSearch, HasFilter,
       if (!isValidRegex((searchCol as RegexSearchValue).value)) {
         return;
       }
+    }
+    if (!searchParams && isEmptySearchValue(search[column]) && isEmptySearchValue(searchCol)) {
+      return;
     }
     search[column] = searchCol;
     this.searchInternal$.next({ search, resetPagination, isForce, hideProgress, immediateHideProgress });

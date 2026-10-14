@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { StatusIconClassDirective } from '../../directives/status-icon-class.directive';
 
 @Component({
@@ -16,6 +16,7 @@ import { StatusIconClassDirective } from '../../directives/status-icon-class.dir
   ],
 })
 export class StatusCommonComponent {
+  readonly tooltip = input<string | undefined>();
   private _statusIconClassDirective = inject(StatusIconClassDirective, { self: true });
 
   protected readonly status = computed(() => this._statusIconClassDirective.status());

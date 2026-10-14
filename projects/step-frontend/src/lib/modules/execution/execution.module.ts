@@ -17,6 +17,7 @@ import {
   canLeaveComponent,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  ControllerService,
   DashletRegistryService,
   DialogParentService,
   dialogRoute,
@@ -25,18 +26,15 @@ import {
   EntityRegistry,
   EXECUTION_REPORT_GRID,
   GridSettingsRegistryService,
-  IncludeTestcases,
   MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
-  ReportNode,
   schedulePlanRoute,
   SearchPaginatorComponent,
   sequenceCanActivateGuards,
   SimpleOutletComponent,
   stepRouteAdditionalConfig,
-  TestRunStatus,
   TreeNodeUtilsService,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
@@ -68,6 +66,7 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { RECREATE_ON_EXECUTION_CHANGE } from './services/execution-route-reuse-strategy';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
@@ -104,7 +103,8 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot, Route, Router, Routes } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap, take } from 'rxjs';
+import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from './shared/relaunch-test-cases';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -159,6 +159,7 @@ import { SchedulerPageComponent } from './components/schedule-overview/scheduler
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
+import { AltExecutionPackageWarningComponent } from './components/alt-execution-package-warning/alt-execution-package-warning.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
@@ -234,14 +235,14 @@ const createAltExecutionNodeDetailsRoute = (): Route => ({
               const nodeId = value;
               result.push({ type, nodeId });
             } else {
-              const [nodeId, searchStatus, searchStatusCountStr] = value.split(';');
-              let searchStatusCount: number | undefined = parseInt(searchStatusCountStr);
-              searchStatusCount = isNaN(searchStatusCount) ? undefined : searchStatusCount;
+              const [nodeId, searchStatuses] = value.split(';');
+              const selectedStatuses = searchStatuses
+                ? (searchStatuses.split(',') as Status[]).filter((status) => status !== Status.RUNNING)
+                : undefined;
               result.push({
                 type,
                 nodeId,
-                searchStatus: !!searchStatus?.length ? (searchStatus as Status) : undefined,
-                searchStatusCount,
+                searchStatuses: selectedStatuses?.length ? selectedStatuses : undefined,
                 partialTreeRootNodeId,
               });
             }
@@ -258,7 +259,7 @@ const createAltExecutionNodeDetailsRoute = (): Route => ({
 const staticAltExecutionReportRoute = (path: string, layoutId: string): Route => ({
   path,
   component: AltExecutionProgressComponent,
-  data: { [EXECUTION_REPORT_LAYOUT_ROUTE_DATA]: layoutId },
+  data: { [EXECUTION_REPORT_LAYOUT_ROUTE_DATA]: layoutId, [RECREATE_ON_EXECUTION_CHANGE]: true },
   providers: [
     ActiveExecutionsService,
     AltExecutionRefreshActivityService,
@@ -372,6 +373,7 @@ import {
 import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
+import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
 
 @NgModule({
   declarations: [
@@ -439,6 +441,7 @@ import { CrossExecutionTabsComponent } from './components/schedule-overview/cros
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
+    AltReportNodePerformanceComponent,
     AltExecutionLaunchDialogComponent,
     AltExecutionRepositoryLinkComponent,
     AltIterationListTitleComponent,
@@ -492,6 +495,7 @@ import { CrossExecutionTabsComponent } from './components/schedule-overview/cros
     NoticeBadgeLabelPipe,
   ],
   imports: [
+    AltExecutionPackageWarningComponent,
     StepCommonModule,
     OperationsModule,
     ReportNodesModule,
@@ -788,6 +792,7 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
+          data: { [RECREATE_ON_EXECUTION_CHANGE]: true },
           providers: [
             AltExecutionRefreshActivityService,
             AggregatedReportViewTreeNodeUtilsService,
@@ -953,46 +958,31 @@ export class ExecutionModule {
                 testCases: () => {
                   const _context = inject(ActiveExecutionContextService);
                   const _executionsApi = inject(AugmentedExecutionsService);
+                  const _controllerService = inject(ControllerService);
                   return _context.execution$.pipe(
                     take(1),
-                    map((execution) => execution?.id),
-                    switchMap((id) => {
-                      if (!id) {
-                        return of([]);
+                    switchMap((execution) => {
+                      const id = execution?.id;
+                      const repoRef = execution?.executionParameters?.repositoryObject;
+                      if (!id || !repoRef) {
+                        return of(undefined);
                       }
-                      return _executionsApi.getReportNodesByExecutionId(
-                        id,
-                        'step.artefacts.reports.TestCaseReportNode',
-                        500,
+                      return forkJoin({
+                        runs: fetchRepositoryTestRuns(_controllerService, repoRef),
+                        testCaseNodes: _executionsApi.getReportNodesByExecutionId(
+                          id,
+                          'step.artefacts.reports.TestCaseReportNode',
+                          500,
+                        ),
+                      }).pipe(
+                        map(({ runs, testCaseNodes }) =>
+                          !runs
+                            ? undefined
+                            : mergeRelaunchTestCases(runs, testCaseNodes ?? [], repoRef.repositoryID === 'local'),
+                        ),
                       );
                     }),
                     catchError(() => of(undefined)),
-                    map((testCases: ReportNode[] | undefined) => {
-                      const items = testCases?.map?.(
-                        (item) =>
-                          ({
-                            id: item.artefactID,
-                            testplanName: item.name,
-                            status: item.status,
-                          }) as TestRunStatus,
-                      );
-
-                      let list = testCases
-                        ?.filter((item) => !!item && item?.status !== 'SKIPPED')
-                        ?.map((item) => item?.artefactID!);
-                      if (list?.length === testCases?.length) {
-                        list = undefined;
-                      }
-
-                      const selection: IncludeTestcases | undefined = !list?.length
-                        ? undefined
-                        : {
-                            list,
-                            by: 'id',
-                          };
-
-                      return { items, selection };
-                    }),
                   );
                 },
               },

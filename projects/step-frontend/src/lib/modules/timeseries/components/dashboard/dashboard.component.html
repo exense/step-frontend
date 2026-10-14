@@ -109,7 +109,7 @@
           @for (dashlet of dashboard.dashlets; let i = $index; track dashlet) {
             @if (editMode || !dashlet.omitWhenEmpty || !emptyItemIds.has(dashlet.id)) {
               @if (dashlet.type === 'CHART') {
-                <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
+                <div class="dashlet chart-dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
                   <step-chart-dashlet
                     #chart
                     [editMode]="editMode"
@@ -126,7 +126,7 @@
                   />
                 </div>
                 @if (compareModeEnabled) {
-                  <div class="dashlet">
+                  <div class="dashlet chart-dashlet">
                     <div class="compare-mode-tag">Compare</div>
                     <step-chart-dashlet
                       #compareChart

@@ -87,12 +87,20 @@
   }
 
   a {
-    color: var.$blue-675;
+    color: var(--step-link-color, var.$blue-675);
     text-decoration: none;
+
+    &:where(:hover, :focus-visible) {
+      color: var(--step-link-hover-color, var(--step-link-color, var.$blue-675));
+    }
   }
 
   step-popover-content > a {
-    color: var.$blue-100;
+    color: var(--step-popover-link-color, var.$blue-100);
+
+    &:where(:hover, :focus-visible) {
+      color: var(--step-popover-link-hover-color, var(--step-popover-link-color, var.$blue-100));
+    }
   }
 
   .tab-content > .tab-pane {

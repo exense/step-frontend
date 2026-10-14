@@ -71,7 +71,7 @@ step-grid-background {
 
   .grid-measure-row:has(button.add-row:hover) > section {
     display: block;
-    background: var.$blue-50;
+    background: var(--step-accent-muted-color, var.$blue-50);
   }
 
   .grid-measure-row:has(button.remove-row:hover) > section {

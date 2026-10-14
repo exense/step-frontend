@@ -9,6 +9,12 @@ export const $ViewModel = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     viewId: {
       type: 'string',
     },

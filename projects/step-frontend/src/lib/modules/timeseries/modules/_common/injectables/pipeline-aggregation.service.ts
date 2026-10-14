@@ -35,7 +35,7 @@ export class PipelineAggregationService {
   }
 
   private toDisplayAggregation(twoStageAggregation: TwoStageAggregation): MetricAggregation | undefined {
-    if (twoStageAggregation.groupAggregation === 'MERGE') {
+    if (twoStageAggregation.groupAggregation === 'MERGE' || twoStageAggregation.groupAggregation === 'SAMPLED_AVG') {
       return undefined;
     }
     return { type: twoStageAggregation.groupAggregation };

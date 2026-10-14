@@ -5,7 +5,7 @@ step-table-dashlet {
   .header-container {
     display: flex;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 0 0 1rem;
     position: relative;
 
     .title {
@@ -13,7 +13,7 @@ step-table-dashlet {
       line-height: 2rem;
       font-weight: 600;
       width: 100%;
-      text-align: center;
+      text-align: left;
       color: var.$gray-550;
     }
 

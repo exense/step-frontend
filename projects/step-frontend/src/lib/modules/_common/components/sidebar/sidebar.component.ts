@@ -79,7 +79,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   );
   private _location = inject(Location);
 
-  private readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
+  protected readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
   private readonly categories = viewChild<ElementRef<HTMLElement>>('categories');
 
   protected readonly beforeCategoriesDashlets = computed(() =>

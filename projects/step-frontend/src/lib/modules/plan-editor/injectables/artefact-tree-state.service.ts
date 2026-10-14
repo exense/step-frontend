@@ -23,11 +23,11 @@ export class ArtefactTreeStateService
     this.showPseudoContainersWithDelay(id);
   }
 
-  override notifyInsertionComplete() {
+  override notifyInsertionComplete(): void {
     this.hidePseudoContainers();
   }
 
-  override ngOnDestroy() {
+  override ngOnDestroy(): void {
     super.ngOnDestroy();
     clearTimeout(this.timerId);
   }
@@ -50,7 +50,7 @@ export class ArtefactTreeStateService
     if (!needsToRefresh) {
       return;
     }
-    this.refresh();
+    this.refresh({ emitTreeUpdate: false });
     this.expandNodes([id, ...this._artefactTreeNodeUtils.getPseudoNodesIds(id)]);
   }
 
@@ -60,7 +60,7 @@ export class ArtefactTreeStateService
     this.nodeId = undefined;
     const needsToRefresh = this._artefactTreeNodeUtils.hidePseudoContainers();
     if (needsToRefresh) {
-      this.refresh();
+      this.refresh({ emitTreeUpdate: false });
     }
   }
 }

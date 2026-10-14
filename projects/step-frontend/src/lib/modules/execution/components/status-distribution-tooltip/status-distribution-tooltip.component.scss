@@ -2,7 +2,7 @@
 
 .container {
   color: white;
-  background: var.$blue-700;
+  background: var(--step-surface-dark-color, var.$blue-700);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;

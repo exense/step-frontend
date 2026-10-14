@@ -9,6 +9,12 @@ export const $ReportNode = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     parentID: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AbstractArtefact } from '../../../client/generated';
-import { IDE_MODE } from '../../basics/injectables/ide-mode.token';
+import { IDE_MODE } from '../../ide-common/injectables/ide-mode.token';
 
 export type PlanReferenceMode = 'ID' | 'SELECTION_CRITERIA';
 

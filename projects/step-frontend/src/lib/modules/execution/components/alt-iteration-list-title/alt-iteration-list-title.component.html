@@ -5,5 +5,9 @@
 <step-aggregated-status
   [hasDescendantInvocations]="item?.hasDescendantInvocations"
   [countByStatus]="item?.countByStatus"
+  [interactive]="true"
+  action="filter"
+  [selectedStatuses]="selectedStatuses()"
+  (statusClick)="handleStatusClick($event)"
 />
-<span class="name">Iterations of {{ item?.name }}</span>
+<span class="name">{{ item?.name }}</span>

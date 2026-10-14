@@ -8,6 +8,7 @@ import type { Error } from './Error';
 
 export type ReportNode = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   parentID?: string;
   ancestorIds?: Array<string>;
   name?: string;

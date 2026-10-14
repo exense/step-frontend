@@ -49,7 +49,9 @@ export class AuthService implements OnDestroy, Reloadable {
   readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
     tap((conf) => {
       this._serviceContext.setConfiguration(conf);
-      if (conf.title) {
+      if (this._isIdeMode) {
+        this._document.title = 'Step Studio';
+      } else if (conf.title) {
         this._document.title = conf.title;
       }
       const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;

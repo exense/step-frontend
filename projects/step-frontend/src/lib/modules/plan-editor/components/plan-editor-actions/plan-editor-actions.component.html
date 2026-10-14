@@ -1,14 +1,15 @@
 <step-btn-group class="with-borders">
-  <button
-    *ngIf="hasUndo"
-    type="button"
-    mat-stroked-button
-    [matTooltip]="captions.revertAll"
-    matTooltipPosition="below"
-    (click)="discardAll.emit()"
-  >
-    Discard All
-  </button>
+  @if (hasUndo) {
+    <button
+      type="button"
+      mat-stroked-button
+      [matTooltip]="captions.revertAll"
+      matTooltipPosition="below"
+      (click)="discardAll.emit()"
+    >
+      Discard All
+    </button>
+  }
 
   <button
     type="button"
@@ -39,13 +40,14 @@
     mat-stroked-button
     (click)="clone.emit()"
     [matTooltip]="captions.duplicate"
-    [disabled]="!('plan-write' | hasRight | async)"
+    [disabled]="!('plan-write' | hasRight: !!planContext?.entity?.customFields?.['readOnly'] | async)"
     matTooltipPosition="below"
   >
     <step-icon name="copy" />
   </button>
 
   <button
+    *stepNonIde
     type="button"
     mat-stroked-button
     (click)="export.emit()"
@@ -73,7 +75,7 @@
     [class.active]="isInteractiveSessionActive"
     (click)="toggleInteractiveSession()"
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
-    [disabled]="!('plan-write' | hasRight | async)"
+    [disabled]="!('plan-write' | hasRight: !!planContext?.entity?.customFields?.['readOnly'] | async)"
     matTooltipPosition="below"
   >
     <step-icon name="bug-01" />

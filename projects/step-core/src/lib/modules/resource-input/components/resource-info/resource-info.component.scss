@@ -13,5 +13,5 @@ section {
 
 step-icon.maven {
   stroke: none !important;
-  fill: var.$blue-700 !important;
+  fill: var(--step-text-color, var.$blue-700) !important;
 }

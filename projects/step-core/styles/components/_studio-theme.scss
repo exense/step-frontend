@@ -1,0 +1,92 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'theme-config' as theme;
+@use 'step-header' as header;
+@use 'step-sidebar' as sidebar;
+
+$studio-shell: #302a4a;
+$studio-accent: #6248b5;
+$studio-lilac: #f3f0fc;
+$studio-text: #2c2540;
+
+$studio-palette: (
+  50: $studio-lilac,
+  100: #e4dcf8,
+  200: #cfc1f2,
+  300: #b49de8,
+  400: #9072d4,
+  500: $studio-accent,
+  600: #563fa4,
+  700: #49358c,
+  800: #38296d,
+  900: #281e4e,
+  contrast: (
+    50: $studio-shell,
+    100: $studio-shell,
+    200: $studio-shell,
+    300: $studio-shell,
+    400: $studio-shell,
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  ),
+);
+
+@mixin studio-theme() {
+  --step-accent-color: #{$studio-accent};
+  --step-accent-strong-color: #{map.get($studio-palette, 700)};
+  --step-accent-muted-color: #{map.get($studio-palette, 400)};
+  --step-accent-soft-color: #{$studio-lilac};
+  --step-accent-subtle-color: #{map.get($studio-palette, 100)};
+  --step-focus-color: #{map.get($studio-palette, 400)};
+  --step-text-color: #{$studio-text};
+  --step-surface-dark-color: #{$studio-shell};
+  --step-selection-background-color: #{$studio-lilac};
+  --main-header-bg-color: #{$studio-shell};
+  --step-link-color: #{$studio-accent};
+  --step-link-hover-color: #{map.get($studio-palette, 700)};
+  --step-popover-link-color: #{map.get($studio-palette, 200)};
+  --step-popover-link-hover-color: #{$studio-lilac};
+
+  @include theme.step-theme(
+    $text-color: $studio-text,
+    $mat-primary-palette: mat.m2-define-palette($studio-palette, 500),
+    $step-sidebar-config: sidebar.step-define-sidebar-config(
+        $background-color: $studio-shell,
+        $menu-color: rgba(255, 255, 255, 0.08),
+        $selection-color: rgba(207, 193, 242, 0.22),
+        $divider-color: rgba(255, 255, 255, 0.16),
+        $menu-secondary: #e4dcf8,
+        $menu-text: #fff
+      ),
+    $step-header-config: header.step-define-header-config(
+        $main-background-color: $studio-shell,
+        $main-text-color: $studio-lilac
+      )
+  );
+
+  --mat-option-selected-state-label-text-color: #{$studio-text};
+
+  .global-indicator-container svg {
+    fill: $studio-accent;
+  }
+
+  .sidebar-logo {
+    position: relative;
+
+    &::after {
+      content: 'STUDIO';
+      position: absolute;
+      top: 29px;
+      left: 0;
+      color: $studio-lilac;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      line-height: 1;
+    }
+  }
+}

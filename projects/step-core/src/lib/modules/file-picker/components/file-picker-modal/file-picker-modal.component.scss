@@ -59,13 +59,13 @@ step-file-picker-modal {
     overflow-y: auto;
     overflow-x: hidden;
 
-    button.mat-mdc-button-base {
+    button.mat-mdc-button.mat-mdc-button-base {
       min-height: 2.5rem;
       justify-content: flex-start;
       text-align: left;
 
       &.selected {
-        background: var.$blue-15;
+        background: var(--step-accent-subtle-color, var.$blue-15);
       }
     }
   }

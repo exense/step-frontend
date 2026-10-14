@@ -53,6 +53,14 @@
     }
   }
 
+  .step-compact-confirmation-dialog.mat-mdc-dialog-panel {
+    min-width: 0 !important;
+
+    .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+      min-width: 0;
+    }
+  }
+
   .cdk-overlay-dark-backdrop {
     background: rgba(0, 0, 0, 0.12);
   }

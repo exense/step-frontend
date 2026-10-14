@@ -63,7 +63,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   protected readonly _strepTreeAutoChooseVirtualScroll = inject(TreeAutoChooseVirtualScrollDirective, {
     optional: true,
   });
-  readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
+  protected readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
   protected readonly itemTrackBy: TrackByFunction<N> = (index, item) => item.id;
   protected readonly virtualScrollSkeletonRows = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -84,7 +84,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     return !!this._stepTreeVirtualScroll;
   });
 
-  readonly contextMenuPosition = { x: 0, y: 0 };
+  protected readonly contextMenuPosition = { x: 0, y: 0 };
 
   @HostBinding('class.in-focus')
   private isTreeInFocus = false;
@@ -135,18 +135,18 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     this.openedMenuNodeId = nodeId;
   }
 
-  handleContextAction(action: TreeAction, node?: N): void {
+  protected handleContextAction(action: TreeAction, node?: N): void {
     const actionId = action.id;
     const multipleNodes = this.contextMenuTrigger().menuData.multipleNodes;
     this.treeContextAction.emit({ actionId, node, multipleNodes });
   }
 
-  handleDblClick(flatNode: TreeFlatNode, event: MouseEvent): void {
+  protected handleDblClick(flatNode: TreeFlatNode, event: MouseEvent): void {
     const node = this._treeState.findNodeById(flatNode.id)!;
     this.nodeDblClick.emit({ node, event });
   }
 
-  handleContextClose(): void {
+  protected handleContextClose(): void {
     this.openedMenuNodeId = undefined;
   }
 

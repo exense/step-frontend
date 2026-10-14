@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { BulkOperationType } from '../../basics/types/bulk-operation-type.enum';
+import { IDE_MODE } from '../../ide-common/injectables/ide-mode.token';
 import { CustomRegistryService, CustomRegistryType } from '../../custom-registeries/custom-registries.module';
 import {
   EntityBulkOperation,
@@ -32,6 +33,7 @@ const convert = ({
 })
 export class EntityBulkOperationsRegistryService {
   private _customRegistry = inject(CustomRegistryService);
+  private readonly _isIdeMode = inject(IDE_MODE);
 
   private readonly registryType = CustomRegistryType.ENTITY_BULK_OPERATIONS;
 
@@ -79,7 +81,7 @@ export class EntityBulkOperationsRegistryService {
 
   getEntityBulkOperations(entity: string): EntityBulkOperationInfo[] {
     return (this._customRegistry.getRegisteredItems(this.registryType) as EntityBulkOperation[])
-      .filter((item) => item.entity === entity)
+      .filter((item) => item.entity === entity && !(this._isIdeMode && item.operationType === BulkOperationType.EXPORT))
       .map(convert)
       .sort((a, b) => {
         const orderA = a.order ?? Infinity;

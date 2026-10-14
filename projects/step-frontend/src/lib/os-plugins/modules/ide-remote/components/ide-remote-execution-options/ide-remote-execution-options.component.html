@@ -1,0 +1,26 @@
+@if (request()) {
+  <details class="cli-options">
+    <summary>
+      <step-icon name="chevron-right" class="properties-chevron" aria-hidden="true" />
+      <span>Remote execution properties</span>
+    </summary>
+    <div class="cli-options-content">
+      @if (options().length || parameters().length) {
+        @for (option of options(); track option.label) {
+          <div class="option">
+            <span>{{ option.label }}</span
+            ><strong>{{ option.value }}</strong>
+          </div>
+        }
+        @for (parameter of parameters(); track parameter[0]) {
+          <div class="option">
+            <span>{{ parameter[0] }}</span
+            ><strong>{{ parameter[1] }}</strong>
+          </div>
+        }
+      } @else {
+        <p>No additional remote execution properties are configured.</p>
+      }
+    </div>
+  </details>
+}

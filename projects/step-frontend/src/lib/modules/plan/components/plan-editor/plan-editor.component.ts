@@ -43,9 +43,9 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService, Ent
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
-  readonly _planEditorService = inject(PlanEditorService);
+  protected readonly _planEditorService = inject(PlanEditorService);
 
-  readonly initialPlanContext$ = this._activatedRoute.data.pipe(
+  protected readonly initialPlanContext$ = this._activatedRoute.data.pipe(
     map((data) => data['plan'] as Plan),
     map((plan) => this._purePlanContextApi.createContext(plan)),
   );
@@ -56,7 +56,7 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService, Ent
       .subscribe(() => this._cd.detectChanges());
   }
 
-  launchPlan(): void {
+  protected launchPlan(): void {
     this._router.navigate(['.', 'launch'], { relativeTo: this._activatedRoute });
   }
 

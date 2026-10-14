@@ -10,8 +10,8 @@
   border-right: 1px solid var.$gray-200;
 
   &.active {
-    border-left: 1px solid var.$blue-600;
-    border-right: 1px solid var.$blue-600;
+    border-left: 1px solid var(--step-accent-color, var.$blue-600);
+    border-right: 1px solid var(--step-accent-color, var.$blue-600);
   }
 }
 

@@ -1,9 +1,11 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import {
   AppConfigContainerService,
   AuthService,
   BookmarkCreateDialogComponent,
   DialogRouteOpenStateService,
+  IDE_MODE,
+  IdeStateStrategyService,
   ViewRegistryService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,14 +25,20 @@ export class MainViewComponent {
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
   private _dialogRouteOpenState = inject(DialogRouteOpenStateService);
+  private readonly _isIdeMode = inject(IDE_MODE);
+  private readonly _ideState = inject(IdeStateStrategyService);
   protected readonly _appConfig = inject(AppConfigContainerService);
   protected readonly _authService = inject(AuthService);
 
   protected readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
   protected readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
   protected readonly ideBar = this._viewRegistry.getDashlets('ide/bar')[0];
+  protected readonly ideEmptyView = this._viewRegistry.getDashlets('ide/empty')[0];
+  protected readonly isIdeEmpty = computed(
+    () => this._isIdeMode && !!this.ideEmptyView && !this._ideState.currentPackage(),
+  );
 
-  private mainScrollableContent = viewChild('mainScrollableContent', { read: CdkScrollable });
+  private readonly mainScrollableContent = viewChild('mainScrollableContent', { read: CdkScrollable });
 
   private navigationEndSubscription = this._router.events
     .pipe(

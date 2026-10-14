@@ -36,6 +36,7 @@
             <step-aggregated-status
               [hasDescendantInvocations]="aggregatedElement.hasDescendantInvocations"
               [countByStatus]="aggregatedElement.countByStatus"
+              [interactive]="true"
               (statusClick)="
                 showIterations(aggregatedElement, { status: $event.status, count: $event.count, event: $event.event })
               "

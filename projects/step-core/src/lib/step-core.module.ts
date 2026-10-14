@@ -312,6 +312,7 @@ export * from './modules/cron/cron.module';
 export * from './modules/date-picker/date-picker.module';
 export * from './modules/import-export';
 export * from './modules/plan-common';
+export * from './modules/ide-common';
 export * from './modules/routing';
 export * from './modules/auth';
 export * from './modules/is-used-by';

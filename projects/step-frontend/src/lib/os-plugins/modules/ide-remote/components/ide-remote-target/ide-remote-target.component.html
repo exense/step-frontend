@@ -1,0 +1,14 @@
+<div class="target">
+  @if (label()) {
+    <div class="target-heading">{{ label() }}</div>
+  }
+  <div class="target-detail">
+    <span>Server URL</span><strong>{{ target().url || 'Not specified' }}</strong>
+  </div>
+  @if (target().projectName) {
+    <div class="target-detail">
+      <span>Project</span><strong>{{ target().projectName }}</strong>
+    </div>
+  }
+  <ng-content />
+</div>

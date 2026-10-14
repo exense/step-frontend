@@ -9,6 +9,12 @@ export const $Bucket = {
         properties: {},
       },
     },
+    metadata: {
+      type: 'dictionary',
+      contains: {
+        properties: {},
+      },
+    },
     begin: {
       type: 'number',
       format: 'int64',

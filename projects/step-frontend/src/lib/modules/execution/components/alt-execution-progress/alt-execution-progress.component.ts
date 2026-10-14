@@ -471,6 +471,7 @@ export class AltExecutionProgressComponent
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     map((result) => result?.aggregatedReportViews ?? []),
+    takeUntilDestroyed(),
     shareReplay(1),
   );
   private readonly testCases = toSignal(this.testCases$, { initialValue: [] });
@@ -572,7 +573,7 @@ export class AltExecutionProgressComponent
       });
     });
 
-  readonly keywordsDataSource$ = of(this.keywordsDataSource);
+  readonly keywordsDataSource$ = this.keywordParameters$.pipe(map(() => this.keywordsDataSource));
 
   readonly errors$ = combineLatest([
     this._refreshActivityService.isActive$(AltExecutionRefreshActivity.ERRORS),
@@ -612,8 +613,8 @@ export class AltExecutionProgressComponent
       (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     map((errors) => (!errors?.length ? undefined : errors)),
-    shareReplay(1),
     takeUntilDestroyed(),
+    shareReplay(1),
   );
 
   readonly availableErrorTypes$ = this.errors$.pipe(
@@ -783,7 +784,7 @@ export class AltExecutionProgressComponent
       .pipe(
         filter(([isActive]) => isActive),
         map(([, execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
-        debounceTime(300),
+        debounceTime(200),
         smartSwitchMap(
           (curr, prev) => {
             return (

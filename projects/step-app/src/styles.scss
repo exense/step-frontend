@@ -1,5 +1,11 @@
 @use 'projects/step-frontend/styles/common-mixins';
 @use 'projects/step-frontend/styles/fonts-setup';
+@use 'projects/step-core/styles/core-mixins' as core;
 
 @include common-mixins.common-styles();
 @include common-mixins.ts-tooltip();
+
+.default-theme.step-studio,
+.enterprise-theme.step-studio {
+  @include core.studio-theme();
+}

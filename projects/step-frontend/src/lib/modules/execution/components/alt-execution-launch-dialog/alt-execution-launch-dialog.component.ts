@@ -1,20 +1,31 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
   ControllerService,
   CustomFormComponent,
+  ExecutionCommandsContext,
+  ExecutionLaunchDashletContext,
   IncludeTestcases,
   PlanEditorService,
   RepositoryObjectReference,
   TableColumnsConfig,
   TablePersistenceConfig,
   TestRunStatus,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ExecutionCommandsDirective } from '../../directives/execution-commands.directive';
-import { ExecutionCommandsContext } from '../../shared/execution-commands-context.interface';
 import { ExecutionCommandsService } from '../../services/execution-commands.service';
 import { catchError, finalize, map, of } from 'rxjs';
 import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -30,6 +41,7 @@ export interface AltExecutionLaunchDialogData {
   };
   hideCancel?: boolean;
   isolateExecution?: boolean;
+  allowExecutionTargetSelection?: boolean;
 }
 
 interface ArtefactInfo extends ArtefactInfoInternal {
@@ -60,6 +72,7 @@ export class AltExecutionLaunchDialogComponent
 {
   private _controllersApi = inject(ControllerService);
   private _artefactsService = inject(ArtefactService);
+  private _viewRegistry = inject(ViewRegistryService);
   private _data = inject<AltExecutionLaunchDialogData>(MAT_DIALOG_DATA);
   protected _schedulerInvoker = inject(SchedulerInvokerService, { optional: true });
 
@@ -68,6 +81,8 @@ export class AltExecutionLaunchDialogComponent
   protected readonly explicitTestCases = this._data.testCases?.items;
   protected readonly showCancel = !this._data.hideCancel;
   protected readonly executionIsolation = !!this._data.isolateExecution;
+  protected readonly headerDashlets = this._viewRegistry.getDashlets('execution/launch/header');
+  protected readonly bodyDashlets = this._viewRegistry.getDashlets('execution/launch/body');
 
   private readonly testCasesComponent = viewChild('testCases', { read: RepositoryPlanTestcaseListComponent });
   private readonly customForm = viewChild(CustomFormComponent);
@@ -76,6 +91,19 @@ export class AltExecutionLaunchDialogComponent
   protected readonly error = signal<string | undefined>(undefined);
   protected readonly artefact = signal<ArtefactInfo | undefined>(undefined);
   protected readonly testcases = signal<IncludeTestcases | undefined>(undefined);
+  private readonly planName = computed(() => this.artefact()?.name);
+  private readonly ready = computed(() => {
+    const artefact = this.artefact();
+    const loading = this.loading();
+    const screenTemplateLoading = this.screenTemplateLoading();
+    return !!artefact && !loading && !screenTemplateLoading;
+  });
+  protected readonly dashletContext: ExecutionLaunchDashletContext = {
+    commands: this._commands,
+    allowExecutionTargetSelection: !!this._data.allowExecutionTargetSelection,
+    planName: this.planName,
+    ready: this.ready,
+  };
 
   ngAfterViewInit(): void {
     this.loadArtefact();

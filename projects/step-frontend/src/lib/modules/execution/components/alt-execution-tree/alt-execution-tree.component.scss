@@ -48,12 +48,12 @@ step-alt-execution-tree {
 
   step-tree-node.aggregated-important-node .tree-node {
     step-tree-node-name {
-      color: var.$blue-600 !important;
+      color: var(--step-accent-color, var.$blue-600) !important;
     }
   }
 
   step-tree-node.highlight .tree-node {
-    @include highlight-node(var.$blue-15);
+    @include highlight-node(var(--step-accent-subtle-color, var.$blue-15));
   }
 
   .tree-node {
@@ -74,7 +74,7 @@ step-alt-execution-tree {
     }
 
     &.tree-node-selected {
-      @include highlight-node(var.$light-blue-gray);
+      @include highlight-node(var(--step-selection-background-color, var.$light-blue-gray));
     }
   }
 

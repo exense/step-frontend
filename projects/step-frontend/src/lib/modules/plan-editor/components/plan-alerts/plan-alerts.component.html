@@ -1,3 +1,6 @@
+@if (readOnlyFields(); as fields) {
+  <step-alert type="info">{{ fields['readOnlyReason'] || 'This plan is read-only.' }}</step-alert>
+}
 @for (alert of _planAlerts; track alert.id) {
-  <step-dashlet [itemKey]="alert.template" [context]="planContext" />
+  <step-dashlet [itemKey]="alert.template" [context]="planContext()" />
 }

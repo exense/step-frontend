@@ -7,6 +7,7 @@ import type { ExecutionParameters } from './ExecutionParameters';
 
 export type ExecutiontTaskParameters = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   name?: string;
   executionsParameters?: ExecutionParameters;

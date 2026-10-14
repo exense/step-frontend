@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { Status } from '../../../_common/shared/status.enum';
+import { areAllIterationStatusesSelected } from '../../shared/iteration-filter-statuses';
 
 type CountByStatus = Record<string, number>;
 
@@ -30,12 +31,21 @@ export class AggregatedStatusComponent {
   readonly hasDescendantInvocations = input<boolean | undefined>(false);
   readonly showTooltips = input(true);
   readonly hideSingleStatus = input(false);
+  readonly interactive = input(false);
+  readonly action = input<'drilldown' | 'filter'>('drilldown');
+  readonly selectedStatuses = input<Status[] | undefined>();
 
   protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
     const showTooltips = this.showTooltips();
+    const interactive = this.interactive();
+    const action = this.action();
+    const selectedStatuses = this.selectedStatuses();
+    const allStatusesSelected = areAllIterationStatusesSelected(selectedStatuses, countByStatus);
     return Object.entries(countByStatus)
-      .map(([status, count]) => this.createStatusItem(showTooltips, status, count))
+      .map(([status, count]) =>
+        this.createStatusItem(showTooltips, interactive, action, selectedStatuses, allStatusesSelected, status, count),
+      )
       .filter((item) => !!item) as StatusItem[];
   });
 
@@ -67,15 +77,51 @@ export class AggregatedStatusComponent {
   });
 
   protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
+    if (status === Status.RUNNING) {
+      this.handleRunningClick(event);
+      return;
+    }
     this.statusClick.emit({ status, count, event });
   }
 
-  private createStatusItem(showTooltips: boolean, status?: string | Status, count?: number): StatusItem | undefined {
+  protected handleRunningClick(event: MouseEvent): void {
+    if (this.action() === 'filter') {
+      event.stopPropagation();
+    }
+  }
+
+  private createStatusItem(
+    showTooltips: boolean,
+    interactive: boolean,
+    action: 'drilldown' | 'filter',
+    selectedStatuses: Status[] | undefined,
+    allStatusesSelected: boolean,
+    status?: string | Status,
+    count?: number,
+  ): StatusItem | undefined {
     if (!status || !count) {
       return undefined;
     }
     const className = `step-aggregated-status-${status}`;
-    const tooltipMessage = showTooltips ? `${status}: ${count}` : undefined;
+    const label = status.toLowerCase().replaceAll('_', ' ');
+    const isInteractive = interactive && status !== Status.RUNNING;
+    const description =
+      action === 'drilldown'
+        ? `Drill to execution details with ${label} nodes only`
+        : allStatusesSelected
+          ? `Filter ${label} nodes`
+          : !selectedStatuses?.includes(status as Status)
+            ? `Show ${label} nodes`
+            : selectedStatuses?.length === 1
+              ? 'Show all nodes'
+              : `Hide ${label} nodes`;
+    const actionDescription =
+      status === Status.RUNNING && interactive && action === 'drilldown'
+        ? ' — Open node'
+        : isInteractive
+          ? ` — ${description}`
+          : '';
+    const tooltipMessage = showTooltips ? `${status}: ${count}${actionDescription}` : undefined;
     return { className, count, status: status as Status, tooltipMessage };
   }
 

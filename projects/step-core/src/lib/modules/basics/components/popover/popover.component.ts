@@ -62,6 +62,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   readonly withBorder = input(false);
   readonly whiteBackground = input(false);
   readonly smallFont = input(true);
+  readonly constrainToViewport = input(false);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
   readonly toggledEvent = output<boolean>();
   protected readonly PopoverMode = PopoverMode;
@@ -129,7 +130,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
       .flexibleConnectedTo(this._el)
       .withPositions(positions)
       .withViewportMargin(8)
-      .withPush(false);
+      .withPush(this.constrainToViewport());
 
     this.positionStrategy.positionChanges.subscribe(({ connectionPair }) => {
       requestAnimationFrame(() => this.applyStyleFromRenderedPosition(connectionPair));
@@ -137,7 +138,10 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
 
     this.overlayRef = this._overlay.create({
       positionStrategy: this.positionStrategy,
-      panelClass: ['step-popover-pane'],
+      panelClass: this.constrainToViewport()
+        ? ['step-popover-pane', 'step-popover-pane--constrained']
+        : ['step-popover-pane'],
+      ...(this.constrainToViewport() ? { maxWidth: 'calc(100vw - 16px)' } : {}),
       hasBackdrop: true,
       backdropClass: this.passiveBackdropClass,
       scrollStrategy: this._overlay.scrollStrategies.reposition(),
@@ -183,6 +187,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   private buildPositions(): ConnectedPosition[] {
     const isBelow = this.yPosition() === 'below';
     const preferLeft = this.xPosition() === 'before';
+    const arrowOffset = this.constrainToViewport() ? 24 : 0;
 
     const buildPosition = (
       originY: 'top' | 'bottom',
@@ -193,6 +198,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
       originY,
       overlayX,
       overlayY,
+      offsetX: overlayX === 'start' ? -arrowOffset : arrowOffset,
     });
 
     const primary = buildPosition(isBelow ? 'bottom' : 'top', isBelow ? 'top' : 'bottom', preferLeft ? 'end' : 'start');
@@ -294,6 +300,11 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
     if (panel) {
       panel.classList.remove('right', 'left', 'bottom-right', 'bottom-left');
       panel.classList.add(positionClass);
+      if (this.constrainToViewport()) {
+        const panelRect = panel.getBoundingClientRect();
+        const arrowLeft = Math.max(8, Math.min(originCenterX - panelRect.left, panelRect.width - 8));
+        panel.style.setProperty('--style__arrow-left', `${arrowLeft}px`);
+      }
     }
   }
 

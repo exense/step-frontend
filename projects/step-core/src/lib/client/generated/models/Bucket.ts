@@ -4,6 +4,7 @@
 
 export type Bucket = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   begin?: number;
   end?: number;
   attributes?: Record<string, any>;

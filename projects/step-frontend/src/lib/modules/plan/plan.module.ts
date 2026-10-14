@@ -83,6 +83,7 @@ export class PlanModule {
                   },
                   data: {
                     title: 'Execute Plan',
+                    allowExecutionTargetSelection: true,
                   },
                 }),
               ],
@@ -202,6 +203,7 @@ export class PlanModule {
                 },
                 data: {
                   title: 'Execute Plan',
+                  allowExecutionTargetSelection: true,
                 },
               }),
             ],

@@ -4,6 +4,7 @@
   } @else {
     <step-timeseries-chart
       #chart
+      class="performance-dashlet-chart"
       (zoomReset)="handleZoomReset()"
       [syncKey]="context().id"
       [settings]="_internalSettings()!"

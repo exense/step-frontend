@@ -4,6 +4,7 @@
 
 export type Resource = {
   customFields?: Record<string, any>;
+  metadata?: Record<string, any>;
   attributes?: Record<string, string>;
   creationDate?: string;
   creationUser?: string;
