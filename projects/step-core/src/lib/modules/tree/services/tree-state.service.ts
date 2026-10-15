@@ -13,9 +13,13 @@ const DEFAULT_OPTIONS: TreeStateInitOptions = {
 };
 
 @Injectable()
-export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
+export abstract class TreeStateService<
+  T,
+  N extends TreeNode,
+  U extends TreeNodeUtilsService<T, N> = TreeNodeUtilsService<T, N>,
+> implements OnDestroy {
   private _treeFlattener = inject(TreeFlattenerService);
-  private _treeNodeUtils = inject<TreeNodeUtilsService<T, N>>(TreeNodeUtilsService);
+  readonly _treeNodeUtils = inject<TreeNodeUtilsService<T, N>>(TreeNodeUtilsService) as U;
 
   private originalRoot?: T;
 

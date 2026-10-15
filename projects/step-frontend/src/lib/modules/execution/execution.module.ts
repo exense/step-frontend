@@ -41,6 +41,7 @@ import {
   PLAN_EXECUTION_REPORT_GRID,
   SCHEDULER_EXECUTION_REPORT_GRID,
   REPOSITORY_REPORT_GRID,
+  treeStateFactoryProvider,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -263,10 +264,14 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
   providers: [
     ActiveExecutionsService,
     AltExecutionRefreshActivityService,
-    AggregatedReportViewTreeNodeUtilsService,
     { provide: DialogParentService, useClass: ExecutionViewDialogUrlCleanupService },
-    { provide: TreeNodeUtilsService, useExisting: AggregatedReportViewTreeNodeUtilsService },
-    { provide: AGGREGATED_TREE_WIDGET_STATE, useClass: AggregatedReportViewTreeStateService },
+    {
+      provide: AGGREGATED_TREE_WIDGET_STATE,
+      useFactory: treeStateFactoryProvider(
+        AggregatedReportViewTreeStateService,
+        AggregatedReportViewTreeNodeUtilsService,
+      ),
+    },
     AltReportNodeDetailsStateService,
     ActiveExecutionContextService,
     AggregatedReportViewTreeStateContextService,
@@ -795,18 +800,16 @@ export class ExecutionModule {
           data: { [RECREATE_ON_EXECUTION_CHANGE]: true },
           providers: [
             AltExecutionRefreshActivityService,
-            AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
               useClass: ExecutionViewDialogUrlCleanupService,
             },
             {
-              provide: TreeNodeUtilsService,
-              useExisting: AggregatedReportViewTreeNodeUtilsService,
-            },
-            {
               provide: AGGREGATED_TREE_WIDGET_STATE,
-              useClass: AggregatedReportViewTreeStateService,
+              useFactory: treeStateFactoryProvider(
+                AggregatedReportViewTreeStateService,
+                AggregatedReportViewTreeNodeUtilsService,
+              ),
             },
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,

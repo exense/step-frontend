@@ -1,7 +1,6 @@
 import { computed, Directive, forwardRef, inject, input, output } from '@angular/core';
 import { TreeStateService } from '../services/tree-state.service';
 import { TreeNode } from '../types/tree-node';
-import { TreeNodeUtilsService } from '../services/tree-node-utils.service';
 import { TreeFlatNode } from '../types/tree-flat-node';
 import { TreeNodeData } from '../services/tree-node-data';
 
@@ -24,7 +23,6 @@ const ICON_COLLAPSED = 'chevron-right';
 })
 export class TreeNodeDirective implements TreeNodeData {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
-  private _utils = inject(TreeNodeUtilsService);
 
   readonly node = input.required<TreeFlatNode>();
   readonly isRootNode = computed(() => this.node().id === this._treeState.rootNodeId());
@@ -41,14 +39,14 @@ export class TreeNodeDirective implements TreeNodeData {
   });
   readonly toggleStateIcon = computed(() => (this.isExpanded() ? ICON_EXPANDED : ICON_COLLAPSED));
 
-  protected containerClasses = computed(() => {
+  protected readonly containerClasses = computed(() => {
     const treeNode = this.node();
     const result = ['step-tree-node-container'];
     const node = this._treeState?.findNodeById?.(treeNode.id);
     if (!node) {
       return result;
     }
-    const classes = this._utils?.getNodeAdditionalClasses?.(node) ?? [];
+    const classes = this._treeState._treeNodeUtils?.getNodeAdditionalClasses?.(node) ?? [];
     result.push(...classes);
     return result;
   });
