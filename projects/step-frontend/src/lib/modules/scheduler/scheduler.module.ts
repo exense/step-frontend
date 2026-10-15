@@ -73,6 +73,7 @@ export class SchedulerModule {
         {
           path: 'scheduler',
           resolve: {
+            planScreenData: preloadScreenDataResolver('plan'),
             executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
           },
           component: ScheduledTaskListComponent,
