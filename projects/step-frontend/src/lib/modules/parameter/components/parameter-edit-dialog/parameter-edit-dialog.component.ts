@@ -203,12 +203,10 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   protected setProtectedValue(protectedValue: boolean): void {
-    this.parameter.protectedValue = protectedValue;
-
-    //as dynamic expressions don't work with protected parameters we have to migrate to value
-    if (this.parameter?.value?.dynamic && protectedValue) {
-      this.parameter.value.value = this.parameter.value.expression;
-      this.parameter.value.dynamic = false;
+    if (protectedValue && this.parameter.value?.dynamic) {
+      return;
     }
+
+    this.parameter.protectedValue = protectedValue;
   }
 }
