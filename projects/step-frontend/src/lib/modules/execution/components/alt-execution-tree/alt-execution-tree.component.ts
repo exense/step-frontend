@@ -10,7 +10,14 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { ElementSizeDirective, TreeAction, TreeActionsService, TreeComponent, TreeNode } from '@exense/step-core';
+import {
+  ElementSizeDirective,
+  TreeAction,
+  TreeActionsService,
+  TreeComponent,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';

@@ -70,7 +70,10 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
+import {
+  AGGREGATED_TREE_WIDGET_STATE,
+  REPORT_NODE_TREE_WIDGET_STATE,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -101,6 +104,7 @@ import { AltExecutionRefreshActivityService } from '../../services/alt-execution
 import { AltExecutionRefreshActivity } from '../../shared/alt-execution-refresh-activity.enum';
 import { REPORT_TYPE } from '../../services/report-type.token';
 import { isExecutionCompletionTransition } from '../../shared/execution-refresh.utils';
+import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -251,7 +255,10 @@ export class AltExecutionProgressComponent
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _tableRemoteDataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
+  private _reportNodeTreeState = inject(REPORT_NODE_TREE_WIDGET_STATE);
+
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionId = inject(EXECUTION_ID);
@@ -277,12 +284,18 @@ export class AltExecutionProgressComponent
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
-  private isTreeInitialized = false;
+  private isAggregatedTreeInitialized = false;
+  private isReportTreeInitialized = false;
   private initialTreeLoadPending = true;
   private previousTreeProgressExecutionId?: string;
   private previousTreeProgressRange?: TimeRangeSelection;
-  private readonly treeInProgressInternal$ = new BehaviorSubject(false);
-  readonly treeInProgress$ = this.treeInProgressInternal$.asObservable();
+
+  private readonly aggregatedTreeInProgressInternal = signal(false);
+  readonly aggregatedTreeInProgress = this.aggregatedTreeInProgressInternal.asReadonly();
+
+  private readonly reportTreeAggregatedInternal = signal(false);
+  readonly reportTreeInProgress = this.reportTreeAggregatedInternal.asReadonly();
+
   private initialErrorsLoadPending = true;
   private previousErrorsProgressExecutionId?: string;
   private previousErrorsProgressRange?: TimeRangeSelection;
@@ -646,7 +659,8 @@ export class AltExecutionProgressComponent
   );
 
   ngOnInit(): void {
-    this.setupTreeRefresh();
+    this.setupAggregatedTreeRefresh();
+    this.setupReportTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
     this.setupAgentProvisioningPopover();
@@ -772,11 +786,10 @@ export class AltExecutionProgressComponent
     this.keywordsDataSource.destroy();
     this.aggregatedTestCasesDataSource?.destroy();
     this.testCaseIterationsDataSource?.destroy();
-    this.treeInProgressInternal$.complete();
     this.errorsDisplayInProgressInternal$.complete();
   }
 
-  private setupTreeRefresh(): void {
+  private setupAggregatedTreeRefresh(): void {
     combineLatest([
       this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TREE),
       this.execution$,
@@ -801,12 +814,12 @@ export class AltExecutionProgressComponent
             return defer(() => {
               const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
               if (displayProgress) {
-                this.treeInProgressInternal$.next(true);
+                this.aggregatedTreeInProgressInternal.set(true);
               }
               return this._treeLoader.load(execution, timeRangeSelection).pipe(
                 finalize(() => {
                   if (displayProgress) {
-                    this.treeInProgressInternal$.next(false);
+                    this.aggregatedTreeInProgressInternal.set(false);
                   }
                 }),
               );
@@ -820,13 +833,13 @@ export class AltExecutionProgressComponent
       .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeWidgetState.init(undefined);
-          this.isTreeInitialized = false;
+          this.isAggregatedTreeInitialized = false;
           return;
         }
         // expand all items in tree, due first initialization
-        const expandAllByDefault = !this.isTreeInitialized;
+        const expandAllByDefault = !this.isAggregatedTreeInitialized;
         this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
-        this.isTreeInitialized = true;
+        this.isAggregatedTreeInitialized = true;
       });
 
     this.execution$
@@ -840,15 +853,60 @@ export class AltExecutionProgressComponent
       });
   }
 
-  private shouldDisplayTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+  private setupReportTreeRefresh(): void {
+    this.execution$
+      .pipe(
+        map((execution) => {
+          const id = execution?.id;
+          const isForceRefresh = execution?.status === 'ENDED';
+          const displayProgress = this.shouldDisplayTreeProgress(execution);
+          if (displayProgress) {
+            this.reportTreeAggregatedInternal.set(true);
+          }
+          return { id, isForceRefresh, displayProgress };
+        }),
+        switchMap(({ id, isForceRefresh, displayProgress }) => {
+          const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
+
+          const rootNode$ = !id
+            ? of(undefined)
+            : this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
+                map((nodes) => nodes?.[0]),
+                catchError((err) => of(undefined)),
+              );
+
+          return rootNode$.pipe(map((rootNode) => ({ rootNode, isForceRefresh, expandedNodeIds, displayProgress })));
+        }),
+        switchMap(({ rootNode, isForceRefresh, expandedNodeIds, displayProgress }) => {
+          if (displayProgress) {
+            this.reportTreeAggregatedInternal.set(false);
+          }
+          if (!rootNode || !this.isReportTreeInitialized || isForceRefresh) {
+            return of(rootNode);
+          }
+          return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, expandedNodeIds);
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((rootNode) => {
+        if (rootNode) {
+          this._reportNodeTreeState.init(rootNode, { expandAllByDefault: false });
+          this.isReportTreeInitialized = true;
+        }
+      });
+  }
+
+  private shouldDisplayTreeProgress(execution: Execution | undefined, range?: TimeRangeSelection): boolean {
     const displayProgress =
       this.initialTreeLoadPending ||
       this.previousTreeProgressExecutionId !== execution?.id ||
-      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range);
+      (range !== undefined && !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range));
 
     this.initialTreeLoadPending = false;
     this.previousTreeProgressExecutionId = execution?.id;
-    this.previousTreeProgressRange = range;
+    if (range !== undefined) {
+      this.previousTreeProgressRange = range;
+    }
 
     return displayProgress;
   }

@@ -155,6 +155,33 @@
               </button>
             </step-stack-view-item>
           }
+          @case (DrilldownRootType.REPORT_TREE) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltExecutionTreeNonAggregatedWidget
+              breadcrumbsTooltip="Click to go back to Execution Tree"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="tree" />
+                <span>Report Tree</span>
+              </div>
+              <section *stepStackViewItemTitle class="stack-view-title">
+                <div>Report Tree</div>
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-execution-tree-non-aggregated (nodeClick)="handleOpenDetails($event, item.id)" />
+              </section>
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Report Tree"
+                matTooltipPosition="below"
+              >
+                <step-icon name="tree" />
+              </button>
+            </step-stack-view-item>
+          }
         }
       }
       @case (StackItemType.AGGREGATED_REPORT_NODE) {

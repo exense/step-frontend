@@ -56,8 +56,9 @@ export class TreeNodeDirective implements TreeNodeData {
     return node.hasChild || node.expandable;
   });
 
-  /** @Output() **/
   readonly contextMenu = output<{ event: MouseEvent; nodeId: string }>();
+
+  readonly nodeClick = output<{ event: MouseEvent; nodeId: string }>();
 
   readonly id = computed(() => this.node().id);
   readonly level = computed(() => this.node().parentPath.length);
@@ -70,5 +71,10 @@ export class TreeNodeDirective implements TreeNodeData {
   openContextMenu(event: MouseEvent): void {
     const nodeId = this.node().id;
     this.contextMenu.emit({ event, nodeId });
+  }
+
+  handleNodeClick(event: MouseEvent): void {
+    const nodeId = this.node().id;
+    this.nodeClick.emit({ event, nodeId });
   }
 }

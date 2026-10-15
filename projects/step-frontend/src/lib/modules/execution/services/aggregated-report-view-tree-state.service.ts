@@ -15,6 +15,7 @@ import {
   AggregatedReportView,
   ArtefactService,
   DialogsService,
+  ReportNode,
   TreeStateInitOptions,
   TreeStateService,
 } from '@exense/step-core';
@@ -24,6 +25,8 @@ import { debounceTime, map } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
+import { ReportTreeNode } from '../shared/report-tree-node';
+import { ReportTreeStateService } from './report-tree-state.service';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions &
   Pick<AggregatedReport, 'partialTreeRootNodeId'> & { resetSearch?: boolean };
@@ -368,6 +371,8 @@ export const AGGREGATED_TREE_TAB_STATE = new InjectionToken<AggregatedReportView
 export const AGGREGATED_TREE_WIDGET_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
   'Tree state related to widget',
 );
+// todo move somewhere else
+export const REPORT_NODE_TREE_WIDGET_STATE = new InjectionToken<ReportTreeStateService>('Report node tree sate');
 
 @Injectable()
 export class AggregatedReportViewTreeStateContextService implements OnDestroy {
