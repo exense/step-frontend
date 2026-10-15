@@ -67,6 +67,15 @@
                 [(ngModel)]="parameter.value!.value"
                 name="protectedValue"
               />
+              <step-suffix
+                class="button-suffix"
+                matTooltip="Protected values cannot use dynamic expressions."
+                matTooltipPosition="below"
+              >
+                <button type="button" mat-stroked-button [disabled]="true" aria-label="Use a dynamic expression">
+                  <step-icon name="zap" />
+                </button>
+              </step-suffix>
             </step-form-field>
           } @else {
             <step-form-field>
@@ -74,12 +83,16 @@
             </step-form-field>
           }
 
-          <step-form-field class="protect-field">
+          <step-form-field
+            class="protect-field"
+            matTooltip="Dynamic values cannot be protected. Switch to a constant value first."
+            [matTooltipDisabled]="!parameter.value?.dynamic"
+          >
             <mat-checkbox
               color="primary"
               [ngModel]="parameter.protectedValue"
               (ngModelChange)="setProtectedValue($event)"
-              [disabled]="protectedParameter"
+              [disabled]="protectedParameter || !!parameter.value?.dynamic"
               name="protected"
             >
               <span>Protect parameter value</span>
