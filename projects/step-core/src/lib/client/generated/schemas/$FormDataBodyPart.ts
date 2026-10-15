@@ -42,11 +42,11 @@ export const $FormDataBodyPart = {
     fileName: {
       type: 'string',
     },
-    formDataContentDisposition: {
-      type: 'FormDataContentDisposition',
-    },
     simple: {
       type: 'boolean',
+    },
+    formDataContentDisposition: {
+      type: 'FormDataContentDisposition',
     },
     parameterizedHeaders: {
       type: 'dictionary',

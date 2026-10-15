@@ -13,6 +13,7 @@ import {
 import { EMPTY, expand, finalize, map, reduce } from 'rxjs';
 import { IdeRemoteApiService } from '../../services/ide-remote-api.service';
 import { IdeRemoteDefaultsService } from '../../services/ide-remote-defaults.service';
+import { IdeRemoteDeploymentOptionsComponent } from '../ide-remote-deployment-options/ide-remote-deployment-options.component';
 import { IdeRemoteResultsComponent } from '../ide-remote-results/ide-remote-results.component';
 import { IdeRemoteExecutionOptionsComponent } from '../ide-remote-execution-options/ide-remote-execution-options.component';
 import { IdeRemoteTargetComponent } from '../ide-remote-target/ide-remote-target.component';
@@ -25,7 +26,13 @@ export interface IdeRemoteOperationDialogData {
 
 @Component({
   selector: 'step-ide-remote-operation-dialog',
-  imports: [StepCoreModule, IdeRemoteTargetComponent, IdeRemoteResultsComponent, IdeRemoteExecutionOptionsComponent],
+  imports: [
+    StepCoreModule,
+    IdeRemoteTargetComponent,
+    IdeRemoteResultsComponent,
+    IdeRemoteExecutionOptionsComponent,
+    IdeRemoteDeploymentOptionsComponent,
+  ],
   templateUrl: './ide-remote-operation-dialog.component.html',
   styleUrl: './ide-remote-operation-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +71,7 @@ export class IdeRemoteOperationDialogComponent implements OnInit {
         const name = plan.attributes?.['name'];
         const categories = plan.categories ?? [];
         return (
+          plan.root?._class !== 'AssertionPlan' &&
           (!request?.includePlans || request.includePlans.includes(name ?? '')) &&
           (!request?.excludePlans || !request.excludePlans.includes(name ?? '')) &&
           (!request?.includeCategories ||
@@ -75,6 +83,7 @@ export class IdeRemoteOperationDialogComponent implements OnInit {
   });
   protected readonly submissionError = signal<string | undefined>(undefined);
   protected readonly completed = computed(() => this.deploymentSucceeded() || this.executionResults() !== undefined);
+  protected readonly deploymentRequest = computed(() => this._defaults.getDeploymentRequest());
   protected readonly executionRequest = computed(() => this._defaults.getExecutionRequest());
   protected readonly readinessError = computed(() => {
     const currentPackage = this._ideState.currentPackage();

@@ -25,3 +25,7 @@ Invoke the command `npm run build` it will assemble the core library and step FE
 ## Generate OpenAPI classes with a local backend
 
 `node generate-openapi-client.js http://localhost:8080/rest/private-openapi.json`
+
+For the local Studio and filesystem APIs, run `npm run openapi:generate:studio -- http://localhost:8080/rest/private-openapi.json`
+against a running Studio backend. A controller backend does not expose these endpoints. Both commands also accept a saved
+OpenAPI JSON file. Studio generation updates `ide-generated` and reuses shared models and HTTP infrastructure from `generated`.

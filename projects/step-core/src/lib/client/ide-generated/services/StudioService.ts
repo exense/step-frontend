@@ -4,8 +4,8 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AutomationPackageUpdateResult } from '../../generated';
 import type { AutomationPackageDescriptor } from '../models/AutomationPackageDescriptor';
+import type { AutomationPackageUpdateResult } from '../../generated/models/AutomationPackageUpdateResult';
 import type { RemoteDefaults } from '../models/RemoteDefaults';
 import type { RemoteDeploymentRequest } from '../models/RemoteDeploymentRequest';
 import type { RemoteExecution } from '../models/RemoteExecution';
@@ -14,7 +14,7 @@ import type { RemoteExecutionRequest } from '../models/RemoteExecutionRequest';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
-export class IdeService {
+export class StudioService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
@@ -24,7 +24,7 @@ export class IdeService {
   public closeAp(): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/ap/close',
+      url: '/local/studio/ap/close',
     });
   }
 
@@ -36,7 +36,7 @@ export class IdeService {
   public deployRemote(requestBody?: RemoteDeploymentRequest): Observable<AutomationPackageUpdateResult> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/remote-deploy',
+      url: '/local/studio/remote-deploy',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -50,7 +50,7 @@ export class IdeService {
   public executeRemote(requestBody?: RemoteExecutionRequest): Observable<Array<RemoteExecution>> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/remote-execute',
+      url: '/local/studio/remote-execute',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -63,7 +63,7 @@ export class IdeService {
   public getCurrentAp(): Observable<AutomationPackageDescriptor> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/local/ide/ap/current',
+      url: '/local/studio/ap/current',
     });
   }
 
@@ -74,7 +74,7 @@ export class IdeService {
   public getRemoteDefaults(): Observable<RemoteDefaults> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/local/ide/remote-defaults',
+      url: '/local/studio/remote-defaults',
     });
   }
 
@@ -87,7 +87,7 @@ export class IdeService {
   public initializeNewAp(existingEmptyDirectory?: string, apName?: string): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/ap/initialize-new',
+      url: '/local/studio/ap/initialize-new',
       query: {
         existingEmptyDirectory: existingEmptyDirectory,
         apName: apName,
@@ -104,7 +104,7 @@ export class IdeService {
   public useExistingAp(directory?: string, upgrade?: boolean): Observable<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/local/ide/ap/use-existing',
+      url: '/local/studio/ap/use-existing',
       query: {
         directory: directory,
         upgrade: upgrade,

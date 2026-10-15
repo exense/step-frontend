@@ -19,5 +19,6 @@ export type ExecutionParameters = {
   isolatedExecution?: boolean;
   exports?: Array<RepositoryObjectReference>;
   description?: string;
+  sharedContextId?: string;
   id?: string;
 };
