@@ -338,7 +338,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Returns a flat aggregated report view for the provided execution and aggregation parameters.
+   * Returns a flat aggregated report view for the provided execution and aggregation parameters. When filtering by artefact classes, matching artefacts nested in another matching artefact are not returned.
    * @param id
    * @param requestBody
    * @returns FlatAggregatedReport default response

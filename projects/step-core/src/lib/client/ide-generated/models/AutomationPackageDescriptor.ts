@@ -5,4 +5,5 @@
 export type AutomationPackageDescriptor = {
   directory?: string;
   name?: string;
+  warnings?: Array<string>;
 };

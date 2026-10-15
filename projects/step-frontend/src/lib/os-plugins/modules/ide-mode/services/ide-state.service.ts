@@ -8,7 +8,7 @@ import {
   GlobalReloadService,
   HttpOverrideResponseInterceptorService,
   SelectionMode,
-  IdeService,
+  StudioService,
   FilePickerModalResult,
   IdeStateStrategy,
   DEFAULT_PAGE,
@@ -21,10 +21,6 @@ import { ApFsDataProviderService } from './ap-fs-data-provider.service';
 import { CreatePackageDialogComponent } from '../components/create-package-dialog/create-package-dialog.component';
 import { IDE_HOME_ROUTE } from '../shared/ide-home-route';
 
-interface IdeAutomationPackageDescriptor extends AutomationPackageDescriptor {
-  warnings?: string[];
-}
-
 const UPGRADE_REQUIRED_ERROR_NAMES = [
   'LegacyAutomationPackageSchemaVersionSetException',
   'NoAutomationPackageSchemaVersionSetException',
@@ -34,7 +30,7 @@ const UPGRADE_REQUIRED_ERROR_NAMES = [
   providedIn: 'root',
 })
 export class IdeStateService implements IdeStateStrategy {
-  private _ideApi = inject(IdeService);
+  private _studioApi = inject(StudioService);
   private _dialogs = inject(DialogsService);
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _reloadable = inject(GlobalReloadService);
@@ -60,11 +56,11 @@ export class IdeStateService implements IdeStateStrategy {
   private readonly inProgressInternal = signal(false);
   readonly inProgress = this.inProgressInternal.asReadonly();
 
-  private readonly currentPackageInternal = signal<IdeAutomationPackageDescriptor | undefined>(undefined);
+  private readonly currentPackageInternal = signal<AutomationPackageDescriptor | undefined>(undefined);
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private setPackage(automationPackage: IdeAutomationPackageDescriptor | undefined): void {
+  private setPackage(automationPackage: AutomationPackageDescriptor | undefined): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
     if (automationPackage && this.isHomeRoute()) {
@@ -81,7 +77,7 @@ export class IdeStateService implements IdeStateStrategy {
 
   initialize(): void {
     this.inProgressInternal.set(true);
-    this._ideApi
+    this._studioApi
       .getCurrentAp()
       .pipe(
         map((result) => (!result?.directory ? undefined : result)),
@@ -95,7 +91,7 @@ export class IdeStateService implements IdeStateStrategy {
     this.leavePackageView()
       .pipe(
         filter((navigated) => navigated),
-        switchMap(() => this._ideApi.closeAp()),
+        switchMap(() => this._studioApi.closeAp()),
         finalize(() => this.inProgressInternal.set(false)),
       )
       .subscribe(() => this.setPackage(undefined));
@@ -113,7 +109,7 @@ export class IdeStateService implements IdeStateStrategy {
       .pipe(
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
-        switchMap(() => this._ideApi.getCurrentAp()),
+        switchMap(() => this._studioApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
@@ -126,7 +122,7 @@ export class IdeStateService implements IdeStateStrategy {
         filter((result) => !!result),
         tap(() => this.inProgressInternal.set(true)),
         switchMap(({ filePath }) => this.useExistingAp(filePath)),
-        switchMap(() => this._ideApi.getCurrentAp()),
+        switchMap(() => this._studioApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
@@ -137,7 +133,7 @@ export class IdeStateService implements IdeStateStrategy {
     this.inProgressInternal.set(true);
     this.useExistingAp(directory)
       .pipe(
-        switchMap(() => this._ideApi.getCurrentAp()),
+        switchMap(() => this._studioApi.getCurrentAp()),
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
@@ -195,7 +191,7 @@ export class IdeStateService implements IdeStateStrategy {
             return of(new HttpResponse({ body: null }));
           }),
         );
-        return this._ideApi.useExistingAp(directory).pipe(
+        return this._studioApi.useExistingAp(directory).pipe(
           switchMap((result) =>
             upgradeRequiredMessage === undefined
               ? of(result)
@@ -207,7 +203,7 @@ export class IdeStateService implements IdeStateStrategy {
                     maxWidth: 'min(600px, calc(100vw - 32px))',
                     panelClass: 'step-compact-confirmation-dialog',
                   })
-                  .pipe(switchMap((confirmed) => (confirmed ? this._ideApi.useExistingAp(directory, true) : EMPTY))),
+                  .pipe(switchMap((confirmed) => (confirmed ? this._studioApi.useExistingAp(directory, true) : EMPTY))),
           ),
         );
       }),
