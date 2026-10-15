@@ -147,7 +147,7 @@ export class IdeStateService implements IdeStateStrategy {
     }
   }
 
-  private onPackageOpened(automationPackage: IdeAutomationPackageDescriptor | undefined): void {
+  private onPackageOpened(automationPackage: AutomationPackageDescriptor | undefined): void {
     this.setPackage(automationPackage);
     if (!automationPackage) {
       return;
