@@ -9,5 +9,11 @@ export const $AutomationPackageDescriptor = {
     name: {
       type: 'string',
     },
+    warnings: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
   },
 } as const;

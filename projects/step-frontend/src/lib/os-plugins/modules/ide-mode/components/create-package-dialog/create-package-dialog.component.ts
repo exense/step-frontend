@@ -15,7 +15,7 @@ import {
   FilePickerService,
   FilesystemService,
   HttpOverrideResponseInterceptorService,
-  IdeService,
+  StudioService,
   ProposeDirectoryResponse,
   SelectionMode,
   StepBasicsModule,
@@ -32,7 +32,7 @@ import { catchError, defer, EMPTY, finalize, map, Observable, of, startWith, swi
 })
 export class CreatePackageDialogComponent implements OnInit {
   protected readonly _dialogRef = inject<MatDialogRef<CreatePackageDialogComponent, boolean>>(MatDialogRef);
-  private _ideApi = inject(IdeService);
+  private _studioApi = inject(StudioService);
   private _filesystem = inject(FilesystemService);
   private _filePicker = inject(FilePickerService);
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
@@ -68,11 +68,7 @@ export class CreatePackageDialogComponent implements OnInit {
           }
           const { name, location } = this.form.getRawValue();
           return timer(300).pipe(
-            switchMap(() =>
-              this.withInlineErrors(() =>
-                this._filesystem.proposeApDirectory({ existingParentDirectory: location.trim(), apName: name }),
-              ),
-            ),
+            switchMap(() => this.withInlineErrors(() => this._filesystem.proposeApDirectory(location.trim(), name))),
             catchError((error: unknown) => {
               this.errors.set([this.errorMessage(error)]);
               this.validating.set(false);
@@ -84,7 +80,7 @@ export class CreatePackageDialogComponent implements OnInit {
       )
       .subscribe((proposal) => {
         this.proposal.set(proposal);
-        this.errors.set(proposal.errors);
+        this.errors.set(proposal.errors ?? []);
         this.validating.set(false);
       });
 
@@ -119,12 +115,12 @@ export class CreatePackageDialogComponent implements OnInit {
   protected create(): void {
     this.form.markAllAsTouched();
     const proposal = this.proposal();
-    if (this.form.invalid || this.validating() || this.creating() || !proposal?.directory || proposal.errors.length) {
+    if (this.form.invalid || this.validating() || this.creating() || !proposal?.directory || proposal.errors?.length) {
       return;
     }
     this.creating.set(true);
     this.form.disable({ emitEvent: false });
-    this.withInlineErrors(() => this._ideApi.initializeNewAp(proposal.directory, this.form.controls.name.value))
+    this.withInlineErrors(() => this._studioApi.initializeNewAp(proposal.directory, this.form.controls.name.value))
       .pipe(
         finalize(() => {
           this.creating.set(false);

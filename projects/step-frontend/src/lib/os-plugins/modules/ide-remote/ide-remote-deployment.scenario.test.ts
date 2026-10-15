@@ -46,7 +46,7 @@ describe('Studio remote deployment properties', () => {
     http
       .match((request) => request.url.endsWith('/app/repositories/parameters'))
       .forEach((request) => request.flush({}));
-    const request = http.expectOne((request) => request.url.endsWith('/local/ide/remote-defaults'));
+    const request = http.expectOne((request) => request.url.endsWith('/local/studio/remote-defaults'));
     expect(request.request.method).toBe('GET');
     request.flush(defaults);
     flushMicrotasks();
@@ -117,7 +117,7 @@ describe('Studio remote deployment properties', () => {
     expect(deployButton.disabled).toBe(false);
     deployButton.click();
     flushMicrotasks();
-    const request = http.expectOne((request) => request.url.endsWith('/local/ide/remote-deploy'));
+    const request = http.expectOne((request) => request.url.endsWith('/local/studio/remote-deploy'));
     expect(request.request.method).toBe('POST');
     expect(JSON.parse(request.request.body)).toEqual(deploy);
     request.flush({ status: 'UPDATED' });

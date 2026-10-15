@@ -5,25 +5,15 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { CreateDirectoryRequest } from '../models/CreateDirectoryRequest';
+import type { DirectoryListing } from '../../generated/models/DirectoryListing';
+import type { FileDescriptor } from '../../generated/models/FileDescriptor';
 import type { ProposeDirectoryResponse } from '../models/ProposeDirectoryResponse';
 
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { DirectoryListing, FileDescriptor } from '../../generated';
 
 @Injectable({ providedIn: 'root' })
 export class FilesystemService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-  public proposeApDirectory(params: {
-    existingParentDirectory: string;
-    apName: string;
-  }): Observable<ProposeDirectoryResponse> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/local/fs/proposeAPDirectory',
-      query: params,
-    });
-  }
 
   /**
    * @param requestBody
@@ -72,6 +62,24 @@ export class FilesystemService {
         showHidden: showHidden,
         filesOnly: filesOnly,
         dirsOnly: dirsOnly,
+      },
+    });
+  }
+
+  /**
+   * Takes an existing parent directory and desired AP name, and returns the proposed corresponding directory name, along with potential warnings or errors.
+   * @param existingParentDirectory
+   * @param apName
+   * @returns ProposeDirectoryResponse default response
+   * @throws ApiError
+   */
+  public proposeApDirectory(existingParentDirectory?: string, apName?: string): Observable<ProposeDirectoryResponse> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/local/fs/proposeAPDirectory',
+      query: {
+        existingParentDirectory: existingParentDirectory,
+        apName: apName,
       },
     });
   }
