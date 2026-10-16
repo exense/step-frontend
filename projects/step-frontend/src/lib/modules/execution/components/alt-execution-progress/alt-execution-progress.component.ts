@@ -236,7 +236,6 @@ interface AgentProvisioningEventState {
   ],
   standalone: false,
 })
-/* eslint-disable step-lint/component-public-fields -- This component also provides the public report-state API through AltExecutionStateService. */
 export class AltExecutionProgressComponent
   implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
 {
@@ -265,10 +264,12 @@ export class AltExecutionProgressComponent
   protected readonly isLayoutEditMode = inject(GridEditableService).editMode;
 
   protected readonly isSmallScreen = toSignal(this._isSmallScreen$);
-  protected readonly isCompactReport = !!this._staticLayouts.get(
+  private readonly reportLayout = this._staticLayouts.get(
     (this._activatedRoute.snapshot.data[EXECUTION_REPORT_LAYOUT_ROUTE_DATA] as string | undefined) ??
       (this._activatedRoute.snapshot.queryParams[EXECUTION_REPORT_LAYOUT_QUERY_PARAM] as string | undefined),
-  )?.compactHeader;
+  );
+  protected readonly isCompactReport = !!this.reportLayout?.compactHeader;
+  protected readonly showAutomationPackageWarning = this.reportLayout?.showAutomationPackageWarning ?? true;
   private readonly toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -1003,4 +1004,3 @@ export class AltExecutionProgressComponent
     this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
   }
 }
-/* eslint-enable step-lint/component-public-fields */

@@ -4,6 +4,7 @@ import {
   DashletRegistryService,
   EntityColumnComponent,
   LOGOUT_CLEANUP,
+  SIDEBAR_STATE,
   StepCoreModule,
   LockColumnComponent,
   ColumnSettingsSaveDashletComponent,
@@ -44,6 +45,7 @@ import { SideBarClickDirective } from './directives/side-bar-click.directive';
   ],
   imports: [StepCoreModule],
   providers: [
+    { provide: SIDEBAR_STATE, useExisting: SidebarStateService },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
@@ -77,10 +79,10 @@ import { SideBarClickDirective } from './directives/side-bar-click.directive';
     {
       provide: APP_INITIALIZER,
       useFactory: () => {
-        const dashletRegistryService = inject(DashletRegistryService);
-        dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
-        dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
-        dashletRegistryService.registerDashlet('columnSettingsSave', ColumnSettingsSaveDashletComponent);
+        const _dashletRegistryService = inject(DashletRegistryService);
+        _dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
+        _dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
+        _dashletRegistryService.registerDashlet('columnSettingsSave', ColumnSettingsSaveDashletComponent);
         return () => true;
       },
       multi: true,

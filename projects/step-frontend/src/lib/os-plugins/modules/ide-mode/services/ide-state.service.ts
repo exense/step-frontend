@@ -113,12 +113,7 @@ export class IdeStateService implements IdeStateStrategy {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result));
   }
 
   openWithPicker(): void {
@@ -131,12 +126,7 @@ export class IdeStateService implements IdeStateStrategy {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result));
   }
 
   openFromPath(directory: string): void {
@@ -147,18 +137,24 @@ export class IdeStateService implements IdeStateStrategy {
         map((result) => (!result?.directory ? undefined : result)),
         finalize(() => this.inProgressInternal.set(false)),
       )
-      .subscribe((result) => {
-        this.setPackage(result);
-        if (result) {
-          this._accessHistory.addToHistory(result);
-        }
-      });
+      .subscribe((result) => this.onPackageOpened(result));
   }
 
   reload(): void {
     const directory = this.currentPackage()?.directory;
     if (directory && !this.inProgress()) {
       this.openFromPath(directory);
+    }
+  }
+
+  private onPackageOpened(automationPackage: AutomationPackageDescriptor | undefined): void {
+    this.setPackage(automationPackage);
+    if (!automationPackage) {
+      return;
+    }
+    this._accessHistory.addToHistory(automationPackage);
+    if (!this.isHomeRoute()) {
+      void this._router.navigateByUrl(this._defaultPage(true));
     }
   }
 
