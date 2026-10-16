@@ -3,4 +3,5 @@ export interface FunctionDialogsConfig {
   functionTypeFilters: string[];
   lightForm: boolean;
   customScreenTable: string;
+  writePermission: string;
 }

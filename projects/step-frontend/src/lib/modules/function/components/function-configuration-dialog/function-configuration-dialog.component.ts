@@ -49,6 +49,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     },
   ],
   hostDirectives: [ReloadableDirective],
+  host: {
+    '(keydown.enter)': 'saveByEnter()',
+  },
   standalone: false,
 })
 export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
@@ -64,6 +67,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   private _destroyRef = inject(DestroyRef);
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
+  protected readonly writePermission = this._functionConfigurationDialogData.dialogConfig.writePermission;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
   protected readonly AlertType = AlertType;
   protected readonly schemaErrorsDictionary: Record<string, string> = {
@@ -79,8 +83,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
-  private functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
-  private customForm = viewChild(CustomFormWrapperComponent);
+  private readonly functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
+  private readonly customForm = viewChild(CustomFormWrapperComponent);
 
   protected readonly itemInfoArrayItemExtractor: ArrayItemLabelValueExtractor<ItemInfo, string> = {
     getValue: (item: ItemInfo) => item.type,
@@ -155,10 +159,14 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
         if (path) {
           this._router.navigateByUrl(path);
         } else {
-          this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
+          this.showNoConfigureEditorError();
         }
         this._matDialogRef.close({ isSuccess, canNavigateBack: !path });
       });
+  }
+
+  private showNoConfigureEditorError(): void {
+    this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
   }
 
   private determineDefaultType(): string {
@@ -180,8 +188,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
     }
   }
 
-  @HostListener('keydown.enter')
-  private saveByEnter(): void {
+  protected saveByEnter(): void {
     this.save(false);
   }
 

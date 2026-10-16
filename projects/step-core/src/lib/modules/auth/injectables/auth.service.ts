@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { SessionDto } from '../../../domain';
-import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, shareReplay, Subscription, switchMap, tap } from 'rxjs';
 import {
   ApplicationConfiguration,
   PrivateApplicationService,
@@ -43,8 +43,10 @@ export class AuthService implements OnDestroy, Reloadable {
 
   readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
-  private isOidcInternal = signal(false);
+  private readonly isOidcInternal = signal(false);
   readonly isOidc = this.isOidcInternal.asReadonly();
+
+  private reloadSessionSubscription?: Subscription;
 
   readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
     tap((conf) => {
@@ -77,7 +79,7 @@ export class AuthService implements OnDestroy, Reloadable {
     this.triggerRightCheck();
   }
 
-  private setContext(context: AuthContext) {
+  private setContext(context: AuthContext): void {
     this.contextInternal$.next(context);
   }
 
@@ -214,13 +216,15 @@ export class AuthService implements OnDestroy, Reloadable {
   }
 
   reload(): void {
-    this.triggerRightCheck();
+    this.reloadSessionSubscription?.unsubscribe?.();
+    this.reloadSessionSubscription = this.getSession().subscribe();
   }
 
   ngOnDestroy(): void {
     this.contextInternal$.complete();
     this.triggerRightCheckInternal$.complete();
     this._globalReloadService.unRegister(this);
+    this.reloadSessionSubscription?.unsubscribe?.();
   }
 
   private redirectToOidc(): void {
