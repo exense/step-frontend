@@ -1,8 +1,10 @@
 <step-modal-window [title]="modalTitle" [showSpinner]="isLoading" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <step-alert *ngIf="keyword?.managed" [type]="AlertType.WARNING">
-      This keyword is part of a keyword package. All changes made will be lost when the package is updated.
-    </step-alert>
+    @if (keyword?.managed) {
+      <step-alert [type]="AlertType.WARNING">
+        This keyword is part of a keyword package. All changes made will be lost when the package is updated.
+      </step-alert>
+    }
 
     @if (keyword) {
       <step-custom-form-wrapper [stScreen]="customScreenTable" [ngModel]="keyword" (ngModelChange)="keyword = $event" />
@@ -14,7 +16,7 @@
         <textarea rows="3" [formControl]="formGroup!.controls.description"></textarea>
       </step-form-field>
 
-      <ng-container *ngIf="!lightForm && schemaEnforced">
+      @if (!lightForm && schemaEnforced) {
         <step-json-raw-editor-formatted
           label="Schema"
           [showRequiredMarker]="true"
@@ -23,10 +25,10 @@
           [isAutoValidateJson]="false"
         >
           <step-label-addon>
-            <step-add-field-schema-button> </step-add-field-schema-button>
+            <step-add-field-schema-button />
           </step-label-addon>
         </step-json-raw-editor-formatted>
-      </ng-container>
+      }
 
       <step-form-field>
         <step-label>Type</step-label>
@@ -40,18 +42,15 @@
         />
       </step-form-field>
 
-      <step-function-type #functionTypeComponent [itemKey]="functionType"> </step-function-type>
+      <step-function-type #functionTypeComponent [itemKey]="functionType" />
 
-      <ng-container *ngIf="!lightForm">
+      @if (!lightForm) {
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title class="advanced-label">Advanced</mat-panel-title>
           </mat-expansion-panel-header>
 
-          <step-dynamic-time-input
-            label="Call timeout"
-            [formControl]="formGroup!.controls.callTimeout"
-          ></step-dynamic-time-input>
+          <step-dynamic-time-input label="Call timeout" [formControl]="formGroup!.controls.callTimeout" />
 
           <section class="execute-slider">
             <mat-slide-toggle color="primary" name="active" [formControl]="formGroup!.controls.executeLocally">
@@ -59,24 +58,24 @@
               <step-icon
                 name="help-circle"
                 matTooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
-              ></step-icon>
+              />
             </mat-slide-toggle>
           </section>
 
-          <ng-container *ngIf="!executeLocally">
+          @if (!executeLocally) {
             <step-agent-token-selection-criteria
               [tokenSelectionCriteria]="formGroup!.controls.tokenSelectionCriteria"
               tooltip="Defines additional selection criteria for the agent token on which the keyword should be executed"
-            ></step-agent-token-selection-criteria>
-          </ng-container>
+            />
+          }
         </mat-expansion-panel>
-      </ng-container>
+      }
     </form>
   </div>
 
   <div step-modal-window-buttons [stepEntityRef]="$any(keyword)">
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" mat-stroked-button (click)="save(true)" [disabled]="!('kw-write' | hasRight | async)">
+    <button type="button" mat-stroked-button (click)="save(true)" [disabled]="!(writePermission | hasRight | async)">
       Save and edit
     </button>
     <button
@@ -84,7 +83,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="!('kw-write' | hasRight | async)"
+      [disabled]="!(writePermission | hasRight | async)"
     >
       Save
     </button>
