@@ -43,7 +43,7 @@ export class AuthService implements OnDestroy, Reloadable {
 
   readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
-  private isOidcInternal = signal(false);
+  private readonly isOidcInternal = signal(false);
   readonly isOidc = this.isOidcInternal.asReadonly();
 
   readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
@@ -77,7 +77,7 @@ export class AuthService implements OnDestroy, Reloadable {
     this.triggerRightCheck();
   }
 
-  private setContext(context: AuthContext) {
+  private setContext(context: AuthContext): void {
     this.contextInternal$.next(context);
   }
 
@@ -214,7 +214,7 @@ export class AuthService implements OnDestroy, Reloadable {
   }
 
   reload(): void {
-    this.triggerRightCheck();
+    this.getSession().subscribe();
   }
 
   ngOnDestroy(): void {
