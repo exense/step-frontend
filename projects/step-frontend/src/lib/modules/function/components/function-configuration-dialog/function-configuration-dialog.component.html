@@ -86,7 +86,7 @@
       type="button"
       mat-stroked-button
       (click)="save(true)"
-      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
+      [disabled]="isLoading || isSaving || !(writePermission | hasRight | async)"
       [attr.aria-busy]="isSaving"
     >
       @if (isSaving) {
@@ -99,7 +99,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="isLoading || isSaving || !('kw-write' | hasRight | async)"
+      [disabled]="isLoading || isSaving || !(writePermission | hasRight | async)"
       [attr.aria-busy]="isSaving"
     >
       @if (isSaving) {
