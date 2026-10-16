@@ -43,6 +43,7 @@ import {
   EntityRefService,
   Execution,
   EXECUTION_REPORT_GRID,
+  IDE_MODE,
   ExecutionCloseHandleService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
   EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
@@ -276,6 +277,8 @@ export class AltExecutionProgressComponent
   ];
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
+  // The Studio doesn't expose the provisioning status the agent provisioning popover displays
+  protected readonly _isIdeMode = inject(IDE_MODE);
 
   private isTreeInitialized = false;
   private initialTreeLoadPending = true;
@@ -720,6 +723,9 @@ export class AltExecutionProgressComponent
   }
 
   private openAgentProvisioningPopover(attempt = 0): void {
+    if (this._isIdeMode) {
+      return;
+    }
     setTimeout(() => {
       if (this.isAgentProvisioningVisible()) {
         return;
