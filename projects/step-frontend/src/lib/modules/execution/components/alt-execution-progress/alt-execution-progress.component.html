@@ -94,7 +94,7 @@
         }
       }
       @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
-        @if (agentProvisioningInfo.hasProvisioning) {
+        @if (agentProvisioningInfo.hasProvisioning && !_isIdeMode) {
           <step-popover
             #agentProvisioningPopover
             yPosition="below"
