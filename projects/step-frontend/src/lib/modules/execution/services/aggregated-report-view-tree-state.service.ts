@@ -15,15 +15,18 @@ import {
   AggregatedReportView,
   ArtefactService,
   DialogsService,
+  ReportNode,
   TreeStateInitOptions,
   TreeStateService,
 } from '@exense/step-core';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
-import { debounceTime, map, startWith } from 'rxjs';
+import { debounceTime, map } from 'rxjs';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
+import { ReportTreeNode } from '../shared/report-tree-node';
+import { ReportTreeStateService } from './report-tree-state.service';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions &
   Pick<AggregatedReport, 'partialTreeRootNodeId'> & { resetSearch?: boolean };
@@ -31,11 +34,14 @@ export type AggregatedTreeStateInitOptions = TreeStateInitOptions &
 const ERROR_STATUSES_SEARCH_VALUE = ERROR_STATUSES.join(' | ');
 
 @Injectable()
-export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
+export class AggregatedReportViewTreeStateService extends TreeStateService<
+  AggregatedReportView,
+  AggregatedTreeNode,
+  AggregatedReportViewTreeNodeUtilsService
+> {
   private _injector = inject(Injector);
   private _artefactService = inject(ArtefactService);
   private _fb = inject(FormBuilder);
-  private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
   private _dialogs = inject(DialogsService);
 
   private querySearchIndex = new SearchIndex();
@@ -198,7 +204,9 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       return;
     }
     const errorStatusesSet = new Set(ERROR_STATUSES);
-    const nodeErrorStatuses = this._utils.getNodeStatuses(node).filter((status) => errorStatusesSet.has(status));
+    const nodeErrorStatuses = this._treeNodeUtils
+      .getNodeStatuses(node)
+      .filter((status) => errorStatusesSet.has(status));
 
     if (!nodeErrorStatuses.length) {
       this.errorsLeafsSet.set(undefined);
@@ -212,7 +220,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.getSubTree(nodeId)
       .map((node) => this.findNodeById(node.id))
       .forEach((node) => {
-        if (!node || !this._utils.nodeHasStatuses(node, ERROR_STATUSES)) {
+        if (!node || !this._treeNodeUtils.nodeHasStatuses(node, ERROR_STATUSES)) {
           return;
         }
         // if current nodes parent was placed into result in previous iteration
@@ -288,7 +296,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     searchValues.push(artefact?.attributes?.['name'] ?? '');
 
-    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
+    const nodeId = this._treeNodeUtils.getUniqueId(artefact.id!, parentId);
     this.querySearchIndex.register(nodeId, searchValues);
 
     (item.children ?? []).forEach((child) => this.buildQuerySearchIndex(child as AggregatedTreeNode, nodeId));
@@ -299,10 +307,10 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     if (!artefact?._class) {
       return;
     }
-    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
+    const nodeId = this._treeNodeUtils.getUniqueId(artefact.id!, parentId);
 
     // As we perform search over all error statuses at once, we use only one status as search condition
-    const hasErrorStatuses = this._utils.nodeHasStatuses(item, ERROR_STATUSES);
+    const hasErrorStatuses = this._treeNodeUtils.nodeHasStatuses(item, ERROR_STATUSES);
     if (hasErrorStatuses) {
       this.errorsSearchIndex.register(nodeId, [Status.FAILED]);
     }
@@ -355,12 +363,16 @@ class SearchIndex {
   }
 }
 
+/*
 export const AGGREGATED_TREE_TAB_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
   'Tree state related to tab',
 );
+*/
 export const AGGREGATED_TREE_WIDGET_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
   'Tree state related to widget',
 );
+// todo move somewhere else
+export const REPORT_NODE_TREE_WIDGET_STATE = new InjectionToken<ReportTreeStateService>('Report node tree sate');
 
 @Injectable()
 export class AggregatedReportViewTreeStateContextService implements OnDestroy {

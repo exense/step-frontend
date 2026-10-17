@@ -1,0 +1,18 @@
+<div class="tree-container">
+  @if (showSkeleton()) {
+    <div class="tree-skeletons" aria-hidden="true">
+      @for (row of [1, 2, 3, 4, 5, 6, 7, 8]; track row) {
+        <div class="tree-skeleton-row" [class.child-row]="row > 1">
+          <span></span>
+        </div>
+      }
+    </div>
+  } @else {
+    <step-tree
+      (treeContextAction)="handleContextAction($event.actionId, $event.node)"
+      (nodeClick)="nodeClick.emit($event.node)"
+      [dragDisabled]="true"
+      [forceFocus]="true"
+    />
+  }
+</div>

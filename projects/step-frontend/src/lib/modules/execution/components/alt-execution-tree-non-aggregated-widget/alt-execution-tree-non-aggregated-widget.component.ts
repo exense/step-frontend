@@ -1,0 +1,24 @@
+import { Component, inject } from '@angular/core';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { ReportNode } from '@exense/step-core';
+import { AltExecutionTreeNonAggregatedWidgetDirective } from '../../directives/alt-execution-tree-non-aggregated-widget.directive';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { DrilldownRootType } from '../../shared/drilldown-root-type';
+
+@Component({
+  selector: 'step-alt-execution-tree-non-aggregated-widget',
+  templateUrl: './alt-execution-tree-non-aggregated-widget.component.html',
+  styleUrl: './alt-execution-tree-non-aggregated-widget.component.scss',
+  hostDirectives: [AltExecutionTreeNonAggregatedWidgetDirective],
+  standalone: false,
+})
+export class AltExecutionTreeNonAggregatedWidgetComponent {
+  protected readonly _state = inject(AltExecutionStateService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
+
+  protected openDrillDown(node: ReportNode): void {
+    this._executionDialogs.openIterations(DrilldownRootType.REPORT_TREE, {
+      reportNodeId: node.id,
+    });
+  }
+}
