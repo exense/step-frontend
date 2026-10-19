@@ -183,17 +183,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
 
           if (path) {
             this._router.navigateByUrl(path);
-          } else {
-            this.showNoConfigureEditorError();
           }
           this._matDialogRef.close({ isSuccess, canNavigateBack: !path });
         },
         error: () => undefined,
       });
-  }
-
-  private showNoConfigureEditorError(): void {
-    this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
   }
 
   private determineDefaultType(): string {
