@@ -28,7 +28,7 @@
         },
         {
           "NAME": "PRODUCTION",
-          "URL": "nexus-exense::https://nexus-enterprise.exense.ch/repository/exense/"
+          "URL": "nexus-exense::https://nexus-enterprise.exense.ch/repository/exense-ee/"
         }
       ],
       "ACTIONS": [
