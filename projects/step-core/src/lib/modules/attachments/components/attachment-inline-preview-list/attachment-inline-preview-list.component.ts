@@ -1,5 +1,5 @@
 import {
-  AfterViewInit,
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -7,7 +7,7 @@ import {
   ElementRef,
   inject,
   input,
-  linkedSignal,
+  signal,
   viewChild,
   viewChildren,
   ViewEncapsulation,
@@ -42,7 +42,7 @@ type AttachmentWidthSnapshot = Map<AttachmentInlinePreviewComponent, number | un
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class AttachmentInlinePreviewListComponent implements AfterViewInit {
+export class AttachmentInlinePreviewListComponent {
   private _hostSize = inject(ElementSizeDirective, { self: true });
   private _parentContainerSizes = inject(ElementSizeService, { optional: true, skipSelf: true });
   private _attachmentUtils = inject(AttachmentUtilsService);
@@ -101,18 +101,31 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     this._attachmentPreviewContent.requestTextPreviews(this.textPreviewIds());
   });
 
-  protected readonly attachments = linkedSignal(() => this.attachmentMetasWithPreviews());
+  protected readonly attachments = this.attachmentMetasWithPreviews;
+
+  private readonly measuredDisplayItems = signal<AttachmentMetaWithExplicitWidth[] | undefined>(undefined);
 
   protected readonly displayItems = computed(() => {
     const items = this.attachments() ?? [];
+    const measuredDisplayItems = this.measuredDisplayItems();
+    return measuredDisplayItems ?? this.applyInitialWidths(items);
+  });
+
+  private readonly measureDisplayItems = afterRenderEffect({
+    read: () => this.measuredDisplayItems.set(this.calculateDisplayItems()),
+  });
+
+  private calculateDisplayItems(): AttachmentMetaWithExplicitWidth[] {
+    const items = this.attachments() ?? [];
     const renderedElements = this.renderedElements() ?? [];
     let availableWidth = this._parentContainerSizes?.width?.() || this._hostSize.width();
-    const listPrefixWidth = this.listPrefix()?.nativeElement?.offsetWidth ?? 0;
+    const listPrefix = this.listPrefix();
 
     if (!availableWidth || !renderedElements?.length) {
       return this.applyInitialWidths(items);
     }
 
+    const listPrefixWidth = listPrefix?.nativeElement?.offsetWidth ?? 0;
     availableWidth = availableWidth - listPrefixWidth - OFFSET;
     const widths: AttachmentWidthSnapshot = new Map();
     const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth, widths);
@@ -144,19 +157,13 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
     );
 
     return this.determineElementsWithWidths(elementsToDisplay, availableWidth, widths, actualData);
-  });
+  }
 
   protected readonly showMoreButton = computed(() => {
     const items = this.attachmentMetas() ?? [];
     const displayItems = this.displayItems();
     return displayItems.length < items.length;
   });
-
-  ngAfterViewInit(): void {
-    // force attachments to redraw, after initial rendering has been done
-    // and item's sizes were determined
-    this.attachments.update((items) => (!items ? items : [...items]));
-  }
 
   private determineElementsToDisplay(
     renderedElements: readonly AttachmentInlinePreviewComponent[],

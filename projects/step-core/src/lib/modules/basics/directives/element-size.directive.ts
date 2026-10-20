@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   Directive,
   ElementRef,
   forwardRef,
@@ -50,8 +51,9 @@ export class ElementSizeDirective implements OnInit, OnDestroy, ElementSizeServi
   readonly width = debounceSignal(this.widthInternal);
   readonly height = debounceSignal(this.heightInternal);
 
+  private readonly initialMeasurement = afterNextRender({ read: () => this.updateSizes() });
+
   ngOnInit(): void {
-    this.updateSizes();
     this.resizeObserver = new ResizeObserver(() => {
       this.updateSizes();
     });
