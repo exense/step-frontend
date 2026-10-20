@@ -39,6 +39,7 @@ import { AltExecutionReportSettingsService } from '../../services/alt-execution-
 import { hasAltExecutionReportDetail } from '../../shared/alt-execution-report-details';
 import { ALT_REPORT_NODE_KEYWORDS_TABLE_ID } from '../../shared/alt-report-node-keywords-list-config.tokens';
 import { OPEN_EXECUTION_DETAILS_TOOLTIP } from '../../shared/open-execution-details-tooltip';
+import { ReportRowRenderQueueService } from '../../services/report-row-render-queue.service';
 
 const DRILLDOWN_KEYWORDS_TABLE_ID = 'keywordsDrilldown';
 
@@ -47,6 +48,7 @@ const DRILLDOWN_KEYWORDS_TABLE_ID = 'keywordsDrilldown';
   templateUrl: './alt-report-node-keywords.component.html',
   styleUrl: './alt-report-node-keywords.component.scss',
   providers: [
+    ReportRowRenderQueueService,
     {
       provide: TableStorageService,
       useClass: TableMemoryStorageService,
@@ -89,6 +91,7 @@ export class AltReportNodeKeywordsComponent implements AfterViewInit {
   }
 
   protected readonly extractReportId: HighlightedItemExtractor<ReportNode, string> = (node?: ReportNode) => node?.id;
+  protected readonly trackReport = (index: number, node: ReportNode): string | undefined => node.id;
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
   protected readonly calculateCounts = signal(false);
   protected readonly details = this._reportSettings.details('keywordsList');

@@ -6,41 +6,55 @@
   [indicatorMode]="TableIndicatorMode.SKELETON"
   [highlightedItem]="selectedReportId()"
   [highlightedItemExtractor]="extractReportId"
+  [trackBy]="trackReport"
   class="paddingless no-border hide-header no-highlight"
 >
   <ng-container matColumnDef="executionTime">
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
-      <div class="details-trigger" stepUndraggedClick (undraggedClick)="openDetails.emit(element)">
-        <div class="step-row-content">
-          <step-alt-execution-time
-            class="step-time"
-            mode="text"
-            displayFormat="time"
-            [preserveDurationSpace]="true"
-            [startTime]="element.executionTime"
-            [duration]="element | reportNodeDuration"
-            [isRunning]="element.status === 'RUNNING'"
-            [singleUnit]="true"
-            [popoverMode]="PopoverMode.HOVER"
-          />
-          <step-artefact-inline-details
-            parentElementSize
-            [reportInfo]="element"
-            [details]="details()"
-            class="smaller-view indent-call-keyword-inline step-entity"
-          >
-            <ng-container *stepArtefactInlineDetailsHeader>
-              <div class="larger-view artefact-header" [class.has-description]="!showFullDescription()">
-                <step-report-node-icon [node]="element" />
-                <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-                <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
-                  element.name
-                }}</span>
-              </div>
-            </ng-container>
-          </step-artefact-inline-details>
-        </div>
+      <div
+        class="details-trigger"
+        stepUndraggedClick
+        (undraggedClick)="openDetails.emit(element)"
+        stepReportRowRender
+        #row="stepReportRowRender"
+        [selected]="element.id === selectedReportId()"
+      >
+        @if (row.ready()) {
+          <div class="step-row-content">
+            <step-alt-execution-time
+              class="step-time"
+              mode="text"
+              displayFormat="time"
+              [preserveDurationSpace]="true"
+              [startTime]="element.executionTime"
+              [duration]="element | reportNodeDuration"
+              [isRunning]="element.status === 'RUNNING'"
+              [singleUnit]="true"
+              [popoverMode]="PopoverMode.HOVER"
+            />
+            <step-artefact-inline-details
+              parentElementSize
+              [reportInfo]="element"
+              [details]="details()"
+              class="smaller-view indent-call-keyword-inline step-entity"
+            >
+              <ng-container *stepArtefactInlineDetailsHeader>
+                <div class="larger-view artefact-header" [class.has-description]="!showFullDescription()">
+                  <step-report-node-icon [node]="element" />
+                  <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+                  <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below" title="">{{
+                    element.name
+                  }}</span>
+                </div>
+              </ng-container>
+            </step-artefact-inline-details>
+          </div>
+        } @else {
+          <div class="step-row-placeholder">
+            <span class="name">{{ element.name }}</span>
+          </div>
+        }
       </div>
     </td>
   </ng-container>

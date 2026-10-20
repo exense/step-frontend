@@ -52,6 +52,16 @@ step-alt-report-node-keywords {
     gap: 0.5rem;
     flex-direction: column;
 
+    .step-row-placeholder {
+      min-height: 5rem;
+      padding-left: 12.5rem;
+      color: var.$gray-500;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      background: linear-gradient(var.$gray-100, var.$gray-100) 12.5rem 2.5rem / 45% 1rem no-repeat;
+    }
+
     .step-row-content {
       display: grid;
       grid-template-columns: 12rem minmax(0, 1fr);
