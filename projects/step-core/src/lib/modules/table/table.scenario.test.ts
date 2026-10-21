@@ -218,10 +218,10 @@ describe('Table scenarios', () => {
     );
     setSearchValue(fixture, 'A');
     setSearchValue(fixture, 'Alpha');
-    tick(201);
+    tick(199);
     settle(fixture);
     expect(api.requestTable).toHaveBeenCalledTimes(1);
-    tick(500);
+    tick(1);
     expect(api.requestTable).toHaveBeenCalledTimes(2);
     expect(api.requestTable).toHaveBeenLastCalledWith(
       'scenario',

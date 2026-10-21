@@ -1,11 +1,19 @@
 import { TablePersistenceStateService } from './table-persistence-state.service';
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, ErrorHandler, inject, Injectable } from '@angular/core';
 import { SearchValue } from '../shared/search-value';
-import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
-import { filter, first, map, pairwise, switchMap, timer } from 'rxjs';
+import {
+  ActivatedRoute,
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  Params,
+  Router,
+} from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TABLE_PERSISTENCE_URL_PARAMS_SERIALIZERS } from './table-persistence-url-params-serializer.token';
 import { FilterCondition } from '../shared/filter-condition';
+import { QUERY_PARAMS_CLEANUP_NAVIGATION } from '../../routing/injectables/navigator-query-params-cleanup.service';
 
 export const TABLE_QUERY_PREFIX = 'tq_';
 
@@ -13,75 +21,68 @@ export const TABLE_QUERY_PREFIX = 'tq_';
 export class TablePersistenceUrlStateService extends TablePersistenceStateService {
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
+  private _destroyRef = inject(DestroyRef);
+  private _errorHandler = inject(ErrorHandler);
   private _urlParamsSerializers = inject(TABLE_PERSISTENCE_URL_PARAMS_SERIALIZERS);
 
-  private isInternalUrlChange = false;
   private isSearchRestoreRequired = false;
-
-  private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
-
-  private storagePath = this.currentRouterUrlPath;
+  private readonly storagePath = this.currentRouterUrlPath;
+  private previousQueryParams = this._activatedRoute.snapshot.queryParams;
+  private pendingTableQueryParams?: Params;
+  private isUrlUpdateScheduled = false;
 
   private get currentRouterUrlPath(): string {
-    const url = this._router.url;
-    return !url.includes('?') ? url : url.slice(0, url.indexOf('?'));
+    const url = this._router.parseUrl(this._router.url);
+    url.queryParams = {};
+    url.fragment = null;
+    return this._router.serializeUrl(url);
   }
 
   override initialize(): void {
     super.initialize();
 
-    this.navigationEnd$
-      .pipe(
-        switchMap(() => timer(100)),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => (this.isInternalUrlChange = false));
-
-    this.navigationEnd$
-      .pipe(
-        switchMap(() => timer(100)),
-        filter(() => this.isSearchRestoreRequired && this.storagePath === this._router.url),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this.isSearchRestoreRequired = false;
-        if (this.hasSearch()) {
-          const search = super.getSearch();
-          this.setUrlSearch(search);
-        }
-      });
-
-    this._activatedRoute.queryParams
-      .pipe(
-        filter(() => this.canStoreSearch),
-        filter(() => !this.isInternalUrlChange),
-        filter((params) => this.hasUrlSearch(params)),
-        map((params) => this.getUrlSearch(params)),
-        takeUntilDestroyed(),
-      )
-      .subscribe((urlSearch) => this.triggerExternalSearchChange(urlSearch));
-
-    this._activatedRoute.queryParams
-      .pipe(
-        filter(() => this.canStoreSearch),
-        pairwise(),
-        filter(([prevParams, currentParams]) => this.hasUrlSearch(prevParams) && !this.hasUrlSearch(currentParams)),
-        filter(() => !this.isInternalUrlChange),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => this.triggerExternalSearchChange({}));
+    this._router.events.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.handleNavigationEnd();
+      }
+      if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped
+      ) {
+        this.scheduleUrlUpdate();
+      }
+    });
   }
 
-  protected override triggerExternalSearchChange(search: Record<string, SearchValue>): void {
+  private handleNavigationEnd(): void {
+    if (!this.canStoreSearch) {
+      return;
+    }
     if (this.storagePath !== this.currentRouterUrlPath) {
-      // It means that during the external change, the route has been changed
-      // and new query parameters relates to another view. Indicate to restore the query parameters
-      // from the storage, when the route will be navigated back to the path, where component
-      // with current persistence url instance exists
       this.isSearchRestoreRequired = true;
       return;
     }
-    super.triggerExternalSearchChange(search);
+
+    const queryParams = this._activatedRoute.snapshot.queryParams;
+    const previousQueryParams = this.previousQueryParams;
+    this.previousQueryParams = queryParams;
+    const navigationInfo = this._router.lastSuccessfulNavigation?.extras.info;
+    const isSearchRestoreRequired = this.isSearchRestoreRequired;
+    this.isSearchRestoreRequired = false;
+
+    if (navigationInfo === this) {
+      return;
+    }
+    if (
+      navigationInfo === QUERY_PARAMS_CLEANUP_NAVIGATION ||
+      (isSearchRestoreRequired && !this.hasUrlSearch(queryParams))
+    ) {
+      this.setUrlSearch(super.getSearch());
+    } else if (isSearchRestoreRequired || this.hasUrlSearchChanged(previousQueryParams, queryParams)) {
+      this.triggerExternalSearchChange(this.getUrlSearch(queryParams));
+    }
   }
 
   override getSearch(): Record<string, SearchValue> {
@@ -136,12 +137,8 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
       return res;
     }, {} as Params);
 
-    const oldQueryParams = { ...this._activatedRoute.snapshot.queryParams };
-    const tableKeys = Object.keys(oldQueryParams).filter((key) => this.isTableKey(key));
-    tableKeys.forEach((key) => delete oldQueryParams[key]);
-
-    const queryParams = { ...oldQueryParams, ...tableQueryParams };
-    this.changeQueryParams(queryParams);
+    this.pendingTableQueryParams = tableQueryParams;
+    this.scheduleUrlUpdate();
   }
 
   private convertToUrlValue(searchValue: SearchValue): string {
@@ -166,6 +163,11 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     return keys.some((key) => this.isTableKey(key));
   }
 
+  private hasUrlSearchChanged(previous: Params, current: Params): boolean {
+    const keys = new Set([...Object.keys(previous), ...Object.keys(current)].filter((key) => this.isTableKey(key)));
+    return [...keys].some((key) => previous[key] !== current[key]);
+  }
+
   private getUrlKey(key: string): string {
     return `${TABLE_QUERY_PREFIX}${key}`;
   }
@@ -181,12 +183,42 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     return key.replace(TABLE_QUERY_PREFIX, '');
   }
 
-  private changeQueryParams(queryParams: Params): void {
-    if (this._router.getCurrentNavigation()) {
-      this.navigationEnd$.pipe(first()).subscribe(() => this.changeQueryParams(queryParams));
+  private scheduleUrlUpdate(): void {
+    if (!this.pendingTableQueryParams || this.isUrlUpdateScheduled || this._destroyRef.destroyed) {
       return;
     }
-    this.isInternalUrlChange = true;
-    this._router.navigate([], { relativeTo: this._activatedRoute, queryParams, replaceUrl: true });
+    this.isUrlUpdateScheduled = true;
+    void Promise.resolve().then(() => {
+      this.isUrlUpdateScheduled = false;
+      this.updateUrl();
+    });
+  }
+
+  private updateUrl(): void {
+    if (this._destroyRef.destroyed || !this.pendingTableQueryParams || this._router.getCurrentNavigation()) {
+      return;
+    }
+    if (this.storagePath !== this.currentRouterUrlPath) {
+      this.pendingTableQueryParams = undefined;
+      return;
+    }
+
+    const queryParams = { ...this._activatedRoute.snapshot.queryParams };
+    Object.keys(queryParams)
+      .filter((key) => this.isTableKey(key))
+      .forEach((key) => delete queryParams[key]);
+    Object.assign(queryParams, this.pendingTableQueryParams);
+    this.pendingTableQueryParams = undefined;
+    const url = this._router.createUrlTree([], {
+      relativeTo: this._activatedRoute,
+      queryParams,
+      preserveFragment: true,
+    });
+    if (this._router.serializeUrl(url) === this._router.url) {
+      return;
+    }
+    void this._router
+      .navigateByUrl(url, { replaceUrl: true, info: this })
+      .catch((error: unknown) => this._errorHandler.handleError(error));
   }
 }
