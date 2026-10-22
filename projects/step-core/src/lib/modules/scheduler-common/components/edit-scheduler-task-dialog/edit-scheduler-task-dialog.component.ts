@@ -50,7 +50,7 @@ import { JSON_FORM_EXPORTS, JsonFieldsSchema, JsonFieldUtilsService } from '../.
 import { RepositoryParametersSchemasService } from '../../../repository-parameters';
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 import { catchError } from 'rxjs/operators';
-import { HasRightPipe } from '../../../auth';
+import { AuthService, HasRightPipe } from '../../../auth';
 import { EntityRefDirective } from '../../../entity/directives/entity-ref.directive';
 import { ReloadableDirective } from '../../../routing';
 
@@ -104,6 +104,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
 
   private _cron = inject(CronService);
   private _api = inject(AugmentedSchedulerService);
+  private readonly _auth = inject(AuthService);
   private _controllerApi = inject(AugmentedControllerService);
   private _destroyRef = inject(DestroyRef);
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
@@ -162,7 +163,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   }
 
   protected save(): void {
-    if (this.isScreenTemplateLoading() || this.isSaving()) {
+    if (!this._auth.hasRight('task-write') || this.isScreenTemplateLoading() || this.isSaving()) {
       return;
     }
 
