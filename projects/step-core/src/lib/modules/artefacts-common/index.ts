@@ -26,6 +26,7 @@ export * from './types/artefact-types';
 export * from './types/artefact-inline-item';
 export * from './types/artefact-class.enum';
 export * from './injectables/artefact.service';
+export * from './injectables/artefact-panel-defaults.service';
 export * from './injectables/artefacts-factory.service';
 export * from './injectables/artefact-refresh-notification.service';
 export * from './injectables/artefact-inline-item-utils.service';
