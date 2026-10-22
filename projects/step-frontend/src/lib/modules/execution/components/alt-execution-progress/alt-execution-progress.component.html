@@ -1,4 +1,6 @@
-<step-alt-execution-package-warning [execution]="execution$ | async" />
+@if (showAutomationPackageWarning) {
+  <step-alt-execution-package-warning [execution]="execution$ | async" />
+}
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)" [class.compact-report]="isCompactReport">
   @if (execution$ | async; as execution) {
     <div class="title">
@@ -22,7 +24,9 @@
             <step-alt-execution-repository [repositoryParams]="repositoryParams" />
           }
         }
-        <step-alt-execution-repository-link [execution]="execution" />
+        @if (!isCompactReport) {
+          <step-alt-execution-repository-link [execution]="execution" />
+        }
       </h3>
     </div>
     <div class="sub-title">
@@ -94,7 +98,7 @@
         }
       }
       @if (agentProvisioningInfo$ | async; as agentProvisioningInfo) {
-        @if (agentProvisioningInfo.hasProvisioning) {
+        @if (agentProvisioningInfo.hasProvisioning && !_isIdeMode) {
           <step-popover
             #agentProvisioningPopover
             yPosition="below"

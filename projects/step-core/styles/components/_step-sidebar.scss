@@ -309,6 +309,31 @@ $menu-sub-item-height: 3.2rem;
       margin-top: 1px;
       max-width: 600px;
 
+      &--standalone {
+        margin-top: 0;
+
+        > label {
+          border-radius: 0.8rem;
+        }
+
+        > input:checked + label {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        > .content {
+          border-radius: 0 0 0.8rem 0.8rem;
+
+          &::after {
+            display: block;
+            content: ' ';
+            height: 0.8rem;
+            background-color: transparent;
+            border-radius: 0 0 0.8rem 0.8rem;
+          }
+        }
+      }
+
       input {
         display: none;
       }

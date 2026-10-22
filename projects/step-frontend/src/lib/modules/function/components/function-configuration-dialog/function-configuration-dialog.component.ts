@@ -54,6 +54,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     }),
   ],
   hostDirectives: [ReloadableDirective],
+  host: {
+    '(keydown.enter)': 'saveByEnter()',
+  },
   standalone: false,
 })
 export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
@@ -69,6 +72,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   private _destroyRef = inject(DestroyRef);
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
+  protected readonly writePermission = this._functionConfigurationDialogData.dialogConfig.writePermission;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
   protected readonly schemaErrorsDictionary: Record<string, string> = {
     format: 'The schema must be in a JSON format',
@@ -205,8 +209,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
     }
   }
 
-  @HostListener('keydown.enter')
-  private saveByEnter(): void {
+  protected saveByEnter(): void {
     this.save(false);
   }
 

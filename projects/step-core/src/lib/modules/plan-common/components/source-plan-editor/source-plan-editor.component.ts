@@ -117,11 +117,11 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
     this.editor.focus();
   }
 
-  handleEditorSizeChange(size: number): void {
+  protected handleEditorSizeChange(size: number): void {
     this._planEditorPersistenceState.setPanelSize(EDITOR_SIZE, size);
   }
 
-  handlePlanSizeChange(size: number): void {
+  protected handlePlanSizeChange(size: number): void {
     this._planEditorPersistenceState.setPanelSize(PLAN_SIZE, size);
   }
 

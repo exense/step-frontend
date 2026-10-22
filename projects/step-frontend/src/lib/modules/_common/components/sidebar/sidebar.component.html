@@ -12,6 +12,9 @@
     </span>
     <span class="sidebar-logo-container">
       <div class="sidebar-logo"></div>
+      @if (_isIdeMode) {
+        <span class="studio-badge">STUDIO</span>
+      }
     </span>
   </div>
   <div id="sidebar-home-and-settings">
@@ -32,8 +35,15 @@
       />
     }
   </div>
-  <div id="sidebar-categories">
-    <div id="sidebar-categories-tabs" #tabs>
+  <div id="sidebar-categories" #categories>
+    @if (beforeCategoriesDashlets().length) {
+      <div id="sidebar-before-categories">
+        @for (item of beforeCategoriesDashlets(); track item.id) {
+          <step-dashlet class="visible-when-collapsed" [itemKey]="item.template" />
+        }
+      </div>
+    }
+    <div id="sidebar-categories-tabs">
       @if (displayMenuItems$ | async; as menuItems) {
         @for (mainMenuEntry of menuItems; track mainMenuEntry.id) {
           <div class="sidebar-collapsable-tab">

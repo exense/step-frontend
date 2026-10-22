@@ -230,6 +230,7 @@ import { AltExecutionTreeNonAggregatedComponent } from './components/alt-executi
 import { AltExecutionTreeNonAggregatedWidgetComponent } from './components/alt-execution-tree-non-aggregated-widget/alt-execution-tree-non-aggregated-widget.component';
 import { ReportTreeStateService } from './services/report-tree-state.service';
 import { AltExecutionTreeNonAggregatedWidgetDirective } from './directives/alt-execution-tree-non-aggregated-widget.directive';
+import { ReportRowRenderDirective } from './directives/report-row-render.directive';
 
 const createAltExecutionNodeDetailsRoute = (): Route => ({
   path: 'node-details',
@@ -520,6 +521,7 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
     AltExecutionTreeNonAggregatedWidgetComponent,
   ],
   imports: [
+    ReportRowRenderDirective,
     AltExecutionPackageWarningComponent,
     StepCommonModule,
     OperationsModule,

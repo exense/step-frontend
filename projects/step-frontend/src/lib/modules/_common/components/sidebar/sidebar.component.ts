@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  computed,
   ElementRef,
   inject,
   NgZone,
@@ -79,7 +80,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _location = inject(Location);
 
   protected readonly mainMenuCheckBoxes = viewChildren<ElementRef<HTMLInputElement>>('mainMenuCheckBox');
-  protected readonly tabs = viewChild<ElementRef<HTMLElement>>('tabs');
+  private readonly categories = viewChild<ElementRef<HTMLElement>>('categories');
+
+  protected readonly beforeCategoriesDashlets = computed(() =>
+    this._viewRegistryService
+      .getDashlets('menu/sidebar/before-categories')
+      .filter((dashlet) => !dashlet.isEnabledFunction || dashlet.isEnabledFunction()),
+  );
 
   private locationStateSubscription = this._location.subscribe((popState: any) => {
     this.openMainMenuBasedOnActualView();
@@ -205,7 +212,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   protected handleScroll($event: Event): void {
     this._zone.runOutsideAngular(() => {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
-      this.tabs()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
+      this.categories()?.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
   }
 

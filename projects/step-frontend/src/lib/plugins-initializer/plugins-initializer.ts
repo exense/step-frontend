@@ -12,7 +12,7 @@ const ADDITIONAL_PLUGINS: ReadonlyArray<MicrofrontendPluginDefinition> = [
 
 const ENTERPRISE_PLUGIN: MicrofrontendPluginDefinition = {
   name: 'stepEnterpriseCore',
-  entryPoint: 'step-enterprise-core/remoteEntry.js',
+  entryPoint: 'step-enterprise-core/remoteEntry.json',
 };
 
 // The entry point name for the OS plugins.

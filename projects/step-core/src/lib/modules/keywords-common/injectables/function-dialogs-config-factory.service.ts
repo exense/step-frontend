@@ -6,7 +6,7 @@ import { FunctionDialogsConfig } from '../types/function-dialogs-config.interfac
 })
 export class FunctionDialogsConfigFactoryService {
   getDefaultConfig(): FunctionDialogsConfig {
-    return this.getConfigObject('Keyword', [], false, 'keyword');
+    return this.getConfigObject('Keyword', [], false, 'keyword', 'kw-write');
   }
 
   getConfigObject(
@@ -14,12 +14,14 @@ export class FunctionDialogsConfigFactoryService {
     functionTypeFilters: string[],
     lightForm: boolean,
     customScreenTable: string,
+    writePermission: string,
   ): FunctionDialogsConfig {
     return {
       title,
       functionTypeFilters,
       lightForm,
       customScreenTable,
+      writePermission,
     };
   }
 }
