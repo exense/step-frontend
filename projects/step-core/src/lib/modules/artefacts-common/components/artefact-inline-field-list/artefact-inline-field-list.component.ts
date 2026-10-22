@@ -1,4 +1,5 @@
 import {
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -54,16 +55,30 @@ export class ArtefactInlineFieldListComponent implements OnDestroy {
 
   protected readonly measurableItems = computed(() => this.items().slice(0, MAX_MEASURABLE_ITEMS));
 
+  private readonly measuredDisplayItems = signal<ArtefactInlineItem[] | undefined>(undefined);
+
   protected readonly displayItems = computed(() => {
+    const items = this.items();
+    const isVertical = this.isVertical();
+    const measuredDisplayItems = this.measuredDisplayItems();
+    return isVertical ? items : (measuredDisplayItems ?? items);
+  });
+
+  private readonly measureDisplayItems = afterRenderEffect({
+    read: () => this.measuredDisplayItems.set(this.calculateDisplayItems()),
+  });
+
+  private calculateDisplayItems(): ArtefactInlineItem[] {
     const items = this.items();
     const renderedElements = this.renderedElements() ?? [];
     let availableWidth = this._parentContainerSizes?.width?.();
-    const listPrefixWidth = this.listPrefix()?.nativeElement?.offsetWidth ?? 0;
+    const listPrefix = this.listPrefix();
     const isVertical = this.isVertical();
     if (isVertical || !availableWidth || !renderedElements?.length) {
       return items;
     }
 
+    const listPrefixWidth = listPrefix?.nativeElement?.offsetWidth ?? 0;
     availableWidth = availableWidth - listPrefixWidth - OFFSET;
     const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth);
 
@@ -84,7 +99,7 @@ export class ArtefactInlineFieldListComponent implements OnDestroy {
     }
 
     return this.determineElementsWithWidths(elementsToDisplay, availableWidth);
-  });
+  }
 
   protected readonly showMoreButton = computed(() => {
     const items = this.items();

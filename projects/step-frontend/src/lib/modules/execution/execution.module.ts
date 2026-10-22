@@ -374,6 +374,7 @@ import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-n
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
 import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
+import { ReportRowRenderDirective } from './directives/report-row-render.directive';
 
 @NgModule({
   declarations: [
@@ -495,6 +496,7 @@ import { AltReportNodePerformanceComponent } from './components/alt-report-node-
     NoticeBadgeLabelPipe,
   ],
   imports: [
+    ReportRowRenderDirective,
     AltExecutionPackageWarningComponent,
     StepCommonModule,
     OperationsModule,
