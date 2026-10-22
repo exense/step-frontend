@@ -1,10 +1,21 @@
-import { inject, Injectable, DOCUMENT } from '@angular/core';
+import { DestroyRef, inject, Injectable, DOCUMENT } from '@angular/core';
 import { DEFAULT_PAGE } from './default-page.token';
 import { Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
-import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
-import { filter, first, map, Observable, shareReplay, startWith } from 'rxjs';
+import {
+  ActivatedRoute,
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  Params,
+  QueryParamsHandling,
+  Router,
+} from '@angular/router';
+import { asapScheduler, filter, first, map, Observable, observeOn, shareReplay, startWith } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
+import { QUERY_PARAMS_CLEANUP_NAVIGATION } from './navigator-query-params-cleanup.service';
 import { MenuEntry } from '../types/menu-entry';
 
 export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFunction'> & {
@@ -18,6 +29,7 @@ export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCust
   providedIn: 'root',
 })
 export class NavigatorService {
+  private _destroyRef = inject(DestroyRef);
   private _router = inject(Router);
   private _location = inject(Location);
   private _activatedRoute = inject(ActivatedRoute);
@@ -34,7 +46,16 @@ export class NavigatorService {
     shareReplay(1),
   );
 
-  private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
+  private navigationFinished$ = this._router.events.pipe(
+    filter(
+      (event) =>
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped,
+    ),
+    observeOn(asapScheduler),
+  );
 
   isViewIdActive(view: MenuEntry | DisplayMenuEntry): Observable<boolean> {
     const viewLink = `/${view.id}`;
@@ -96,7 +117,9 @@ export class NavigatorService {
 
   reloadCurrentRoute(): void {
     if (this._router.getCurrentNavigation()) {
-      this.navigationEnd$.pipe(first()).subscribe(() => this.reloadCurrentRoute());
+      this.navigationFinished$
+        .pipe(first(), takeUntilDestroyed(this._destroyRef))
+        .subscribe(() => this.reloadCurrentRoute());
       return;
     }
 
@@ -127,7 +150,11 @@ export class NavigatorService {
       const segments = link.split('/');
       const queryParams = this.prepareQueryParams();
       const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
-      this._router.navigate(segments, { queryParams, queryParamsHandling });
+      this._router.navigate(segments, {
+        queryParams,
+        queryParamsHandling,
+        info: queryParams ? QUERY_PARAMS_CLEANUP_NAVIGATION : undefined,
+      });
     }
   }
 

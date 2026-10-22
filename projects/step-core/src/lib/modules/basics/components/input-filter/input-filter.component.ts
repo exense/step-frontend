@@ -1,6 +1,6 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, forwardRef, input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { debounceTime, filter, merge, Observable, of } from 'rxjs';
+import { filter, merge, Observable, of } from 'rxjs';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 
 @Component({
@@ -15,26 +15,20 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
   ],
   standalone: false,
 })
-export class InputFilterComponent extends BaseFilterComponent<string> implements OnChanges {
-  @Input() externalSearchValue?: string;
+export class InputFilterComponent extends BaseFilterComponent<string> implements OnInit {
+  readonly externalSearchValue = input<string>();
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cExternalSearchValue = changes['externalSearchValue'];
-    if (
-      cExternalSearchValue?.previousValue !== cExternalSearchValue?.currentValue &&
-      cExternalSearchValue?.firstChange
-    ) {
-      const value = cExternalSearchValue?.currentValue;
-      if (value) {
-        this.filterControl.setValue(value);
-      }
+  override ngOnInit(): void {
+    const value = this.externalSearchValue();
+    if (value) {
+      this.filterControl.setValue(value);
     }
+    super.ngOnInit();
   }
 
   protected override createControlChangeStream(control: FormControl<string>): Observable<string> {
     const initialValue$ = of(control.value).pipe(filter((value) => !!value));
-    const valueChanges$ = control.valueChanges.pipe(debounceTime(200));
-    return merge(initialValue$, valueChanges$);
+    return merge(initialValue$, control.valueChanges);
   }
 
   protected override handleChange(value: string): void {
