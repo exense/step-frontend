@@ -286,15 +286,19 @@ export class AltExecutionProgressComponent
 
   private isAggregatedTreeInitialized = false;
   private isReportTreeInitialized = false;
-  private initialTreeLoadPending = true;
-  private previousTreeProgressExecutionId?: string;
-  private previousTreeProgressRange?: TimeRangeSelection;
+
+  private initialAggregatedTreeLoadPending = true;
+  private previousAggregatedTreeProgressExecutionId?: string;
+  private previousAggregatedTreeProgressRange?: TimeRangeSelection;
+
+  private initialReportTreeLoadPending = true;
+  private previousReportTreeProgressExecutionId?: string;
 
   private readonly aggregatedTreeInProgressInternal = signal(false);
   readonly aggregatedTreeInProgress = this.aggregatedTreeInProgressInternal.asReadonly();
 
-  private readonly reportTreeAggregatedInternal = signal(false);
-  readonly reportTreeInProgress = this.reportTreeAggregatedInternal.asReadonly();
+  private readonly reportTreeInProgressInternal = signal(false);
+  readonly reportTreeInProgress = this.reportTreeInProgressInternal.asReadonly();
 
   private initialErrorsLoadPending = true;
   private previousErrorsProgressExecutionId?: string;
@@ -812,7 +816,7 @@ export class AltExecutionProgressComponent
               return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
             }
             return defer(() => {
-              const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
+              const displayProgress = this.shouldDisplayAggregatedTreeProgress(execution, timeRangeSelection);
               if (displayProgress) {
                 this.aggregatedTreeInProgressInternal.set(true);
               }
@@ -859,9 +863,9 @@ export class AltExecutionProgressComponent
         map((execution) => {
           const id = execution?.id;
           const isForceRefresh = execution?.status === 'ENDED';
-          const displayProgress = this.shouldDisplayTreeProgress(execution);
+          const displayProgress = this.shouldDisplayReportTreeProgress(execution);
           if (displayProgress) {
-            this.reportTreeAggregatedInternal.set(true);
+            this.reportTreeInProgressInternal.set(true);
           }
           return { id, isForceRefresh, displayProgress };
         }),
@@ -879,7 +883,7 @@ export class AltExecutionProgressComponent
         }),
         switchMap(({ rootNode, isForceRefresh, expandedNodeIds, displayProgress }) => {
           if (displayProgress) {
-            this.reportTreeAggregatedInternal.set(false);
+            this.reportTreeInProgressInternal.set(false);
           }
           if (!rootNode || !this.isReportTreeInitialized || isForceRefresh) {
             return of(rootNode);
@@ -892,21 +896,35 @@ export class AltExecutionProgressComponent
         if (rootNode) {
           this._reportNodeTreeState.init(rootNode, { expandAllByDefault: false });
           this.isReportTreeInitialized = true;
+        } else {
+          this._reportNodeTreeState.init(undefined);
+          this.isReportTreeInitialized = false;
         }
       });
   }
 
-  private shouldDisplayTreeProgress(execution: Execution | undefined, range?: TimeRangeSelection): boolean {
+  private shouldDisplayAggregatedTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
     const displayProgress =
-      this.initialTreeLoadPending ||
-      this.previousTreeProgressExecutionId !== execution?.id ||
-      (range !== undefined && !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range));
+      this.initialAggregatedTreeLoadPending ||
+      this.previousAggregatedTreeProgressExecutionId !== execution?.id ||
+      (range !== undefined &&
+        !this._dateUtils.areTimeRangeSelectionsEquals(this.previousAggregatedTreeProgressRange, range));
 
-    this.initialTreeLoadPending = false;
-    this.previousTreeProgressExecutionId = execution?.id;
+    this.initialAggregatedTreeLoadPending = false;
+    this.previousAggregatedTreeProgressExecutionId = execution?.id;
     if (range !== undefined) {
-      this.previousTreeProgressRange = range;
+      this.previousAggregatedTreeProgressRange = range;
     }
+
+    return displayProgress;
+  }
+
+  private shouldDisplayReportTreeProgress(execution: Execution | undefined): boolean {
+    const displayProgress =
+      this.initialReportTreeLoadPending || this.previousReportTreeProgressExecutionId !== execution?.id;
+
+    this.initialReportTreeLoadPending = false;
+    this.previousAggregatedTreeProgressExecutionId = execution?.id;
 
     return displayProgress;
   }

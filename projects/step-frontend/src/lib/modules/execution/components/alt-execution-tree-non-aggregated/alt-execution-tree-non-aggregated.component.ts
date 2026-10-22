@@ -47,6 +47,9 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
 
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;
+    if (!nodeId) {
+      return;
+    }
     switch (actionId) {
       case ExecutionTreeAction.LOAD_PREVIOUS_NODES:
         this.pageBefore(nodeId);
