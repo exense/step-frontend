@@ -10,7 +10,7 @@
   } @else {
     <step-tree
       (treeContextAction)="handleContextAction($event.actionId, $event.node)"
-      (nodeClick)="nodeClick.emit($event.node)"
+      (nodeClick)="handleNodeClick($event.node)"
       [dragDisabled]="true"
       [forceFocus]="true"
     />

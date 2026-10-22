@@ -14,6 +14,7 @@ import {
 } from '../../services/execution-tree-paging.service';
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { REPORT_NODE_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
+import { ReportTreeNode } from '../../shared/report-tree-node';
 
 @Component({
   selector: 'step-alt-execution-tree-non-aggregated',
@@ -79,6 +80,19 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
 
   hasActionsForNode(node: TreeNode): boolean {
     return true;
+  }
+
+  protected handleNodeClick(node: ReportTreeNode): void {
+    let nodeId = node.id;
+    let result = node.originalNode;
+    if (!!nodeId && nodeId.includes('|')) {
+      nodeId = nodeId.split('|')[1];
+      result = this._treeState.findNodeById(nodeId)?.originalNode;
+    }
+    if (!result) {
+      return;
+    }
+    this.nodeClick.emit(result);
   }
 
   private pageBefore(nodeId: string): void {
