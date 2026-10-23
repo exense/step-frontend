@@ -13,7 +13,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+  MatProgressSpinnerDefaultOptions,
+  MatProgressSpinnerModule,
+} from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -40,6 +44,12 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 @NgModule({
   imports: [CommonModule, StepIconsModule],
   declarations: [BtnGroupComponent, ThemeComponent],
+  providers: [
+    {
+      provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+      useValue: { _forceAnimations: true } satisfies MatProgressSpinnerDefaultOptions,
+    },
+  ],
   exports: [
     MatBadgeModule,
     MatCheckboxModule,
