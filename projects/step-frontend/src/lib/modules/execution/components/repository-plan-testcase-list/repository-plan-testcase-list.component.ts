@@ -1,4 +1,15 @@
-import { Component, computed, effect, inject, input, OnInit, output, untracked, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  OnInit,
+  output,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import {
   ArrayFilterComponent,
   BulkSelectionType,
@@ -16,7 +27,7 @@ import {
 } from '@exense/step-core';
 import { filter, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
 import { ERROR_STATUSES, Status } from '../../../_common/step-common.module';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { fetchRepositoryTestRuns } from '../../shared/relaunch-test-cases';
@@ -31,6 +42,7 @@ const unique = <T>(item: T, index: number, self: T[]): boolean => self.indexOf(i
   standalone: false,
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _selectionState = inject<EntitySelectionState<string, TestRunStatus>>(EntitySelectionState);
   private readonly listSelect = viewChild('listSelect', { read: SelectionList<string, TestRunStatus> });
 
@@ -38,6 +50,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
 
   readonly repoRef = input<RepositoryObjectReference | undefined>(undefined);
   readonly explicitTestCases = input<TestRunStatus[] | undefined>(undefined);
+  readonly initialSelection = input<IncludeTestcases | undefined>(undefined);
 
   readonly includedTestCasesChange = output<IncludeTestcases>();
 
@@ -136,13 +149,16 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       .pipe(
         filter((items) => !!items.length),
         take(1),
+        takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((_) => this.listSelect()?.selectAll?.());
-  }
-
-  // eslint-disable-next-line step-lint/component-public-fields -- Used by the launch dialog to restore the relaunch selection.
-  reselect(idsToSelect: string[]): void {
-    this.listSelect()?.selectIds(idsToSelect);
+      .subscribe(() => {
+        const selection = this.initialSelection();
+        if (!selection || selection.by === 'all') {
+          this.listSelect()?.selectAll?.();
+        } else {
+          this.listSelect()?.selectIds(selection.list);
+        }
+      });
   }
 
   protected toggleErrorFilter(): void {

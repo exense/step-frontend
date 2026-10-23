@@ -1,22 +1,13 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
+  AugmentedExecutionsService,
   ControllerService,
   CustomFormComponent,
   ExecutionCommandsContext,
   ExecutionLaunchDashletContext,
   IncludeTestcases,
-  PlanEditorService,
   RepositoryObjectReference,
   TableColumnsConfig,
   TablePersistenceConfig,
@@ -27,14 +18,15 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ExecutionCommandsDirective } from '../../directives/execution-commands.directive';
 import { ExecutionCommandsService } from '../../services/execution-commands.service';
-import { catchError, finalize, map, of } from 'rxjs';
-import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
+import { catchError, finalize, forkJoin, map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from '../../shared/relaunch-test-cases';
 
 export interface AltExecutionLaunchDialogData {
   title?: string;
   repoRef: RepositoryObjectReference;
   parameters?: Record<string, string>;
+  relaunchExecutionId?: string;
   testCases?: {
     items?: TestRunStatus[];
     selection?: IncludeTestcases;
@@ -71,6 +63,7 @@ export class AltExecutionLaunchDialogComponent
   implements AfterViewInit, ExecutionCommandsContext
 {
   private _controllersApi = inject(ControllerService);
+  private _executionsApi = inject(AugmentedExecutionsService);
   private _artefactsService = inject(ArtefactService);
   private _viewRegistry = inject(ViewRegistryService);
   private _data = inject<AltExecutionLaunchDialogData>(MAT_DIALOG_DATA);
@@ -78,21 +71,22 @@ export class AltExecutionLaunchDialogComponent
 
   protected readonly title = this._data.title ?? 'Launch Execution';
   protected readonly repoRef = this._data.repoRef;
-  protected readonly explicitTestCases = this._data.testCases?.items;
+  private readonly testCaseData = signal(this._data.testCases);
+  protected readonly explicitTestCases = computed(() => this.testCaseData()?.items);
+  protected readonly initialTestCaseSelection = computed(() => this.testCaseData()?.selection);
   protected readonly showCancel = !this._data.hideCancel;
   protected readonly executionIsolation = !!this._data.isolateExecution;
   protected readonly headerDashlets = this._viewRegistry.getDashlets('execution/launch/header');
   protected readonly bodyDashlets = this._viewRegistry.getDashlets('execution/launch/body');
 
-  private readonly testCasesComponent = viewChild('testCases', { read: RepositoryPlanTestcaseListComponent });
   private readonly customForm = viewChild(CustomFormComponent);
 
-  protected readonly loading = signal(false);
+  protected readonly loading = signal(!!this.repoRef);
   protected readonly error = signal<string | undefined>(undefined);
   protected readonly artefact = signal<ArtefactInfo | undefined>(undefined);
   protected readonly testcases = signal<IncludeTestcases | undefined>(undefined);
   private readonly planName = computed(() => this.artefact()?.name);
-  private readonly ready = computed(() => {
+  protected readonly ready = computed(() => {
     const artefact = this.artefact();
     const loading = this.loading();
     const screenTemplateLoading = this.screenTemplateLoading();
@@ -106,7 +100,7 @@ export class AltExecutionLaunchDialogComponent
   };
 
   ngAfterViewInit(): void {
-    this.loadArtefact();
+    this.loadDialogData();
   }
 
   protected override setupExecutionParameters(): void {
@@ -155,45 +149,49 @@ export class AltExecutionLaunchDialogComponent
   }
   /* eslint-enable step-lint/component-public-fields */
 
-  private loadArtefact(): void {
+  private loadDialogData(): void {
     if (!this.repoRef) {
       return;
     }
     this.loading.set(true);
-    this._controllersApi
-      .getArtefactInfo(this.repoRef)
+    forkJoin({
+      artefact: this._controllersApi.getArtefactInfo(this.repoRef),
+      testCases: this.loadTestCases(),
+    })
       .pipe(
-        map((artefact) => {
-          const icon = this._artefactsService.getArtefactType(artefact.type)?.icon;
-          return {
-            ...artefact,
-            icon,
-          } as ArtefactInfo;
-        }),
         catchError((error) => {
           this.error.set(error);
           return of(undefined);
         }),
         finalize(() => this.loading.set(false)),
+        takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((artefact) => {
-        if (artefact) {
-          this.artefact.set(artefact);
+      .subscribe((data) => {
+        if (data) {
+          this.testCaseData.set(data.testCases);
+          const icon = this._artefactsService.getArtefactType(data.artefact.type)?.icon;
+          this.artefact.set({ ...data.artefact, icon } as ArtefactInfo);
         }
       });
   }
 
-  private effectInitTestCases = effect(() => {
-    const testCases = this.testCasesComponent();
-    if (!testCases) {
-      return;
+  private loadTestCases(): Observable<AltExecutionLaunchDialogData['testCases']> {
+    const id = this._data.relaunchExecutionId;
+    if (!id) {
+      return of(this._data.testCases);
     }
-    const selection = this._data.testCases?.selection;
-    if (!selection || selection.by === 'all') {
-      return;
-    }
-    setTimeout(() => {
-      testCases.reselect(selection.list);
-    }, 500);
-  });
+
+    return forkJoin({
+      runs: fetchRepositoryTestRuns(this._controllersApi, this.repoRef),
+      testCaseNodes: this._executionsApi.getReportNodesByExecutionId(
+        id,
+        'step.artefacts.reports.TestCaseReportNode',
+        500,
+      ),
+    }).pipe(
+      map(({ runs, testCaseNodes }) =>
+        mergeRelaunchTestCases(runs ?? [], testCaseNodes ?? [], this.repoRef.repositoryID === 'local'),
+      ),
+    );
+  }
 }
