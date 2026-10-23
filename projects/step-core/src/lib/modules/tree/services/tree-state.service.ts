@@ -30,7 +30,7 @@ export abstract class TreeStateService<
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
   protected readonly rootNode = signal<N | null | undefined>(null);
-  private readonly hideRootInternal = signal(false);
+  protected readonly hideRootInternal = signal(false);
   private readonly selectedInsertionParentId = signal<string | undefined>(undefined);
   protected readonly treeData = computed(() => this._treeFlattener.flattenTree(this.rootNode()));
   private readonly selectedNodeIdsInternal = signal<string[]>([]);

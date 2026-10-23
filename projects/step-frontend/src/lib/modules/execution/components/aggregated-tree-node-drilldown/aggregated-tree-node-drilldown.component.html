@@ -132,7 +132,7 @@
               </div>
               <section *stepStackViewItemTitle class="stack-view-title">
                 <div>Execution Tree</div>
-                <step-alt-execution-tree-control-panel />
+                <step-alt-execution-tree-control-panel widgetType="executionTree" />
               </section>
               <section *stepStackViewItemContent class="root-content">
                 <step-alt-execution-tree
@@ -167,6 +167,7 @@
               </div>
               <section *stepStackViewItemTitle class="stack-view-title">
                 <div>Report Tree</div>
+                <step-alt-execution-tree-control-panel />
               </section>
               <section *stepStackViewItemContent class="root-content">
                 <step-alt-execution-tree-non-aggregated (nodeClick)="handleOpenDetails($event, item.id)" />
@@ -267,7 +268,7 @@
               <step-icon name="tree" />
               <span>{{ $any(item).data.name }}</span>
             </div>
-            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" />
+            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" widgetType="executionTree" />
           </section>
           <ng-container *stepStackViewItemContent>
             <section class="standalone-tree-container">

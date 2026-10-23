@@ -16,6 +16,10 @@ export class AltExecutionTreeNonAggregatedWidgetComponent {
   protected readonly _state = inject(AltExecutionStateService);
   private _executionDialogs = inject(AltExecutionDialogsService);
 
+  protected openMaximized(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.REPORT_TREE);
+  }
+
   protected openDrillDown(node: ReportNode): void {
     this._executionDialogs.openIterations(DrilldownRootType.REPORT_TREE, {
       reportNodeId: node.id,

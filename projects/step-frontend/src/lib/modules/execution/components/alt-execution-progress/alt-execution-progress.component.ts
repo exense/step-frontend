@@ -105,7 +105,6 @@ import { AltExecutionRefreshActivityService } from '../../services/alt-execution
 import { AltExecutionRefreshActivity } from '../../shared/alt-execution-refresh-activity.enum';
 import { REPORT_TYPE } from '../../services/report-type.token';
 import { isExecutionCompletionTransition } from '../../shared/execution-refresh.utils';
-import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -299,9 +298,11 @@ export class AltExecutionProgressComponent
   private previousReportTreeProgressExecutionId?: string;
 
   private readonly aggregatedTreeInProgressInternal = signal(false);
+  // eslint-disable-next-line step-lint/component-public-fields -- Exposed through AltExecutionStateService.
   readonly aggregatedTreeInProgress = this.aggregatedTreeInProgressInternal.asReadonly();
 
   private readonly reportTreeInProgressInternal = signal(false);
+  // eslint-disable-next-line step-lint/component-public-fields -- Exposed through AltExecutionStateService.
   readonly reportTreeInProgress = this.reportTreeInProgressInternal.asReadonly();
 
   private initialErrorsLoadPending = true;
@@ -867,41 +868,51 @@ export class AltExecutionProgressComponent
   private setupReportTreeRefresh(): void {
     this.execution$
       .pipe(
-        map((execution) => {
+        switchMap((execution) => {
           const id = execution?.id;
-          const isForceRefresh = execution?.status === 'ENDED';
           const displayProgress = this.shouldDisplayReportTreeProgress(execution);
           if (displayProgress) {
             this.reportTreeInProgressInternal.set(true);
           }
-          return { id, isForceRefresh, displayProgress };
-        }),
-        switchMap(({ id, isForceRefresh, displayProgress }) => {
-          const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
 
-          const rootNode$ = !id
-            ? of(undefined)
-            : this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
-                map((nodes) => nodes?.[0]),
-                catchError((err) => of(undefined)),
-              );
-
-          return rootNode$.pipe(map((rootNode) => ({ rootNode, isForceRefresh, expandedNodeIds, displayProgress })));
-        }),
-        switchMap(({ rootNode, isForceRefresh, expandedNodeIds, displayProgress }) => {
-          if (displayProgress) {
+          if (!id) {
             this.reportTreeInProgressInternal.set(false);
+            return of(undefined);
           }
-          if (!rootNode || !this.isReportTreeInitialized || isForceRefresh) {
-            return of(rootNode);
-          }
-          return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, expandedNodeIds);
+
+          return this._reportNodeTreeState.whenDepthRestoreSettled().pipe(
+            switchMap(() => {
+              const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
+              const parentIds = [
+                ...new Set(
+                  expandedNodeIds
+                    .map((nodeId) => this._reportNodeTreeState.findNodeById(nodeId)?.originalNode?.id)
+                    .filter((nodeId): nodeId is string => !!nodeId),
+                ),
+              ];
+
+              return this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
+                map((nodes) => nodes?.[0]),
+                catchError(() => of(undefined)),
+                tap(() => this.reportTreeInProgressInternal.set(false)),
+                switchMap((rootNode) => {
+                  if (!rootNode || !this.isReportTreeInitialized || !parentIds.length) {
+                    return of(rootNode);
+                  }
+                  return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, parentIds);
+                }),
+              );
+            }),
+          );
         }),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((rootNode) => {
         if (rootNode) {
-          this._reportNodeTreeState.init(rootNode, { expandAllByDefault: false });
+          this._reportNodeTreeState.init(
+            rootNode,
+            this.isReportTreeInitialized ? { expandAllByDefault: false } : { depth: 3 },
+          );
           this.isReportTreeInitialized = true;
         } else {
           this._reportNodeTreeState.init(undefined);
@@ -931,7 +942,7 @@ export class AltExecutionProgressComponent
       this.initialReportTreeLoadPending || this.previousReportTreeProgressExecutionId !== execution?.id;
 
     this.initialReportTreeLoadPending = false;
-    this.previousAggregatedTreeProgressExecutionId = execution?.id;
+    this.previousReportTreeProgressExecutionId = execution?.id;
 
     return displayProgress;
   }
