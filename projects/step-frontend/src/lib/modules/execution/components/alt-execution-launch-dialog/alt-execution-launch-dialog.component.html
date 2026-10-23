@@ -1,17 +1,21 @@
 <step-modal-window
-  [showSpinner]="loading() || screenTemplateLoading()"
+  [showSpinner]="!loading() && screenTemplateLoading()"
   [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
   class="slim-actions"
 >
   <div step-modal-window-title class="launch-title">
     <span>{{ _commands.showHandledResults() ? 'Remote Execution Started' : title }}</span>
-    <div class="launch-target-selector" [hidden]="_commands.showHandledResults()">
+    <div
+      class="launch-target-selector"
+      [hidden]="_commands.showHandledResults()"
+      [attr.inert]="loading() || screenTemplateLoading() ? '' : null"
+    >
       @for (item of headerDashlets; track item.id) {
         <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
       }
     </div>
   </div>
-  <div step-modal-window-body>
+  <div step-modal-window-body [attr.inert]="loading() || screenTemplateLoading() ? '' : null">
     @for (item of bodyDashlets; track item.id) {
       <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
     }
@@ -24,7 +28,9 @@
         </step-alert>
       }
       @if (loading()) {
-        <step-icon name="step-refresh" class="icon-refresh-animate" />
+        <div class="initial-loading">
+          <mat-spinner diameter="40" aria-label="Loading execution details" />
+        </div>
       }
       @if (artefact(); as artefact) {
         <div class="artefact-info">
@@ -47,9 +53,9 @@
           <div class="testcase-selection" [hidden]="!_commands.showTestcases()">
             <hr />
             <step-repository-plan-testcase-list
-              #testCases
               [repoRef]="repoRef"
-              [explicitTestCases]="explicitTestCases"
+              [explicitTestCases]="explicitTestCases()"
+              [initialSelection]="initialTestCaseSelection()"
               (includedTestCasesChange)="testcases.set($event)"
             />
           </div>
@@ -69,7 +75,7 @@
       <step-execution-actions
         [tooltips]="tooltips()"
         [isExecutionIsolated]="executionIsolation"
-        [disabled]="loading() || screenTemplateLoading()"
+        [disabled]="!ready()"
         [availability]="_commands.availability()"
         (execute)="execute($event)"
         (schedule)="schedule()"
