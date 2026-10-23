@@ -1,5 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
-import { Keyword, BaseArtefactComponent, ArtefactFormChangeHelperService, JsonFieldsSchema } from '@exense/step-core';
+import { Component, inject, ViewChild } from '@angular/core';
+import {
+  Keyword,
+  BaseArtefactComponent,
+  ArtefactFormChangeHelperService,
+  ArtefactPanelDefaultsService,
+  JsonFieldsSchema,
+} from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { KeywordArtefact } from '../../types/keyword.artefact';
 
@@ -11,6 +17,9 @@ import { KeywordArtefact } from '../../types/keyword.artefact';
   standalone: false,
 })
 export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact> {
+  private _panelDefaults = inject(ArtefactPanelDefaultsService);
+
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
 
@@ -18,6 +27,15 @@ export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact>
 
   protected keyword?: Keyword;
   protected schema?: JsonFieldsSchema;
+
+  // eslint-disable-next-line step-lint/component-public-fields -- Custom component rendering invokes this public base-class hook.
+  override contextChange(): void {
+    super.contextChange();
+    const artefact = this.context.artefact;
+    this.showTokenSelectionParameters =
+      this._panelDefaults.isNonDefault(artefact?.remote, true) ||
+      this._panelDefaults.hasTokenSelectors(artefact?.token);
+  }
 
   protected onUpdateKeyword(keyword?: Keyword): void {
     this.keyword = keyword;
