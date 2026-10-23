@@ -166,7 +166,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="isScreenTemplateLoading() || isSaving() || (!isSchedulePlan && !('task-write' | hasRight | async))"
+      [disabled]="isScreenTemplateLoading() || isSaving() || !('task-write' | hasRight | async)"
       [attr.aria-busy]="isSaving()"
     >
       @if (isSaving()) {
