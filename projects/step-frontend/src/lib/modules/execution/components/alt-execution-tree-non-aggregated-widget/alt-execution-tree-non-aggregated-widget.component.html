@@ -1,0 +1,29 @@
+<step-alt-report-widget [applyOverflow]="true">
+  <step-alt-report-widget-title>
+    <step-grid-element-title />
+  </step-alt-report-widget-title>
+  <step-alt-report-widget-filter>
+    <step-alt-execution-tree-control-panel>
+      <step-btn-group class="with-borders maximize-button">
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Maximize"
+          matTooltipPosition="below"
+          (click)="openMaximized()"
+        >
+          <step-icon name="maximize-2" />
+        </button>
+      </step-btn-group>
+    </step-alt-execution-tree-control-panel>
+  </step-alt-report-widget-filter>
+  <step-alt-report-widget-content>
+    <step-alt-execution-tree-non-aggregated
+      stepTreeAutoChooseVirtualScroll="100%"
+      [applyVirtualScrollFrom]="100"
+      [showSpinnerWhileTreeInitialize]="true"
+      [showSkeletonWhileLoading]="_state.reportTreeInProgress()"
+      (nodeClick)="openDrillDown($event)"
+    />
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

@@ -19,7 +19,7 @@ import { NgTemplateOutlet } from '@angular/common';
     {
       directive: TreeNodeDirective,
       inputs: ['node'],
-      outputs: ['contextMenu'],
+      outputs: ['contextMenu', 'nodeClick'],
     },
   ],
   host: {

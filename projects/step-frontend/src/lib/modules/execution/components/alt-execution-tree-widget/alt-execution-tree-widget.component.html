@@ -3,7 +3,7 @@
     <step-grid-element-title />
   </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
-    <step-alt-execution-tree-control-panel>
+    <step-alt-execution-tree-control-panel widgetType="executionTree">
       <step-btn-group class="with-borders maximize-button">
         <button
           type="button"
@@ -25,7 +25,7 @@
       stepTreeAutoChooseVirtualScroll="100%"
       [applyVirtualScrollFrom]="100"
       [showSpinnerWhileTreeInitialize]="true"
-      [showSkeletonWhileLoading]="(_state.treeInProgress$ | async) ?? false"
+      [showSkeletonWhileLoading]="_state.aggregatedTreeInProgress()"
       (openIterations)="handleOpenIterations($event)"
     />
   </step-alt-report-widget-content>

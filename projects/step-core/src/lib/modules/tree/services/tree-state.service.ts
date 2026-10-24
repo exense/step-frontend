@@ -13,9 +13,13 @@ const DEFAULT_OPTIONS: TreeStateInitOptions = {
 };
 
 @Injectable()
-export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
+export abstract class TreeStateService<
+  T,
+  N extends TreeNode,
+  U extends TreeNodeUtilsService<T, N> = TreeNodeUtilsService<T, N>,
+> implements OnDestroy {
   private _treeFlattener = inject(TreeFlattenerService);
-  private _treeNodeUtils = inject<TreeNodeUtilsService<T, N>>(TreeNodeUtilsService);
+  readonly _treeNodeUtils = inject<TreeNodeUtilsService<T, N>>(TreeNodeUtilsService) as U;
 
   private originalRoot?: T;
 
@@ -26,7 +30,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
   protected readonly rootNode = signal<N | null | undefined>(null);
-  private readonly hideRootInternal = signal(false);
+  protected readonly hideRootInternal = signal(false);
   private readonly selectedInsertionParentId = signal<string | undefined>(undefined);
   protected readonly treeData = computed(() => this._treeFlattener.flattenTree(this.rootNode()));
   private readonly selectedNodeIdsInternal = signal<string[]>([]);

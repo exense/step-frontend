@@ -44,9 +44,8 @@
     />
     @if (_mode === ViewMode.VIEW) {
       <step-alt-execution-tree-widget *stepGridItem="'executionTree'" #treeWidget class="widget" />
-    }
-    @if (_mode === ViewMode.VIEW) {
       <step-alt-report-node-keywords-widget *stepGridItem="'keywordsList'" #keywordWidget class="keywords" />
+      <step-alt-execution-tree-non-aggregated-widget *stepGridItem="'reportTree'" #reportTree class="widget" />
     }
     @if (_state.executionId$ | async; as executionId) {
       <step-alt-report-performance-overview-chart

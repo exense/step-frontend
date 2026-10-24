@@ -3,35 +3,47 @@
     <button
       type="button"
       mat-stroked-button
+      [disabled]="disableCollapse()"
       (click)="collapseAll()"
       matTooltip="Collapse All"
       matTooltipPosition="below"
     >
       <step-icon name="collapse-all" />
     </button>
-    <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="disableExpand()"
+      (click)="expandAll()"
+      matTooltip="Expand All"
+      matTooltipPosition="below"
+    >
       <step-icon name="expand-all" />
     </button>
   </step-btn-group>
 }
-<step-search-field
-  [formControl]="_treeSearch.searchCtrl"
-  [(searchIndex)]="_treeSearch.pageIndex"
-  [total]="_treeSearch.foundItems()"
-  [hint]="_treeSearchDescription"
-  notFoundTooltip="no results found"
-/>
-<step-search-paginator
-  [isActive]="_treeSearch.isErrorSearchActive()"
-  (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
-  [(searchIndex)]="_treeSearch.pageIndex"
-  [total]="_treeSearch.foundItems()"
-  [isDisabled]="!_treeSearch.hasErrors()"
-  [inactiveTooltip]="_treeSearch.errorsButtonHint()"
-  activeTooltip="Close error search"
-  [hintTooltip]="_treeSearch.errorsSearchHint()"
-  prevTooltip="show previous error"
-  nextTooltip="show next error"
-/>
+@if (_treeSearch) {
+  <step-search-field
+    [formControl]="_treeSearch.searchCtrl"
+    [(searchIndex)]="_treeSearch.pageIndex"
+    [total]="_treeSearch.foundItems()"
+    [hint]="_treeSearchDescription"
+    notFoundTooltip="no results found"
+  />
+  <step-search-paginator
+    [isActive]="_treeSearch.isErrorSearchActive()"
+    (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
+    [(searchIndex)]="_treeSearch.pageIndex"
+    [total]="_treeSearch.foundItems()"
+    [isDisabled]="!_treeSearch.hasErrors()"
+    [inactiveTooltip]="_treeSearch.errorsButtonHint()"
+    activeTooltip="Close error search"
+    [hintTooltip]="_treeSearch.errorsSearchHint()"
+    prevTooltip="show previous error"
+    nextTooltip="show next error"
+  />
+}
 <ng-content />
-<step-alt-execution-report-settings widgetType="executionTree" />
+@if (widgetType(); as widgetType) {
+  <step-alt-execution-report-settings [widgetType]="widgetType" />
+}

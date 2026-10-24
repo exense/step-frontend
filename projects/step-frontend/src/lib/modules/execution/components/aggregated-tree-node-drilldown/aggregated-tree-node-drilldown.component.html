@@ -132,7 +132,7 @@
               </div>
               <section *stepStackViewItemTitle class="stack-view-title">
                 <div>Execution Tree</div>
-                <step-alt-execution-tree-control-panel />
+                <step-alt-execution-tree-control-panel widgetType="executionTree" />
               </section>
               <section *stepStackViewItemContent class="root-content">
                 <step-alt-execution-tree
@@ -149,6 +149,34 @@
                 class="miniature"
                 *stepStackViewItemMiniature
                 matTooltip="Execution Tree"
+                matTooltipPosition="below"
+              >
+                <step-icon name="tree" />
+              </button>
+            </step-stack-view-item>
+          }
+          @case (DrilldownRootType.REPORT_TREE) {
+            <step-stack-view-item
+              [itemId]="item.id"
+              stepAltExecutionTreeNonAggregatedWidget
+              breadcrumbsTooltip="Click to go back to Execution Tree"
+            >
+              <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
+                <step-icon name="tree" />
+                <span>Report Tree</span>
+              </div>
+              <section *stepStackViewItemTitle class="stack-view-title">
+                <div>Report Tree</div>
+                <step-alt-execution-tree-control-panel />
+              </section>
+              <section *stepStackViewItemContent class="root-content">
+                <step-alt-execution-tree-non-aggregated (nodeClick)="handleOpenDetails($event, item.id)" />
+              </section>
+              <button
+                mat-stroked-button
+                class="miniature"
+                *stepStackViewItemMiniature
+                matTooltip="Report Tree"
                 matTooltipPosition="below"
               >
                 <step-icon name="tree" />
@@ -240,7 +268,7 @@
               <step-icon name="tree" />
               <span>{{ $any(item).data.name }}</span>
             </div>
-            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" />
+            <step-alt-execution-tree-control-panel [hideCollapseButtons]="true" widgetType="executionTree" />
           </section>
           <ng-container *stepStackViewItemContent>
             <section class="standalone-tree-container">
