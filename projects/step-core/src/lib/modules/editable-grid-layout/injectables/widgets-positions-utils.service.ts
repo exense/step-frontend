@@ -54,7 +54,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
         return undefined;
       }
 
-      const positionLimits = this.getElementLimits(elementPosition.widgetType);
+      const positionLimits = this.getDragLimits(elementPosition);
       const otherPositionLimits = this.getElementLimits(otherWidgetPosition.widgetType);
 
       // check the possibility to swap
@@ -136,7 +136,7 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       return { canBeApplied, position: result };
     }
 
-    const limits = this.getElementLimits(elementPosition.widgetType);
+    const limits = this.getDragLimits(elementPosition);
     canBeApplied = this.isFit({
       width: limits.minWidthInCells,
       height: limits.minHeightInCells,
@@ -236,6 +236,18 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
     const { minWidthInCells, minHeightInCells } = this.getElementLimits(position.widgetType);
     this.applyMinLimits(result, minWidthInCells, minHeightInCells);
 
+    const overlapsWidget = Object.values(this.context.getWidgetPositions()).some(
+      (item) =>
+        item.id !== elementId &&
+        item.leftEdge <= result.rightEdge &&
+        item.rightEdge >= result.leftEdge &&
+        item.topEdge <= result.bottomEdge &&
+        item.bottomEdge >= result.topEdge,
+    );
+    if (result.rightEdge > this._colCount || overlapsWidget) {
+      return undefined;
+    }
+
     return result;
   }
 
@@ -328,6 +340,43 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
       }
     }
     result = result ?? this.findProperPositionAtEnd(widthInCells, heightInCells);
+    return result;
+  }
+
+  findProperPositionAtPoint(info: GridElementInfo, point: GridPoint): WidgetPositionParams | undefined {
+    const { row, column } = point;
+    if (!Number.isInteger(row) || !Number.isInteger(column) || row < 1 || column < 1 || column > this._colCount) {
+      return undefined;
+    }
+    const positions = Object.values(this.context.getWidgetPositions());
+    const minWidth = info.minWidthInCells ?? 1;
+    const minHeight = info.minHeightInCells ?? 1;
+    let availableWidth = Math.min(info.widthInCells, this._colCount - column + 1);
+    let result: WidgetPositionParams | undefined;
+    let resultFits = false;
+    for (let heightInCells = 1; heightInCells <= info.heightInCells; heightInCells++) {
+      let widthInCells = 0;
+      while (
+        widthInCells < availableWidth &&
+        !positions.some((item) => item.includesPoint(row + heightInCells - 1, column + widthInCells))
+      ) {
+        widthInCells++;
+      }
+      if (!widthInCells) {
+        break;
+      }
+      availableWidth = widthInCells;
+      const fits = widthInCells >= minWidth && heightInCells >= minHeight;
+      const area = widthInCells * heightInCells;
+      if (
+        !result ||
+        (fits && !resultFits) ||
+        (fits === resultFits && area > result.widthInCells * result.heightInCells)
+      ) {
+        result = { row, column, widthInCells, heightInCells };
+        resultFits = fits;
+      }
+    }
     return result;
   }
 
@@ -428,6 +477,14 @@ export class WidgetsPositionsUtilsService implements OnDestroy {
 
   private getElementLimits(widgetType: string): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
     return this._gridConfig.defaultElementParamsMap?.[widgetType] ?? {};
+  }
+
+  private getDragLimits(position: WidgetPosition): Pick<GridElementInfo, 'minWidthInCells' | 'minHeightInCells'> {
+    const limits = this.getElementLimits(position.widgetType);
+    return {
+      minWidthInCells: Math.min(limits.minWidthInCells ?? 1, position.widthInCells),
+      minHeightInCells: Math.min(limits.minHeightInCells ?? 1, position.heightInCells),
+    };
   }
 
   private applyEdgeLimits(pos: WidgetPosition, maxRightEdgeInCells?: number, maxBottomEdgeInCells?: number): void {

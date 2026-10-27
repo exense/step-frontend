@@ -1,1 +1,6 @@
 <ng-content />
+@if (sizeWarning(); as warning) {
+  <div class="widget-size-warning" role="alert">
+    Widget too small (min: {{ warning.minWidthInCells }}x{{ warning.minHeightInCells }})
+  </div>
+}
