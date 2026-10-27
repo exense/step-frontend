@@ -33,6 +33,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
   private _executionTreePagingService = inject(ExecutionTreePagingService);
 
   private readonly hasChildrenFlags: Record<string, boolean> = {};
+  private readonly childrenPages: Record<string, NonNullable<ReportTreeNode['childrenPage']>> = {};
 
   convertItem(
     item: ReportNodeWithChildren,
@@ -86,6 +87,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
       parentId,
       iconClassName,
       originalNode: item,
+      childrenPage: this.childrenPages[id],
     };
   }
 
@@ -208,12 +210,13 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
 
   loadNodes(nodeId: string): Observable<ReportNode[]> {
     const skip = this._paging[nodeId]?.skip || 0;
-    return this._controllerService
-      .getReportNodeChildren(nodeId, skip, this._executionTreePagingService.getExecutionTreePaging())
-      .pipe(
-        map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
-        tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
-      );
+    const limit = this._executionTreePagingService.getExecutionTreePaging();
+    return this._controllerService.getReportNodeChildren(nodeId, skip, limit + 1).pipe(
+      tap((nodes) => (this.childrenPages[nodeId] = { skip, hasNext: nodes.length > limit })),
+      map((nodes) => nodes.slice(0, limit)),
+      map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
+      tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
+    );
   }
 
   getPathToNode(nodeId: string): Observable<string[]> {

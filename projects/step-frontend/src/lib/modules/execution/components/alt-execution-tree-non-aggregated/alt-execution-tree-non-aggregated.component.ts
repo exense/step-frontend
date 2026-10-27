@@ -1,11 +1,22 @@
-import { Component, computed, forwardRef, inject, input, output, ViewEncapsulation } from '@angular/core';
 import {
-  AbstractArtefact,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  inject,
+  input,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
+import {
   ReportNode,
   TreeAction,
   TreeActionsService,
   TreeComponent,
   TreeNode,
+  TreeNodeNameTemplateDirective,
+  StepIconsModule,
+  StepMaterialModule,
 } from '@exense/step-core';
 import { Observable, of } from 'rxjs';
 import {
@@ -18,7 +29,8 @@ import { ReportTreeNode } from '../../shared/report-tree-node';
 
 @Component({
   selector: 'step-alt-execution-tree-non-aggregated',
-  imports: [TreeComponent],
+  imports: [TreeComponent, TreeNodeNameTemplateDirective, StepIconsModule, StepMaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: TreeActionsService,
@@ -38,6 +50,16 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
   readonly showSkeletonWhileLoading = input(false);
   readonly nodeClick = output<ReportNode>();
 
+  protected readonly omittedChildrenByNode = computed<Record<string, boolean>>(() => {
+    const nodes = this._treeState.flatTree();
+    return Object.fromEntries(
+      nodes.map(({ id }) => {
+        const page = this._treeState.findNodeById(id)?.childrenPage;
+        return [id, !!page && (page.hasNext || page.skip > 0)];
+      }),
+    );
+  });
+
   protected readonly showSkeleton = computed(() => {
     const showSkeletonForEmptyTree = this.showSpinnerWhileTreeInitialize();
     const showSkeletonWhileLoading = this.showSkeletonWhileLoading();
@@ -45,7 +67,7 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
     return showSkeletonWhileLoading || (showSkeletonForEmptyTree && !isInitialized);
   });
 
-  handleContextAction(actionId: string, node?: AbstractArtefact): void {
+  protected handleContextAction(actionId: string, node?: TreeNode): void {
     const nodeId = node?.id!;
     if (!nodeId) {
       return;
@@ -63,10 +85,9 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
     this._treeState.reloadChildrenForNode(nodeId);
   }
 
-  getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
-    const nodeId = node.id;
-    const canPrevious = (this._paging[nodeId]?.skip || 0) > 0;
-    const canNext = (node?.children || []).length >= this._executionTreePagingService.getExecutionTreePaging();
+  getActionsForNode(node: ReportTreeNode): Observable<TreeAction[]> {
+    const canPrevious = (node.childrenPage?.skip ?? 0) > 0;
+    const canNext = !!node.childrenPage?.hasNext;
     return of([
       {
         id: ExecutionTreeAction.LOAD_PREVIOUS_NODES,
@@ -82,7 +103,7 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
   }
 
   hasActionsForNode(node: TreeNode): boolean {
-    return true;
+    return !node.id.includes('|');
   }
 
   protected handleNodeClick(node: ReportTreeNode): void {
@@ -124,13 +145,13 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
     return 'Previous Nodes' + (currentSkip > 0 ? ` (${newSkip}..${currentSkip})` : '');
   }
 
-  private getNextLabel(node: TreeNode): string {
+  private getNextLabel(node: ReportTreeNode): string {
     const nodeId = node.id;
     const currentSkip = this._paging[nodeId]?.skip || 0;
-    const childrenLength = (node.children || []).length;
+    const hasNext = !!node.childrenPage?.hasNext;
     return (
       'Next Nodes' +
-      (childrenLength >= this._executionTreePagingService.getExecutionTreePaging()
+      (hasNext
         ? ` (${currentSkip + this._executionTreePagingService.getExecutionTreePaging()}..${
             currentSkip + this._executionTreePagingService.getExecutionTreePaging() * 2
           })`

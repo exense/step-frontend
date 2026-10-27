@@ -159,15 +159,15 @@
             <step-stack-view-item
               [itemId]="item.id"
               stepAltExecutionTreeNonAggregatedWidget
-              breadcrumbsTooltip="Click to go back to Execution Tree"
+              breadcrumbsTooltip="Click to go back to Execution Tree (classic)"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="tree" />
-                <span>Report Tree</span>
+                <span>Execution Tree (classic)</span>
               </div>
               <section *stepStackViewItemTitle class="stack-view-title">
-                <div>Report Tree</div>
-                <step-alt-execution-tree-control-panel />
+                <div>Execution Tree (classic)</div>
+                <step-alt-execution-tree-control-panel expandTooltip="Expand All Loaded Nodes" />
               </section>
               <section *stepStackViewItemContent class="root-content">
                 <step-alt-execution-tree-non-aggregated (nodeClick)="handleOpenDetails($event, item.id)" />
@@ -176,7 +176,7 @@
                 mat-stroked-button
                 class="miniature"
                 *stepStackViewItemMiniature
-                matTooltip="Report Tree"
+                matTooltip="Execution Tree (classic)"
                 matTooltipPosition="below"
               >
                 <step-icon name="tree" />

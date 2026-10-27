@@ -15,7 +15,7 @@
       mat-stroked-button
       [disabled]="disableExpand()"
       (click)="expandAll()"
-      matTooltip="Expand All"
+      [matTooltip]="expandTooltip()"
       matTooltipPosition="below"
     >
       <step-icon name="expand-all" />

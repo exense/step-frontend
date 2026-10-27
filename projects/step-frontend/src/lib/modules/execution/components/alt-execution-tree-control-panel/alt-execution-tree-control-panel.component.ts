@@ -27,6 +27,7 @@ export class AltExecutionTreeControlPanelComponent {
   readonly hideCollapseButtons = input(false);
   readonly disableCollapse = input(false);
   readonly disableExpand = input(false);
+  readonly expandTooltip = input('Expand All');
   readonly widgetType = input<AltExecutionReportWidgetType>();
 
   protected collapseAll(): void {

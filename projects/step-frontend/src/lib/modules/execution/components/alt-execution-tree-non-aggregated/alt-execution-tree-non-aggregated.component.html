@@ -13,6 +13,20 @@
       (nodeClick)="handleNodeClick($event.node)"
       [dragDisabled]="true"
       [forceFocus]="true"
-    />
+    >
+      <ng-template stepTreeNodeNameTemplate let-node>
+        <span class="node-name">
+          <step-icon [name]="node.icon" [class]="node.iconClassName" />
+          <span>{{ node.name }}</span>
+          @if (omittedChildrenByNode()[node.id]) {
+            <span
+              class="children-limit"
+              matTooltip="Right-click this node and choose Previous Nodes or Next Nodes to see more children."
+              >Some children are not shown</span
+            >
+          }
+        </span>
+      </ng-template>
+    </step-tree>
   }
 </div>
