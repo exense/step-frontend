@@ -16,4 +16,6 @@ export {
   ExecutionStrategyController,
 } from '@exense/step-core';
 export * from './lib/modules/execution/services/execution-commands.service';
+export * from './lib/modules/execution/services/error-search-actions.service';
+export * from './lib/modules/execution/shared/error-search-action';
 export { AltExecutionLaunchDialogData } from './lib/modules/execution/components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';

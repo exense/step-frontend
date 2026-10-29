@@ -13,8 +13,9 @@
       <step-alt-execution-errors-widget
         *stepGridItem="'errorsWidget'; autoHeightOnFirstRow: true"
         [errors]="errors"
+        [searchActions]="availableErrorSearchActions()"
+        [showDetailsAvailable]="showErrorDetailsAvailable()"
         (showDetails)="scrollToErrorsSection()"
-        (searchFor)="searchErrorInTree($event)"
       />
     }
     @if (hasTestCases$ | async) {
@@ -69,7 +70,7 @@
           [inProgress]="_state.errorsDisplayInProgress$ | async"
           [showExecutionsMenu]="false"
           [hasTestCases]="!!(hasTestCases$ | async)"
-          (searchFor)="searchError($event)"
+          [searchActions]="availableErrorSearchActions()"
         />
       </step-alt-report-widget-content>
     </step-alt-report-widget>
