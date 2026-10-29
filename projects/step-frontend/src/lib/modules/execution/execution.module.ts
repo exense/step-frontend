@@ -17,7 +17,6 @@ import {
   canLeaveComponent,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
-  ControllerService,
   DashletRegistryService,
   DialogParentService,
   dialogRoute,
@@ -104,8 +103,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot, Route, Router, Routes } from '@angular/router';
-import { catchError, forkJoin, map, of, switchMap, take } from 'rxjs';
-import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from './shared/relaunch-test-cases';
+import { map, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -992,34 +990,11 @@ export class ExecutionModule {
                     map((execution) => execution?.executionParameters?.customParameters),
                   );
                 },
-                testCases: () => {
+                relaunchExecutionId: () => {
                   const _context = inject(ActiveExecutionContextService);
-                  const _executionsApi = inject(AugmentedExecutionsService);
-                  const _controllerService = inject(ControllerService);
                   return _context.execution$.pipe(
                     take(1),
-                    switchMap((execution) => {
-                      const id = execution?.id;
-                      const repoRef = execution?.executionParameters?.repositoryObject;
-                      if (!id || !repoRef) {
-                        return of(undefined);
-                      }
-                      return forkJoin({
-                        runs: fetchRepositoryTestRuns(_controllerService, repoRef),
-                        testCaseNodes: _executionsApi.getReportNodesByExecutionId(
-                          id,
-                          'step.artefacts.reports.TestCaseReportNode',
-                          500,
-                        ),
-                      }).pipe(
-                        map(({ runs, testCaseNodes }) =>
-                          !runs
-                            ? undefined
-                            : mergeRelaunchTestCases(runs, testCaseNodes ?? [], repoRef.repositoryID === 'local'),
-                        ),
-                      );
-                    }),
-                    catchError(() => of(undefined)),
+                    map((execution) => execution?.id),
                   );
                 },
               },

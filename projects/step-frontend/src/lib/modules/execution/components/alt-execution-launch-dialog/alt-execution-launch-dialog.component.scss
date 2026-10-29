@@ -21,6 +21,12 @@ div[step-modal-window-body] {
   }
 }
 
+.initial-loading {
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
+}
+
 .testcase-selection {
   display: flex;
   flex-direction: column;

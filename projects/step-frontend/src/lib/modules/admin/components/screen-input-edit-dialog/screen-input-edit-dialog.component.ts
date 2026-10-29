@@ -52,7 +52,9 @@ export class ScreenInputEditDialogComponent {
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         switchMap((data) => {
-          this.screenInput.position = data['nextIndex'];
+          if (!this.screenInput.id && data['nextIndex'] !== undefined) {
+            this.screenInput.position = Number(data['nextIndex']);
+          }
           return this._screenApi.saveInput(this.screenInput);
         }),
       )
