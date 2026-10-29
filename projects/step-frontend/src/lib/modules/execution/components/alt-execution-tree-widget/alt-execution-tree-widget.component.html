@@ -1,6 +1,21 @@
 <step-alt-report-widget [applyOverflow]="true">
   <step-alt-report-widget-title>
     <step-grid-element-title />
+    <step-icon
+      name="help-circle"
+      matTooltip="Execution results grouped by plan node, with counts and status distribution"
+      matTooltipPosition="below"
+    />
+    <button
+      type="button"
+      mat-icon-button
+      aria-label="Open Execution Trace Tree"
+      matTooltip="Open Execution Trace Tree"
+      matTooltipPosition="below"
+      (click)="openAlternateTree()"
+    >
+      <step-icon name="repeat" />
+    </button>
   </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
     <step-alt-execution-tree-control-panel widgetType="executionTree">

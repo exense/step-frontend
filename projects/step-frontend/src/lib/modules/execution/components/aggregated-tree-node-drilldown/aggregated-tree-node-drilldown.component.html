@@ -124,14 +124,21 @@
             <step-stack-view-item
               [itemId]="item.id"
               stepAltExecutionTreeWidget
-              breadcrumbsTooltip="Click to go back to Execution Tree"
+              breadcrumbsTooltip="Click to go back to Aggregated Execution Tree"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="tree" />
-                <span>Execution Tree</span>
+                <span>Aggregated Execution Tree</span>
               </div>
-              <section *stepStackViewItemTitle class="stack-view-title">
-                <div>Execution Tree</div>
+              <section *stepStackViewItemTitle class="stack-view-title tree-root-header">
+                <div class="tree-root-title">
+                  <span>Aggregated Execution Tree</span>
+                  <step-icon
+                    name="help-circle"
+                    matTooltip="Execution results grouped by plan node, with counts and status distribution"
+                    matTooltipPosition="below"
+                  />
+                </div>
                 <step-alt-execution-tree-control-panel widgetType="executionTree" />
               </section>
               <section *stepStackViewItemContent class="root-content">
@@ -148,7 +155,7 @@
                 mat-stroked-button
                 class="miniature"
                 *stepStackViewItemMiniature
-                matTooltip="Execution Tree"
+                matTooltip="Aggregated Execution Tree"
                 matTooltipPosition="below"
               >
                 <step-icon name="tree" />
@@ -159,14 +166,21 @@
             <step-stack-view-item
               [itemId]="item.id"
               stepAltExecutionTreeNonAggregatedWidget
-              breadcrumbsTooltip="Click to go back to Execution Tree (classic)"
+              breadcrumbsTooltip="Click to go back to Execution Trace Tree"
             >
               <div *stepStackViewBreadcrumbsTitle class="breadcrumb-title">
                 <step-icon name="tree" />
-                <span>Execution Tree (classic)</span>
+                <span>Execution Trace Tree</span>
               </div>
-              <section *stepStackViewItemTitle class="stack-view-title">
-                <div>Execution Tree (classic)</div>
+              <section *stepStackViewItemTitle class="stack-view-title tree-root-header">
+                <div class="tree-root-title">
+                  <span>Execution Trace Tree</span>
+                  <step-icon
+                    name="help-circle"
+                    matTooltip="Individual execution instances, including loop iterations and runtime-generated nodes."
+                    matTooltipPosition="below"
+                  />
+                </div>
                 <step-alt-execution-tree-control-panel expandTooltip="Expand All Loaded Nodes" />
               </section>
               <section *stepStackViewItemContent class="root-content">
@@ -176,7 +190,7 @@
                 mat-stroked-button
                 class="miniature"
                 *stepStackViewItemMiniature
-                matTooltip="Execution Tree (classic)"
+                matTooltip="Execution Trace Tree"
                 matTooltipPosition="below"
               >
                 <step-icon name="tree" />

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ReportNode } from '@exense/step-core';
 import { AltExecutionTreeNonAggregatedWidgetDirective } from '../../directives/alt-execution-tree-non-aggregated-widget.directive';
@@ -10,6 +10,7 @@ import { DrilldownRootType } from '../../shared/drilldown-root-type';
   templateUrl: './alt-execution-tree-non-aggregated-widget.component.html',
   styleUrl: './alt-execution-tree-non-aggregated-widget.component.scss',
   hostDirectives: [AltExecutionTreeNonAggregatedWidgetDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionTreeNonAggregatedWidgetComponent {
@@ -18,6 +19,10 @@ export class AltExecutionTreeNonAggregatedWidgetComponent {
 
   protected openMaximized(): void {
     this._executionDialogs.openDrilldownRoot(DrilldownRootType.REPORT_TREE);
+  }
+
+  protected openAlternateTree(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.TREE);
   }
 
   protected openDrillDown(node: ReportNode): void {

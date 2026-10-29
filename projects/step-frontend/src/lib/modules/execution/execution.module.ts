@@ -1109,7 +1109,7 @@ export class ExecutionModule {
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'executionTree',
-      title: 'Execution Tree',
+      title: 'Aggregated Execution Tree',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,
@@ -1147,7 +1147,7 @@ export class ExecutionModule {
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'reportTree',
-      title: 'Execution Tree (classic)',
+      title: 'Execution Trace Tree',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,

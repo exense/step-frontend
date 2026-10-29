@@ -1,6 +1,21 @@
 <step-alt-report-widget [applyOverflow]="true">
   <step-alt-report-widget-title>
     <step-grid-element-title />
+    <step-icon
+      name="help-circle"
+      matTooltip="Individual execution instances, including loop iterations and runtime-generated nodes."
+      matTooltipPosition="below"
+    />
+    <button
+      type="button"
+      mat-icon-button
+      aria-label="Open Aggregated Execution Tree"
+      matTooltip="Open Aggregated Execution Tree"
+      matTooltipPosition="below"
+      (click)="openAlternateTree()"
+    >
+      <step-icon name="repeat" />
+    </button>
   </step-alt-report-widget-title>
   <step-alt-report-widget-filter>
     <step-alt-execution-tree-control-panel expandTooltip="Expand All Loaded Nodes">
