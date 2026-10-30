@@ -17,6 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
 import { QUERY_PARAMS_CLEANUP_NAVIGATION } from './navigator-query-params-cleanup.service';
 import { MenuEntry } from '../types/menu-entry';
+import { MultipleProjectsService } from '../../basics/step-basics.module';
 
 export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFunction'> & {
   isEnabled: boolean;
@@ -37,6 +38,7 @@ export class NavigatorService {
   private _window = inject(DOCUMENT).defaultView!;
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _queryParamsCleanups = inject(NAVIGATOR_QUERY_PARAMS_CLEANUP);
+  private _multipleProjects = inject(MultipleProjectsService);
 
   private forcedActivatedViewId?: string;
 
@@ -136,9 +138,20 @@ export class NavigatorService {
   }
 
   private navigateToSeparateTab(link: string): void {
+    let appliedLink = link;
+    const currentProject = this._multipleProjects.currentProject();
+    if (currentProject !== undefined) {
+      const urlTree = this._router.parseUrl(appliedLink);
+      appliedLink = this._multipleProjects.getUrlForProject(currentProject, {
+        url: appliedLink,
+        search: urlTree.queryParams,
+      });
+    }
+
     const pathIndex = this._window.location.href.indexOf(this._router.url);
-    let url = this._window.location.href.slice(0, pathIndex);
-    url = `${url}${link}`;
+    const host = this._window.location.href.slice(0, pathIndex);
+
+    const url = `${host}${appliedLink}`;
     this._window.open(url, '_blank');
   }
 
