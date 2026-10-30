@@ -16,22 +16,24 @@ export class AltExecutionErrorsWidgetComponent {
   readonly showDetails = output<void>();
   readonly searchFor = output<string>();
 
-  protected readonly hasErrors = computed(() => this.errors().length > 0);
+  protected readonly distinctErrorCount = computed(() => {
+    const errors = this.errors();
+    return errors.length;
+  });
+
+  protected readonly hasErrors = computed(() => {
+    const distinctErrorCount = this.distinctErrorCount();
+    return distinctErrorCount > 0;
+  });
 
   protected readonly singleError = computed(() => {
     const errors = this.errors();
     return errors.length === 1 ? errors[0] : undefined;
   });
 
-  protected readonly failedCount = computed(() => {
+  protected readonly occurrenceCount = computed(() => {
     const errors = this.errors();
     return errors.reduce((res, error) => res + error.count, 0);
-  });
-
-  protected readonly singleOccurrenceError = computed(() => {
-    const singleError = this.singleError();
-    const failedCount = this.failedCount();
-    return failedCount === 1 ? singleError : undefined;
   });
 
   protected readonly resolvedSearchActions = computed<readonly ErrorSearchAction[]>(() => {
@@ -47,11 +49,6 @@ export class AltExecutionErrorsWidgetComponent {
         },
       ]
     );
-  });
-
-  protected readonly treeSearchAction = computed(() => {
-    const actions = this.resolvedSearchActions();
-    return actions.find((action) => action.id === 'tree' && action.isAvailable());
   });
 
   protected activateSearchAction(action: ErrorSearchAction, error: TimeSeriesErrorEntry): void {

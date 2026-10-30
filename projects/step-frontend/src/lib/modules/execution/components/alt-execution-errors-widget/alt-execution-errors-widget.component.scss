@@ -2,34 +2,50 @@
 
 .error-overview {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 0.5rem;
   min-width: 0;
+  margin-bottom: 1rem;
 }
 
-.error-info {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+.error-header {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  column-gap: 0.2rem;
-  row-gap: 0.5rem;
-  flex: 1;
+  gap: 0.5rem;
+}
+
+.error-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
   min-width: 0;
-  margin-bottom: 1rem;
 }
 
 .error-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  max-width: 50%;
+}
+
+.error-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.error-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
 .error-message {
+  flex: 1 1 12rem;
   font-style: italic;
   color: var(--step-text-color, var.$blue-700);
   white-space: pre-wrap;
-  grid-column: 1/3;
   overflow-wrap: anywhere;
   min-width: 0;
 }

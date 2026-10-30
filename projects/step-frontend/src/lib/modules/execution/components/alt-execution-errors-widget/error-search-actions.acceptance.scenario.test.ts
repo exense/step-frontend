@@ -192,7 +192,7 @@ describe('SED-5023 public error search action acceptance', () => {
     fixtures.splice(0).forEach((fixture) => fixture.destroy());
   });
 
-  it('AC-1 AC-2 AC-4: renders destination buttons only for one occurrence and activates the current entry once', fakeAsync(() => {
+  it('AC-1 AC-2 AC-4: renders destination buttons for one distinct error and activates the current entry once', fakeAsync(() => {
     expectInput(AltExecutionErrorsWidgetComponent, 'searchActions');
     const fixture = create(AltExecutionErrorsWidgetComponent);
     const activate = jest.fn();
@@ -210,11 +210,14 @@ describe('SED-5023 public error search action acceptance', () => {
     expect(activate).toHaveBeenCalledTimes(3);
     expect(legacySearch).not.toHaveBeenCalled();
 
-    const repeated = error({ count: 2, types: ['FAILED', 'TECHNICAL_ERROR'] });
+    const repeated = error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'] });
     fixture.componentRef.setInput('errors', [repeated]);
     settle(fixture);
-    actions.forEach((action) => expect(button(fixture, action.label)).toBeUndefined());
-    expect(activate).toHaveBeenCalledTimes(3);
+    actions.forEach((action) => {
+      expectAction(fixture, action).click();
+      expect(activate).toHaveBeenLastCalledWith(repeated);
+    });
+    expect(activate).toHaveBeenCalledTimes(6);
 
     const current = error({ errorMessage: 'Current selected error', types: ['TECHNICAL_ERROR'] });
     fixture.componentRef.setInput('errors', [current]);
@@ -222,11 +225,11 @@ describe('SED-5023 public error search action acceptance', () => {
     actions.forEach((action) => expectAction(fixture, action));
     button(fixture, 'Find error in Steps')!.click();
     expect(activate).toHaveBeenLastCalledWith(current);
-    expect(activate).toHaveBeenCalledTimes(4);
+    expect(activate).toHaveBeenCalledTimes(7);
     expect(legacySearch).not.toHaveBeenCalled();
   }));
 
-  it('AC-1 AC-2 AC-3: hides and restores the table link in every nonempty error state', fakeAsync(() => {
+  it('AC-4 AC-5: toggles the multiple-error table link and omits it for a single distinct error', fakeAsync(() => {
     expectInput(AltExecutionErrorsWidgetComponent, 'showDetailsAvailable');
     const fixture = create(AltExecutionErrorsWidgetComponent);
     fixture.componentRef.setInput('errors', [
@@ -236,12 +239,12 @@ describe('SED-5023 public error search action acceptance', () => {
     fixture.componentRef.setInput('showDetailsAvailable', false);
     settle(fixture);
     const element: HTMLElement = fixture.nativeElement;
-    expect(element.textContent).toContain('This execution contains 2 errors');
-    expect(element.textContent).not.toContain('show in error table');
+    expect(element.textContent!.replace(/\s+/g, ' ')).toContain('2 distinct errors · 2 occurrences');
+    expect(element.textContent).not.toContain('error table');
     fixture.componentRef.setInput('showDetailsAvailable', true);
     settle(fixture);
     const details = Array.from(element.querySelectorAll<HTMLAnchorElement>('a[href]')).find(
-      (link) => link.textContent?.trim() === 'show in error table',
+      (link) => link.textContent?.trim() === 'error table',
     );
     expect(details).toBeDefined();
     const showDetails = jest.fn();
@@ -249,21 +252,22 @@ describe('SED-5023 public error search action acceptance', () => {
     details!.click();
     expect(showDetails).toHaveBeenCalledTimes(1);
 
-    [error(), error({ count: 2 })].forEach((entry, index) => {
+    [error(), error({ count: 5 })].forEach((entry) => {
       fixture.componentRef.setInput('errors', [entry]);
       fixture.componentRef.setInput('showDetailsAvailable', false);
       settle(fixture);
-      expect(element.textContent).toContain(`This execution contains ${entry.count} error`);
+      expect(element.textContent!.replace(/\s+/g, ' ')).toContain(
+        `1 distinct error · ${entry.count} ${entry.count === 1 ? 'occurrence' : 'occurrences'}`,
+      );
       expect(element.textContent).toContain(entry.errorMessage);
-      expect(element.textContent).not.toContain('show in error table');
+      expect(element.textContent).not.toContain('error table');
       fixture.componentRef.setInput('showDetailsAvailable', true);
       settle(fixture);
       const restored = Array.from(element.querySelectorAll<HTMLAnchorElement>('a[href]')).find(
-        (link) => link.textContent?.trim() === 'show in error table',
+        (link) => link.textContent?.trim() === 'error table',
       );
-      expect(restored).toBeDefined();
-      restored!.click();
-      expect(showDetails).toHaveBeenCalledTimes(index + 2);
+      expect(restored).toBeUndefined();
+      expect(showDetails).toHaveBeenCalledTimes(1);
     });
   }));
 
@@ -280,13 +284,18 @@ describe('SED-5023 public error search action acceptance', () => {
     expect(legacySearch).toHaveBeenCalledWith(entry.errorMessage);
 
     const element: HTMLElement = fixture.nativeElement;
-    const messageLink = Array.from(element.querySelectorAll<HTMLAnchorElement>('a[href]')).find(
-      (link) => link.textContent?.trim() === entry.errorMessage,
+    const interactiveElements = element.querySelectorAll<HTMLElement>(
+      'a[href], button, [role="link"], [role="button"]',
     );
-    expect(messageLink).toBeDefined();
-    messageLink!.click();
-    expect(legacySearch).toHaveBeenCalledTimes(2);
-    expect(legacySearch).toHaveBeenLastCalledWith(entry.errorMessage);
+    expect(
+      Array.from(interactiveElements).some((candidate) => candidate.textContent?.includes(entry.errorMessage)),
+    ).toBe(false);
+    const message = Array.from(element.querySelectorAll<HTMLElement>('*')).find(
+      (candidate) => candidate.textContent?.trim() === entry.errorMessage,
+    );
+    expect(message).toBeDefined();
+    message!.click();
+    expect(legacySearch).toHaveBeenCalledTimes(1);
   }));
 
   it('AC-4 AC-5: preserves standalone table typed navigation and the Test Cases gate with corrected accessible labels', fakeAsync(() => {
@@ -454,7 +463,7 @@ describe('SED-5023 public error search action acceptance', () => {
     expect(namedButtons(table)).toHaveLength(2);
     fixture.componentInstance.errors.set([error({ errorMessage: 'Repeated selected error', count: 2 })]);
     settle(fixture);
-    expect(namedButtons(overview)).toHaveLength(0);
+    expect(namedButtons(overview)).toHaveLength(1);
     expect(namedButtons(table)).toHaveLength(2);
     fixture.componentInstance.errors.set([error({ errorMessage: 'Current selected error' })]);
     settle(fixture);

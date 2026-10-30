@@ -2,46 +2,43 @@
   <step-alt-report-widget-content>
     @if (hasErrors()) {
       <div class="error-overview">
-        <section class="error-info">
-          <step-icon class="error" name="alert-triangle" />
-          <div>
-            <span>This execution contains {{ failedCount() }} {{ failedCount() === 1 ? 'error' : 'errors' }}</span>
-            @if (showDetailsAvailable()) {
-              &nbsp;<span>(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>)</span>
-            }
-            @if (singleError()) {
-              <span>:</span>
-            }
+        <div class="error-header">
+          <div class="error-summary">
+            <step-icon class="error" name="alert-triangle" />
+            <span>
+              {{ distinctErrorCount() }} distinct {{ distinctErrorCount() === 1 ? 'error' : 'errors' }} ·
+              {{ occurrenceCount() }} {{ occurrenceCount() === 1 ? 'occurrence' : 'occurrences' }}
+            </span>
           </div>
-          @if (singleError(); as singleError) {
-            @if (treeSearchAction(); as treeAction) {
-              <a
-                href="#"
-                class="error-message"
-                stepClampFade
-                [lines]="5"
-                (click)="activateSearchAction(treeAction, singleError); (false)"
-                >{{ singleError.errorMessage }}</a
-              >
-            } @else {
-              <div class="error-message" stepClampFade [lines]="5">{{ singleError.errorMessage }}</div>
-            }
+          @if (singleError(); as error) {
+            <div class="error-actions">
+              @for (action of resolvedSearchActions(); track action.id) {
+                <button
+                  type="button"
+                  mat-icon-button
+                  [attr.aria-label]="action.label"
+                  [matTooltip]="action.label"
+                  matTooltipPosition="below"
+                  (click)="activateSearchAction(action, error)"
+                >
+                  <step-icon [name]="action.icon" />
+                </button>
+              }
+            </div>
           }
-        </section>
-        @if (singleOccurrenceError(); as error) {
-          <div class="error-actions">
-            @for (action of resolvedSearchActions(); track action.id) {
-              <button
-                type="button"
-                mat-icon-button
-                [attr.aria-label]="action.label"
-                [matTooltip]="action.label"
-                matTooltipPosition="below"
-                (click)="activateSearchAction(action, error)"
-              >
-                <step-icon [name]="action.icon" />
-              </button>
-            }
+        </div>
+        @if (singleError(); as singleError) {
+          <section class="error-details">
+            <div class="error-statuses">
+              @for (type of singleError.types; track type) {
+                <step-status [status]="type" />
+              }
+            </div>
+            <div class="error-message" stepClampFade [lines]="5">{{ singleError.errorMessage }}</div>
+          </section>
+        } @else if (showDetailsAvailable()) {
+          <div class="error-details">
+            <span>View error details in <a href="#" (click)="showDetails.emit(); (false)">error table</a></span>
           </div>
         }
       </div>
