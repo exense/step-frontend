@@ -36,6 +36,10 @@ export class AltExecutionTreeWidgetComponent {
     this._executionDialogs.openDrilldownRoot(DrilldownRootType.TREE);
   }
 
+  protected openAlternateTree(): void {
+    this._executionDialogs.openDrilldownRoot(DrilldownRootType.REPORT_TREE);
+  }
+
   focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }

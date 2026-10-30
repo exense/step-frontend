@@ -1,0 +1,10 @@
+export const OpenInTree = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-open-in-tree">
+    
+  <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 3v12a3 3 0 0 0 3 3h2M11 6h5" />
+    <circle cx="19" cy="6" r="3" />
+    <circle cx="19" cy="18" r="3" />
+    <path d="M2 12h6m-3-3 3 3-3 3" />
+  </g>
+
+</svg>`;

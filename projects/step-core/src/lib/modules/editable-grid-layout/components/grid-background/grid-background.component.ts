@@ -3,15 +3,15 @@ import { WidgetsPositionsStateService } from '../../injectables/widgets-position
 import { GRID_COLUMN_COUNT } from '../../injectables/grid-column-count.token';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { GridAddWidgetComponent } from '../grid-add-widget/grid-add-widget.component';
+import { GridPoint } from '../../types/widget-position';
 
 interface Row {
   index: number;
   isEmpty: boolean;
 }
 
-interface Cell {
+interface Cell extends GridPoint {
   index: number;
-  hasAddButton: boolean;
 }
 
 @Component({
@@ -32,25 +32,15 @@ export class GridBackgroundComponent {
 
   protected readonly rowsCount = computed(() => this._widgetPositionState.fieldBottom() + 1);
 
-  protected readonly cells = computed(() => {
-    const widgetsBottom = this._widgetPositionState.widgetsBottom();
+  protected readonly emptyCells = computed(() => {
+    const positions = Object.values(this._widgetPositionState.positions());
+    const rowsCount = this.rowsCount();
     const colCount = this._colCount - 1;
-    const size = this.rowsCount() * colCount;
-    // First cell in the last row
-    const addCellIndex = widgetsBottom * colCount;
-    return this.createArray(size, (index) => ({ index, hasAddButton: index === addCellIndex }) as Cell);
-  });
-
-  protected readonly addCellCoordinates = computed(() => {
-    const widgetsBottom = this._widgetPositionState.widgetsBottom();
-    if (widgetsBottom < 0) {
-      return undefined;
-    }
-    const rowStart = widgetsBottom + 1;
-    const rowEnd = rowStart + 1;
-    const colStart = 1;
-    const colEnd = colStart + 1;
-    return `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
+    return this.createArray<Cell>(rowsCount * colCount, (index) => ({
+      index,
+      row: Math.floor(index / colCount) + 1,
+      column: (index % colCount) + 1,
+    })).filter((cell) => !positions.some((position) => position.includesPoint(cell.row, cell.column)));
   });
 
   protected readonly verticalCols = computed(() => {

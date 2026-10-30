@@ -49,6 +49,28 @@ step-aggregated-tree-node-drilldown {
     }
   }
 
+  .tree-root-header {
+    flex-wrap: wrap;
+  }
+
+  .tree-root-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+
+    > span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    > step-icon {
+      flex-shrink: 0;
+    }
+  }
+
   step-btn-group.report-filter-button {
     @include common.report-filter-button-size;
   }

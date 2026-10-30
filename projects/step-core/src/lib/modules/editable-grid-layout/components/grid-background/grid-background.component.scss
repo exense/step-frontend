@@ -24,6 +24,12 @@ step-grid-background {
 
     .grid-cell {
       z-index: 5;
+
+      &:not(.always-show-add) {
+        step-grid-add-widget > button:not(:hover):not(:focus-visible):not([aria-expanded='true']) > step-icon {
+          opacity: 0;
+        }
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import {
   afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
@@ -19,18 +20,29 @@ import { WidgetsPositionsStateService } from '../../injectables/widgets-position
   host: {
     class: 'step-grid-element',
     '[class.element-hidden]': 'isHidden()',
+    '[class.widget-too-small]': '!!sizeWarning()',
     '[attr.data-grid-element-id]': 'elementId()',
     '[style.grid-column]': 'gridColumn()',
     '[style.grid-row]': 'gridRow()',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridElementComponent {
   private _positionsState = inject(WidgetsPositionsStateService);
 
   private readonly isRenderComplete = signal(false);
 
+  // Drag handles and resizers need the widget's host element for pointer geometry.
+  // eslint-disable-next-line step-lint/component-public-fields
   readonly _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly elementId = input.required<string>();
+
+  protected readonly sizeWarning = computed(() => {
+    const elementId = this.elementId();
+    const undersizedWidgets = this._positionsState.undersizedWidgets();
+    const isEditing = this._positionsState.editMode();
+    return isEditing ? undersizedWidgets.find((widget) => widget.id === elementId) : undefined;
+  });
 
   private readonly position = computed(() => {
     const elementId = this.elementId();
@@ -38,6 +50,8 @@ export class GridElementComponent {
     return positions[elementId];
   });
 
+  // GridElementTitleComponent and GridElementHeaderActionsComponent read the owning widget's type.
+  // eslint-disable-next-line step-lint/component-public-fields
   readonly widgetType = computed(() => {
     const position = this.position();
     return position.widgetType;

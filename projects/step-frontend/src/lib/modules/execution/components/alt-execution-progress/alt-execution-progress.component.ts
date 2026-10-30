@@ -71,7 +71,10 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-view-tree-state.service';
+import {
+  AGGREGATED_TREE_WIDGET_STATE,
+  REPORT_NODE_TREE_WIDGET_STATE,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -251,7 +254,10 @@ export class AltExecutionProgressComponent
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _tableRemoteDataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
+  private _reportNodeTreeState = inject(REPORT_NODE_TREE_WIDGET_STATE);
+
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionId = inject(EXECUTION_ID);
@@ -281,12 +287,24 @@ export class AltExecutionProgressComponent
   // The Studio doesn't expose the provisioning status the agent provisioning popover displays
   protected readonly _isIdeMode = inject(IDE_MODE);
 
-  private isTreeInitialized = false;
-  private initialTreeLoadPending = true;
-  private previousTreeProgressExecutionId?: string;
-  private previousTreeProgressRange?: TimeRangeSelection;
-  private readonly treeInProgressInternal$ = new BehaviorSubject(false);
-  readonly treeInProgress$ = this.treeInProgressInternal$.asObservable();
+  private isAggregatedTreeInitialized = false;
+  private isReportTreeInitialized = false;
+
+  private initialAggregatedTreeLoadPending = true;
+  private previousAggregatedTreeProgressExecutionId?: string;
+  private previousAggregatedTreeProgressRange?: TimeRangeSelection;
+
+  private initialReportTreeLoadPending = true;
+  private previousReportTreeProgressExecutionId?: string;
+
+  private readonly aggregatedTreeInProgressInternal = signal(false);
+  // eslint-disable-next-line step-lint/component-public-fields -- Exposed through AltExecutionStateService.
+  readonly aggregatedTreeInProgress = this.aggregatedTreeInProgressInternal.asReadonly();
+
+  private readonly reportTreeInProgressInternal = signal(false);
+  // eslint-disable-next-line step-lint/component-public-fields -- Exposed through AltExecutionStateService.
+  readonly reportTreeInProgress = this.reportTreeInProgressInternal.asReadonly();
+
   private initialErrorsLoadPending = true;
   private previousErrorsProgressExecutionId?: string;
   private previousErrorsProgressRange?: TimeRangeSelection;
@@ -650,7 +668,8 @@ export class AltExecutionProgressComponent
   );
 
   ngOnInit(): void {
-    this.setupTreeRefresh();
+    this.setupAggregatedTreeRefresh();
+    this.setupReportTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
     this.setupAgentProvisioningPopover();
@@ -779,11 +798,10 @@ export class AltExecutionProgressComponent
     this.keywordsDataSource.destroy();
     this.aggregatedTestCasesDataSource?.destroy();
     this.testCaseIterationsDataSource?.destroy();
-    this.treeInProgressInternal$.complete();
     this.errorsDisplayInProgressInternal$.complete();
   }
 
-  private setupTreeRefresh(): void {
+  private setupAggregatedTreeRefresh(): void {
     combineLatest([
       this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TREE),
       this.execution$,
@@ -806,14 +824,14 @@ export class AltExecutionProgressComponent
               return of({ aggregatedReportView: undefined, partialTreeRootNodeId: undefined });
             }
             return defer(() => {
-              const displayProgress = this.shouldDisplayTreeProgress(execution, timeRangeSelection);
+              const displayProgress = this.shouldDisplayAggregatedTreeProgress(execution, timeRangeSelection);
               if (displayProgress) {
-                this.treeInProgressInternal$.next(true);
+                this.aggregatedTreeInProgressInternal.set(true);
               }
               return this._treeLoader.load(execution, timeRangeSelection).pipe(
                 finalize(() => {
                   if (displayProgress) {
-                    this.treeInProgressInternal$.next(false);
+                    this.aggregatedTreeInProgressInternal.set(false);
                   }
                 }),
               );
@@ -827,13 +845,13 @@ export class AltExecutionProgressComponent
       .subscribe(({ aggregatedReportView, partialTreeRootNodeId }) => {
         if (!aggregatedReportView) {
           this._aggregatedTreeWidgetState.init(undefined);
-          this.isTreeInitialized = false;
+          this.isAggregatedTreeInitialized = false;
           return;
         }
         // expand all items in tree, due first initialization
-        const expandAllByDefault = !this.isTreeInitialized;
+        const expandAllByDefault = !this.isAggregatedTreeInitialized;
         this._aggregatedTreeWidgetState.init(aggregatedReportView, { partialTreeRootNodeId, expandAllByDefault });
-        this.isTreeInitialized = true;
+        this.isAggregatedTreeInitialized = true;
       });
 
     this.execution$
@@ -847,15 +865,84 @@ export class AltExecutionProgressComponent
       });
   }
 
-  private shouldDisplayTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
-    const displayProgress =
-      this.initialTreeLoadPending ||
-      this.previousTreeProgressExecutionId !== execution?.id ||
-      !this._dateUtils.areTimeRangeSelectionsEquals(this.previousTreeProgressRange, range);
+  private setupReportTreeRefresh(): void {
+    this.execution$
+      .pipe(
+        switchMap((execution) => {
+          const id = execution?.id;
+          const displayProgress = this.shouldDisplayReportTreeProgress(execution);
+          if (displayProgress) {
+            this.reportTreeInProgressInternal.set(true);
+          }
 
-    this.initialTreeLoadPending = false;
-    this.previousTreeProgressExecutionId = execution?.id;
-    this.previousTreeProgressRange = range;
+          if (!id) {
+            this.reportTreeInProgressInternal.set(false);
+            return of(undefined);
+          }
+
+          return this._reportNodeTreeState.whenDepthRestoreSettled().pipe(
+            switchMap(() => {
+              const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
+              const parentIds = [
+                ...new Set(
+                  expandedNodeIds
+                    .map((nodeId) => this._reportNodeTreeState.findNodeById(nodeId)?.originalNode?.id)
+                    .filter((nodeId): nodeId is string => !!nodeId),
+                ),
+              ];
+
+              return this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
+                map((nodes) => nodes?.[0]),
+                catchError(() => of(undefined)),
+                tap(() => this.reportTreeInProgressInternal.set(false)),
+                switchMap((rootNode) => {
+                  if (!rootNode || !this.isReportTreeInitialized || !parentIds.length) {
+                    return of(rootNode);
+                  }
+                  return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, parentIds);
+                }),
+              );
+            }),
+          );
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((rootNode) => {
+        if (rootNode) {
+          this._reportNodeTreeState.init(
+            rootNode,
+            this.isReportTreeInitialized ? { expandAllByDefault: false } : { depth: 3 },
+          );
+          this.isReportTreeInitialized = true;
+        } else {
+          this._reportNodeTreeState.init(undefined);
+          this.isReportTreeInitialized = false;
+        }
+      });
+  }
+
+  private shouldDisplayAggregatedTreeProgress(execution: Execution | undefined, range: TimeRangeSelection): boolean {
+    const displayProgress =
+      this.initialAggregatedTreeLoadPending ||
+      this.previousAggregatedTreeProgressExecutionId !== execution?.id ||
+      (range !== undefined &&
+        !this._dateUtils.areTimeRangeSelectionsEquals(this.previousAggregatedTreeProgressRange, range));
+
+    this.initialAggregatedTreeLoadPending = false;
+    this.previousAggregatedTreeProgressExecutionId = execution?.id;
+    if (range !== undefined) {
+      this.previousAggregatedTreeProgressRange = range;
+    }
+
+    return displayProgress;
+  }
+
+  private shouldDisplayReportTreeProgress(execution: Execution | undefined): boolean {
+    const displayProgress =
+      this.initialReportTreeLoadPending || this.previousReportTreeProgressExecutionId !== execution?.id;
+
+    this.initialReportTreeLoadPending = false;
+    this.previousReportTreeProgressExecutionId = execution?.id;
 
     return displayProgress;
   }

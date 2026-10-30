@@ -40,6 +40,7 @@ import {
   PLAN_EXECUTION_REPORT_GRID,
   SCHEDULER_EXECUTION_REPORT_GRID,
   REPOSITORY_REPORT_GRID,
+  treeStateFactoryProvider,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -108,6 +109,7 @@ import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
+  REPORT_NODE_TREE_WIDGET_STATE,
 } from './services/aggregated-report-view-tree-state.service';
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
@@ -172,6 +174,62 @@ import { ExecutionHistorySectionComponent } from './components/execution-history
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
 
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
+import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
+import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
+import { NoticeBadgeLabelPipe } from './pipes/notice-badge-label.pipe';
+import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
+import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
+import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
+import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
+import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
+import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
+import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
+import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
+import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
+import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
+import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
+import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
+import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
+import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
+import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
+import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
+import {
+  DRILL_DOWN_ROOT_ID,
+  DrillDownStackItemConfig,
+  DrillDownStackItemType,
+  DrillDownStackItemTypeWORoot,
+} from './shared/drilldown-stack-item';
+import { DrilldownRootType } from './shared/drilldown-root-type';
+import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
+import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
+import { SummaryCardComponent } from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
+import { CrossExecutionCallCountsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
+import { CrossExecutionStatusComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
+import { AltExecutionRefreshActivityService } from './services/alt-execution-refresh-activity.service';
+import {
+  ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
+  AltExecutionRefreshActivity,
+} from './shared/alt-execution-refresh-activity.enum';
+import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
+import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
+import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
+import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
+import { ReportTreeNodeUtilsService } from './services/report-tree-node-utils.service';
+import { EXECUTION_TREE_PAGING_SETTINGS, ExecutionTreePagingService } from './services/execution-tree-paging.service';
+import { AltExecutionTreeNonAggregatedComponent } from './components/alt-execution-tree-non-aggregated/alt-execution-tree-non-aggregated.component';
+import { AltExecutionTreeNonAggregatedWidgetComponent } from './components/alt-execution-tree-non-aggregated-widget/alt-execution-tree-non-aggregated-widget.component';
+import { ReportTreeStateService } from './services/report-tree-state.service';
+import { AltExecutionTreeNonAggregatedWidgetDirective } from './directives/alt-execution-tree-non-aggregated-widget.directive';
+import { ReportRowRenderDirective } from './directives/report-row-render.directive';
+
 const createAltExecutionNodeDetailsRoute = (): Route => ({
   path: 'node-details',
   component: SimpleOutletComponent,
@@ -181,6 +239,7 @@ const createAltExecutionNodeDetailsRoute = (): Route => ({
         if (
           url.length > 0 &&
           (url[0].path === DrilldownRootType.TREE ||
+            url[0].path === DrilldownRootType.REPORT_TREE ||
             url[0].path === DrilldownRootType.TESTCASES ||
             url[0].path === DrilldownRootType.KEYWORDS)
         ) {
@@ -261,10 +320,23 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
   providers: [
     ActiveExecutionsService,
     AltExecutionRefreshActivityService,
-    AggregatedReportViewTreeNodeUtilsService,
     { provide: DialogParentService, useClass: ExecutionViewDialogUrlCleanupService },
-    { provide: TreeNodeUtilsService, useExisting: AggregatedReportViewTreeNodeUtilsService },
-    { provide: AGGREGATED_TREE_WIDGET_STATE, useClass: AggregatedReportViewTreeStateService },
+    {
+      provide: AGGREGATED_TREE_WIDGET_STATE,
+      useFactory: treeStateFactoryProvider(
+        AggregatedReportViewTreeStateService,
+        AggregatedReportViewTreeNodeUtilsService,
+      ),
+    },
+    {
+      provide: EXECUTION_TREE_PAGING_SETTINGS,
+      useValue: {},
+    },
+    ExecutionTreePagingService,
+    {
+      provide: REPORT_NODE_TREE_WIDGET_STATE,
+      useFactory: treeStateFactoryProvider(ReportTreeStateService, ReportTreeNodeUtilsService),
+    },
     AltReportNodeDetailsStateService,
     ActiveExecutionContextService,
     AggregatedReportViewTreeStateContextService,
@@ -300,6 +372,7 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
       return true;
     },
     () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+    () => inject(REPORT_NODE_TREE_WIDGET_STATE).cleanup(),
     () => inject(AltReportNodeDetailsStateService).cleanup(),
     () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
   ],
@@ -324,55 +397,6 @@ const staticAltExecutionReportRoute = (path: string, layoutId: string): Route =>
     createAltExecutionNodeDetailsRoute(),
   ],
 });
-import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
-import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
-import { ExecutionHistoryNodesComponent } from './components/execution-history-node/execution-history-nodes.component';
-import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
-import { TableCountsToggleComponent } from './components/table-counts-toggle/table-counts-toggle.component';
-import { AltReportWidgetTitleDirective } from './directives/alt-report-widget-title.directive';
-import { AggregatedReportViewCountErrorsPipe } from './pipes/aggregated-report-view-count-errors.pipe';
-import { NoticeBadgeLabelPipe } from './pipes/notice-badge-label.pipe';
-import { CalcElementWidthDirective } from './directives/calc-element-width.directive';
-import { CalcElementWidthAggregatorDirective } from './directives/calc-element-width-aggregator.directive';
-import { CalcElementWidthItemDirective } from './directives/calc-element-width-item.directive';
-import { AggregatedTreeNodeDrilldownComponent } from './components/aggregated-tree-node-drilldown/aggregated-tree-node-drilldown.component';
-import { AltReportNodeHeaderComponent } from './components/alt-report-node-header/alt-report-node-header.component';
-import { AltExecutionTreeControlPanelComponent } from './components/alt-execution-tree-control-panel/alt-execution-tree-control-panel.component';
-import { AltExecutionTreeWidgetDirective } from './directives/alt-execution-tree-widget.directive';
-import { AltExecutionTreeSearchFocusDirective } from './directives/alt-execution-tree-search-focus.directive';
-import { AltReportNodeListSortDirective } from './directives/alt-report-node-list-sort.directive';
-import { AltReportNodeSearchComponent } from './components/alt-report-node-search/alt-report-node-search.component';
-import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
-import { AltReportNodeTestcasesComponent } from './components/alt-report-node-testcases/alt-report-node-testcases.component';
-import { AltReportNodeListProvideKeywordsDirective } from './directives/alt-report-node-list-provide-keywords.directive';
-import { AltReportNodeListProvideTestcasesDirective } from './directives/alt-report-node-list-provide-testcases.directive';
-import { AltIterationListTitleComponent } from './components/alt-iteration-list-title/alt-iteration-list-title.component';
-import { AltReportNodeDetailsTestcasesStepsComponent } from './components/alt-report-node-details-testcases-steps/alt-report-node-details-testcases-steps.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
-import { ExecutionHistoryNodeTooltipComponent } from './components/execution-history-node-tooltip/execution-history-node-tooltip.component';
-import { RepositoryPageComponent } from './components/schedule-overview/repository-page/repository-page.component';
-import {
-  DRILL_DOWN_ROOT_ID,
-  DrillDownStackItemConfig,
-  DrillDownStackItemType,
-  DrillDownStackItemTypeWORoot,
-} from './shared/drilldown-stack-item';
-import { DrilldownRootType } from './shared/drilldown-root-type';
-import { DrilldownPartialTreeStateDirective } from './directives/drilldown-partial-tree-state.directive';
-import { DashletEmptyColumnComponent } from './components/dashlet-empty-column/dashlet-empty-column.component';
-import { SummaryCardComponent } from './components/schedule-overview/cross-execution-dashboard/summary-card/summary-card.component';
-import { CrossExecutionCallCountsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-call-counts/cross-execution-call-counts.component';
-import { CrossExecutionStatusComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-status/cross-execution-status.component';
-import { AltExecutionRefreshActivityService } from './services/alt-execution-refresh-activity.service';
-import {
-  ALL_ALT_EXECUTION_REFRESH_ACTIVITY,
-  AltExecutionRefreshActivity,
-} from './shared/alt-execution-refresh-activity.enum';
-import { AltReportNodeSummarySkeletonComponent } from './components/alt-report-node-summary-skeleton/alt-report-node-summary-skeleton.component';
-import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
-import { CrossExecutionTabsComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-tabs/cross-execution-tabs.component';
-import { AltReportNodePerformanceComponent } from './components/alt-report-node-performance/alt-report-node-performance.component';
-import { ReportRowRenderDirective } from './directives/report-row-render.directive';
 
 @NgModule({
   declarations: [
@@ -492,6 +516,7 @@ import { ReportRowRenderDirective } from './directives/report-row-render.directi
     DashletEmptyColumnComponent,
     CrossExecutionStatusComponent,
     NoticeBadgeLabelPipe,
+    AltExecutionTreeNonAggregatedWidgetComponent,
   ],
   imports: [
     ReportRowRenderDirective,
@@ -540,6 +565,8 @@ import { ReportRowRenderDirective } from './directives/report-row-render.directi
     EntityRefDirective,
     AltReportNodeSummarySkeletonComponent,
     CrossExecutionTabsComponent,
+    AltExecutionTreeNonAggregatedComponent,
+    AltExecutionTreeNonAggregatedWidgetDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -795,18 +822,25 @@ export class ExecutionModule {
           data: { [RECREATE_ON_EXECUTION_CHANGE]: true },
           providers: [
             AltExecutionRefreshActivityService,
-            AggregatedReportViewTreeNodeUtilsService,
             {
               provide: DialogParentService,
               useClass: ExecutionViewDialogUrlCleanupService,
             },
             {
-              provide: TreeNodeUtilsService,
-              useExisting: AggregatedReportViewTreeNodeUtilsService,
+              provide: AGGREGATED_TREE_WIDGET_STATE,
+              useFactory: treeStateFactoryProvider(
+                AggregatedReportViewTreeStateService,
+                AggregatedReportViewTreeNodeUtilsService,
+              ),
             },
             {
-              provide: AGGREGATED_TREE_WIDGET_STATE,
-              useClass: AggregatedReportViewTreeStateService,
+              provide: EXECUTION_TREE_PAGING_SETTINGS,
+              useValue: {},
+            },
+            ExecutionTreePagingService,
+            {
+              provide: REPORT_NODE_TREE_WIDGET_STATE,
+              useFactory: treeStateFactoryProvider(ReportTreeStateService, ReportTreeNodeUtilsService),
             },
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
@@ -844,6 +878,7 @@ export class ExecutionModule {
               return true;
             },
             () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+            () => inject(REPORT_NODE_TREE_WIDGET_STATE).cleanup(),
             () => inject(AltReportNodeDetailsStateService).cleanup(),
             () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
           ],
@@ -1049,7 +1084,7 @@ export class ExecutionModule {
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'executionTree',
-      title: 'Execution Tree',
+      title: 'Aggregated Execution Tree',
       widthInCells: 6,
       heightInCells: 3,
       minWidthInCells: 3,
@@ -1084,6 +1119,16 @@ export class ExecutionModule {
       minWidthInCells: 3,
       minHeightInCells: 3,
       weight: 1,
+    });
+    this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
+      widgetType: 'reportTree',
+      title: 'Execution Trace Tree',
+      widthInCells: 6,
+      heightInCells: 3,
+      minWidthInCells: 3,
+      minHeightInCells: 3,
+      weight: 1,
+      denyDuplicates: true,
     });
     this._gridSettingsRegistry.register(EXECUTION_REPORT_GRID, {
       widgetType: 'currentOperations',

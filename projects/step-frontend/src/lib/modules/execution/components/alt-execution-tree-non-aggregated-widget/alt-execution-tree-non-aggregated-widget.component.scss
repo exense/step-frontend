@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.collapse-buttons {
+  button {
+    height: 3.4rem !important;
+  }
+}
+
+step-alt-report-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  white-space: normal;
+
+  step-grid-element-title {
+    min-width: 0;
+  }
+
+  > step-icon,
+  > button {
+    flex-shrink: 0;
+  }
+}
+
+step-alt-report-widget-content {
+  min-height: 0;
+  overflow: auto;
+}
+
+step-alt-execution-tree-non-aggregated {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+:host ::ng-deep step-alt-execution-tree-non-aggregated step-tree {
+  flex: 1;
+  min-height: 0;
+  padding-left: 0;
+  padding-bottom: 0;
+  overflow: auto;
+}
+
+:host ::ng-deep step-alt-report-widget {
+  mat-card,
+  mat-card-content {
+    min-height: 0;
+  }
+}
