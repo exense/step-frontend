@@ -42,12 +42,14 @@ import {
 import { AltReportNodeTestcasesWidgetComponent } from '../alt-report-node-testcases-widget/alt-report-node-testcases-widget.component';
 import { AltReportNodeKeywordsWidgetComponent } from '../alt-report-node-keywords-widget/alt-report-node-keywords-widget.component';
 import { SearchError, SearchErrorType } from '../../shared/search-error';
+import { ErrorSearchActionsService } from '../../services/error-search-actions.service';
 
 @Component({
   selector: 'step-alt-execution-report',
   templateUrl: './alt-execution-report.component.html',
   styleUrl: './alt-execution-report.component.scss',
   providers: [
+    ErrorSearchActionsService,
     {
       provide: VIEW_MODE,
       useFactory: () => {
@@ -86,6 +88,13 @@ export class AltExecutionReportComponent
   private readonly keywordWidgetContainer = viewChild('keywordWidget', { read: ElementRef });
 
   private readonly errors = viewChild('errors', { read: ElementRef });
+
+  private readonly _errorSearchActions = inject(ErrorSearchActionsService);
+  protected readonly availableErrorSearchActions = this._errorSearchActions.availableActions;
+  protected readonly showErrorDetailsAvailable = computed(() => {
+    const errors = this.errors();
+    return !!errors;
+  });
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -133,11 +142,48 @@ export class AltExecutionReportComponent
     });
   }
 
+  private registerErrorSearchActions(): void {
+    this._errorSearchActions.register({
+      id: 'tree',
+      label: 'Find error in tree',
+      icon: 'tree',
+      isAvailable: () => {
+        const widget = this.treeWidget();
+        const container = this.treeWidgetContainer();
+        return !!widget && !!container;
+      },
+      activate: (error) => this.searchErrorInTree(error.errorMessage),
+    });
+    this._errorSearchActions.register({
+      id: 'steps',
+      label: 'Find error in Steps',
+      icon: 'list',
+      isAvailable: () => {
+        const widget = this.keywordWidget();
+        const container = this.keywordWidgetContainer();
+        return !!widget && !!container;
+      },
+      activate: (error) => this.searchErrorInKeywords(error.errorMessage),
+    });
+    this._errorSearchActions.register({
+      id: 'testCases',
+      label: 'Find error in Test Cases',
+      icon: 'plan-testcase',
+      isAvailable: () => {
+        const widget = this.testCasesWidget();
+        const container = this.testCasesWidgetContainer();
+        return !!widget && !!container;
+      },
+      activate: (error) => this.searchErrorInTestCases(error.errorMessage),
+    });
+  }
+
   private scheduleAfterNextPaint(callback: () => void): void {
     requestAnimationFrame(callback);
   }
 
   ngOnInit(): void {
+    this.registerErrorSearchActions();
     this._hooks.useStrategy(this);
   }
 
@@ -145,6 +191,7 @@ export class AltExecutionReportComponent
     this._hooks.cleanupStrategy();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by CanLeaveComponent.
   canLeave(): boolean | Observable<boolean> {
     const isEditMode = untracked(() => this._gridEditable.editMode());
     const hasChanges = untracked(() => this._gridEditable.hasChanges());
@@ -163,6 +210,7 @@ export class AltExecutionReportComponent
       .pipe(tap((isConfirmed) => (isConfirmed ? this._gridEditable.reset() : noop())));
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Required by AggregatedTreeNodeDialogHooksStrategy.
   reportNodeOpened(reportNode: ReportNode): void {
     this.treeWidget()?.focusNodeByReport(reportNode);
   }

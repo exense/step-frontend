@@ -1,30 +1,47 @@
 <step-alt-report-widget>
   <step-alt-report-widget-content>
     @if (hasErrors()) {
-      <section class="error-info">
-        @if (singleError(); as singleError) {
-          <step-icon class="error" name="alert-triangle" />
-          <div>
-            <span>This execution contains {{ failedCount() }} {{ failedCount() === 1 ? 'error' : 'errors' }}</span
-            >&nbsp;
-            <span>(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>):</span>
+      <div class="error-overview">
+        <div class="error-header">
+          <div class="error-summary">
+            <step-icon class="error" name="alert-triangle" />
+            <span>
+              {{ distinctErrorCount() }} distinct {{ distinctErrorCount() === 1 ? 'error' : 'errors' }} ·
+              {{ occurrenceCount() }} {{ occurrenceCount() === 1 ? 'occurrence' : 'occurrences' }}
+            </span>
           </div>
-          <a
-            href="#"
-            class="error-message"
-            stepClampFade
-            [lines]="5"
-            (click)="findInTree(singleError.errorMessage); (false)"
-            >{{ singleError.errorMessage }}</a
-          >
-        } @else {
-          <step-icon class="error" name="alert-triangle" />
-          <div>
-            <span>This execution contains {{ failedCount() }} errors</span>&nbsp;
-            <span>(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>)</span>
+          @if (singleError(); as error) {
+            <div class="error-actions">
+              @for (action of resolvedSearchActions(); track action.id) {
+                <button
+                  type="button"
+                  mat-icon-button
+                  [attr.aria-label]="action.label"
+                  [matTooltip]="action.label"
+                  matTooltipPosition="below"
+                  (click)="activateSearchAction(action, error)"
+                >
+                  <step-icon [name]="action.icon" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+        @if (singleError(); as singleError) {
+          <section class="error-details">
+            <div class="error-statuses">
+              @for (type of singleError.types; track type) {
+                <step-status [status]="type" />
+              }
+            </div>
+            <div class="error-message" stepClampFade [lines]="5">{{ singleError.errorMessage }}</div>
+          </section>
+        } @else if (showDetailsAvailable()) {
+          <div class="error-details">
+            <span>View error details in <a href="#" (click)="showDetails.emit(); (false)">error table</a></span>
           </div>
         }
-      </section>
+      </div>
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>
