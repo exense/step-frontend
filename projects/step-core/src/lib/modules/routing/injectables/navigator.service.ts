@@ -141,7 +141,11 @@ export class NavigatorService {
     let appliedLink = link;
     const currentProject = this._multipleProjects.currentProject();
     if (currentProject !== undefined) {
-      appliedLink = this._multipleProjects.getUrlForProject(currentProject, { url: appliedLink });
+      const urlTree = this._router.parseUrl(appliedLink);
+      appliedLink = this._multipleProjects.getUrlForProject(currentProject, {
+        url: appliedLink,
+        search: urlTree.queryParams,
+      });
     }
 
     const pathIndex = this._window.location.href.indexOf(this._router.url);
