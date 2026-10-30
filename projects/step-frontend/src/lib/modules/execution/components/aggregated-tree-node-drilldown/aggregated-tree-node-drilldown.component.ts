@@ -173,6 +173,7 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const nodeDetailsPath = ['node-details', ...this._activatedRoute.snapshot.url.map((item) => item.path)];
     this._tabs.ensureActiveDrilldownTab(nodeDetailsPath, this._activatedRoute.snapshot.queryParams);
+    this._tabs.updateActiveDrilldownLabel(this.getTabLabel(this.stackItemsUntracked));
     this.executionProgressElement?.classList?.add?.(IS_DRILLDOWN_OPENED);
   }
 
@@ -466,7 +467,9 @@ export class AggregatedTreeNodeDrilldownComponent implements OnInit, OnDestroy {
         case DrilldownRootType.TESTCASES:
           return 'Drilldown: Testcases';
         case DrilldownRootType.TREE:
-          return 'Drilldown: Tree';
+          return 'Aggregated Execution Tree';
+        case DrilldownRootType.REPORT_TREE:
+          return 'Execution Trace Tree';
       }
     }
     return 'Drilldown';
