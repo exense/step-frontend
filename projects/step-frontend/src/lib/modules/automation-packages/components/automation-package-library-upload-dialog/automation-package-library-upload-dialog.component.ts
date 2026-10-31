@@ -2,6 +2,7 @@ import { Component, effect, ElementRef, inject, OnInit, signal, viewChild } from
 import {
   AceMode,
   AugmentedAutomationPackagesService,
+  AuthService,
   DialogRouteResult,
   Resource,
   StepCoreModule,
@@ -31,6 +32,7 @@ type DialogData = {
 export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
   private _fb = inject(FormBuilder).nonNullable;
   private _api = inject(AugmentedAutomationPackagesService);
+  private readonly _auth = inject(AuthService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _dialogData = inject<DialogData>(MAT_DIALOG_DATA);
   protected readonly UploadType = UploadType;
@@ -107,7 +109,7 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
   }
 
   protected upload(): void {
-    if (this.progress$) {
+    if (!this._auth.hasRight('automation-package-write') || this.progress$) {
       return;
     }
 
@@ -149,7 +151,7 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
   }
 
-  private setFile(file?: File) {
+  private setFile(file?: File): void {
     this.file = file;
     this.form.controls.fileName.setValue(file?.name ?? '');
   }

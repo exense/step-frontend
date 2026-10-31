@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, OnDestroy, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedExecutionsService,
+  AuthService,
   BulkSelectionType,
   DateFormat,
   DialogsService,
@@ -17,7 +18,7 @@ import {
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ERROR_STATUSES, EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, exhaustMap, of, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, EMPTY, exhaustMap, filter, map, of, startWith, switchMap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -62,6 +63,7 @@ export class ExecutionListComponent implements OnDestroy {
     exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
   private readonly _dialogs = inject(DialogsService);
+  private readonly _auth = inject(AuthService);
 
   protected autoRefreshDisabled: boolean = false;
 
@@ -100,20 +102,26 @@ export class ExecutionListComponent implements OnDestroy {
 
   protected restartExecution(execution: Execution): void {
     const name = execution.description;
+    const parameters$ = execution.executionParameters
+      ? of(execution.executionParameters)
+      : this._augmentedExecutionsService
+          .getExecutionById(execution.id!)
+          .pipe(map((value) => value.executionParameters));
     this._dialogs
       .showWarning(`Are you sure you want to restart Execution ${name}?`)
       .pipe(
-        switchMap((confirmed) =>
-          confirmed
-            ? this._augmentedExecutionsService.restartExecutions({
-                ids: [execution.id!],
-                targetType: 'LIST',
-                preview: false,
-              })
-            : of(false),
-        ),
+        filter((confirmed) => !!confirmed),
+        switchMap(() => parameters$),
+        switchMap((parameters) => {
+          if (!parameters) {
+            return this._dialogs
+              .showErrorMsg('The execution has no parameters to re-execute.')
+              .pipe(switchMap(() => EMPTY));
+          }
+          return this._augmentedExecutionsService.execute({ ...parameters, userID: this._auth.getUserID() });
+        }),
       )
-      .subscribe();
+      .subscribe(() => this.refreshTable());
   }
 
   protected stopExecution(execution: Execution): void {
@@ -121,17 +129,10 @@ export class ExecutionListComponent implements OnDestroy {
     this._dialogs
       .showWarning(`Are you sure you want to stop Execution ${name}?`)
       .pipe(
-        switchMap((confirmed) =>
-          confirmed
-            ? this._augmentedExecutionsService.stopExecutions({
-                ids: [execution.id!],
-                targetType: 'LIST',
-                preview: false,
-              })
-            : of(false),
-        ),
+        filter((confirmed) => !!confirmed),
+        switchMap(() => this._augmentedExecutionsService.abort(execution.id!)),
       )
-      .subscribe();
+      .subscribe(() => this.refreshTable());
   }
 
   ngOnDestroy(): void {
