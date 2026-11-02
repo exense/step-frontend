@@ -8,7 +8,7 @@
     <div
       class="launch-target-selector"
       [hidden]="_commands.showHandledResults()"
-      [attr.inert]="loading() || screenTemplateLoading() ? '' : null"
+      [attr.inert]="loading() || screenTemplateLoading() || error() ? '' : null"
     >
       @for (item of headerDashlets; track item.id) {
         <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
@@ -49,7 +49,7 @@
             (loadingChange)="setScreenTemplateLoading($event)"
           />
         </div>
-        @if (artefact.type === 'TestSet') {
+        @if (!loading() && !error() && artefact.type === 'TestSet') {
           <div class="testcase-selection" [hidden]="!_commands.showTestcases()">
             <hr />
             <step-repository-plan-testcase-list

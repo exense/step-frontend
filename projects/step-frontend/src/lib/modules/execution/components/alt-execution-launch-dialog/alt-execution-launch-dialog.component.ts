@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
@@ -8,6 +9,7 @@ import {
   ExecutionCommandsContext,
   ExecutionLaunchDashletContext,
   IncludeTestcases,
+  HttpOverrideResponseInterceptorService,
   RepositoryObjectReference,
   TableColumnsConfig,
   TablePersistenceConfig,
@@ -18,9 +20,10 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ExecutionCommandsDirective } from '../../directives/execution-commands.directive';
 import { ExecutionCommandsService } from '../../services/execution-commands.service';
-import { catchError, finalize, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, defer, EMPTY, finalize, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fetchRepositoryTestRuns, mergeRelaunchTestCases } from '../../shared/relaunch-test-cases';
+import { HttpErrorInterceptor } from '../../../_common/interceptors/http-error.interceptor';
 
 export interface AltExecutionLaunchDialogData {
   title?: string;
@@ -67,6 +70,7 @@ export class AltExecutionLaunchDialogComponent
   private _artefactsService = inject(ArtefactService);
   private _viewRegistry = inject(ViewRegistryService);
   private _data = inject<AltExecutionLaunchDialogData>(MAT_DIALOG_DATA);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   protected _schedulerInvoker = inject(SchedulerInvokerService, { optional: true });
 
   protected readonly title = this._data.title ?? 'Launch Execution';
@@ -90,7 +94,8 @@ export class AltExecutionLaunchDialogComponent
     const artefact = this.artefact();
     const loading = this.loading();
     const screenTemplateLoading = this.screenTemplateLoading();
-    return !!artefact && !loading && !screenTemplateLoading;
+    const error = this.error();
+    return !!artefact && !loading && !screenTemplateLoading && !error;
   });
   protected readonly dashletContext: ExecutionLaunchDashletContext = {
     commands: this._commands,
@@ -154,25 +159,71 @@ export class AltExecutionLaunchDialogComponent
       return;
     }
     this.loading.set(true);
+    this.error.set(undefined);
     forkJoin({
-      artefact: this._controllersApi.getArtefactInfo(this.repoRef),
+      artefact: this.withInlineErrors(() => this._controllersApi.getArtefactInfo(this.repoRef)),
       testCases: this.loadTestCases(),
     })
       .pipe(
-        catchError((error) => {
-          this.error.set(error);
-          return of(undefined);
+        switchMap(({ artefact, testCases }) => {
+          const icon = this._artefactsService.getArtefactType(artefact.type)?.icon;
+          this.artefact.set({ ...artefact, icon } as ArtefactInfo);
+          if (artefact.type !== 'TestSet' || testCases?.items !== undefined) {
+            return of(testCases);
+          }
+          return this.withInlineErrors(() => fetchRepositoryTestRuns(this._controllersApi, this.repoRef)).pipe(
+            map((items) => ({ ...testCases, items: items ?? [] })),
+          );
+        }),
+        catchError((error: unknown) => {
+          this.error.set(this.errorMessage(error));
+          return EMPTY;
         }),
         finalize(() => this.loading.set(false)),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((data) => {
-        if (data) {
-          this.testCaseData.set(data.testCases);
-          const icon = this._artefactsService.getArtefactType(data.artefact.type)?.icon;
-          this.artefact.set({ ...data.artefact, icon } as ArtefactInfo);
-        }
+      .subscribe((testCases) => {
+        this.testCaseData.set(testCases);
       });
+  }
+
+  private withInlineErrors<T>(request: () => Observable<T>): Observable<T> {
+    return defer(() => {
+      let requestError: unknown;
+      this._interceptorOverride.overrideInterceptor(
+        catchError((error: unknown) => {
+          requestError = error;
+          return of(new HttpResponse({ body: null }));
+        }),
+      );
+      return request().pipe(
+        map((result) => {
+          if (requestError) {
+            throw requestError;
+          }
+          return result;
+        }),
+      );
+    });
+  }
+
+  private errorMessage(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return error instanceof Error ? error.message : 'Unable to load execution details.';
+    }
+    let body: unknown = error.error;
+    if (body instanceof ArrayBuffer) {
+      body = new TextDecoder('utf-8').decode(body);
+    }
+    if (typeof body === 'string') {
+      const text = body;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        return text || error.message;
+      }
+    }
+    return body ? HttpErrorInterceptor.formatError(body) || error.message : error.message;
   }
 
   private loadTestCases(): Observable<AltExecutionLaunchDialogData['testCases']> {
@@ -182,11 +233,9 @@ export class AltExecutionLaunchDialogComponent
     }
 
     return forkJoin({
-      runs: fetchRepositoryTestRuns(this._controllersApi, this.repoRef),
-      testCaseNodes: this._executionsApi.getReportNodesByExecutionId(
-        id,
-        'step.artefacts.reports.TestCaseReportNode',
-        500,
+      runs: this.withInlineErrors(() => fetchRepositoryTestRuns(this._controllersApi, this.repoRef)),
+      testCaseNodes: this.withInlineErrors(() =>
+        this._executionsApi.getReportNodesByExecutionId(id, 'step.artefacts.reports.TestCaseReportNode', 500),
       ),
     }).pipe(
       map(({ runs, testCaseNodes }) =>
