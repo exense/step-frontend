@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TimeSeriesErrorEntry } from '@exense/step-core';
+import { Status } from '../../../_common/shared/status.enum';
 import { ErrorSearchAction } from '../../shared/error-search-action';
 
 @Component({
@@ -16,14 +17,9 @@ export class AltExecutionErrorsWidgetComponent {
   readonly showDetails = output<void>();
   readonly searchFor = output<string>();
 
-  protected readonly distinctErrorCount = computed(() => {
-    const errors = this.errors();
-    return errors.length;
-  });
-
   protected readonly hasErrors = computed(() => {
-    const distinctErrorCount = this.distinctErrorCount();
-    return distinctErrorCount > 0;
+    const errors = this.errors();
+    return errors.length > 0;
   });
 
   protected readonly singleError = computed(() => {
@@ -31,10 +27,28 @@ export class AltExecutionErrorsWidgetComponent {
     return errors.length === 1 ? errors[0] : undefined;
   });
 
-  protected readonly occurrenceCount = computed(() => {
+  protected readonly errorTypeSummaries = computed(() => {
     const errors = this.errors();
-    return errors.reduce((res, error) => res + error.count, 0);
+    return [Status.FAILED, Status.TECHNICAL_ERROR]
+      .map((status) => {
+        const matchingErrors = errors.filter((error) => (error.countByStatus[status] ?? 0) > 0);
+        return {
+          status,
+          errorCount: matchingErrors.length,
+          occurrenceCount: matchingErrors.reduce((count, error) => count + error.countByStatus[status], 0),
+        };
+      })
+      .filter((summary) => summary.errorCount > 0);
   });
+
+  protected readonly singleErrorStatuses = computed(() => {
+    const error = this.singleError();
+    return Object.entries(error?.countByStatus ?? {})
+      .filter(([, count]) => count > 0)
+      .map(([status, count]) => ({ status, count, statusLabel: status.replaceAll('_', ' ') }));
+  });
+
+  protected readonly Status = Status;
 
   protected readonly resolvedSearchActions = computed<readonly ErrorSearchAction[]>(() => {
     const searchActions = this.searchActions();

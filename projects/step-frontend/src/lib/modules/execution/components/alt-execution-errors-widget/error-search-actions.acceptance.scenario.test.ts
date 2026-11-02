@@ -72,6 +72,7 @@ function error(options: Partial<TimeSeriesErrorEntry> = {}): TimeSeriesErrorEntr
     errorMessage: 'Payment request failed: (gateway.*)',
     errorCode: 500,
     count: 1,
+    countByStatus: { [options.types?.[0] ?? 'FAILED']: options.count ?? 1 },
     percentage: 100,
     executionIds: ['execution-1'],
     executionIdsTruncated: false,
@@ -210,7 +211,11 @@ describe('SED-5023 public error search action acceptance', () => {
     expect(activate).toHaveBeenCalledTimes(3);
     expect(legacySearch).not.toHaveBeenCalled();
 
-    const repeated = error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'] });
+    const repeated = error({
+      count: 5,
+      types: ['FAILED', 'TECHNICAL_ERROR'],
+      countByStatus: { FAILED: 2, TECHNICAL_ERROR: 3 },
+    });
     fixture.componentRef.setInput('errors', [repeated]);
     settle(fixture);
     actions.forEach((action) => {
@@ -239,7 +244,7 @@ describe('SED-5023 public error search action acceptance', () => {
     fixture.componentRef.setInput('showDetailsAvailable', false);
     settle(fixture);
     const element: HTMLElement = fixture.nativeElement;
-    expect(element.textContent!.replace(/\s+/g, ' ')).toContain('2 distinct errors · 2 occurrences');
+    expect(element.textContent!.replace(/\s+/g, ' ')).toContain('FAILED 2');
     expect(element.textContent).not.toContain('error table');
     fixture.componentRef.setInput('showDetailsAvailable', true);
     settle(fixture);
@@ -256,9 +261,6 @@ describe('SED-5023 public error search action acceptance', () => {
       fixture.componentRef.setInput('errors', [entry]);
       fixture.componentRef.setInput('showDetailsAvailable', false);
       settle(fixture);
-      expect(element.textContent!.replace(/\s+/g, ' ')).toContain(
-        `1 distinct error · ${entry.count} ${entry.count === 1 ? 'occurrence' : 'occurrences'}`,
-      );
       expect(element.textContent).toContain(entry.errorMessage);
       expect(element.textContent).not.toContain('error table');
       fixture.componentRef.setInput('showDetailsAvailable', true);

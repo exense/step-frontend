@@ -20,6 +20,7 @@ describe('SED-5023 error overview acceptance', () => {
       errorMessage: 'Payment request failed',
       errorCode: 500,
       count: 1,
+      countByStatus: { [options.types?.[0] ?? 'FAILED']: options.count ?? 1 },
       percentage: 100,
       executionIds: ['execution-1'],
       executionIdsTruncated: false,
@@ -72,10 +73,9 @@ describe('SED-5023 error overview acceptance', () => {
 
   afterEach(() => fixture.destroy());
 
-  it('AC-1: shows single-error status, occurrence count and actions without a table link', fakeAsync(() => {
+  it('AC-1: shows single-error status, message and actions without a table link', fakeAsync(() => {
     updateErrors([error()]);
 
-    expect(text()).toContain('1 distinct error · 1 occurrence');
     expect(text()).toContain('Payment request failed');
     expect(text()).toContain('FAILED');
     expect(links().some((link) => link.textContent?.includes('error table'))).toBe(false);
@@ -90,19 +90,22 @@ describe('SED-5023 error overview acceptance', () => {
     navigationButtons()[0].click();
     expect(searchFor).toHaveBeenCalledTimes(1);
     expect(searchFor).toHaveBeenCalledWith('Payment request failed');
-    expect(text()).toContain('1 distinct error · 5 occurrences');
+    expect(text()).toContain('5x');
     expect(text()).toContain('Payment request failed');
     expect(text()).toContain('FAILED');
     expect(links().some((link) => link.textContent?.includes('error table'))).toBe(false);
   }));
 
   it('AC-3: displays every status belonging to one distinct error', fakeAsync(() => {
-    updateErrors([error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'] })]);
+    updateErrors([
+      error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'], countByStatus: { FAILED: 2, TECHNICAL_ERROR: 3 } }),
+    ]);
 
     expect(text()).toContain('FAILED');
-    expect(text()).toContain('TECHNICAL_ERROR');
+    expect(text()).toContain('TECHNICAL ERROR');
     expect(text()).toContain('Payment request failed');
-    expect(text()).toContain('1 distinct error · 5 occurrences');
+    expect(text()).toContain('2x');
+    expect(text()).toContain('3x');
   }));
 
   it('AC-4: distinguishes counts and requests the error table without a single-error body', fakeAsync(() => {
@@ -113,11 +116,11 @@ describe('SED-5023 error overview acceptance', () => {
       error({ errorMessage: 'Connection timed out', errorCode: 504, count: 3, percentage: 60 }),
     ]);
 
-    expect(text()).toContain('2 distinct errors · 5 occurrences');
+    expect(text()).toContain('FAILED 2');
     expect(text()).not.toContain('Payment request failed');
     expect(text()).not.toContain('Connection timed out');
     expect(navigationButtons()).toHaveLength(0);
-    expect(text()).toContain('View error details in error table');
+    expect(text()).toContain('View error details in the error table');
     const details = links().find((link) => link.textContent?.trim() === 'error table');
     expect(details).toBeDefined();
     details!.click();
@@ -189,15 +192,19 @@ describe('SED-5023 error overview acceptance', () => {
     expect(links()).toHaveLength(0);
     expect(navigationButtons()).toHaveLength(0);
 
-    updateErrors([error({ types: ['FAILED', 'TECHNICAL_ERROR'] })]);
-    expect(text()).toContain('1 distinct error · 1 occurrence');
+    updateErrors([
+      error({ count: 2, types: ['FAILED', 'TECHNICAL_ERROR'], countByStatus: { FAILED: 1, TECHNICAL_ERROR: 1 } }),
+    ]);
     expect(text()).toContain('Payment request failed');
     expect(text()).toContain('FAILED');
     expect(links().some((link) => link.textContent?.includes('error table'))).toBe(false);
     expect(navigationButtons()).toHaveLength(1);
 
-    updateErrors([error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'] })]);
-    expect(text()).toContain('1 distinct error · 5 occurrences');
+    updateErrors([
+      error({ count: 5, types: ['FAILED', 'TECHNICAL_ERROR'], countByStatus: { FAILED: 2, TECHNICAL_ERROR: 3 } }),
+    ]);
+    expect(text()).toContain('2x');
+    expect(text()).toContain('3x');
     expect(text()).toContain('Payment request failed');
     expect(text()).toContain('FAILED');
     expect(links().some((link) => link.textContent?.includes('error table'))).toBe(false);
@@ -207,18 +214,16 @@ describe('SED-5023 error overview acceptance', () => {
       error({ errorMessage: 'First updated error', count: 2, percentage: 50 }),
       error({ errorMessage: 'Second updated error', errorCode: 503, count: 2, percentage: 50 }),
     ]);
-    expect(text()).toContain('2 distinct errors · 4 occurrences');
+    expect(text()).toContain('FAILED 2');
     expect(text()).not.toContain('Payment request failed');
-    expect(text()).not.toContain('TECHNICAL_ERROR');
-    expect(text()).not.toContain('FAILED');
-    expect(text()).toContain('View error details in error table');
+    expect(text()).not.toContain('TECHNICAL ERROR');
+    expect(text()).toContain('View error details in the error table');
     expect(links().some((link) => link.textContent?.trim() === 'error table')).toBe(true);
     expect(navigationButtons()).toHaveLength(0);
 
     updateErrors([error({ errorMessage: 'New single error', types: ['TECHNICAL_ERROR'] })]);
-    expect(text()).toContain('1 distinct error · 1 occurrence');
     expect(text()).toContain('New single error');
-    expect(text()).toContain('TECHNICAL_ERROR');
+    expect(text()).toContain('TECHNICAL ERROR');
     expect(text()).not.toContain('FAILED');
     expect(links().some((link) => link.textContent?.includes('error table'))).toBe(false);
     expect(navigationButtons()).toHaveLength(1);
