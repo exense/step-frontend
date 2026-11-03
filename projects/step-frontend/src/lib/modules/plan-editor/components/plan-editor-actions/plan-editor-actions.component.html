@@ -75,7 +75,7 @@
     [class.active]="isInteractiveSessionActive"
     (click)="toggleInteractiveSession()"
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
-    [disabled]="!('plan-write' | hasRight: !!planContext?.entity?.customFields?.['readOnly'] | async)"
+    [disabled]="!('interactive' | hasRight: !!planContext?.entity?.customFields?.['readOnly'] | async)"
     matTooltipPosition="below"
   >
     <step-icon name="bug-01" />
@@ -86,6 +86,7 @@
       type="button"
       mat-stroked-button
       (click)="reset.emit()"
+      [disabled]="!('interactive' | hasRight | async)"
       [matTooltip]="captions.resetInteractive"
       matTooltipPosition="below"
     >
@@ -148,6 +149,7 @@
           type="button"
           mat-stroked-button
           (click)="startInteractiveSession()"
+          [disabled]="!('interactive' | hasRight | async)"
           [matTooltip]="captions.startInteractive"
           matTooltipPosition="below"
         >

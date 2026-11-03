@@ -123,7 +123,7 @@ export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
         return;
       }
 
-      if (this.checkKey(event, true, 'Enter', 'plan-interactive')) {
+      if (this.checkKey(event, true, 'Enter', 'interactive')) {
         event.preventDefault();
         this._planInteractiveSession?.execute();
         return;
