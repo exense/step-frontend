@@ -22,18 +22,18 @@ export class AutomationPackagesBulkOperationsRegisterService {
     });
     this._entityBulkOperationsRegister.register(AP_ENTITY_ID, {
       type: BulkOperationType.REFRESH,
-      permission: AutomationPackagePermission.READ,
+      permission: AutomationPackagePermission.WRITE,
       operation: (requestBody) => this._automationPackagesApi.bulkRefresh(requestBody),
     });
     this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.DELETE,
-      permission: 'resource-bulk-delete',
+      permission: AutomationPackagePermission.DELETE,
       operation: (requestBody) =>
         this._automationPackagesApi.bulkDeleteAutomationPackageResource(requestBody, AP_RESOURCE_LIBRARY_FILTER),
     });
     this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.REFRESH,
-      permission: 'resource-read',
+      permission: AutomationPackagePermission.WRITE,
       operation: (requestBody) =>
         this._automationPackagesApi.bulkRefreshAutomationPackageResource(requestBody, AP_RESOURCE_LIBRARY_FILTER),
     });

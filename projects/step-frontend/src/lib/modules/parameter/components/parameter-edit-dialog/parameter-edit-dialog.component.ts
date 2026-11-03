@@ -12,7 +12,7 @@ import {
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, delay, map, Observable, of, switchMap, take, throwError } from 'rxjs';
+import { combineLatest, delay, EMPTY, map, Observable, of, switchMap, take, throwError } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
@@ -75,6 +75,10 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   protected saveInternal(event?: KeyboardEvent): Observable<Parameter> {
+    if (!this._authService.hasRight('param-write')) {
+      return EMPTY;
+    }
+
     if (
       (!!event?.target && event?.target instanceof HTMLTextAreaElement) ||
       (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write'))
