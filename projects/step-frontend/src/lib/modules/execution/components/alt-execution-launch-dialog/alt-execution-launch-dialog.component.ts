@@ -35,6 +35,7 @@ export interface AltExecutionLaunchDialogData {
     selection?: IncludeTestcases;
   };
   hideCancel?: boolean;
+  embedded?: boolean;
   isolateExecution?: boolean;
   allowExecutionTargetSelection?: boolean;
 }
@@ -79,6 +80,7 @@ export class AltExecutionLaunchDialogComponent
   protected readonly explicitTestCases = computed(() => this.testCaseData()?.items);
   protected readonly initialTestCaseSelection = computed(() => this.testCaseData()?.selection);
   protected readonly showCancel = !this._data.hideCancel;
+  protected readonly isEmbedded = !!this._data.embedded;
   protected readonly executionIsolation = !!this._data.isolateExecution;
   protected readonly headerDashlets = this._viewRegistry.getDashlets('execution/launch/header');
   protected readonly bodyDashlets = this._viewRegistry.getDashlets('execution/launch/body');

@@ -1,10 +1,41 @@
-<step-modal-window
-  [showSpinner]="!loading() && screenTemplateLoading()"
-  [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
-  class="slim-actions"
->
+@if (isEmbedded) {
+  <section
+    class="repository-execution-panel"
+    aria-labelledby="repository-execution-title"
+    [attr.aria-busy]="loading() || screenTemplateLoading()"
+  >
+    <header class="repository-execution-header">
+      <ng-container [ngTemplateOutlet]="launchTitle" />
+      @if (!loading() && screenTemplateLoading()) {
+        <mat-spinner diameter="20" aria-label="Loading screen templates" />
+      }
+    </header>
+    <div class="repository-execution-body">
+      <ng-container [ngTemplateOutlet]="launchBody" />
+    </div>
+    <footer class="repository-execution-footer">
+      <ng-container [ngTemplateOutlet]="launchActions" />
+    </footer>
+  </section>
+} @else {
+  <step-modal-window
+    [showSpinner]="!loading() && screenTemplateLoading()"
+    [spinnerTooltip]="screenTemplateLoading() ? 'Loading screen templates' : ''"
+    class="slim-actions"
+  >
+    <ng-container step-modal-window-title [ngTemplateOutlet]="launchTitle" />
+    <ng-container step-modal-window-body [ngTemplateOutlet]="launchBody" />
+    <ng-container step-modal-window-buttons [ngTemplateOutlet]="launchActions" />
+  </step-modal-window>
+}
+
+<ng-template #launchTitle>
   <div step-modal-window-title class="launch-title">
-    <span>{{ _commands.showHandledResults() ? 'Remote Execution Started' : title }}</span>
+    @if (isEmbedded) {
+      <h1 id="repository-execution-title">{{ _commands.showHandledResults() ? 'Remote Execution Started' : title }}</h1>
+    } @else {
+      <span>{{ _commands.showHandledResults() ? 'Remote Execution Started' : title }}</span>
+    }
     <div
       class="launch-target-selector"
       [hidden]="_commands.showHandledResults()"
@@ -15,16 +46,21 @@
       }
     </div>
   </div>
+</ng-template>
+
+<ng-template #launchBody>
   <div step-modal-window-body [attr.inert]="loading() || screenTemplateLoading() ? '' : null">
     @for (item of bodyDashlets; track item.id) {
       <step-dashlet [itemKey]="item.template" [context]="dashletContext" />
     }
     @if (!_commands.showHandledResults()) {
       @if (error(); as error) {
-        <step-alert type="danger" role="alert">
+        <step-alert type="danger" role="alert" class="launch-error">
           <step-icon name="alert-circle" aria-hidden="true" />
-          <span class="sr-only">Error:</span>
-          {{ error }}
+          <span>
+            <span class="sr-only">Error:</span>
+            {{ error }}
+          </span>
         </step-alert>
       }
       @if (loading()) {
@@ -63,15 +99,25 @@
       }
     }
   </div>
-  <div step-modal-window-buttons [class.result-actions]="_commands.showHandledResults()">
+</ng-template>
+
+<ng-template #launchActions>
+  <div step-modal-window-buttons [class.result-actions]="_commands.showHandledResults() && !isEmbedded">
+    @if (isEmbedded) {
+      <a mat-button routerLink="/executions">Back to Executions</a>
+    }
     @if (_commands.showHandledResults()) {
-      <button type="button" mat-button mat-dialog-close>Close</button>
+      @if (!isEmbedded) {
+        <button type="button" mat-button mat-dialog-close>Close</button>
+      }
     } @else {
-      <step-btn-group class="btn-group-close">
-        @if (showCancel) {
-          <button type="button" mat-button mat-dialog-close [disabled]="_commands.submitting()">Cancel</button>
-        }
-      </step-btn-group>
+      @if (!isEmbedded) {
+        <step-btn-group class="btn-group-close">
+          @if (showCancel) {
+            <button type="button" mat-button mat-dialog-close [disabled]="_commands.submitting()">Cancel</button>
+          }
+        </step-btn-group>
+      }
       <step-execution-actions
         [tooltips]="tooltips()"
         [isExecutionIsolated]="executionIsolation"
@@ -83,4 +129,4 @@
       />
     }
   </div>
-</step-modal-window>
+</ng-template>

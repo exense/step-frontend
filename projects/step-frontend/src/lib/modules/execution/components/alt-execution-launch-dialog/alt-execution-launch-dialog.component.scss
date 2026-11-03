@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .artefact-info,
 div[step-modal-window-body] {
   display: flex;
@@ -68,4 +70,77 @@ div[step-modal-window-buttons] {
 
 .btn-group-close {
   flex: 0 !important;
+}
+
+:host(.repository-execution-view) {
+  display: block;
+  min-width: 0;
+  color: var(--step-text-color, var.$blue-700);
+}
+
+.repository-execution-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  border: 1px solid var.$gray-200;
+  border-radius: 0.5rem;
+  background: var.$white;
+}
+
+.repository-execution-header,
+.repository-execution-body,
+.repository-execution-footer {
+  padding: 1.5rem;
+}
+
+.repository-execution-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var.$gray-200;
+
+  .launch-title {
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+}
+
+.repository-execution-body .launch-error {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow-wrap: anywhere;
+
+  > step-icon {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  > span {
+    min-width: 0;
+  }
+}
+
+.repository-execution-footer {
+  border-top: 1px solid var.$gray-200;
+  background: var.$gray-50;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.repository-execution-footer div[step-modal-window-buttons] {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.repository-execution-footer step-execution-actions {
+  margin-inline-start: auto;
 }
