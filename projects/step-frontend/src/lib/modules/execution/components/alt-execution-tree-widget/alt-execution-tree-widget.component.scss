@@ -11,6 +11,23 @@
   }
 }
 
+step-alt-report-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  white-space: normal;
+
+  step-grid-element-title {
+    min-width: 0;
+  }
+
+  > step-icon,
+  > button {
+    flex-shrink: 0;
+  }
+}
+
 step-alt-report-widget-content {
   min-height: 0;
   overflow: auto;

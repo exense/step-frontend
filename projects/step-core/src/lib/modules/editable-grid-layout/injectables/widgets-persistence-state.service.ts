@@ -2,13 +2,14 @@ import { computed, effect, inject, Injectable, signal, untracked } from '@angula
 import { GridPersistenceStateDefaultImplService } from './grid-persistence-state-default-impl.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { WidgetsPositionsStateService } from './widgets-positions-state.service';
-import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { defer, filter, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { WidgetPosition, WidgetPositionParams } from '../types/widget-position';
 import { WidgetState } from '../types/widget-state';
 import { WidgetStatePreset } from '../types/widget-state-preset';
 import { GridPresetListItem } from '../types/grid-preset-list-item';
 import { v4 } from 'uuid';
 import { GridPersistenceStateService } from './grid-persistence-state.service';
+import { DialogsService } from '../../basics/injectables/dialogs.service';
 
 @Injectable()
 export class WidgetsPersistenceStateService {
@@ -17,6 +18,7 @@ export class WidgetsPersistenceStateService {
     inject(GridPersistenceStateService, { optional: true }) ??
     inject<GridPersistenceStateService>(GridPersistenceStateDefaultImplService);
   private _widgetsPositions = inject(WidgetsPositionsStateService);
+  private _dialogs = inject(DialogsService);
 
   private readonly ALL_WIDGET_TYPE_IDS = Object.keys(this._gridConfig.defaultElementParamsMap);
   private readonly lastSavedPositions = signal<Record<string, WidgetPosition> | undefined>(undefined);
@@ -64,54 +66,87 @@ export class WidgetsPersistenceStateService {
   }
 
   saveState(name?: string): Observable<void> {
-    const positions = untracked(() => this._widgetsPositions.positionsState());
-    const preset = untracked(() => this.selectedPreset())!;
-    const widgets = this.getWidgetsStates();
-    const presetToSave: WidgetStatePreset = {
-      ...preset,
-      attributes: name ? { ...preset.attributes, name } : preset.attributes,
-      layout: { widgets } as WidgetStatePreset['layout'],
-    };
-    return this._gridPersistence.save(this._gridConfig.gridId, presetToSave).pipe(
-      tap(() => {
-        this.lastSavedPositions.set(positions);
-        this.selectedPresetInternal.update(
-          (value) =>
-            ({
-              ...value!,
-              attributes: name ? { ...value!.attributes, name } : value!.attributes,
-              layout: { widgets },
-            }) as WidgetStatePreset,
+    return this.confirmWidgetSizes().pipe(
+      switchMap(() => {
+        const positions = untracked(() => this._widgetsPositions.positionsState());
+        const preset = untracked(() => this.selectedPreset())!;
+        const widgets = this.getWidgetsStates();
+        const presetToSave: WidgetStatePreset = {
+          ...preset,
+          attributes: name ? { ...preset.attributes, name } : preset.attributes,
+          layout: { widgets } as WidgetStatePreset['layout'],
+        };
+        return this._gridPersistence.save(this._gridConfig.gridId, presetToSave).pipe(
+          tap(() => {
+            this.lastSavedPositions.set(positions);
+            this.selectedPresetInternal.update(
+              (value) =>
+                ({
+                  ...value!,
+                  attributes: name ? { ...value!.attributes, name } : value!.attributes,
+                  layout: { widgets },
+                }) as WidgetStatePreset,
+            );
+            if (name) {
+              this.gridPresetsInternal.update((presets) =>
+                presets.map((p) => (p.key === presetToSave.id ? { ...p, value: name } : p)),
+              );
+            }
+          }),
+          map(() => {}),
         );
-        if (name) {
-          this.gridPresetsInternal.update((presets) =>
-            presets.map((p) => (p.key === presetToSave.id ? { ...p, value: name } : p)),
-          );
-        }
       }),
-      map(() => {}),
     );
   }
 
   createPreset(name: string): Observable<string> {
-    const widgets = this.getWidgetsStates();
-    const preset: WidgetStatePreset = {
-      attributes: {
-        name,
-      },
-      layout: {
-        widgets,
-      } as WidgetStatePreset['layout'],
-    };
-    return this._gridPersistence.save(this._gridConfig.gridId, preset).pipe(
-      switchMap((presetId) =>
-        this._gridPersistence.getGridPresets(this._gridConfig.gridId).pipe(
-          tap((presets) => this.gridPresetsInternal.set(presets)),
-          tap(() => this.selectPreset(presetId)),
-          map(() => presetId),
-        ),
-      ),
+    return this.confirmWidgetSizes().pipe(
+      switchMap(() => {
+        const widgets = this.getWidgetsStates();
+        const preset: WidgetStatePreset = {
+          attributes: {
+            name,
+          },
+          layout: {
+            widgets,
+          } as WidgetStatePreset['layout'],
+        };
+        return this._gridPersistence.save(this._gridConfig.gridId, preset).pipe(
+          switchMap((presetId) =>
+            this._gridPersistence.getGridPresets(this._gridConfig.gridId).pipe(
+              tap((presets) => this.gridPresetsInternal.set(presets)),
+              tap(() => this.selectPreset(presetId)),
+              map(() => presetId),
+            ),
+          ),
+        );
+      }),
     );
+  }
+
+  private confirmWidgetSizes(): Observable<void> {
+    return defer(() => {
+      const widgets = untracked(() => this._widgetsPositions.undersizedWidgets());
+      if (!widgets.length) {
+        return of(undefined);
+      }
+      const message = widgets
+        .map(
+          (widget) =>
+            `Widget '${widget.title}' is smaller than its min-size (min: ${widget.minWidthInCells}x${widget.minHeightInCells}).`,
+        )
+        .join('\n');
+      return this._dialogs
+        .showWarning(message, {
+          confirmButtonLabel: widgets.length === 1 ? 'Discard widget & save' : 'Discard widgets & save',
+          cancelButtonLabel: 'Cancel',
+        })
+        .pipe(
+          filter((confirmed) => confirmed),
+          tap(() => widgets.forEach((widget) => this._widgetsPositions.remove(widget.id))),
+          map(() => {}),
+        );
+    });
   }
 
   selectLocalPreset(preset: WidgetStatePreset): void {

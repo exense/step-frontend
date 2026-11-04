@@ -17,6 +17,7 @@ import {
   viewChild,
   ViewEncapsulation,
   DOCUMENT,
+  output,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TreeActionsService } from '../../services/tree-actions.service';
@@ -102,9 +103,11 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   /** @Input() **/
   readonly forceFocus = input<boolean>(false);
 
-  @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N; multipleNodes?: boolean }>();
+  readonly treeContextAction = output<{ actionId: string; node?: N; multipleNodes?: boolean }>();
 
-  @Output() nodeDblClick = new EventEmitter<{ node: N | TreeNode; event: MouseEvent }>();
+  readonly nodeDblClick = output<{ node: N | TreeNode; event: MouseEvent }>();
+
+  readonly nodeClick = output<{ node: N | TreeNode; event: MouseEvent }>();
 
   openedMenuNodeId?: string;
 
@@ -139,6 +142,11 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     const actionId = action.id;
     const multipleNodes = this.contextMenuTrigger().menuData.multipleNodes;
     this.treeContextAction.emit({ actionId, node, multipleNodes });
+  }
+
+  protected handleClick(flatNode: TreeFlatNode, event: MouseEvent): void {
+    const node = this._treeState.findNodeById(flatNode.id)!;
+    this.nodeClick.emit({ node, event });
   }
 
   protected handleDblClick(flatNode: TreeFlatNode, event: MouseEvent): void {

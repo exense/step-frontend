@@ -17,6 +17,7 @@
     <div
       class="node-content"
       (contextmenu)="_treeNode.openContextMenu($event)"
+      (click)="_treeNode.handleNodeClick($event)"
       [stepDragItem]="n.id"
       [dragDisabled]="dragDisabled()"
       [stepDropArea]="n.id"

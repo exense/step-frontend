@@ -45,3 +45,4 @@ export * from './types/tree-flat-node';
 export * from './types/tree-node';
 export * from './types/tree-state-init-options.interface';
 export * from './pipes/tree-node-has-actions.pipe';
+export * from './services/tree-state-factory.provider';

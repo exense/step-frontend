@@ -1,5 +1,4 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { TreeNodeUtilsService } from '../services/tree-node-utils.service';
 import { TreeStateService } from '../services/tree-state.service';
 import { TreeNode } from '../types/tree-node';
 
@@ -7,7 +6,6 @@ import { TreeNode } from '../types/tree-node';
   name: 'treeNodeClasses',
 })
 export class TreeNodeClassesPipe implements PipeTransform {
-  private _utils = inject(TreeNodeUtilsService, { optional: true });
   private _treeState = inject(TreeStateService, { optional: true });
 
   transform(treeNode: TreeNode): string[] {
@@ -16,7 +14,7 @@ export class TreeNodeClassesPipe implements PipeTransform {
     if (!node) {
       return result;
     }
-    const classes = this._utils?.getNodeAdditionalClasses?.(node) ?? [];
+    const classes = this._treeState?._treeNodeUtils?.getNodeAdditionalClasses?.(node) ?? [];
     result.push(...classes);
     return result;
   }

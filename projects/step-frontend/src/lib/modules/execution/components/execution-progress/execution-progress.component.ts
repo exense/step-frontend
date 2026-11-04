@@ -33,7 +33,7 @@ import {
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  TreeNodeUtilsService,
+  treeStateFactoryProvider,
   TreeStateService,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -44,7 +44,6 @@ import { ErrorDistributionStatus } from '../../shared/error-distribution-status.
 import { ExecutionStateService } from '../../services/execution-state.service';
 import { distinctUntilChanged, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Panels } from '../../shared/panels.enum';
-import { ReportTreeNode } from '../../shared/report-tree-node';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import {
   EXECUTION_TREE_PAGING_SETTINGS,
@@ -56,6 +55,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ReportNodeExt } from '../../shared/report-node-ext';
+import { ReportTreeStateService } from '../../services/report-tree-state.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -81,10 +81,13 @@ interface RefreshParams {
       provide: EXECUTION_TREE_PAGING_SETTINGS,
       useValue: {},
     },
-    ReportTreeNodeUtilsService,
     {
-      provide: TreeNodeUtilsService,
-      useExisting: ReportTreeNodeUtilsService,
+      provide: ReportTreeStateService,
+      useFactory: treeStateFactoryProvider(ReportTreeStateService, ReportTreeNodeUtilsService),
+    },
+    {
+      provide: TreeStateService,
+      useExisting: ReportTreeStateService,
     },
     {
       provide: ExecutionStateService,
@@ -101,7 +104,6 @@ interface RefreshParams {
     SingleExecutionPanelsService,
     ExecutionTreePagingService,
     ...entitySelectionStateProvider('artefactID'),
-    TreeStateService,
   ],
   hostDirectives: [ReloadableDirective],
   standalone: false,
@@ -116,11 +118,10 @@ export class ExecutionProgressComponent
   private _viewService = inject(PrivateViewPluginService);
   private _systemService = inject(SystemService);
   private _viewRegistry = inject(ViewRegistryService);
-  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  private _executionTreeState = inject(ReportTreeStateService);
   protected _executionPanels = inject(SingleExecutionPanelsService);
   private _testCasesSelectionState =
     inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
-  private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -192,7 +193,7 @@ export class ExecutionProgressComponent
   protected activeTabId?: string;
 
   showNodeInTree(nodeId: string): void {
-    this._treeUtils
+    this._executionTreeState._treeNodeUtils
       .getPathToNode(nodeId)
       .pipe(
         tap(() => this.selectTab('tree')),
@@ -421,7 +422,7 @@ export class ExecutionProgressComponent
     if (!this.executionId) {
       return;
     }
-    this._treeUtils.loadNodes(this.executionId).subscribe((nodes) => {
+    this._executionTreeState._treeNodeUtils.loadNodes(this.executionId).subscribe((nodes) => {
       if (nodes[0]) {
         this._executionTreeState.init(nodes[0], { expandAllByDefault: false });
         this.isTreeInitialized = true;
@@ -434,7 +435,7 @@ export class ExecutionProgressComponent
       return;
     }
     const expandedNodIds = this._executionTreeState.getExpandedNodeIds();
-    this._treeUtils
+    this._executionTreeState._treeNodeUtils
       .loadNodes(this.executionId)
       .pipe(
         map((nodes) => nodes[0]),
@@ -442,7 +443,7 @@ export class ExecutionProgressComponent
           if (!rootNode || !this.isTreeInitialized || isForceRefresh) {
             return of(rootNode);
           }
-          return this._treeUtils.restoreTree(rootNode, expandedNodIds);
+          return this._executionTreeState._treeNodeUtils.restoreTree(rootNode, expandedNodIds);
         }),
       )
       .subscribe((rootNode) => {

@@ -1,7 +1,6 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { GridPoint, WidgetPosition } from '../types/widget-position';
 import { GRID_COLUMN_COUNT } from './grid-column-count.token';
-import { GridEditableService } from './grid-editable.service';
 import { GRID_LAYOUT_CONFIG } from './grid-layout-config.token';
 import { PositionToApply } from '../types/position-to-apply';
 import { WidgetsPositionsUtilsService } from './widgets-positions-utils.service';
@@ -24,6 +23,21 @@ export class WidgetsPositionsStateService implements WidgetPositionsUtilsContext
   private readonly notRenderedWidgetTypes = signal<string[]>([]);
   private readonly positionsStateInternal = signal<Record<string, WidgetPosition>>({});
   readonly positionsState = this.positionsStateInternal.asReadonly();
+
+  readonly undersizedWidgets = computed(() => {
+    const positions = this.positionsState();
+    return Object.values(positions).flatMap((position) => {
+      const info = this._gridConfig.defaultElementParamsMap[position.widgetType];
+      if (!info) {
+        return [];
+      }
+      const minWidthInCells = info.minWidthInCells ?? 1;
+      const minHeightInCells = info.minHeightInCells ?? 1;
+      return position.widthInCells < minWidthInCells || position.heightInCells < minHeightInCells
+        ? [{ id: position.id, title: info.title, minWidthInCells, minHeightInCells }]
+        : [];
+    });
+  });
 
   private readonly extraRows = signal(0);
 
@@ -212,9 +226,20 @@ export class WidgetsPositionsStateService implements WidgetPositionsUtilsContext
     });
   }
 
-  add(widgetType: string): void {
+  add(widgetType: string, point?: GridPoint): void {
     const info = this._gridConfig.defaultElementParamsMap[widgetType];
-    const positionParams = this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
+    if (
+      !info ||
+      (info.denyDuplicates && Object.values(this.getWidgetPositions()).some((item) => item.widgetType === widgetType))
+    ) {
+      return;
+    }
+    const positionParams = point
+      ? this._utils.findProperPositionAtPoint(info, point)
+      : this._utils.findProperPositionAtEnd(info.widthInCells, info.heightInCells);
+    if (!positionParams) {
+      return;
+    }
     const id = v4();
     const position = new WidgetPosition(id, info.widgetType, positionParams);
     this.updatePosition(position);

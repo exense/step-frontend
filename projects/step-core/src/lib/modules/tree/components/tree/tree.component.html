@@ -20,6 +20,7 @@
             <step-tree-node
               [class.context-menu-open]="item.id === openedMenuNodeId"
               [node]="item"
+              (nodeClick)="handleClick(item, $event.event)"
               (contextMenu)="openContextMenu($event)"
             />
           }
@@ -51,6 +52,7 @@
         <step-tree-node
           [class.context-menu-open]="item.id === openedMenuNodeId"
           [node]="item"
+          (nodeClick)="handleClick(item, $event.event)"
           (contextMenu)="openContextMenu($event)"
         />
       }

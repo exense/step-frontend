@@ -1,13 +1,16 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 :host {
-  & > div {
+  & > button {
     display: flex;
     width: 100%;
     height: 100%;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
 
     &:hover {
       background: var(--step-accent-soft-color, var.$blue-10);

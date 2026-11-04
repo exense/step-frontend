@@ -28,7 +28,6 @@ import {
   PlanEditorService,
   PlanInteractiveSessionService,
   RepositoryObjectReference,
-  TreeNodeUtilsService,
   TreeStateService,
   ArtefactService,
   FunctionActionsService,
@@ -44,6 +43,7 @@ import {
   PlanContext,
   AuthService,
   PlanReferencePolicyService,
+  treeStateFactoryProvider,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -72,17 +72,12 @@ export interface ActionsConfig {
   providers: [
     ArtefactTreeNodeUtilsService,
     {
-      provide: TreeNodeUtilsService,
-      useExisting: ArtefactTreeNodeUtilsService,
-    },
-    {
       provide: ArtefactRefreshNotificationService,
       useExisting: ArtefactTreeNodeUtilsService,
     },
-    ArtefactTreeStateService,
     {
       provide: TreeStateService,
-      useExisting: ArtefactTreeStateService,
+      useFactory: treeStateFactoryProvider(ArtefactTreeStateService, ArtefactTreeNodeUtilsService, true),
     },
     PlanHistoryService,
     InteractiveSessionService,

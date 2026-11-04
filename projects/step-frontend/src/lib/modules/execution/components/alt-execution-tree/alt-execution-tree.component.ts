@@ -10,13 +10,19 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { ElementSizeDirective, TreeAction, TreeActionsService, TreeComponent, TreeNode } from '@exense/step-core';
+import {
+  ElementSizeDirective,
+  TreeAction,
+  TreeActionsService,
+  TreeComponent,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { ERROR_STATUSES } from '../../../_common/shared/status.enum';
-import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
 
 enum TreeNodeAction {
@@ -42,7 +48,6 @@ enum TreeNodeAction {
 })
 export class AltExecutionTreeComponent implements TreeActionsService {
   protected readonly _treeSate = inject(AggregatedReportViewTreeStateService);
-  private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
   private readonly tree = viewChild('tree', { read: TreeComponent });
   readonly showSpinnerWhileTreeInitialize = input(false);
@@ -67,7 +72,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
     const aggregatedNode = node as AggregatedTreeNode;
 
-    const hasErrors = this._utils.nodeHasStatuses(aggregatedNode, ERROR_STATUSES);
+    const hasErrors = this._treeSate._treeNodeUtils.nodeHasStatuses(aggregatedNode, ERROR_STATUSES);
 
     if (hasErrors) {
       actions.push({

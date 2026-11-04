@@ -1,7 +1,12 @@
 <section class="grid-cells">
-  @if (addCellCoordinates(); as coords) {
-    <div class="grid-cell" [style.grid-area]="coords">
-      <step-grid-add-widget />
+  @for (cell of emptyCells(); track cell.index) {
+    <div
+      class="grid-cell"
+      [class.always-show-add]="cell.column === 1 && cell.row === rowsCount()"
+      [style.grid-row]="cell.row"
+      [style.grid-column]="cell.column"
+    >
+      <step-grid-add-widget [position]="cell" />
     </div>
   }
 </section>
