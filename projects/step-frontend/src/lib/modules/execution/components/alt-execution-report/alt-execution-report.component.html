@@ -16,6 +16,7 @@
         [searchActions]="availableErrorSearchActions()"
         [showDetailsAvailable]="showErrorDetailsAvailable()"
         (showDetails)="scrollToErrorsSection()"
+        (statusSelect)="handleErrorStatusSelection($event)"
       />
     }
     @if (hasTestCases$ | async) {
@@ -66,6 +67,7 @@
         <step-alt-execution-errors
           [dataSource]="_state.errors$"
           [statusFilterItems]="_state.availableErrorTypes$ | async"
+          [statusFilter]="errorStatusFilter()"
           [indicatorMode]="TableIndicatorMode.SKELETON"
           [inProgress]="_state.errorsDisplayInProgress$ | async"
           [showExecutionsMenu]="false"

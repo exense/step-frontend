@@ -4,9 +4,15 @@
       <div class="error-overview" [class.multiple-errors]="!singleError()">
         <div class="error-summary">
           @for (summary of errorTypeSummaries(); track summary.status) {
-            <span
-              class="error-type-badge"
-              [class.technical-error]="summary.status === Status.TECHNICAL_ERROR"
+            <button
+              type="button"
+              class="error-type-summary"
+              [disabled]="!showDetailsAvailable()"
+              [attr.aria-label]="
+                summary.status === Status.FAILED
+                  ? 'Show failures in error table'
+                  : 'Show technical errors in error table'
+              "
               matTooltip="{{ summary.errorCount }} {{
                 summary.status === Status.FAILED
                   ? summary.errorCount === 1
@@ -15,12 +21,18 @@
                   : summary.errorCount === 1
                     ? 'technical error'
                     : 'technical errors'
-              }} with {{ summary.occurrenceCount }} {{ summary.occurrenceCount === 1 ? 'occurrence' : 'occurrences' }}"
+              }} · Count: {{ summary.occurrenceCount }}"
               matTooltipPosition="below"
+              (click)="statusSelect.emit(summary.status)"
             >
-              {{ summary.status === Status.FAILED ? 'FAILED' : 'TECHNICAL ERROR' }}
-              <span class="error-type-count">{{ summary.errorCount }}</span>
-            </span>
+              <span class="error-type-badge" [class.technical-error]="summary.status === Status.TECHNICAL_ERROR">
+                {{ summary.status === Status.FAILED ? 'FAILED' : 'TECHNICAL ERROR' }}
+                <span class="error-type-count">{{ summary.errorCount }}</span>
+              </span>
+              <span class="error-count-badge" [class.technical-error]="summary.status === Status.TECHNICAL_ERROR">
+                {{ summary.occurrenceCount | shortenNumber: 'x' }}
+              </span>
+            </button>
           }
         </div>
         @if (singleError(); as error) {
@@ -29,11 +41,9 @@
               <div class="error-statuses">
                 @for (item of singleErrorStatuses(); track item.status) {
                   <span
-                    class="error-occurrence-badge"
+                    class="error-count-badge"
                     [class.technical-error]="item.status !== Status.FAILED"
-                    matTooltip="{{ item.statusLabel }}: {{ item.count }} {{
-                      item.count === 1 ? 'occurrence' : 'occurrences'
-                    }}"
+                    matTooltip="{{ item.statusLabel }} · Count: {{ item.count }}"
                     matTooltipPosition="below"
                     >{{ item.count | shortenNumber: 'x' }}</span
                   >

@@ -97,6 +97,7 @@ export class AltExecutionReportComponent
   });
 
   protected readonly _state = inject(AltExecutionStateService);
+  protected readonly errorStatusFilter = signal<Status[] | undefined>(undefined);
 
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
@@ -229,6 +230,11 @@ export class AltExecutionReportComponent
   protected scrollToErrorsSection(): void {
     const errorsElement = this.errors()?.nativeElement as HTMLHtmlElement | undefined;
     errorsElement?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }
+
+  protected handleErrorStatusSelection(status: Status): void {
+    this.errorStatusFilter.set([status]);
+    this.scrollToErrorsSection();
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {

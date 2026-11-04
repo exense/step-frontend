@@ -1,9 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import {
   AceMode,
+  arrayToRegex,
   AugmentedTimeSeriesService,
   RichEditorDialogService,
   TableDataSource,
+  TableComponent,
   TableIndicatorMode,
   TableLocalDataSource,
   tablePersistenceConfigProvider,
@@ -79,6 +91,18 @@ export class AltExecutionErrorsComponent {
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],
+  });
+
+  readonly statusFilter = input<Status[]>();
+
+  private readonly table = viewChild('table', { read: TableComponent<TimeSeriesErrorEntry> });
+  private readonly applyStatusFilter = effect(() => {
+    const statuses = this.statusFilter();
+    const table = this.table();
+    if (statuses === undefined || !table) {
+      return;
+    }
+    untracked(() => table.onSearch(ALL_COLUMNS.types, arrayToRegex(statuses)));
   });
 
   protected readonly displayColumns = computed(() => {

@@ -15,6 +15,7 @@ export class AltExecutionErrorsWidgetComponent {
   readonly searchActions = input<readonly ErrorSearchAction[] | undefined>();
   readonly showDetailsAvailable = input(true);
   readonly showDetails = output<void>();
+  readonly statusSelect = output<Status>();
   readonly searchFor = output<string>();
 
   protected readonly hasErrors = computed(() => {
