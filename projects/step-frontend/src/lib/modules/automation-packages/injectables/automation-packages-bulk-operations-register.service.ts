@@ -3,9 +3,9 @@ import {
   AugmentedAutomationPackagesService,
   BulkOperationType,
   EntityBulkOperationsRegistryService,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { AP_ENTITY_ID, AP_RESOURCE_LIBRARY_ENTITY_ID, AP_RESOURCE_LIBRARY_FILTER } from '../types/constants';
-import { AutomationPackagePermission } from '../types/automation-package-permission.enum';
 
 @Injectable({
   providedIn: 'root',

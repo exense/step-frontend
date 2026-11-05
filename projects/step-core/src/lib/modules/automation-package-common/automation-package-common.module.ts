@@ -16,6 +16,7 @@ import { AutomationPackageRefIconComponent } from './components/automation-packa
 import { AutomationPackageFilterPopoverComponent } from './components/automation-package-filter-popover/automation-package-filter-popover.component';
 import { ENTITIES_SELECTION_EXPORTS } from '../entities-selection';
 import { AutomationPackageFilterComponent } from './components/automation-package-filter/automation-package-filter.component';
+import { AUTH_EXPORTS } from '../auth';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AutomationPackageFilterComponent } from './components/automation-packag
     TableModule,
     EntityModule,
     ENTITIES_SELECTION_EXPORTS,
+    AUTH_EXPORTS,
   ],
   exports: [
     AutomationPackageInfoComponent,
@@ -65,3 +67,4 @@ export * from './components/automation-package-info/automation-package-info.comp
 export * from './components/automation-package-search/automation-package-search.component';
 export * from './components/automation-package-ref-icon/automation-package-ref-icon.component';
 export * from './components/automation-package-filter/automation-package-filter.component';
+export * from './types/automation-package-permission.enum';

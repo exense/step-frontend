@@ -12,9 +12,9 @@ import {
   tableColumnsConfigProvider,
   entitySelectionStateProvider,
   IDE_MODE,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
-import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-function-list',

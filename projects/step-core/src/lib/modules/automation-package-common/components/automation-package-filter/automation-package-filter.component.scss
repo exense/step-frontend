@@ -1,5 +1,13 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-automation-package-filter {
   cursor: pointer;
+
+  &.disabled {
+    cursor: not-allowed;
+    color: var.$gray-150;
+  }
+
   .mat-badge-content {
     font-size: 1rem !important;
     line-height: 1.5 !important;
