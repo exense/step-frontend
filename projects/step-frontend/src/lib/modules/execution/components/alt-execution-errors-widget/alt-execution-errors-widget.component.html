@@ -1,30 +1,73 @@
 <step-alt-report-widget>
   <step-alt-report-widget-content>
     @if (hasErrors()) {
-      <section class="error-info">
-        @if (singleError(); as singleError) {
-          <step-icon class="error" name="alert-triangle" />
-          <div>
-            <span>This execution contains {{ failedCount() }} {{ failedCount() === 1 ? 'error' : 'errors' }}</span
-            >&nbsp;
-            <span>(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>):</span>
-          </div>
-          <a
-            href="#"
-            class="error-message"
-            stepClampFade
-            [lines]="5"
-            (click)="findInTree(singleError.errorMessage); (false)"
-            >{{ singleError.errorMessage }}</a
-          >
-        } @else {
-          <step-icon class="error" name="alert-triangle" />
-          <div>
-            <span>This execution contains {{ failedCount() }} errors</span>&nbsp;
-            <span>(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>)</span>
+      <div class="error-overview" [class.multiple-errors]="!singleError()">
+        <div class="error-summary">
+          @for (summary of errorTypeSummaries(); track summary.status) {
+            <button
+              type="button"
+              class="error-type-summary"
+              [disabled]="!showDetailsAvailable()"
+              [attr.aria-label]="
+                summary.status === Status.FAILED
+                  ? 'Show failures in error table'
+                  : 'Show technical errors in error table'
+              "
+              matTooltip="{{ summary.status === Status.FAILED ? 'Failed' : 'Technical error' }}: {{
+                summary.errorCount
+              }} {{ summary.errorCount === 1 ? 'error message' : 'error messages' }} - total count {{
+                summary.occurrenceCount
+              }}"
+              matTooltipPosition="below"
+              (click)="statusSelect.emit(summary.status)"
+            >
+              <span class="error-type-badge" [class.technical-error]="summary.status === Status.TECHNICAL_ERROR">
+                {{ summary.status === Status.FAILED ? 'FAILED' : 'TECHNICAL ERROR' }}
+                <span class="error-type-count">{{ summary.errorCount }}</span>
+              </span>
+              <span class="error-count-badge" [class.technical-error]="summary.status === Status.TECHNICAL_ERROR">
+                {{ summary.occurrenceCount | shortenNumber: 'x' }}
+              </span>
+            </button>
+          }
+        </div>
+        @if (singleError(); as error) {
+          <section class="error-details">
+            <div class="error-content">
+              <div class="error-statuses">
+                @for (item of singleErrorStatuses(); track item.status) {
+                  <span
+                    class="error-count-badge"
+                    [class.technical-error]="item.status !== Status.FAILED"
+                    matTooltip="{{ item.statusLabel }}: count {{ item.count }}"
+                    matTooltipPosition="below"
+                    >{{ item.count | shortenNumber: 'x' }}</span
+                  >
+                }
+              </div>
+              <div class="error-message" stepClampFade [lines]="5">{{ error.errorMessage }}</div>
+            </div>
+            <div class="error-actions">
+              @for (action of resolvedSearchActions(); track action.id) {
+                <button
+                  type="button"
+                  mat-icon-button
+                  [attr.aria-label]="action.label"
+                  [matTooltip]="action.label"
+                  matTooltipPosition="below"
+                  (click)="activateSearchAction(action, error)"
+                >
+                  <step-icon [name]="action.icon" />
+                </button>
+              }
+            </div>
+          </section>
+        } @else if (showDetailsAvailable()) {
+          <div class="error-details">
+            <span>View all error details in the <a href="#" (click)="showDetails.emit(); (false)">error table</a></span>
           </div>
         }
-      </section>
+      </div>
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>

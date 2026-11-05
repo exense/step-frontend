@@ -49,49 +49,59 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
       end: request.timeRange.to,
       numberOfBuckets: 1,
       oqlFilter,
-      groupDimensions: ['errorMessage', 'errorCode'],
-      collectAttributeKeys: ['status', 'executionId'],
+      groupDimensions: ['errorMessage', 'errorCode', 'status'],
+      collectAttributeKeys: ['executionId'],
       collectAttributesValuesLimit: executionsAttributesLimit,
     };
 
     return this.getReportNodesTimeSeries(fetchBucketRequest).pipe(
       map((response) => {
         let totalCountWithErrors = 0;
-        const result = response.matrixKeys
-          .map((keyAttributes, index) => {
-            const errorCode = keyAttributes['errorCode'];
-            const errorMessage = keyAttributes['errorMessage'];
+        const errorsByMessageAndCode = new Map<string, TimeSeriesErrorEntry>();
 
-            if (errorCode === undefined && errorMessage === undefined) {
-              return undefined;
-            }
+        response.matrixKeys.forEach((keyAttributes, index) => {
+          const errorCode = keyAttributes['errorCode'];
+          const errorMessage = keyAttributes['errorMessage'];
+          const status = keyAttributes['status'] as string | undefined;
 
-            const bucket = response.matrix[index][0];
-            const count = bucket.count;
-            const executionIds = (bucket.attributes['executionId'] ?? []) as string[];
-            const executionIdsTruncated = executionIds.length >= executionsAttributesLimit;
-            const types = (bucket.attributes['status'] ?? []) as string[];
-            totalCountWithErrors += count;
+          if (errorCode === undefined && errorMessage === undefined) {
+            return;
+          }
 
-            const errorItem: TimeSeriesErrorEntry = {
+          const key = JSON.stringify([errorMessage, errorCode]);
+          let error = errorsByMessageAndCode.get(key);
+          if (!error) {
+            error = {
               errorCode,
               errorMessage,
-              count,
+              count: 0,
+              countByStatus: {},
               percentage: 0,
-              executionIds,
-              executionIdsTruncated,
-              types,
+              executionIds: [],
+              executionIdsTruncated: false,
+              types: [],
             };
+            errorsByMessageAndCode.set(key, error);
+          }
 
-            return errorItem;
-          })
-          .filter((item) => !!item) as TimeSeriesErrorEntry[];
+          const bucket = response.matrix[index][0];
+          error.count += bucket.count;
+          totalCountWithErrors += bucket.count;
+          if (status) {
+            error.countByStatus[status] = (error.countByStatus[status] ?? 0) + bucket.count;
+          }
 
-        result.forEach((error) => {
-          error.percentage = Number(((error.count / totalCountWithErrors) * 100).toFixed(2));
+          const bucketExecutionIds = (bucket.attributes['executionId'] ?? []) as string[];
+          const executionIds = Array.from(new Set([...error.executionIds, ...bucketExecutionIds]));
+          error.executionIdsTruncated ||= executionIds.length >= executionsAttributesLimit;
+          error.executionIds = executionIds.slice(0, executionsAttributesLimit);
         });
 
-        return result;
+        return Array.from(errorsByMessageAndCode.values()).map((error) => ({
+          ...error,
+          types: Object.keys(error.countByStatus),
+          percentage: Number(((error.count / totalCountWithErrors) * 100).toFixed(2)),
+        }));
       }),
     );
   }
