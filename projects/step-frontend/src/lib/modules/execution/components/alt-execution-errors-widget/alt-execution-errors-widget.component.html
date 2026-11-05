@@ -13,15 +13,11 @@
                   ? 'Show failures in error table'
                   : 'Show technical errors in error table'
               "
-              matTooltip="{{ summary.errorCount }} {{
-                summary.status === Status.FAILED
-                  ? summary.errorCount === 1
-                    ? 'failure'
-                    : 'failures'
-                  : summary.errorCount === 1
-                    ? 'technical error'
-                    : 'technical errors'
-              }} · Count: {{ summary.occurrenceCount }}"
+              matTooltip="{{ summary.status === Status.FAILED ? 'Failed' : 'Technical error' }}: {{
+                summary.errorCount
+              }} {{ summary.errorCount === 1 ? 'error message' : 'error messages' }} - count {{
+                summary.occurrenceCount
+              }}"
               matTooltipPosition="below"
               (click)="statusSelect.emit(summary.status)"
             >
@@ -43,7 +39,7 @@
                   <span
                     class="error-count-badge"
                     [class.technical-error]="item.status !== Status.FAILED"
-                    matTooltip="{{ item.statusLabel }} · Count: {{ item.count }}"
+                    matTooltip="{{ item.statusLabel }}: count {{ item.count }}"
                     matTooltipPosition="below"
                     >{{ item.count | shortenNumber: 'x' }}</span
                   >
@@ -68,7 +64,7 @@
           </section>
         } @else if (showDetailsAvailable()) {
           <div class="error-details">
-            <span>View error details in the <a href="#" (click)="showDetails.emit(); (false)">error table</a></span>
+            <span>View all error details in the <a href="#" (click)="showDetails.emit(); (false)">error table</a></span>
           </div>
         }
       </div>

@@ -120,7 +120,7 @@ describe('SED-5023 error overview acceptance', () => {
     expect(text()).not.toContain('Payment request failed');
     expect(text()).not.toContain('Connection timed out');
     expect(navigationButtons()).toHaveLength(0);
-    expect(text()).toContain('View error details in the error table');
+    expect(text()).toContain('View all error details in the error table');
     const details = links().find((link) => link.textContent?.trim() === 'error table');
     expect(details).toBeDefined();
     details!.click();
@@ -217,7 +217,7 @@ describe('SED-5023 error overview acceptance', () => {
     expect(text()).toContain('FAILED 2');
     expect(text()).not.toContain('Payment request failed');
     expect(text()).not.toContain('TECHNICAL ERROR');
-    expect(text()).toContain('View error details in the error table');
+    expect(text()).toContain('View all error details in the error table');
     expect(links().some((link) => link.textContent?.trim() === 'error table')).toBe(true);
     expect(navigationButtons()).toHaveLength(0);
 

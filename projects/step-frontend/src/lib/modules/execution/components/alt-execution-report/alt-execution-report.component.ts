@@ -227,14 +227,10 @@ export class AltExecutionReportComponent
     });
   }
 
-  protected scrollToErrorsSection(): void {
+  protected showErrorDetails(status?: Status): void {
+    this.errorStatusFilter.set(status ? [status] : []);
     const errorsElement = this.errors()?.nativeElement as HTMLHtmlElement | undefined;
     errorsElement?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-  }
-
-  protected handleErrorStatusSelection(status: Status): void {
-    this.errorStatusFilter.set([status]);
-    this.scrollToErrorsSection();
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {

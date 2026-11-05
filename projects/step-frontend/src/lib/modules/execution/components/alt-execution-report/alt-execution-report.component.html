@@ -15,8 +15,8 @@
         [errors]="errors"
         [searchActions]="availableErrorSearchActions()"
         [showDetailsAvailable]="showErrorDetailsAvailable()"
-        (showDetails)="scrollToErrorsSection()"
-        (statusSelect)="handleErrorStatusSelection($event)"
+        (showDetails)="showErrorDetails()"
+        (statusSelect)="showErrorDetails($event)"
       />
     }
     @if (hasTestCases$ | async) {
