@@ -1,4 +1,13 @@
-import { Component, ElementRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  untracked,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import {
   map,
@@ -20,6 +29,9 @@ import {
 } from '../../../basics/step-basics.module';
 import { AutomationPackageFilterPopoverComponent } from '../automation-package-filter-popover/automation-package-filter-popover.component';
 import { EntityAutomationPackageService } from '../../injectables/entity-automation-package.service';
+import { AuthService } from '../../../auth';
+import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type PopoverOverlay = PopoverOverlayService<AutomationPackageFilterPopoverComponent>;
 
@@ -36,6 +48,9 @@ const DEFAULT_TOOLTIP = 'Filter by package name';
     },
     PopoverOverlayService,
   ],
+  host: {
+    '[class.disabled]': '!isEnabled()',
+  },
   encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
@@ -49,9 +64,12 @@ export class AutomationPackageFilterComponent
   private _elRef = inject(ElementRef);
   private _popoverOverlay = inject<PopoverOverlay>(PopoverOverlayService);
   private _entityAutomationPackageService = inject(EntityAutomationPackageService);
+  private _auth = inject(AuthService);
 
   protected selectedIds: string[] = [];
   protected tooltipText$: Observable<string> = of(DEFAULT_TOOLTIP);
+
+  protected readonly isEnabled = toSignal(this._auth.hasRight$(AutomationPackagePermission.READ));
 
   protected get selectedIdsBadge(): number | null {
     return this.selectedIds.length || null;
@@ -77,6 +95,10 @@ export class AutomationPackageFilterComponent
   }
 
   protected showPopover(): void {
+    if (!this.isEnabled()) {
+      return;
+    }
+
     this.terminatePopoverStreams();
 
     const component = this._popoverOverlay.open(AutomationPackageFilterPopoverComponent, this._elRef).getComponent();
@@ -135,7 +157,8 @@ export class AutomationPackageFilterComponent
 
     this.tooltipText$ = currentSelection$.pipe(
       switchMap((ids) => {
-        if (!ids.length) {
+        const isEnabled = untracked(() => this.isEnabled());
+        if (!ids.length || !isEnabled) {
           return of([]);
         }
         const packageNames$ = ids.map((id) => {
