@@ -17,7 +17,7 @@ export class ExecutionActionGuardRegistryService {
   getGuards(actionType: string): ReadonlyArray<ExecutionActionGuard> {
     return (this._customRegistry.getRegisteredItems(this.registryType) as ExecutionActionGuard[])
       .filter((guard) => guard.actionType === actionType)
-      .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+      .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER));
   }
 
   hasGuards(actionType: string): boolean {
