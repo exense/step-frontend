@@ -99,7 +99,7 @@ describe('IDE package navigation', () => {
                 }
                 if (packageReplaced) {
                   readsAfterReplacement.push(route.params['id']);
-                  return "Plan doesn't exist";
+                  return 'Refreshed plan';
                 }
                 return 'Review plan';
               },
@@ -112,7 +112,7 @@ describe('IDE package navigation', () => {
               keywordName: (route: ActivatedRouteSnapshot) => {
                 if (packageReplaced) {
                   readsAfterReplacement.push(route.params['id']);
-                  return "Keyword doesn't exist";
+                  return 'Refreshed keyword';
                 }
                 return 'Review keyword';
               },
@@ -153,7 +153,7 @@ describe('IDE package navigation', () => {
     ['execution report', '/executions/execution-one?nodeId=child'],
     ['composite keyword editor', '/composites/editor/keyword-one?artefactId=child'],
   ])(
-    'leaves the %s before reloading its package without revisiting stale references',
+    'restores the %s with fresh data after reloading its package',
     fakeAsync((_view: string, url: string) => {
       const harness = openEditor(url);
       const state = TestBed.inject(IdeStateService);
@@ -163,18 +163,18 @@ describe('IDE package navigation', () => {
       flush();
       harness.detectChanges();
 
-      expect(readsAfterReplacement).toEqual([]);
       expect(replacementUrl).toBe('/studio');
-      expect(router.url).toBe('/plans/list');
+      expect(router.url).toBe(url);
+      expect(readsAfterReplacement).toEqual([url.split('/').pop()!.split('?')[0]]);
       expect(api.useExistingAp).toHaveBeenCalledTimes(1);
       expect(api.useExistingAp).toHaveBeenCalledWith(packageDescriptor.directory);
       expect(state.currentPackage()).toEqual(packageDescriptor);
       expect(state.inProgress()).toBe(false);
-      expect(harness.routeNativeElement?.textContent).not.toContain("Plan doesn't exist");
+      expect(harness.routeNativeElement?.textContent).toBe('Refreshed plan');
     }),
   );
 
-  it('closes the keyword configuration dialog before reloading without reopening its stale reference', fakeAsync(() => {
+  it('reopens the keyword configuration dialog with fresh data after reloading', fakeAsync(() => {
     const state = TestBed.inject(IdeStateService);
     state.initialize();
     let harness!: RouterTestingHarness;
@@ -196,11 +196,12 @@ describe('IDE package navigation', () => {
     flush();
     harness.detectChanges();
 
-    expect(readsAfterReplacement).toEqual([]);
     expect(keywordsOpenAtReplacement).toBe(0);
-    expect(dialogs.openDialogs).toHaveLength(0);
+    expect(router.url).toBe('/functions/configure/keyword-one');
+    expect(readsAfterReplacement).toEqual(['keyword-one']);
+    expect(dialogs.openDialogs).toHaveLength(1);
     expect(document.body.textContent).not.toContain('Review keyword');
-    expect(router.url).toBe('/plans/list');
+    expect(document.body.textContent).toContain('Refreshed keyword');
     expect(state.currentPackage()).toEqual(packageDescriptor);
     expect(state.inProgress()).toBe(false);
   }));
