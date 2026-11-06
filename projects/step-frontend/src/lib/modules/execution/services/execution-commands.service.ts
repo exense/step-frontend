@@ -4,6 +4,7 @@ import {
   AugmentedExecutionsService,
   CommonEntitiesUrlsService,
   ExecutiontTaskParameters,
+  ExecutionActionGuardService,
   ExecutionCommandsContext,
   ExecutionStrategy,
   ExecutionStrategyController,
@@ -18,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyController {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _executionService = inject(AugmentedExecutionsService);
+  private readonly _actionGuard = inject(ExecutionActionGuardService);
   private _localStrategy = inject(LocalExecutionStrategyService);
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
@@ -63,11 +65,14 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
       return;
     }
 
-    const currentEId = this.context.getExecution()?.id;
+    const context = this.context;
+    const execution = context.getExecution();
+    const currentEId = execution?.id;
     this.submitting.set(true);
-    strategy
-      .execute(this.context, { simulate })
+    this._actionGuard
+      .check('execute', execution)
       .pipe(
+        switchMap((allowed) => (allowed ? strategy.execute(context, { simulate }) : EMPTY)),
         finalize(() => this.submitting.set(false)),
         takeUntilDestroyed(this._destroyRef),
       )
@@ -84,11 +89,17 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
   }
 
   stop(): Observable<void> {
-    return this._executionService.abort(this.context.getExecution()!.id!);
+    const execution = this.context.getExecution()!;
+    return this._actionGuard
+      .check('stop', execution)
+      .pipe(switchMap((allowed) => (allowed ? this._executionService.abort(execution.id!) : EMPTY)));
   }
 
   forceStop(): Observable<void> {
-    return this._executionService.forceStop(this.context.getExecution()!.id!);
+    const execution = this.context.getExecution()!;
+    return this._actionGuard
+      .check('forceStop', execution)
+      .pipe(switchMap((allowed) => (allowed ? this._executionService.forceStop(execution.id!) : EMPTY)));
   }
 
   copyExecutionServiceAsCurlToClipboard(): void {

@@ -58,3 +58,5 @@ export * from './shared/custom-registry-item';
 export * from './shared/custom-registry-type.enum';
 export * from './shared/custom-component';
 export * from './shared/entity-item';
+export * from './services/execution-action-guard-registry.service';
+export * from './shared/execution-action-guard.interface';
