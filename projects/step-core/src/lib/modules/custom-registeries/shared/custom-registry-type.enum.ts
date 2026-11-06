@@ -8,6 +8,7 @@ export enum CustomRegistryType {
   CUSTOM_SEARCH_CELL = 'customSearchCell',
   DASHLET = 'dashlet', // this is a temporary type, while we have to use an old router
 
+  EXECUTION_ACTION_GUARD = 'executionActionGuard',
   EXECUTION_CUSTOM_PANEL = 'executionCustomPanel',
   ARTEFACT = 'artefact',
   WIZARD_STEP = 'wizardStep',

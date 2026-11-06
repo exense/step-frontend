@@ -4,6 +4,7 @@ import { ExecutionNamePipe } from './pipes/execution-name.pipe';
 export * from './injectables/execution-params-factory.service';
 export * from './injectables/execution-view-mode.token';
 export * from './services/execution-list-filters.service';
+export * from './services/execution-action-guard.service';
 export * from './services/execution-report-static-layout-registry.service';
 export * from './types/include-testcases.interface';
 export * from './types/execution-params-config';

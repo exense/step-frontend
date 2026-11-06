@@ -70,6 +70,7 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
 import { PasswordComponent } from './components/password/password.component';
+import { RichTextareaComponent } from './components/rich-textarea/rich-textarea.component';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
@@ -145,6 +146,7 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     PerTimeUnitInputComponent,
     ArrayInputComponent,
     PasswordComponent,
+    RichTextareaComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -219,6 +221,7 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     PerTimeUnitInputComponent,
     ArrayInputComponent,
     PasswordComponent,
+    RichTextareaComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -291,6 +294,7 @@ export * from './components/upload-container/upload-container.component';
 export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
 export * from './components/password/password.component';
+export * from './components/rich-textarea/rich-textarea.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
