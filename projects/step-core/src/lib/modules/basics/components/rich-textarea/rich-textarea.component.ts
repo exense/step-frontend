@@ -94,9 +94,20 @@ export class RichTextareaComponent implements ControlValueAccessor {
     if (this.composing) {
       return;
     }
-    const html = this.sanitize(this._element.nativeElement.innerHTML);
-    const value = this.isEmpty(html) ? '' : html;
-    this.render(value);
+    const element = this._element.nativeElement;
+    const currentHtml = element.innerHTML;
+    const html = this.sanitize(currentHtml);
+    let content = element;
+    if (html !== currentHtml) {
+      content = element.ownerDocument.createElement('div');
+      content.innerHTML = html;
+      if (content.innerHTML !== currentHtml && !this.sanitizeAttributes(content)) {
+        this.replaceContent(html);
+      }
+    }
+    const empty = this.isEmpty(content);
+    this.empty.set(empty);
+    const value = empty ? '' : html;
     const duplicateCompositionInput = value === this.compositionValue;
     this.compositionValue = undefined;
     if (duplicateCompositionInput) {
@@ -199,23 +210,90 @@ export class RichTextareaComponent implements ControlValueAccessor {
     return this._sanitizer.sanitize(SecurityContext.HTML, html) ?? '';
   }
 
-  private isEmpty(html: string): boolean {
-    const container = this._element.nativeElement.ownerDocument.createElement('div');
-    container.innerHTML = html;
+  private isEmpty(container: HTMLElement): boolean {
     if (container.textContent || container.querySelector('img, video, audio, hr, table')) {
       return false;
     }
     return container.querySelectorAll('br').length < 2;
   }
 
+  private sanitizeAttributes(normalized: HTMLElement): boolean {
+    const element = this._element.nativeElement;
+    if (!this.sameContentStructure(element, normalized)) {
+      return false;
+    }
+    const elements = element.querySelectorAll('*');
+    const sanitizedElements = normalized.querySelectorAll('*');
+    elements.forEach((current, index) => {
+      const sanitized = sanitizedElements[index];
+      for (const attribute of Array.from(current.attributes)) {
+        if (!sanitized.hasAttributeNS(attribute.namespaceURI, attribute.localName)) {
+          current.removeAttributeNode(attribute);
+        }
+      }
+      for (const attribute of Array.from(sanitized.attributes)) {
+        if (current.getAttributeNS(attribute.namespaceURI, attribute.localName) !== attribute.value) {
+          current.setAttributeNS(attribute.namespaceURI, attribute.name, attribute.value);
+        }
+      }
+    });
+    return element.innerHTML === normalized.innerHTML;
+  }
+
+  private sameContentStructure(current: Node, normalized: Node): boolean {
+    let child = current.firstChild;
+    let sanitizedChild = normalized.firstChild;
+    while (child || sanitizedChild) {
+      if (child?.nodeType === Node.TEXT_NODE || sanitizedChild?.nodeType === Node.TEXT_NODE) {
+        let text = '';
+        let sanitizedText = '';
+        while (child?.nodeType === Node.TEXT_NODE) {
+          text += child.nodeValue;
+          child = child.nextSibling;
+        }
+        while (sanitizedChild?.nodeType === Node.TEXT_NODE) {
+          sanitizedText += sanitizedChild.nodeValue;
+          sanitizedChild = sanitizedChild.nextSibling;
+        }
+        if (text !== sanitizedText) {
+          return false;
+        }
+        continue;
+      }
+      if (
+        !child ||
+        !sanitizedChild ||
+        child.nodeType !== sanitizedChild.nodeType ||
+        child.nodeName !== sanitizedChild.nodeName
+      ) {
+        return false;
+      }
+      if (child instanceof Element && sanitizedChild instanceof Element) {
+        if (child.namespaceURI !== sanitizedChild.namespaceURI || !this.sameContentStructure(child, sanitizedChild)) {
+          return false;
+        }
+      } else if (child.nodeValue !== sanitizedChild.nodeValue) {
+        return false;
+      }
+      child = child.nextSibling;
+      sanitizedChild = sanitizedChild.nextSibling;
+    }
+    return true;
+  }
+
   private render(html: string): void {
     const element = this._element.nativeElement;
-    this.empty.set(this.isEmpty(html));
     const normalized = element.ownerDocument.createElement('div');
     normalized.innerHTML = html;
+    this.empty.set(this.isEmpty(normalized));
     if (element.innerHTML === normalized.innerHTML) {
       return;
     }
+    this.replaceContent(html);
+  }
+
+  private replaceContent(html: string): void {
+    const element = this._element.nativeElement;
     const selection = element.ownerDocument.getSelection();
     const ownedSelection = !!selection?.rangeCount && element.contains(selection.getRangeAt(0).commonAncestorContainer);
     element.innerHTML = html;
