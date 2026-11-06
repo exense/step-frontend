@@ -60,10 +60,13 @@ export class IdeStateService implements IdeStateStrategy {
 
   readonly currentPackage = this.currentPackageInternal.asReadonly();
 
-  private setPackage(automationPackage: AutomationPackageDescriptor | undefined): void {
+  private setPackage(
+    automationPackage: AutomationPackageDescriptor | undefined,
+    options?: { navigateToDefault?: boolean },
+  ): void {
     this.currentPackageInternal.set(automationPackage);
     this._reloadable.reloadData();
-    if (automationPackage && this.isHomeRoute()) {
+    if (automationPackage && options?.navigateToDefault !== false && this.isHomeRoute()) {
       void this._router.navigateByUrl(this._defaultPage(true));
     }
   }
@@ -143,7 +146,23 @@ export class IdeStateService implements IdeStateStrategy {
   reload(): void {
     const directory = this.currentPackage()?.directory;
     if (directory && !this.inProgress()) {
-      this.openFromPath(directory);
+      const url = this._router.url;
+      this.inProgressInternal.set(true);
+      this.useExistingAp(directory)
+        .pipe(
+          switchMap(() => this._studioApi.getCurrentAp()),
+          map((result) => (!result?.directory ? undefined : result)),
+          tap((result) => this.setPackage(result, { navigateToDefault: false })),
+          switchMap((result) => {
+            if (!result) {
+              return EMPTY;
+            }
+            this._accessHistory.addToHistory(result);
+            return from(this._router.navigateByUrl(url, { replaceUrl: true }));
+          }),
+          finalize(() => this.inProgressInternal.set(false)),
+        )
+        .subscribe();
     }
   }
 
