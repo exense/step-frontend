@@ -96,7 +96,7 @@ export class ChartStandardTooltipComponent {
             yPoints.push({
               value: bucketValue,
               formattedValue: this.formatValue(bucketValue, settings.yAxisUnit),
-              name: series.label || '',
+              name: typeof series.label === 'string' ? series.label : series.label?.textContent || '',
               stroke: series.strokeConfig!,
               executions: executionIds,
               executionsFn: executionFn,

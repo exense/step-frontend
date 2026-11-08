@@ -123,7 +123,8 @@ export const checkEntityGuardFactory =
         } else {
           _multipleProjects.showProjectMessage({
             icon: 'alert-triangle',
-            message: action ? `${message} <a href="${action.url}">${action.label}</a>` : message,
+            message,
+            action,
           });
         }
 
