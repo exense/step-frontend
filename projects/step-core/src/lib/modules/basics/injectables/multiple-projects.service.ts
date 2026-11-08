@@ -2,13 +2,14 @@ import { inject, Injectable, InjectionToken } from '@angular/core';
 import { CheckLoadErrorsConfig, MultipleProjectsStrategy, Project } from '../types/multiple-projects-strategy';
 import { Observable, pipe, tap, UnaryFunction } from 'rxjs';
 import { ErrorMessageHandlerService } from './error-message-handler.service';
+import { ProjectScopeWarning } from './project-scope-warning.service';
 
 const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default multiple project strategy', {
   providedIn: 'root',
   factory: () => {
     const _errorMessageHandler = inject(ErrorMessageHandlerService);
     return {
-      showProjectMessage: (message?: { icon: string; message: string }) => {},
+      showProjectMessage: (message?: ProjectScopeWarning) => {},
       currentProject: () => undefined,
       getProjects: () => [],
       getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
@@ -33,14 +34,14 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
   providedIn: 'root',
 })
 export class MultipleProjectsService implements MultipleProjectsStrategy {
-  private strategy = inject(DEFAULT_STRATEGY);
+  private _strategy = inject(DEFAULT_STRATEGY);
 
   currentProject(): Project | undefined {
-    return this.strategy.currentProject();
+    return this._strategy.currentProject();
   }
 
   getProjects(): Project[] {
-    return this.strategy.getProjects();
+    return this._strategy.getProjects();
   }
 
   getProject(projectId: string): Project | undefined;
@@ -48,10 +49,10 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
   getProject<T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string): Project | undefined {
     if (typeof entityOrProjectId === 'string') {
       const projectId = entityOrProjectId as string;
-      return this.strategy.getProject(projectId);
+      return this._strategy.getProject(projectId);
     }
     const entity = entityOrProjectId as T;
-    return this.strategy.getProject(entity);
+    return this._strategy.getProject(entity);
   }
 
   isEntityBelongsToCurrentProject<T extends { attributes?: Record<string, string> }>(entity: T): boolean {
@@ -75,7 +76,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
   }
 
   getUrlForProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): string {
-    return this.strategy.getUrlForProject(project, navigationParams);
+    return this._strategy.getUrlForProject(project, navigationParams);
   }
 
   checkLoadErrors<
@@ -83,18 +84,18 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
       attributes?: Record<string, string>;
     },
   >(config: CheckLoadErrorsConfig): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
-    return this.strategy.checkLoadErrors(config);
+    return this._strategy.checkLoadErrors(config);
   }
 
-  showProjectMessage(message?: { icon: string; message: string }): void {
-    this.strategy.showProjectMessage(message);
+  showProjectMessage(message?: ProjectScopeWarning): void {
+    this._strategy.showProjectMessage(message);
   }
 
   cleanupProjectMessage(): void {
-    this.strategy.showProjectMessage(undefined);
+    this._strategy.showProjectMessage(undefined);
   }
 
   useStrategy(strategy: MultipleProjectsStrategy): void {
-    this.strategy = strategy;
+    this._strategy = strategy;
   }
 }

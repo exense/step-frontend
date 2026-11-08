@@ -1,5 +1,6 @@
 import { Observable, UnaryFunction } from 'rxjs';
 import { RouterStateSnapshot } from '@angular/router';
+import { ProjectScopeWarning } from '../injectables/project-scope-warning.service';
 
 export interface Project {
   name?: string;
@@ -26,5 +27,5 @@ export interface MultipleProjectsStrategy {
   checkLoadErrors<T extends { attributes?: Record<string, string> }>(
     config: CheckLoadErrorsConfig,
   ): UnaryFunction<Observable<T>, Observable<T | string | undefined>>;
-  showProjectMessage(message?: { icon: string; message: string }): void;
+  showProjectMessage(message?: ProjectScopeWarning): void;
 }
