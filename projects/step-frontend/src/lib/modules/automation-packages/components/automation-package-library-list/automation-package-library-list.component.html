@@ -27,7 +27,7 @@
           color="primary"
           matTooltip="New automation package library"
           matTooltipPosition="below"
-          [disabled]="!('resource-write' | hasRight | async)"
+          [disabled]="!('automation-package-write' | hasRight | async)"
           [routerLink]="['.', 'upload', 'new']"
           [relativeTo]="_activatedRoute"
         >
@@ -115,7 +115,7 @@
             data-step-testid="refresh-library-btn"
             mat-icon-button
             matTooltip="Refresh library"
-            [disabled]="!('resource-write' | hasRight | async)"
+            [disabled]="!('automation-package-write' | hasRight | async)"
             (click)="refreshResource(element)"
           >
             <step-icon name="refresh-cw" />
@@ -124,7 +124,7 @@
             data-step-testid="delete-library-btn"
             mat-icon-button
             matTooltip="Delete library"
-            [disabled]="!('resource-delete' | hasRight | async)"
+            [disabled]="!('automation-package-delete' | hasRight | async)"
             (click)="deleteResource(element.id, element.resourceName)"
           >
             <step-icon name="trash-2">delete</step-icon>

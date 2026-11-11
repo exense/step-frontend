@@ -157,7 +157,10 @@
       <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
       <button
         [hidden]="isEditMode"
-        [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
+        [disabled]="
+          !('param-write' | hasRight | async) ||
+          (parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+        "
         type="button"
         mat-stroked-button
         (click)="saveAndNext()"
@@ -165,7 +168,10 @@
         Save & next
       </button>
       <button
-        [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
+        [disabled]="
+          !('param-write' | hasRight | async) ||
+          (parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async))
+        "
         type="button"
         mat-flat-button
         color="primary"

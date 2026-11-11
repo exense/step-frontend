@@ -80,7 +80,7 @@
           stepTestId="delete-screen-btn"
           mat-icon-button
           matTooltip="Delete Screen"
-          [disabled]="!('screenInputs-write' | hasRight | async)"
+          [disabled]="!('screenInputs-delete' | hasRight | async)"
           (click)="removeScreen(element.id, element.input.label)"
         >
           <step-icon name="trash-2">delete</step-icon>

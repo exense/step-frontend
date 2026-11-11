@@ -28,7 +28,7 @@ export class FunctionActionsImplService implements FunctionActionsService {
       .showDeleteWarning(1, `Keyword "${name}"`)
       .pipe(
         switchMap((isDeleteConfirmed) =>
-          isDeleteConfirmed ? this._functionApiService.deleteFunction(id).pipe(map(() => true)) : of(false),
+          isDeleteConfirmed ? this.deleteFunction(id).pipe(map(() => true)) : of(false),
         ),
       );
   }
@@ -57,5 +57,9 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected getFunctionEditor(id: string): Observable<string> {
     return this._functionApiService.getFunctionEditor(id);
+  }
+
+  protected deleteFunction(id: string): Observable<unknown> {
+    return this._functionApiService.deleteFunction(id);
   }
 }
