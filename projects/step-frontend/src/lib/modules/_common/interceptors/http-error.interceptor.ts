@@ -174,7 +174,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       tap((response: HttpEvent<any>) => {
         this.handleAsyncError(response);
       }),
-      catchError((error) => this.handleHttpError(error, true, req.method === 'GET')),
+      catchError((error) =>
+        // Errors raised by inner interceptors (e.g. errors already handled by them) are passed through
+        error instanceof HttpErrorResponse
+          ? this.handleHttpError(error, true, req.method === 'GET')
+          : throwError(() => error),
+      ),
     );
   }
 }
