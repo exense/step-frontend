@@ -23,23 +23,10 @@ step-input-dropdown {
   line-height: 1.6rem;
 
   step-input-dropdown-help {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding: 0.8rem 1.2rem;
-    background: var.$gray-50;
-    color: var.$gray-550;
+    display: block;
 
     &:not(:first-child) {
       border-top: 1px solid var.$gray-200;
-    }
-
-    p {
-      margin: 0;
-    }
-
-    a {
-      align-self: flex-start;
     }
   }
 }

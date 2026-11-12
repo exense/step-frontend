@@ -1,0 +1,4 @@
+<div class="step-help-message-text" [innerHTML]="safeHtml()"></div>
+@if (help().learnMoreUrl; as learnMoreUrl) {
+  <a [href]="learnMoreUrl" target="_blank" rel="noopener noreferrer">Learn more</a>
+}

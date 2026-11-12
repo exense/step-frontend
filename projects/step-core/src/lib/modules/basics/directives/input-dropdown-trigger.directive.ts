@@ -18,8 +18,13 @@ import { InputDropdownComponent } from '../components/input-dropdown/input-dropd
 
 const PANEL_GAP = 4;
 const MIN_VISIBLE_PART = 0.5;
+const SCROLLING_OVERFLOW = ['auto', 'scroll', 'overlay'];
 
-const observeLayoutChanges = (anchor: HTMLElement, ancestors: HTMLElement[]): Observable<void> =>
+const observeLayoutChanges = (
+  anchor: HTMLElement,
+  ancestors: HTMLElement[],
+  mutationRoot: HTMLElement,
+): Observable<void> =>
   new Observable<void>((subscriber) => {
     const notify = (): void => subscriber.next();
 
@@ -27,7 +32,7 @@ const observeLayoutChanges = (anchor: HTMLElement, ancestors: HTMLElement[]): Ob
     [anchor, ...ancestors].forEach((element) => resizeObserver.observe(element));
 
     const mutationObserver = new MutationObserver(notify);
-    mutationObserver.observe(anchor.ownerDocument.body, {
+    mutationObserver.observe(mutationRoot, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -185,18 +190,25 @@ export class InputDropdownTriggerDirective {
 
   // Runs outside of the Angular zone and at most once per animation frame, so scrolling does not trigger change detection.
   // Scroll events of arbitrary ancestors do not bubble, so they are caught in the capture phase.
-  // Layout shifts that move the anchor without resizing it are detected by the resize and mutation observers.
+  // Layout shifts that move the anchor without resizing it are detected by the resize observer and by the mutation observer,
+  // which watches the nearest scroll container of the anchor (or the body, when there is none).
   private followAnchor(overlayRef: OverlayRef, anchor: HTMLElement): void {
     const ancestors = this.getAncestors(anchor);
     const clippingAncestors = ancestors.filter((element) => this.isClipping(element));
+    const mutationRoot = ancestors.find((element) => this.isScrollContainer(element)) ?? this._document.body;
     let lastRect = anchor.getBoundingClientRect();
+    const hadSizeAtOpen = !this.isEmptyRect(lastRect);
 
     this._zone.runOutsideAngular(() => {
-      merge(fromEvent(this._document, 'scroll', { capture: true }), observeLayoutChanges(anchor, ancestors))
+      merge(
+        fromEvent(this._document, 'scroll', { capture: true }),
+        observeLayoutChanges(anchor, ancestors, mutationRoot),
+      )
         .pipe(auditTime(0, animationFrameScheduler), takeUntil(this.closeTerminator$))
         .subscribe(() => {
           const rect = anchor.getBoundingClientRect();
-          if (this.isOutOfView(rect, clippingAncestors)) {
+          const isHidden = hadSizeAtOpen && this.isEmptyRect(rect);
+          if (isHidden || this.isOutOfView(rect, clippingAncestors)) {
             this._zone.run(() => this.close());
             return;
           }
@@ -227,8 +239,17 @@ export class InputDropdownTriggerDirective {
     return !!style && (style.overflowX !== 'visible' || style.overflowY !== 'visible');
   }
 
+  private isScrollContainer(element: HTMLElement): boolean {
+    const style = this._document.defaultView?.getComputedStyle(element);
+    return !!style && (SCROLLING_OVERFLOW.includes(style.overflowX) || SCROLLING_OVERFLOW.includes(style.overflowY));
+  }
+
+  private isEmptyRect(rect: DOMRect): boolean {
+    return !rect.width || !rect.height;
+  }
+
   private isOutOfView(anchorRect: DOMRect, clippingAncestors: HTMLElement[]): boolean {
-    if (!anchorRect.width || !anchorRect.height) {
+    if (this.isEmptyRect(anchorRect)) {
       return false;
     }
     const view = this._document.defaultView;

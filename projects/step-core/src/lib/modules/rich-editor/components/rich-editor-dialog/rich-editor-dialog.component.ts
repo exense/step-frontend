@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnInit, viewChild } from '@angular/core';
-import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
+import { DialogsService, HelpMessage, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder } from '@angular/forms';
 import { RichEditorComponent } from '../rich-editor/rich-editor.component';
@@ -17,6 +17,7 @@ export interface RichEditorDialogData {
   allowedModes?: AceMode[];
   isReadOnly?: boolean;
   wrapText?: boolean;
+  help?: HelpMessage;
 }
 
 type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;

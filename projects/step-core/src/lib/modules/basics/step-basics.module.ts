@@ -88,6 +88,7 @@ import { ButtonSpinnerComponent } from './components/button-spinner/button-spinn
 import { InputDropdownComponent } from './components/input-dropdown/input-dropdown.component';
 import { InputDropdownTriggerDirective } from './directives/input-dropdown-trigger.directive';
 import { InputDropdownHelpDirective } from './directives/input-dropdown-help.directive';
+import { HelpMessageComponent } from './components/help-message/help-message.component';
 import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
 
 @NgModule({
@@ -116,6 +117,7 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     InputDropdownComponent,
     InputDropdownTriggerDirective,
     InputDropdownHelpDirective,
+    HelpMessageComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -277,6 +279,7 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     InputDropdownComponent,
     InputDropdownTriggerDirective,
     InputDropdownHelpDirective,
+    HelpMessageComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -332,6 +335,8 @@ export * from './directives/hint.directive';
 export * from './components/input-dropdown/input-dropdown.component';
 export * from './directives/input-dropdown-trigger.directive';
 export * from './directives/input-dropdown-help.directive';
+export * from './components/help-message/help-message.component';
+export * from './types/help-message';
 export * from './directives/error.directive';
 export * from './directives/warning.directive';
 export * from './directives/alert.directive';

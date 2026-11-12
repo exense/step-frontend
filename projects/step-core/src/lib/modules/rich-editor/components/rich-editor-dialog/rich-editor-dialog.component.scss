@@ -1,6 +1,13 @@
+.rich-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
 step-rich-editor {
   height: 50rem;
   display: block;
+  flex: none;
 }
 
 .rich-header,

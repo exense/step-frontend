@@ -57,7 +57,7 @@
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"
         (blur)="onBlur()"
-        [stepInputDropdownTrigger]="plainValueHelp"
+        [stepInputDropdownTrigger]="plainValueHelpDropdown"
         [stepInputDropdownDisabled]="isDisabled"
       />
     }
@@ -88,19 +88,10 @@
       </button>
     </step-suffix>
   </step-form-field>
-  <step-input-dropdown #plainValueHelp>
+  <step-input-dropdown #plainValueHelpDropdown>
     @if (!isNumber && !isPassword) {
       <step-input-dropdown-help>
-        <p>
-          Plain (non dynamic) plan values can now embed variables using the $&#123;...&#125; placeholder syntax. A value
-          containing $&#123; was previously used literally and is now evaluated, so existing values have to be escaped
-          to keep their meaning.
-        </p>
-        <p>
-          This is done for you, in two different ways depending on where the value lives. Only the values containing
-          $&#123; are ever rewritten: a value without it, including one containing $ or $$, is never touched.
-        </p>
-        <a [href]="helpUrl" target="_blank" rel="noopener noreferrer">Learn more</a>
+        <step-help-message [help]="_plainValueHelp" />
       </step-input-dropdown-help>
     }
   </step-input-dropdown>
