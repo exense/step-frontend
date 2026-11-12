@@ -88,6 +88,7 @@ describe('IDE package navigation', () => {
       imports: [MatDialogModule, NoopAnimationsModule, StepBasicsModule],
       providers: [
         provideRouter([
+          { path: 'executions/list', component: PackageHomeProbeComponent },
           ...['plans/editor/:id', 'executions/:id', 'composites/editor/:id'].map((path) => ({
             path,
             component: PackagePlanProbeComponent,
@@ -99,7 +100,7 @@ describe('IDE package navigation', () => {
                 }
                 if (packageReplaced) {
                   readsAfterReplacement.push(route.params['id']);
-                  return 'Refreshed plan';
+                  return "Plan doesn't exist";
                 }
                 return 'Review plan';
               },
@@ -112,13 +113,14 @@ describe('IDE package navigation', () => {
               keywordName: (route: ActivatedRouteSnapshot) => {
                 if (packageReplaced) {
                   readsAfterReplacement.push(route.params['id']);
-                  return 'Refreshed keyword';
+                  return "Keyword doesn't exist";
                 }
                 return 'Review keyword';
               },
             },
           }),
           { path: 'plans/list', component: PackageHomeProbeComponent },
+          { path: 'functions', component: PackageHomeProbeComponent },
           { path: 'studio', component: PackageHomeProbeComponent },
           {
             path: 'in-progress',
@@ -149,12 +151,12 @@ describe('IDE package navigation', () => {
   };
 
   it.each([
-    ['plan editor', '/plans/editor/plan-one?artefactId=child'],
-    ['execution report', '/executions/execution-one?nodeId=child'],
-    ['composite keyword editor', '/composites/editor/keyword-one?artefactId=child'],
+    ['plan editor', '/plans/editor/plan-one?artefactId=child', '/plans/list'],
+    ['execution report', '/executions/execution-one?nodeId=child', '/executions/list'],
+    ['composite keyword editor', '/composites/editor/keyword-one?artefactId=child', '/functions'],
   ])(
-    'restores the %s with fresh data after reloading its package',
-    fakeAsync((_view: string, url: string) => {
+    'returns from the %s to its list after reloading without revisiting stale references',
+    fakeAsync((_view: string, url: string, listUrl: string) => {
       const harness = openEditor(url);
       const state = TestBed.inject(IdeStateService);
       state.reload();
@@ -164,17 +166,28 @@ describe('IDE package navigation', () => {
       harness.detectChanges();
 
       expect(replacementUrl).toBe('/studio');
-      expect(router.url).toBe(url);
-      expect(readsAfterReplacement).toEqual([url.split('/').pop()!.split('?')[0]]);
+      expect(router.url).toBe(listUrl);
+      expect(readsAfterReplacement).toEqual([]);
       expect(api.useExistingAp).toHaveBeenCalledTimes(1);
       expect(api.useExistingAp).toHaveBeenCalledWith(packageDescriptor.directory);
       expect(state.currentPackage()).toEqual(packageDescriptor);
       expect(state.inProgress()).toBe(false);
-      expect(harness.routeNativeElement?.textContent).toBe('Refreshed plan');
+      expect(harness.routeNativeElement?.textContent).not.toContain("Plan doesn't exist");
+
+      const filteredListUrl = `${listUrl}?search=review`;
+      void router.navigateByUrl(filteredListUrl);
+      flush();
+      state.reload();
+      flush();
+      harness.detectChanges();
+
+      expect(router.url).toBe(filteredListUrl);
+      expect(readsAfterReplacement).toEqual([]);
+      expect(api.useExistingAp).toHaveBeenCalledTimes(2);
     }),
   );
 
-  it('reopens the keyword configuration dialog with fresh data after reloading', fakeAsync(() => {
+  it('returns to the keyword list after reloading without reopening the stale configuration dialog', fakeAsync(() => {
     const state = TestBed.inject(IdeStateService);
     state.initialize();
     let harness!: RouterTestingHarness;
@@ -197,11 +210,11 @@ describe('IDE package navigation', () => {
     harness.detectChanges();
 
     expect(keywordsOpenAtReplacement).toBe(0);
-    expect(router.url).toBe('/functions/configure/keyword-one');
-    expect(readsAfterReplacement).toEqual(['keyword-one']);
-    expect(dialogs.openDialogs).toHaveLength(1);
+    expect(router.url).toBe('/functions');
+    expect(readsAfterReplacement).toEqual([]);
+    expect(dialogs.openDialogs).toHaveLength(0);
     expect(document.body.textContent).not.toContain('Review keyword');
-    expect(document.body.textContent).toContain('Refreshed keyword');
+    expect(document.body.textContent).not.toContain("Keyword doesn't exist");
     expect(state.currentPackage()).toEqual(packageDescriptor);
     expect(state.inProgress()).toBe(false);
   }));

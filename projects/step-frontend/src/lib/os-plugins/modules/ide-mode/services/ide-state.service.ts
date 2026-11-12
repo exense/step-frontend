@@ -146,7 +146,7 @@ export class IdeStateService implements IdeStateStrategy {
   reload(): void {
     const directory = this.currentPackage()?.directory;
     if (directory && !this.inProgress()) {
-      const url = this._router.url;
+      const url = this.packageReloadUrl();
       this.inProgressInternal.set(true);
       this.useExistingAp(directory)
         .pipe(
@@ -164,6 +164,27 @@ export class IdeStateService implements IdeStateStrategy {
         )
         .subscribe();
     }
+  }
+
+  private packageReloadUrl(): string {
+    const url = this._router.url;
+    let route = this._router.routerState.snapshot.root;
+    while (!route.paramMap.has('id') && route.firstChild) {
+      route = route.firstChild;
+    }
+    if (!route.paramMap.has('id')) {
+      return url;
+    }
+    const entityListUrls: Record<string, string> = {
+      plans: '/plans/list',
+      functions: '/functions',
+      composites: '/functions',
+      parameters: '/parameters',
+      scheduler: '/scheduler',
+      executions: '/executions/list',
+      resources: '/resources',
+    };
+    return entityListUrls[url.split('/')[1]] ?? this._defaultPage(true);
   }
 
   private onPackageOpened(automationPackage: AutomationPackageDescriptor | undefined): void {
