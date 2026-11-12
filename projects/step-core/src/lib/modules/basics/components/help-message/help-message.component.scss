@@ -1,0 +1,31 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-help-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  background: var.$gray-50;
+  color: var.$gray-550;
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+
+  .step-help-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    align-self: flex-start;
+  }
+
+  &.step-help-message-bordered {
+    border: 1px solid var.$gray-300;
+    border-radius: 0.8rem;
+  }
+}

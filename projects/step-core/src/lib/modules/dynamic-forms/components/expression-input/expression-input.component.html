@@ -22,6 +22,8 @@
     (ngModelChange)="onExpressionChange($event)"
     [disabled]="isDisabled"
     (blur)="onBlur()"
+    [stepInputDropdownTrigger]="expressionHelpDropdown"
+    [stepInputDropdownDisabled]="isDisabled || !!isParentDisabled"
   />
 
   <step-suffix class="button-suffix">
@@ -56,3 +58,8 @@
     }
   </step-suffix>
 </step-form-field>
+<step-input-dropdown #expressionHelpDropdown>
+  <step-input-dropdown-help>
+    <step-help-message [help]="_expressionHelp" />
+  </step-input-dropdown-help>
+</step-input-dropdown>

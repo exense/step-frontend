@@ -15,12 +15,12 @@ export class RichEditorDialogService {
   private _matDialog = inject(MatDialog);
 
   editText(text: string, config?: Config): Observable<string> {
-    const { title, allowedModes, predefinedMode, isReadOnly, wrapText, filterEmptyResult } = {
+    const { title, allowedModes, predefinedMode, isReadOnly, wrapText, help, filterEmptyResult } = {
       title: 'Free text editor',
       filterEmptyResult: true,
       ...(config ?? {}),
     };
-    const data: RichEditorDialogData = { text, title, allowedModes, predefinedMode, isReadOnly, wrapText };
+    const data: RichEditorDialogData = { text, title, allowedModes, predefinedMode, isReadOnly, wrapText, help };
     const dialogRef = this._matDialog.open(RichEditorDialogComponent, { data, width: 'min(100rem, 80%)' });
 
     dialogRef

@@ -85,6 +85,10 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
 import { ChartSkeletonComponent } from './components/chart-skeleton/chart-skeleton.component';
 import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
+import { InputDropdownComponent } from './components/input-dropdown/input-dropdown.component';
+import { InputDropdownTriggerDirective } from './directives/input-dropdown-trigger.directive';
+import { InputDropdownHelpDirective } from './directives/input-dropdown-help.directive';
+import { HelpMessageComponent } from './components/help-message/help-message.component';
 import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
 
 @NgModule({
@@ -110,6 +114,10 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     SkeletonPlaceholderComponent,
     ChartSkeletonComponent,
     ButtonSpinnerComponent,
+    InputDropdownComponent,
+    InputDropdownTriggerDirective,
+    InputDropdownHelpDirective,
+    HelpMessageComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -268,6 +276,10 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     SkeletonPlaceholderComponent,
     ChartSkeletonComponent,
     ButtonSpinnerComponent,
+    InputDropdownComponent,
+    InputDropdownTriggerDirective,
+    InputDropdownHelpDirective,
+    HelpMessageComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -308,6 +320,7 @@ export * from './types/compare-condition.enum';
 export * from './types/alert-type.enum';
 export * from './types/screen-width.token';
 export * from './types/is-small-screen.token';
+export * from './types/dynamic-expression-toggle-tooltip.token';
 export * from './types/resize-observable';
 export * from './types/time-unit.enum';
 export * from './types/generate-api-key-strategy';
@@ -320,6 +333,11 @@ export * from './directives/description.directive';
 export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
+export * from './components/input-dropdown/input-dropdown.component';
+export * from './directives/input-dropdown-trigger.directive';
+export * from './directives/input-dropdown-help.directive';
+export * from './components/help-message/help-message.component';
+export * from './types/help-message';
 export * from './directives/error.directive';
 export * from './directives/warning.directive';
 export * from './directives/alert.directive';

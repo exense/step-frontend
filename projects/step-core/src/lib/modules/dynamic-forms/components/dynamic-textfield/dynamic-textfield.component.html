@@ -57,6 +57,8 @@
         (ngModelChange)="onValueChange($event)"
         [disabled]="isDisabled"
         (blur)="onBlur()"
+        [stepInputDropdownTrigger]="plainValueHelpDropdown"
+        [stepInputDropdownDisabled]="isDisabled"
       />
     }
     @if (!isNumber) {
@@ -77,7 +79,7 @@
       <button
         type="button"
         mat-stroked-button
-        matTooltip="Use a dynamic expression to set this attribute"
+        [matTooltip]="_toggleTooltip"
         matTooltipPosition="below"
         (click)="toggleDynamicExpression(true)"
         [disabled]="isDisabled"
@@ -86,4 +88,11 @@
       </button>
     </step-suffix>
   </step-form-field>
+  <step-input-dropdown #plainValueHelpDropdown>
+    @if (!isNumber && !isPassword) {
+      <step-input-dropdown-help>
+        <step-help-message [help]="_plainValueHelp" />
+      </step-input-dropdown-help>
+    }
+  </step-input-dropdown>
 }

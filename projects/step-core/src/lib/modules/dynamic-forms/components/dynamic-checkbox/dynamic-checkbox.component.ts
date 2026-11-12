@@ -1,7 +1,8 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { DynamicValueBoolean } from '../../../../client/step-client-module';
 import { NgControl } from '@angular/forms';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
+import { DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-checkbox',
@@ -11,6 +12,8 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
   standalone: false,
 })
 export class DynamicCheckboxComponent extends DynamicValueBaseComponent<DynamicValueBoolean> {
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
+
   constructor(_ngControl: NgControl) {
     super(_ngControl);
   }

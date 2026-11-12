@@ -7,7 +7,7 @@ import { ResourceInputConfigDirective } from './resource-input-config.directive'
 import { ResourceInputService } from '../../injectables/resource-input.service';
 import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP, StepBasicsModule } from '../../../basics/step-basics.module';
 import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
 import { AutomationPackageResourceComponent } from '../automation-package-resource/automation-package-resource.component';
 
@@ -58,6 +58,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
   private _resourceInputService = inject(RESOURCE_INPUT);
   private _config = inject(ResourceInputConfigDirective, { self: true });
   protected readonly _ngControl = inject(NgControl);
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;

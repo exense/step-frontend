@@ -1,0 +1,6 @@
+<ng-template #panelTemplate>
+  <div class="step-input-dropdown-panel" [id]="panelId" (mousedown)="$event.preventDefault()">
+    <ng-content />
+    <ng-content select="step-input-dropdown-help" />
+  </div>
+</ng-template>

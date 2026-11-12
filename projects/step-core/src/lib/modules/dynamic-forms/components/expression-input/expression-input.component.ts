@@ -1,6 +1,7 @@
 import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
+import { DYNAMIC_EXPRESSION_HELP } from '../../shared/dynamic-forms-help.token';
 
 type OnChange = (expression?: string) => void;
 type OnTouch = () => void;
@@ -28,6 +29,8 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
+
+  protected readonly _expressionHelp = inject(DYNAMIC_EXPRESSION_HELP);
 
   protected expression: string = '';
   protected isDisabled: boolean = false;
@@ -64,7 +67,11 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   protected editDynamicExpression(): void {
     this._richEditorDialogs
-      .editText(this.expression, { predefinedMode: AceMode.GROOVY, title: 'Free text editor' })
+      .editText(this.expression, {
+        predefinedMode: AceMode.GROOVY,
+        title: 'Free text editor',
+        help: this._expressionHelp,
+      })
       .subscribe((expression) => {
         this.expression = expression;
         this.onChange?.(expression);
