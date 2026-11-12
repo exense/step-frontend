@@ -150,7 +150,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return '';
   }
 
-  private showError(error: any) {
+  private showError(error: any): void {
     if (typeof error !== 'string' || error === '') {
       this._errorLogger.log('Error with unknown format', error);
     } else {
@@ -174,7 +174,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       tap((response: HttpEvent<any>) => {
         this.handleAsyncError(response);
       }),
-      catchError((error) => this.handleHttpError(error, true, req.method === 'GET')),
+      catchError((error) =>
+        error instanceof HttpErrorResponse
+          ? this.handleHttpError(error, true, req.method === 'GET')
+          : throwError(() => error),
+      ),
     );
   }
 }
