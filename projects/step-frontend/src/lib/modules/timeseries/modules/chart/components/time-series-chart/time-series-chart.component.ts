@@ -40,8 +40,11 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
   self: uPlot,
   rawValue: number,
   seriesIdx: number,
-  idx: number,
-) => string | number = (self: uPlot, rawValue: number, seriesIdx: number, idx: number): string | number => {
+  idx: number | null,
+) => string | number = (self: uPlot, rawValue: number, seriesIdx: number, idx: number | null): string | number => {
+  if (idx === null) {
+    return '';
+  }
   let date = new Date(rawValue);
   return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 };

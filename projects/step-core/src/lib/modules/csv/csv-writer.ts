@@ -28,6 +28,13 @@ export class CSVWriter {
 
   private escape(value: CSVValue): string {
     const text = value instanceof Date ? value.toISOString() : String(value ?? '');
+    const trimmedText = text.trimStart();
+    if (
+      typeof value === 'string' &&
+      (/^[=+\-@＝＋－＠]/u.test(trimmedText) || trimmedText.charCodeAt(0) < 32 || text.charCodeAt(0) < 32)
+    ) {
+      return `"\t${text.replace(/"/g, '""')}"`;
+    }
     return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
   }
 }

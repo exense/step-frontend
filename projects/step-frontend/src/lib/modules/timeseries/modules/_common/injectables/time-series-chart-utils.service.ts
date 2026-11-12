@@ -546,10 +546,12 @@ export class TimeSeriesChartUtilsService {
         stackEndSeriesIdx: stackEndSeriesIndex,
       });
       item.fill = item.strokeConfig!.color + 'cc';
-      item.value = (self: any, value: number, seriesIndex: number, index: number) =>
-        TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
-          this.calculateStackedValue(self, value, seriesIndex, index, skippedSeries),
-        );
+      item.value = (self: any, value: number, seriesIndex: number, index: number | null): string =>
+        index === null
+          ? ''
+          : TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(
+              this.calculateStackedValue(self, value, seriesIndex, index, skippedSeries),
+            );
     });
   }
 

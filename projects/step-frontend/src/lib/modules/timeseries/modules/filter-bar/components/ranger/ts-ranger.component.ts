@@ -96,19 +96,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   resizeChart(): void {
-    const chartPadding = 50; // this is the way uplot works
-    const fullWidth = this.uplot.width - chartPadding;
-    const leftSelect = this.uplot.select.left;
-    const width = this.uplot.select.width;
-    const rightSelect = leftSelect + width;
-    const leftPercent = (100 * leftSelect) / fullWidth;
-    const rightPercent = (100 * rightSelect) / fullWidth;
     this.uplot.setSize(this.getSize());
-    let newChartWidth = this.uplot.width - chartPadding;
-
-    const newLeft = (leftPercent / 100) * newChartWidth;
-    const newRight = (rightPercent / 100) * newChartWidth;
-    this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0, height: this.CHART_HEIGHT }, false);
   }
 
   protected init(settings: TSRangerSettings): void {
@@ -260,8 +248,14 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         },
         sync: {
           key: this.syncKey,
+          filters: {
+            // Ignore mouseup cursor updates that clear the selection before the synced mouseup arrives.
+            sub: (eventType, source): boolean => eventType !== 'mousemove' || source.cursor.event?.type !== 'mouseup',
+          },
         },
         bind: {
+          // uPlot's default target filter excludes the selection and its grips from hover events.
+          mousemove: (self: uPlot, target: HTMLElement, handler: MouseListener): MouseListener => handler,
           // this is not trigger when dblclick is fired on synced charts, but just on the ranger
           dblclick: (self: uPlot, b, handler: MouseListener) => {
             return (e: MouseEvent): null => {
