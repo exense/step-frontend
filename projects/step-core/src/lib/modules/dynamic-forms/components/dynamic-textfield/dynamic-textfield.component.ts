@@ -3,7 +3,11 @@ import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { DialogsService } from '../../../basics/step-basics.module';
-import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
+import {
+  DYNAMIC_VALUES_HELP_URL,
+  NUMBER_CHARS_POSITIVE_ONLY,
+  NUMBER_CHARS_WITH_NEGATIVE,
+} from '../../shared/constants';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 
 @Component({
@@ -25,6 +29,7 @@ export class DynamicTextfieldComponent
   @Input() predefinedRichEditorMode?: AceMode;
   @Input() allowedRichEditorModes?: AceMode[];
 
+  protected readonly helpUrl = DYNAMIC_VALUES_HELP_URL;
   protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
   constructor(_ngControl: NgControl) {

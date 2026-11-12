@@ -1,0 +1,45 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-input-dropdown {
+  display: none;
+}
+
+// The theme sets padding-top and an important min-width: fit-content on every overlay pane, which would widen the panel past the field.
+.cdk-overlay-container .cdk-overlay-pane.step-input-dropdown-pane {
+  padding-top: 0;
+  min-width: 0 !important;
+}
+
+.step-input-dropdown-panel {
+  box-sizing: border-box;
+  width: 100%;
+  background: var.$white;
+  border: 1px solid var.$gray-300;
+  border-radius: 0.8rem;
+  box-shadow: 0 4px 8px -2px rgba(16, 24, 40, 0.1);
+  overflow: hidden;
+  color: var(--step-text-color, var.$gray-700);
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+
+  step-input-dropdown-help {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.8rem 1.2rem;
+    background: var.$gray-50;
+    color: var.$gray-550;
+
+    &:not(:first-child) {
+      border-top: 1px solid var.$gray-200;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    a {
+      align-self: flex-start;
+    }
+  }
+}

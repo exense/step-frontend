@@ -85,6 +85,9 @@ import { UndraggedClickDirective } from './directives/undragged-click.directive'
 import { SkeletonPlaceholderComponent } from './components/skeleton-placeholder/skeleton-placeholder.component';
 import { ChartSkeletonComponent } from './components/chart-skeleton/chart-skeleton.component';
 import { ButtonSpinnerComponent } from './components/button-spinner/button-spinner.component';
+import { InputDropdownComponent } from './components/input-dropdown/input-dropdown.component';
+import { InputDropdownTriggerDirective } from './directives/input-dropdown-trigger.directive';
+import { InputDropdownHelpDirective } from './directives/input-dropdown-help.directive';
 import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
 
 @NgModule({
@@ -110,6 +113,9 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     SkeletonPlaceholderComponent,
     ChartSkeletonComponent,
     ButtonSpinnerComponent,
+    InputDropdownComponent,
+    InputDropdownTriggerDirective,
+    InputDropdownHelpDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -268,6 +274,9 @@ import { NonIdeDirective } from '../ide-common/directives/non-ide.directive';
     SkeletonPlaceholderComponent,
     ChartSkeletonComponent,
     ButtonSpinnerComponent,
+    InputDropdownComponent,
+    InputDropdownTriggerDirective,
+    InputDropdownHelpDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -320,6 +329,9 @@ export * from './directives/description.directive';
 export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
+export * from './components/input-dropdown/input-dropdown.component';
+export * from './directives/input-dropdown-trigger.directive';
+export * from './directives/input-dropdown-help.directive';
 export * from './directives/error.directive';
 export * from './directives/warning.directive';
 export * from './directives/alert.directive';

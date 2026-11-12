@@ -22,6 +22,8 @@
     (ngModelChange)="onExpressionChange($event)"
     [disabled]="isDisabled"
     (blur)="onBlur()"
+    [stepInputDropdownTrigger]="expressionHelp"
+    [stepInputDropdownDisabled]="isDisabled || !!isParentDisabled"
   />
 
   <step-suffix class="button-suffix">
@@ -56,3 +58,12 @@
     }
   </step-suffix>
 </step-form-field>
+<step-input-dropdown #expressionHelp>
+  <step-input-dropdown-help>
+    <p>
+      The whole field is a Groovy expression, for example "http://" + host + ":8080/api". Use it when you need a number,
+      a boolean or a complex object rather than text, or logic the placeholder syntax cannot express.
+    </p>
+    <a [href]="helpUrl" target="_blank" rel="noopener noreferrer">Learn more</a>
+  </step-input-dropdown-help>
+</step-input-dropdown>

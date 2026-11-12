@@ -1,6 +1,7 @@
 import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
+import { DYNAMIC_VALUES_HELP_URL } from '../../shared/constants';
 
 type OnChange = (expression?: string) => void;
 type OnTouch = () => void;
@@ -28,6 +29,8 @@ export class ExpressionInputComponent implements ControlValueAccessor {
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
+
+  protected readonly helpUrl = DYNAMIC_VALUES_HELP_URL;
 
   protected expression: string = '';
   protected isDisabled: boolean = false;
