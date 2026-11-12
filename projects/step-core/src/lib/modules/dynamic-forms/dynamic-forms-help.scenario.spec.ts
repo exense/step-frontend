@@ -18,7 +18,7 @@ const PLAIN_HELP_LINES = [
   'This is done for you, in two different ways depending on where the value lives. Only the values containing ${ are ever rewritten: a value without it, including one containing $ or $$, is never touched.',
 ];
 
-const TOGGLE_TO_EXPRESSION_TOOLTIP = 'Use a dynamic expression to set this attribute';
+const TOGGLE_TO_EXPRESSION_TOOLTIP = 'Toggle to use an expression for this value';
 const TOGGLE_TO_CONSTANT_TOOLTIP = 'Use a constant value to set this attribute';
 
 const PLAIN_VALUES: Record<FieldKind, FieldValue> = {

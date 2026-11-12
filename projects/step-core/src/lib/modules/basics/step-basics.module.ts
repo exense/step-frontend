@@ -320,6 +320,7 @@ export * from './types/compare-condition.enum';
 export * from './types/alert-type.enum';
 export * from './types/screen-width.token';
 export * from './types/is-small-screen.token';
+export * from './types/dynamic-expression-toggle-tooltip.token';
 export * from './types/resize-observable';
 export * from './types/time-unit.enum';
 export * from './types/generate-api-key-strategy';

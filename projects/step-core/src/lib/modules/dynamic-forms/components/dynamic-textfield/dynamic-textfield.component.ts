@@ -2,7 +2,7 @@ import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation }
 import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
-import { DialogsService } from '../../../basics/step-basics.module';
+import { DialogsService, DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP } from '../../../basics/step-basics.module';
 import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
 import { PLAIN_VALUE_HELP } from '../../shared/dynamic-forms-help.token';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
@@ -27,6 +27,7 @@ export class DynamicTextfieldComponent
   @Input() allowedRichEditorModes?: AceMode[];
 
   protected readonly _plainValueHelp = inject(PLAIN_VALUE_HELP);
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
   protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
   constructor(_ngControl: NgControl) {
