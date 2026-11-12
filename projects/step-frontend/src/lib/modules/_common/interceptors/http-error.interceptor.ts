@@ -150,7 +150,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return '';
   }
 
-  private showError(error: any) {
+  private showError(error: any): void {
     if (typeof error !== 'string' || error === '') {
       this._errorLogger.log('Error with unknown format', error);
     } else {
@@ -175,7 +175,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         this.handleAsyncError(response);
       }),
       catchError((error) =>
-        // Errors raised by inner interceptors (e.g. errors already handled by them) are passed through
         error instanceof HttpErrorResponse
           ? this.handleHttpError(error, true, req.method === 'GET')
           : throwError(() => error),
