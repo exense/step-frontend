@@ -7,6 +7,7 @@ import { GridDragHandleComponent } from './components/grid-drag-handle/grid-drag
 import { GridElementComponent } from './components/grid-element/grid-element.component';
 import { GridElementHeaderActionsComponent } from './components/grid-element-header-actions/grid-element-header-actions.component';
 import { GridItemDirective } from './directives/grid-item.directive';
+import { GridItemConditionDirective } from './directives/grid-item-condition.directive';
 import { GridControlToolComponent } from './components/grid-control-tool/grid-control-tool.component';
 import { GridLayoutTabsComponent } from './components/grid-layout-tabs/grid-layout-tabs.component';
 import { GridLayoutExternalTabDirective } from './components/grid-layout-tabs/grid-layout-external-tab.directive';
@@ -22,6 +23,7 @@ export const EDITABLE_GRID_LAYOUT_EXPORTS = [
   GridElementTitleComponent,
   GridControlToolComponent,
   GridItemDirective,
+  GridItemConditionDirective,
   GridLayoutTabsComponent,
   GridLayoutExternalTabDirective,
 ];
@@ -31,6 +33,7 @@ export * from './components/grid-resizer/grid-resizer.component';
 export * from './components/grid-element/grid-element.component';
 export * from './directives/grid-element.directive';
 export * from './directives/grid-item.directive';
+export * from './directives/grid-item-condition.directive';
 export * from './directives/grid-drag-handle.directive';
 export * from './components/grid-drag-handle/grid-drag-handle.component';
 export * from './components/grid-element-header-actions/grid-element-header-actions.component';

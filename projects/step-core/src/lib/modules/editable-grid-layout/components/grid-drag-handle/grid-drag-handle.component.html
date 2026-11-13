@@ -1,5 +1,16 @@
 <section></section>
 <div class="drag-handle-title">
+  @if (visibleConditionDescription(); as description) {
+    <step-icon
+      class="condition-indicator"
+      name="eye"
+      role="img"
+      tabindex="0"
+      aria-label="Displayed conditionally"
+      [matTooltip]="description"
+      matTooltipPosition="below"
+    />
+  }
   <step-grid-element-title />
 </div>
 <ng-content />
