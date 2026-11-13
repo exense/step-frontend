@@ -9,6 +9,10 @@
     [class.print]="_mode === ViewMode.PRINT"
     [class.hidden]="hasNoLayout()"
   >
+    <ng-container
+      stepGridItemCondition="errorsWidget"
+      stepGridItemConditionDescription="Displayed only when the execution has errors."
+    ></ng-container>
     @if (_state.errors$ | async; as errors) {
       <step-alt-execution-errors-widget
         *stepGridItem="'errorsWidget'; autoHeightOnFirstRow: true"
@@ -17,6 +21,14 @@
         (searchFor)="searchErrorInTree($event)"
       />
     }
+    <ng-container
+      stepGridItemCondition="testCases"
+      stepGridItemConditionDescription="Displayed only when the execution has more than one test case, or one test case executed more than once."
+    ></ng-container>
+    <ng-container
+      stepGridItemCondition="testCasesSummary"
+      stepGridItemConditionDescription="Displayed only when the execution has more than one test case, or one test case executed more than once."
+    ></ng-container>
     @if (hasTestCases$ | async) {
       @if (_state.testCases$ | async) {
         <step-alt-report-node-testcases-widget *stepGridItem="'testCases'" #testCasesWidget />
@@ -73,6 +85,10 @@
         />
       </step-alt-report-widget-content>
     </step-alt-report-widget>
+    <ng-container
+      stepGridItemCondition="currentOperations"
+      stepGridItemConditionDescription="Displayed only while the execution is running."
+    ></ng-container>
     @if (_state.currentOperations$ | async; as currentOperations) {
       <step-alt-report-current-operations *stepGridItem="'currentOperations'" [operations]="currentOperations" />
     }

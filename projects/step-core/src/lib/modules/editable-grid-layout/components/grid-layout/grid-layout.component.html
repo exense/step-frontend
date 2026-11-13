@@ -6,7 +6,7 @@
     @if (item.templateRef; as templateRef) {
       <step-grid-element [elementId]="item.widgetId">
         <ng-container *ngTemplateOutlet="templateRef; context: { heightInCells: item.heightInCells }" />
-        <step-grid-drag-handle />
+        <step-grid-drag-handle [conditionDescription]="item.conditionDescription" />
         @if (item.canResize) {
           <step-grid-resizer />
         }
@@ -18,11 +18,15 @@
           @if (item.isSupported) {
             <step-icon name="eye" />
             <span>Widget is currently hidden for this execution</span>
-            <step-icon
-              name="help-circle"
-              matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
-              matTooltipPosition="below"
-            />
+            @if (item.conditionDescription; as conditionDescription) {
+              <step-icon name="help-circle" [matTooltip]="conditionDescription" matTooltipPosition="below" />
+            } @else {
+              <step-icon
+                name="help-circle"
+                matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
+                matTooltipPosition="below"
+              />
+            }
           } @else {
             <step-icon name="alert-triangle" />
             <span>Widget is not supported: {{ item.widgetType }}</span>

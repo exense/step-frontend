@@ -8,7 +8,9 @@
   position: relative;
   z-index: 12;
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 0.6rem;
   width: 100%;
   padding: 0.8rem 1.2rem;
   margin-top: 1.4rem;
@@ -18,4 +20,9 @@
   text-align: center;
   pointer-events: none;
   user-select: none;
+}
+
+.condition-indicator {
+  flex: none;
+  pointer-events: auto;
 }
