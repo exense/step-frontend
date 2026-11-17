@@ -12,6 +12,7 @@ import {
 } from '../../async-operations/async-operations.module';
 import { BulkOperationConfig, BulkOperationPerformStrategy, BulkSelectionType } from '../../entities-selection';
 import { AsyncTaskStatus, TableBulkOperationRequest, TableParameters } from '../../../client/step-client-module';
+import { escapeHtml } from '../../basics/utils/escape-html';
 
 const formatMessageWithDeleteWarning = (
   strings: TemplateStringsArray,
@@ -193,7 +194,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
   }
 
   private alertLayout(alertType: AlertType, text: string): string {
-    const escapedText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escapedText = escapeHtml(text);
     return `<step-alert type="${alertType}">
       <section class="message-content">
         <div>${escapedText}</div>

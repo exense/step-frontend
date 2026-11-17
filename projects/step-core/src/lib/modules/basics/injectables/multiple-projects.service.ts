@@ -2,14 +2,13 @@ import { inject, Injectable, InjectionToken } from '@angular/core';
 import { CheckLoadErrorsConfig, MultipleProjectsStrategy, Project } from '../types/multiple-projects-strategy';
 import { Observable, pipe, tap, UnaryFunction } from 'rxjs';
 import { ErrorMessageHandlerService } from './error-message-handler.service';
-import { ProjectScopeWarning } from './project-scope-warning.service';
 
 const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default multiple project strategy', {
   providedIn: 'root',
   factory: () => {
     const _errorMessageHandler = inject(ErrorMessageHandlerService);
     return {
-      showProjectMessage: (message?: ProjectScopeWarning) => {},
+      showProjectMessage: (message?: { icon: string; message: string }) => {},
       currentProject: () => undefined,
       getProjects: () => [],
       getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
@@ -87,7 +86,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     return this._strategy.checkLoadErrors(config);
   }
 
-  showProjectMessage(message?: ProjectScopeWarning): void {
+  showProjectMessage(message?: { icon: string; message: string }): void {
     this._strategy.showProjectMessage(message);
   }
 
