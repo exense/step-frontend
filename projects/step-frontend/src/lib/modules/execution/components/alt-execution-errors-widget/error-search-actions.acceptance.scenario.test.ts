@@ -300,7 +300,7 @@ describe('SED-5023 public error search action acceptance', () => {
     expect(legacySearch).toHaveBeenCalledTimes(1);
   }));
 
-  it('AC-4 AC-5: preserves standalone table typed navigation and the Test Cases gate with corrected accessible labels', fakeAsync(() => {
+  it('AC-4 AC-5: keeps standalone table navigation tree-only with and without test cases', fakeAsync(() => {
     const fixture = create(AltExecutionErrorsComponent);
     const entry = error();
     fixture.componentRef.setInput('dataSource', new TableLocalDataSource([entry]));
@@ -310,16 +310,17 @@ describe('SED-5023 public error search action acceptance', () => {
     fixture.componentInstance.searchFor.subscribe(search);
     settle(fixture);
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(entry.errorMessage);
+    expect(button(fixture, 'Find error in Steps')).toBeUndefined();
     expect(button(fixture, 'Find error in Test Cases')).toBeUndefined();
     expectAction(fixture, destinations()[0]).click();
     expect(search).toHaveBeenLastCalledWith({ type: SearchErrorType.TREE, value: entry.errorMessage });
-    expectAction(fixture, destinations()[1]).click();
-    expect(search).toHaveBeenLastCalledWith({ type: SearchErrorType.KEYWORD, value: entry.errorMessage });
     fixture.componentRef.setInput('hasTestCases', true);
     settle(fixture);
-    expectAction(fixture, destinations()[2]).click();
-    expect(search).toHaveBeenLastCalledWith({ type: SearchErrorType.TEST_CASE, value: entry.errorMessage });
-    expect(search).toHaveBeenCalledTimes(3);
+    expect(button(fixture, 'Find error in Steps')).toBeUndefined();
+    expect(button(fixture, 'Find error in Test Cases')).toBeUndefined();
+    expectAction(fixture, destinations()[0]).click();
+    expect(search).toHaveBeenLastCalledWith({ type: SearchErrorType.TREE, value: entry.errorMessage });
+    expect(search).toHaveBeenCalledTimes(2);
   }));
 
   it('AC-5: treats supplied action arrays as authoritative and preserves showActions=false for the real table', fakeAsync(() => {

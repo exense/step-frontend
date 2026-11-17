@@ -155,28 +155,6 @@ export class AltExecutionReportComponent
       },
       activate: (error) => this.searchErrorInTree(error.errorMessage),
     });
-    this._errorSearchActions.register({
-      id: 'steps',
-      label: 'Find error in Steps',
-      icon: 'list',
-      isAvailable: () => {
-        const widget = this.keywordWidget();
-        const container = this.keywordWidgetContainer();
-        return !!widget && !!container;
-      },
-      activate: (error) => this.searchErrorInKeywords(error.errorMessage),
-    });
-    this._errorSearchActions.register({
-      id: 'testCases',
-      label: 'Find error in Test Cases',
-      icon: 'plan-testcase',
-      isAvailable: () => {
-        const widget = this.testCasesWidget();
-        const container = this.testCasesWidgetContainer();
-        return !!widget && !!container;
-      },
-      activate: (error) => this.searchErrorInTestCases(error.errorMessage),
-    });
   }
 
   private scheduleAfterNextPaint(callback: () => void): void {

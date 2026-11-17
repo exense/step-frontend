@@ -114,40 +114,19 @@ export class AltExecutionErrorsComponent {
     return columns;
   });
 
-  protected readonly resolvedSearchActions = computed(() => {
+  protected readonly resolvedSearchActions = computed<readonly ErrorSearchAction[]>(() => {
     const searchActions = this.searchActions();
-    const hasTestCases = this.hasTestCases();
-    if (searchActions !== undefined) {
-      return searchActions;
-    }
-
-    const actions: ErrorSearchAction[] = [
-      {
-        id: 'tree',
-        label: 'Find error in tree',
-        icon: 'tree',
-        isAvailable: () => true,
-        activate: (error) => this.findInTree(error.errorMessage),
-      },
-      {
-        id: 'steps',
-        label: 'Find error in Steps',
-        icon: 'list',
-        isAvailable: () => true,
-        activate: (error) => this.findInKeywords(error.errorMessage),
-      },
-    ];
-    if (!hasTestCases) {
-      return actions;
-    }
-    actions.push({
-      id: 'testCases',
-      label: 'Find error in Test Cases',
-      icon: 'plan-testcase',
-      isAvailable: () => this.hasTestCases(),
-      activate: (error) => this.findInTestCases(error.errorMessage),
-    });
-    return actions;
+    return (
+      searchActions ?? [
+        {
+          id: 'tree',
+          label: 'Find error in tree',
+          icon: 'tree',
+          isAvailable: () => true,
+          activate: (error) => this.findInTree(error.errorMessage),
+        },
+      ]
+    );
   });
 
   protected activateSearchAction(action: ErrorSearchAction, error: TimeSeriesErrorEntry): void {
