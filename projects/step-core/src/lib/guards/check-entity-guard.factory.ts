@@ -10,6 +10,7 @@ import {
 import { EntityRegistry } from '../modules/entity/injectables/entity-registry';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
+import { escapeHtml } from '../modules/basics/utils/escape-html';
 
 export interface CheckProjectGuardConfig {
   entityType: string;
@@ -121,9 +122,12 @@ export const checkEntityGuardFactory =
             action,
           });
         } else {
+          const messageHtml = action
+            ? `${escapeHtml(message)} <a href="${escapeHtml(action.url)}">${escapeHtml(action.label)}</a>`
+            : escapeHtml(message);
           _multipleProjects.showProjectMessage({
             icon: 'alert-triangle',
-            message: action ? `${message} <a href="${action.url}">${action.label}</a>` : message,
+            message: messageHtml,
           });
         }
 
