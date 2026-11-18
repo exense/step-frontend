@@ -9,11 +9,11 @@ import {
   FilterConditionFactoryService,
   tableColumnsConfigProvider,
   entitySelectionStateProvider,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { filter, switchMap } from 'rxjs';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-parameter-list',
@@ -36,7 +36,7 @@ export class ParameterListComponent implements DialogParentService, OnInit {
   private _dialogs = inject(DialogsService);
   private _parametersService = inject(AugmentedParametersService);
   private _dialogCommunicationService = inject(DialogCommunicationService);
-  private destroyRef = inject(DestroyRef);
+  private _destroyRef = inject(DestroyRef);
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
@@ -45,7 +45,7 @@ export class ParameterListComponent implements DialogParentService, OnInit {
   readonly dataSource = this._parametersService.createDataSource();
 
   ngOnInit(): void {
-    this._dialogCommunicationService.dialogAction$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+    this._dialogCommunicationService.dialogAction$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
       this.dataSource.reload();
     });
   }
