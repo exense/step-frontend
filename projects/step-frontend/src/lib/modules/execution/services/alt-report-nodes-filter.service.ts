@@ -3,7 +3,7 @@ import { EXECUTION_ID } from './execution-id.token';
 import { FormBuilder } from '@angular/forms';
 import { ERROR_STATUSES, REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, debounceTime, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs';
+import { combineLatest, debounceTime, defer, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
 import { AltExecutionViewAllService } from './alt-execution-view-all.service';
 import { AltExecutionStateService } from './alt-execution-state.service';
@@ -11,9 +11,12 @@ import { DateUtilsService } from '@exense/step-core';
 
 @Injectable()
 export abstract class AltReportNodesFilterService {
-  protected constructor(protected storagePrefix: string) {
+  protected constructor(storagePrefix: string) {
+    this.storagePrefix = storagePrefix;
     this.setupSyncWithStorage();
   }
+
+  protected readonly storagePrefix: string;
 
   private _fb = inject(FormBuilder);
   protected _executionId = inject(EXECUTION_ID);
@@ -27,8 +30,9 @@ export abstract class AltReportNodesFilterService {
 
   readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, { initialValue: this.statusesCtrl.value });
 
-  readonly selectedStatuses$ = this.statusesCtrl.valueChanges.pipe(
-    startWith(this.statusesCtrl.value),
+  readonly selectedStatuses$ = defer(() =>
+    this.statusesCtrl.valueChanges.pipe(startWith(this.statusesCtrl.value)),
+  ).pipe(
     map((statuses) => new Set(statuses)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -65,16 +69,13 @@ export abstract class AltReportNodesFilterService {
     return new Set(value ?? []);
   });
 
-  readonly artefactClass$ = this.artefactClassCtrl.valueChanges.pipe(
-    startWith(this.artefactClassCtrl.value),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
+  readonly artefactClass$ = defer(() =>
+    this.artefactClassCtrl.valueChanges.pipe(startWith(this.artefactClassCtrl.value)),
+  ).pipe(shareReplay(1), takeUntilDestroyed());
 
   readonly searchCtrl = this._fb.control<string>('');
 
-  readonly search$ = this.searchCtrl.valueChanges.pipe(
-    startWith(this.searchCtrl.value),
+  readonly search$ = defer(() => this.searchCtrl.valueChanges.pipe(startWith(this.searchCtrl.value))).pipe(
     debounceTime(200),
     shareReplay(1),
     map((value) => (value ?? '').trim().toLowerCase()),

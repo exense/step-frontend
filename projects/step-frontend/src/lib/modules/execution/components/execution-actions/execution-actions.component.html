@@ -25,7 +25,12 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="disabled() || !availability().schedule || !('plan-execute' | hasRight | async)"
+      [disabled]="
+        disabled() ||
+        !availability().schedule ||
+        !('plan-execute' | hasRight | async) ||
+        !('task-write' | hasRight | async)
+      "
       aria-label="Left Align"
       [matTooltip]="tooltips().schedule"
       matTooltipPosition="below"

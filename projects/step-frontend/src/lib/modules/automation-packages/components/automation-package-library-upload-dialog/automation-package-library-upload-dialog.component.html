@@ -90,7 +90,7 @@
       mat-flat-button
       color="primary"
       (click)="upload()"
-      [disabled]="!!progress$ || !('resource-write' | hasRight | async)"
+      [disabled]="!!progress$ || !('automation-package-write' | hasRight | async)"
     >
       @switch (selectedType()) {
         @case (UploadType.UPLOAD) {
