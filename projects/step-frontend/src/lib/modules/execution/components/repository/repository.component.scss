@@ -1,0 +1,5 @@
+:host {
+  display: block;
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 2rem) clamp(0.75rem, 2vw, 1.5rem);
+}
