@@ -19,7 +19,7 @@ import { ArtefactFormChangeHelperService } from '../../injectables/artefact-form
 import { BehaviorSubject } from 'rxjs';
 import { EDITABLE_LABELS_EXPORTS } from '../../../editable-labels';
 import { CustomRegistriesModule } from '../../../custom-registeries/custom-registries.module';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP, StepBasicsModule } from '../../../basics/step-basics.module';
 import { DynamicFormsModule } from '../../../dynamic-forms/dynamic-forms.module';
 
 @Component({
@@ -33,6 +33,7 @@ import { DynamicFormsModule } from '../../../dynamic-forms/dynamic-forms.module'
 export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit, OnDestroy {
   private _artefactsService = inject(ArtefactService);
   private _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
 
   @ViewChild('form')
   private form!: NgForm;

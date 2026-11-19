@@ -141,7 +141,7 @@
     <button
       type="button"
       mat-flat-button
-      matTooltip="Toggle dynamic field"
+      [matTooltip]="toggleTooltip()"
       matTooltipPosition="below"
       [disabled]="isDisabled()"
       [color]="dynamic() ? 'primary' : undefined"

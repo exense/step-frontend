@@ -17,12 +17,11 @@ export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimp
   readonly DynamicFieldType = JsonFieldType;
   readonly AceMode = AceMode;
 
-  /** @Input() **/
   readonly enumItems = input<string[] | undefined>([]);
 
-  private enumItemsSet = computed(() => new Set(this.enumItems() ?? []));
+  private readonly enumItemsSet = computed(() => new Set(this.enumItems() ?? []));
 
-  protected displayEnumExtraValue = computed(() => {
+  protected readonly displayEnumExtraValue = computed(() => {
     const fieldType = this.fieldType();
     const enumItemsSet = this.enumItemsSet();
     const value = this.value();
@@ -31,8 +30,4 @@ export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimp
     }
     return value && !enumItemsSet.has(value.toString());
   });
-
-  constructor(@Optional() _ngControl?: NgControl) {
-    super(_ngControl);
-  }
 }

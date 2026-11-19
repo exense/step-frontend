@@ -2,6 +2,7 @@ import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } fro
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { DYNAMIC_EXPRESSION_HELP } from '../../shared/dynamic-forms-help.token';
+import { CONSTANT_VALUE_TOGGLE_TOOLTIP } from '../../../basics/step-basics.module';
 
 type OnChange = (expression?: string) => void;
 type OnTouch = () => void;
@@ -31,6 +32,7 @@ export class ExpressionInputComponent implements ControlValueAccessor {
   private onTouch?: OnTouch;
 
   protected readonly _expressionHelp = inject(DYNAMIC_EXPRESSION_HELP);
+  protected readonly _constantToggleTooltip = inject(CONSTANT_VALUE_TOGGLE_TOOLTIP);
 
   protected expression: string = '';
   protected isDisabled: boolean = false;
