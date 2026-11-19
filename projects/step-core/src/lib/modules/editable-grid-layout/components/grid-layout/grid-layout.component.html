@@ -13,20 +13,17 @@
       </step-grid-element>
     } @else {
       <step-grid-element [elementId]="item.widgetId" class="hidden-placeholder">
-        <step-grid-drag-handle />
+        @let description =
+          item.isSupported ? (item.conditionDescription ?? 'Widget is currently hidden for this execution') : undefined;
+        <step-grid-drag-handle [conditionDescription]="description" />
         <div class="hidden-placeholder-info">
           @if (item.isSupported) {
-            <step-icon name="eye" />
             <span>Widget is currently hidden for this execution</span>
-            @if (item.conditionDescription; as conditionDescription) {
-              <step-icon name="help-circle" [matTooltip]="conditionDescription" matTooltipPosition="below" />
-            } @else {
-              <step-icon
-                name="help-circle"
-                matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
-                matTooltipPosition="below"
-              />
-            }
+            <step-icon
+              name="help-circle"
+              matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
+              matTooltipPosition="below"
+            />
           } @else {
             <step-icon name="alert-triangle" />
             <span>Widget is not supported: {{ item.widgetType }}</span>
