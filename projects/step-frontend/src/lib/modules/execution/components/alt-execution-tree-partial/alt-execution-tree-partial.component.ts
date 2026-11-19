@@ -13,7 +13,12 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { AggregatedReportViewRequest, AugmentedExecutionsService, ReportNode } from '@exense/step-core';
+import {
+  AggregatedReport,
+  AggregatedReportViewRequest,
+  AugmentedExecutionsService,
+  ReportNode,
+} from '@exense/step-core';
 import { catchError, combineLatest, filter, finalize, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -25,6 +30,11 @@ import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggr
 import { Router } from '@angular/router';
 import { Status } from '../../../_common/shared/status.enum';
 import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.service';
+
+interface PartialTreeResult extends AggregatedReport {
+  reportNode: ReportNode;
+  shouldFocusNode: boolean;
+}
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
@@ -62,6 +72,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   private readonly isFirstLoad = signal(true);
   private lastLoadedReportNodeId?: string;
+  private lastFocusedReportNodeId?: string;
   private readonly loadInProgress = signal(false);
   protected readonly showSpinner = computed(() => {
     const isFirstLoad = this.isFirstLoad();
@@ -94,6 +105,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     this._treeUtils.cleanupImportantIds();
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Keep the existing public partial-tree search API.
   focusAndSearch(query: string): void {
     this._treeSearch.searchCtrl.setValue(query ?? '');
   }
@@ -121,6 +133,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           return reportNode?.status === Status.RUNNING;
         }),
         switchMap(([executionId, range, reportNode]) => {
+          const shouldFocusNode = this.lastFocusedReportNodeId !== reportNode.id || !!range?.isManualChange;
           this.lastLoadedReportNodeId = reportNode?.id;
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
@@ -129,12 +142,14 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
               aggregatedReportView: response?.aggregatedReportView,
               partialTreeRootNodeId: response?.partialTreeRootNodeId,
               reportNode,
+              shouldFocusNode,
             })),
             catchError(() =>
               of({
                 aggregatedReportView: undefined,
                 partialTreeRootNodeId: undefined,
                 reportNode,
+                shouldFocusNode,
               }),
             ),
             finalize(() => {
@@ -145,32 +160,36 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
         }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((result) => {
-        if (!result?.aggregatedReportView) {
-          this._treeUtils.cleanupImportantIds();
-          this._treeState.init(undefined);
-          return;
-        }
-        const { aggregatedReportView, partialTreeRootNodeId, reportNode } = result;
+      .subscribe((result) => this.applyTree(result));
+  }
 
-        this._treeState.init(aggregatedReportView, { partialTreeRootNodeId });
+  private applyTree(result: PartialTreeResult): void {
+    if (!result.aggregatedReportView) {
+      this.lastFocusedReportNodeId = undefined;
+      this._treeUtils.cleanupImportantIds();
+      this._treeState.init(undefined);
+      return;
+    }
+    const { aggregatedReportView, partialTreeRootNodeId, reportNode, shouldFocusNode } = result;
 
-        const treeNode = this.findTreeNode(reportNode);
+    this._treeState.init(aggregatedReportView, { partialTreeRootNodeId });
 
-        if (treeNode?.id) {
-          this._treeUtils.markIdAsImportant(treeNode.id);
-          this._treeState.selectNode(treeNode);
-          if (this.autoFocusNode()) {
-            this.tree()?.focusNode?.(treeNode.id);
-          }
-        }
+    const treeNode = this.findTreeNode(reportNode);
 
-        const url = this._router.parseUrl(this._router.url);
-        const searchFor = url.queryParams['searchFor'];
-        if (searchFor) {
-          queueMicrotask(() => this._treeSearch.searchCtrl.setValue(searchFor));
-        }
-      });
+    if (treeNode?.id) {
+      this._treeUtils.markIdAsImportant(treeNode.id);
+      this._treeState.selectNode(treeNode);
+      if (this.autoFocusNode() && shouldFocusNode) {
+        this.lastFocusedReportNodeId = reportNode.id;
+        this.tree()?.focusNode?.(treeNode.id);
+      }
+    }
+
+    const url = this._router.parseUrl(this._router.url);
+    const searchFor = url.queryParams['searchFor'];
+    if (searchFor) {
+      queueMicrotask(() => this._treeSearch.searchCtrl.setValue(searchFor));
+    }
   }
 
   private findTreeNode(reportNode: ReportNode): AggregatedTreeNode | undefined {
