@@ -43,14 +43,14 @@ import {
   EntityRefService,
   Execution,
   EXECUTION_REPORT_GRID,
-  IDE_MODE,
-  ExecutionCloseHandleService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
   EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
+  ExecutionCloseHandleService,
   ExecutionReportStaticLayoutRegistryService,
   GRID_ELEMENT_HEADER_ACTIONS,
   GridEditableService,
   GridPersistenceStateService,
+  IDE_MODE,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverComponent,
@@ -63,8 +63,8 @@ import {
   TableDataSource,
   TableLocalDataSource,
   TableRemoteDataSourceFactoryService,
-  TimeSeriesErrorEntry,
   TimeRangeSelection,
+  TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -143,6 +143,7 @@ interface AgentProvisioningStatusInfo {
 
 interface ControlledPopover {
   toggled: boolean;
+
   openPopover(): void;
 }
 
@@ -803,7 +804,7 @@ export class AltExecutionProgressComponent
 
   private setupAggregatedTreeRefresh(): void {
     combineLatest([
-      this._refreshActivityService.isActive$(AltExecutionRefreshActivity.TREE),
+      this._refreshActivityService.isActive$(AltExecutionRefreshActivity.AGGREGATED_TREE),
       this.execution$,
       this.timeRangeSelection$,
     ])
@@ -866,45 +867,53 @@ export class AltExecutionProgressComponent
   }
 
   private setupReportTreeRefresh(): void {
-    this.execution$
+    combineLatest([this._refreshActivityService.isActive$(AltExecutionRefreshActivity.REPORT_TREE), this.execution$])
       .pipe(
-        switchMap((execution) => {
-          const id = execution?.id;
-          const displayProgress = this.shouldDisplayReportTreeProgress(execution);
-          if (displayProgress) {
-            this.reportTreeInProgressInternal.set(true);
-          }
+        filter(([isActive]) => isActive),
+        map(([, execution]) => execution),
+        debounceTime(200),
+        smartSwitchMap(
+          (curr, prev) => curr.id !== prev?.id || curr.status !== prev?.status,
+          (execution) => {
+            const id = execution?.id;
+            const displayProgress = this.shouldDisplayReportTreeProgress(execution);
+            if (displayProgress) {
+              this.reportTreeInProgressInternal.set(true);
+            }
 
-          if (!id) {
-            this.reportTreeInProgressInternal.set(false);
-            return of(undefined);
-          }
+            if (!id) {
+              this.reportTreeInProgressInternal.set(false);
+              return of(undefined);
+            }
 
-          return this._reportNodeTreeState.whenDepthRestoreSettled().pipe(
-            switchMap(() => {
-              const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
-              const parentIds = [
-                ...new Set(
-                  expandedNodeIds
-                    .map((nodeId) => this._reportNodeTreeState.findNodeById(nodeId)?.originalNode?.id)
-                    .filter((nodeId): nodeId is string => !!nodeId),
-                ),
-              ];
+            return this._reportNodeTreeState.whenDepthRestoreSettled().pipe(
+              switchMap(() => {
+                const expandedNodeIds = this._reportNodeTreeState.getExpandedNodeIds();
+                const parentIds = [
+                  ...new Set(
+                    expandedNodeIds
+                      .map((nodeId) => this._reportNodeTreeState.findNodeById(nodeId)?.originalNode?.id)
+                      .filter((nodeId): nodeId is string => !!nodeId),
+                  ),
+                ];
 
-              return this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
-                map((nodes) => nodes?.[0]),
-                catchError(() => of(undefined)),
-                tap(() => this.reportTreeInProgressInternal.set(false)),
-                switchMap((rootNode) => {
-                  if (!rootNode || !this.isReportTreeInitialized || !parentIds.length) {
-                    return of(rootNode);
-                  }
-                  return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, parentIds);
-                }),
-              );
-            }),
-          );
-        }),
+                return this._reportNodeTreeState._treeNodeUtils.loadNodes(id).pipe(
+                  map((nodes) => nodes?.[0]),
+                  tap(() => this.reportTreeInProgressInternal.set(false)),
+                  switchMap((rootNode) => {
+                    if (!rootNode || !this.isReportTreeInitialized || !parentIds.length) {
+                      return of(rootNode);
+                    }
+                    return this._reportNodeTreeState._treeNodeUtils.restoreTree(rootNode, parentIds);
+                  }),
+                  catchError(() => of(undefined)),
+                );
+              }),
+            );
+          },
+          this._destroyRef,
+          (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+        ),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((rootNode) => {

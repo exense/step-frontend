@@ -1,4 +1,4 @@
-import { inject, NgModule, DOCUMENT } from '@angular/core';
+import { DOCUMENT, inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -24,23 +24,24 @@ import {
   EntityRefDirective,
   EntityRegistry,
   EXECUTION_REPORT_GRID,
+  EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
+  ExecutionReportStaticLayoutRegistryService,
   GridSettingsRegistryService,
   MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
+  PLAN_EXECUTION_REPORT_GRID,
   preloadScreenDataResolver,
+  REPOSITORY_REPORT_GRID,
   schedulePlanRoute,
+  SCHEDULER_EXECUTION_REPORT_GRID,
   SearchPaginatorComponent,
   sequenceCanActivateGuards,
   SimpleOutletComponent,
   stepRouteAdditionalConfig,
-  TreeNodeUtilsService,
+  treeStateFactoryProvider,
   ViewItemDefaultNamePipe,
   ViewRegistryService,
-  PLAN_EXECUTION_REPORT_GRID,
-  SCHEDULER_EXECUTION_REPORT_GRID,
-  REPOSITORY_REPORT_GRID,
-  treeStateFactoryProvider,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -172,7 +173,6 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { ExecutionHistorySectionComponent } from './components/execution-history-section/execution-history-section.component';
 
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
-import { EXECUTION_REPORT_LAYOUT_ROUTE_DATA, ExecutionReportStaticLayoutRegistryService } from '@exense/step-core';
 
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
@@ -250,7 +250,8 @@ const createAltExecutionNodeDetailsRoute = (): Route => ({
       canActivate: [
         () => {
           inject(AltExecutionRefreshActivityService).setupRefreshActivity(
-            AltExecutionRefreshActivity.TREE,
+            AltExecutionRefreshActivity.AGGREGATED_TREE,
+            AltExecutionRefreshActivity.REPORT_TREE,
             AltExecutionRefreshActivity.KEYWORDS_TABLE,
             AltExecutionRefreshActivity.TEST_CASES_TABLE,
           );
