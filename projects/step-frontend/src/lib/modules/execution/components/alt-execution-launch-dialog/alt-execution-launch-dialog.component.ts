@@ -5,6 +5,7 @@ import {
   AugmentedExecutionsService,
   ControllerService,
   CustomFormComponent,
+  Execution,
   ExecutionCommandsContext,
   ExecutionLaunchDashletContext,
   IncludeTestcases,
@@ -27,6 +28,7 @@ export interface AltExecutionLaunchDialogData {
   repoRef: RepositoryObjectReference;
   parameters?: Record<string, string>;
   relaunchExecutionId?: string;
+  execution?: Execution;
   testCases?: {
     items?: TestRunStatus[];
     selection?: IncludeTestcases;
@@ -122,6 +124,10 @@ export class AltExecutionLaunchDialogComponent
   }
 
   /* eslint-disable step-lint/component-public-fields -- Public overrides implement ExecutionCommandsContext and the base execution actions. */
+  override getExecution(): Execution | undefined {
+    return this._data.execution;
+  }
+
   override getIncludedTestcases(): IncludeTestcases | null | undefined {
     return this.testcases();
   }

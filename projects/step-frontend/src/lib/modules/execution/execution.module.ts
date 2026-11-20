@@ -941,6 +941,10 @@ export class ExecutionModule {
                 title: 'Relaunch Execution',
               },
               resolve: {
+                execution: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  return _context.execution$.pipe(take(1));
+                },
                 repoRef: () => {
                   const _context = inject(ActiveExecutionContextService);
                   return _context.execution$.pipe(

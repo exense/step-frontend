@@ -8,6 +8,8 @@ import {
   EntitySelectionState,
   entitySelectionStateProvider,
   Execution,
+  ExecutionActionGuardRegistryService,
+  ExecutionActionGuardService,
   ExecutionListFiltersService,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
@@ -64,6 +66,8 @@ export class ExecutionListComponent implements OnDestroy {
   );
   private readonly _dialogs = inject(DialogsService);
   private readonly _auth = inject(AuthService);
+  private readonly _guardRegistry = inject(ExecutionActionGuardRegistryService);
+  private readonly _actionGuard = inject(ExecutionActionGuardService);
 
   protected autoRefreshDisabled: boolean = false;
 
@@ -107,8 +111,10 @@ export class ExecutionListComponent implements OnDestroy {
       : this._augmentedExecutionsService
           .getExecutionById(execution.id!)
           .pipe(map((value) => value.executionParameters));
-    this._dialogs
-      .showWarning(`Are you sure you want to restart Execution ${name}?`)
+    const authorization$ = this._guardRegistry.hasGuards('execute')
+      ? this._actionGuard.check('execute', execution)
+      : this._dialogs.showWarning(`Are you sure you want to restart Execution ${name}?`);
+    authorization$
       .pipe(
         filter((confirmed) => !!confirmed),
         switchMap(() => parameters$),
@@ -126,8 +132,10 @@ export class ExecutionListComponent implements OnDestroy {
 
   protected stopExecution(execution: Execution): void {
     const name = execution.description;
-    this._dialogs
-      .showWarning(`Are you sure you want to stop Execution ${name}?`)
+    const authorization$ = this._guardRegistry.hasGuards('stop')
+      ? this._actionGuard.check('stop', execution)
+      : this._dialogs.showWarning(`Are you sure you want to stop Execution ${name}?`);
+    authorization$
       .pipe(
         filter((confirmed) => !!confirmed),
         switchMap(() => this._augmentedExecutionsService.abort(execution.id!)),
