@@ -21,7 +21,12 @@
             <span>Widget is currently hidden for this execution</span>
             <step-icon
               name="help-circle"
-              matTooltip="The widget is displayed by conditions not met in this execution, and will be hidden after finishing editing this layout."
+              role="img"
+              tabindex="0"
+              aria-label="Widget visibility condition"
+              [matTooltip]="
+                item.conditionDescription ?? 'The display conditions for this widget are not met in this execution.'
+              "
               matTooltipPosition="below"
             />
           } @else {
