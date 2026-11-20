@@ -36,7 +36,7 @@
     <button
       type="button"
       mat-stroked-button
-      matTooltip="Use a dynamic expression to set this attribute"
+      [matTooltip]="_toggleTooltip"
       matTooltipPosition="below"
       (click)="toggleDynamicExpression.emit()"
       [disabled]="!!isDisabled || !!parentControl?.disabled"

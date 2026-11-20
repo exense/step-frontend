@@ -1,8 +1,9 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, ViewEncapsulation } from '@angular/core';
 import { DynamicValueString } from '../../../../client/step-client-module';
 import { NgControl } from '@angular/forms';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { JsonFieldsSchema } from '../../../json-forms';
+import { DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-json',
@@ -20,6 +21,8 @@ export class DynamicJsonComponent extends DynamicValueBaseComponent<DynamicValue
   @Input() addFieldBtnLabel?: string;
   @Input() jsonFieldsLabel?: string;
   @Input() schema?: JsonFieldsSchema;
+
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
 
   constructor(_ngControl: NgControl) {
     super(_ngControl);

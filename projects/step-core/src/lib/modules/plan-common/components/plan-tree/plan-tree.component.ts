@@ -30,6 +30,15 @@ import { SPLIT_EXPORTS } from '../../../split';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { AsyncPipe } from '@angular/common';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
+import {
+  INTERPOLATION_SUGGESTION_CONTEXT,
+  InterpolationSuggestionContext,
+  InterpolationSuggestionLookup,
+} from '../../../dynamic-forms/shared/interpolation-suggestions';
+import {
+  getInterpolationPlanId,
+  MockInterpolationSuggestionLookupService,
+} from '../../injectables/mock-interpolation-suggestion-lookup.service';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -54,6 +63,18 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
       provide: TreeActionsService,
       useExisting: forwardRef(() => PlanTreeComponent),
     },
+    MockInterpolationSuggestionLookupService,
+    {
+      provide: InterpolationSuggestionLookup,
+      useFactory: (): InterpolationSuggestionLookup =>
+        inject(InterpolationSuggestionLookup, { skipSelf: true, optional: true }) ??
+        inject(MockInterpolationSuggestionLookupService),
+    },
+    {
+      provide: INTERPOLATION_SUGGESTION_CONTEXT,
+      useFactory: (): Signal<InterpolationSuggestionContext | undefined> =>
+        inject(PlanTreeComponent).interpolationSuggestionContext,
+    },
   ],
 })
 export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
@@ -72,6 +93,19 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   readonly externalObjectDrop = output<DropInfo>();
 
   readonly isReadonly = input(false);
+
+  private readonly interpolationSuggestionContext = computed(() => {
+    const activeNode = this.activeNode();
+    const isReadonly = this.isReadonly();
+    const planContext = this._planEditorService.planContext();
+
+    const nodeId = activeNode?.originalArtefact?.id;
+    const planId = getInterpolationPlanId(planContext);
+    if (isReadonly || activeNode?.nodeType !== undefined || !nodeId || !planId) {
+      return undefined;
+    }
+    return { planId, nodeId };
+  });
 
   protected readonly splitAreaElementRef = viewChild<ElementRef<HTMLElement>>('area');
 

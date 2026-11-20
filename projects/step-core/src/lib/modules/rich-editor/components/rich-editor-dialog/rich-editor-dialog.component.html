@@ -14,8 +14,11 @@
       />
     </section>
   </div>
-  <div step-modal-window-body>
+  <div step-modal-window-body class="rich-body">
     <step-rich-editor #richEditor [formControl]="textControl" [syntaxMode]="selectedMode" [wrapText]="_data.wrapText" />
+    @if (_data.help; as help) {
+      <step-help-message class="step-help-message-bordered" [help]="help" />
+    }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>

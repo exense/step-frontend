@@ -8,7 +8,7 @@
             <step-editable-label name="name" [(ngModel)]="artefact.attributes!['name']" [disabled]="readonly" />
             <button
               type="button"
-              matTooltip="Use an expression to replace dynamically the step name at execution time"
+              [matTooltip]="_toggleTooltip"
               mat-icon-button
               [disabled]="readonly"
               (click)="switchToDynamicName()"

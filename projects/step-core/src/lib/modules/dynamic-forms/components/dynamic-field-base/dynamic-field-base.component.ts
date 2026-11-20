@@ -3,6 +3,7 @@ import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { JsonFieldType } from '../../../json-forms';
+import { CONSTANT_VALUE_TOGGLE_TOOLTIP, DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP } from '../../../basics/step-basics.module';
 
 type OnChange<T extends DynamicValue> = (dynamicValue?: T) => void;
 type OnTouch = () => void;
@@ -11,32 +12,29 @@ const SIMPLE_TYPES = new Set(['string', 'number', 'boolean']);
 
 @Directive()
 export abstract class DynamicFieldBaseComponent<T extends DynamicValue> implements ControlValueAccessor {
+  readonly _ngControl = inject(NgControl, { optional: true });
   private _richEditorDialogs = inject(RichEditorDialogService);
+  private readonly _expressionToggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
+  private readonly _constantToggleTooltip = inject(CONSTANT_VALUE_TOGGLE_TOOLTIP);
 
   private onChange?: OnChange<T>;
   private onTouch?: OnTouch;
 
-  /** @Input() **/
   readonly tabIndex = input<number | undefined>();
 
-  /** @Input() **/
   readonly hasLabel = input(true);
 
-  /** @Input() **/
   readonly canEditLabel = input(false, {
     transform: (value: boolean | undefined) => value ?? false,
   });
 
-  /** @Input() **/
   readonly tooltip = input<string | undefined>();
 
-  /** @Input() **/
   readonly label = input<string | undefined>();
 
-  /** @Output() **/
   readonly labelChange = output<string | undefined>();
 
-  protected labelModel = model<string | undefined>();
+  protected readonly labelModel = model<string | undefined>();
 
   private effSyncLabel = effect(() => {
     const inputLabel = this.label();
@@ -57,15 +55,19 @@ export abstract class DynamicFieldBaseComponent<T extends DynamicValue> implemen
   /** @Input() **/
   readonly elementRefMapKey = input<string | undefined>();
 
-  protected forceFocus = signal(false);
+  protected readonly forceFocus = signal(false);
   readonly isDisabled = signal(false);
-  protected internalValue = signal<T | undefined>(undefined);
+  protected readonly internalValue = signal<T | undefined>(undefined);
 
   readonly value = computed(() => this.internalValue()?.value);
-  protected expression = computed(() => this.internalValue()?.expression);
-  protected dynamic = computed(() => this.internalValue()?.dynamic);
+  protected readonly expression = computed(() => this.internalValue()?.expression);
+  protected readonly dynamic = computed(() => this.internalValue()?.dynamic);
+  protected readonly toggleTooltip = computed(() => {
+    const dynamic = this.dynamic();
+    return dynamic ? this._constantToggleTooltip : this._expressionToggleTooltip;
+  });
 
-  protected constructor(public readonly _ngControl?: NgControl) {
+  constructor() {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;
     }

@@ -21,6 +21,7 @@ import { Entity } from '../../modules/entity/types/entity';
 import { HintFor } from '../../shared/hint-for.enum';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SchemaObjectField } from '../../modules/json-forms';
+import { DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP } from '../../modules/basics/step-basics.module';
 
 interface ReferenceMeta {
   icon: string;
@@ -70,6 +71,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
   private _artefactRefreshNotification = inject(ArtefactRefreshNotificationService, { optional: true });
   private _destroyRef = inject(DestroyRef);
   readonly _artefactNameConfig = inject<ReferenceArtefactNameConfig<A, T>>(ReferenceArtefactNameConfig);
+  protected readonly _toggleTooltip = inject(DYNAMIC_EXPRESSION_TOGGLE_TOOLTIP);
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: A;

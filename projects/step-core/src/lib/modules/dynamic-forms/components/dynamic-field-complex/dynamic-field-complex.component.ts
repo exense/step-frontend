@@ -28,18 +28,11 @@ export class DynamicFieldComplexComponent
 {
   protected fieldContext?: ComplexFieldContextService = this as ComplexFieldContextService;
 
-  /** @Input() **/
   readonly fieldObjectTemplate = input<TemplateRef<ComplexFieldContext> | undefined>();
 
-  /** @Input() **/
   readonly fieldArrayTemplate = input<TemplateRef<ComplexFieldContext> | undefined>();
 
-  /** @Input() **/
   readonly fieldSchema = input<SchemaField | undefined>();
-
-  constructor(@Optional() _ngControl?: NgControl) {
-    super(_ngControl);
-  }
 
   ngOnDestroy(): void {
     this.fieldContext = undefined;
