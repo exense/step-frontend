@@ -6,6 +6,7 @@ import {
   inject,
   input,
   NgZone,
+  signal,
   untracked,
   ViewContainerRef,
 } from '@angular/core';
@@ -17,19 +18,16 @@ import { animationFrameScheduler, auditTime, filter, fromEvent, merge, Observabl
 import { InputDropdownComponent } from '../components/input-dropdown/input-dropdown.component';
 
 const PANEL_GAP = 4;
+const VIEWPORT_MARGIN = 8;
 const MIN_VISIBLE_PART = 0.5;
 const SCROLLING_OVERFLOW = ['auto', 'scroll', 'overlay'];
 
-const observeLayoutChanges = (
-  anchor: HTMLElement,
-  ancestors: HTMLElement[],
-  mutationRoot: HTMLElement,
-): Observable<void> =>
+const observeLayoutChanges = (elements: HTMLElement[], mutationRoot: HTMLElement): Observable<void> =>
   new Observable<void>((subscriber) => {
     const notify = (): void => subscriber.next();
 
     const resizeObserver = new ResizeObserver(notify);
-    [anchor, ...ancestors].forEach((element) => resizeObserver.observe(element));
+    elements.forEach((element) => resizeObserver.observe(element));
 
     const mutationObserver = new MutationObserver(notify);
     mutationObserver.observe(mutationRoot, {
@@ -64,6 +62,9 @@ export class InputDropdownTriggerDirective {
 
   readonly dropdown = input.required<InputDropdownComponent>({ alias: 'stepInputDropdownTrigger' });
   readonly isDropdownDisabled = input(false, { alias: 'stepInputDropdownDisabled' });
+
+  private readonly openState = signal(false);
+  readonly isOpen = this.openState.asReadonly();
 
   private overlayRef?: OverlayRef;
   private describedById?: string;
@@ -108,10 +109,6 @@ export class InputDropdownTriggerDirective {
     this.close();
   }
 
-  private isOpen(): boolean {
-    return !!this.overlayRef?.hasAttached();
-  }
-
   private isOwnElement(target: EventTarget | null): boolean {
     if (!(target instanceof Node)) {
       return false;
@@ -132,6 +129,7 @@ export class InputDropdownTriggerDirective {
     this.applyAnchorWidth(overlayRef, anchor.getBoundingClientRect().width);
 
     const view = overlayRef.attach(new TemplatePortal(this.dropdown().panelTemplate(), this._viewContainerRef));
+    this.openState.set(true);
     view.detectChanges();
     overlayRef.updatePosition();
     this.addDescribedBy();
@@ -147,12 +145,13 @@ export class InputDropdownTriggerDirective {
         { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -PANEL_GAP },
       ])
       .withFlexibleDimensions(false)
-      .withPush(false)
-      .withViewportMargin(8);
+      .withPush()
+      .withViewportMargin(VIEWPORT_MARGIN);
 
     return this._overlay.create({
       positionStrategy,
       hasBackdrop: false,
+      maxWidth: `calc(100% - ${2 * VIEWPORT_MARGIN}px)`,
       panelClass: 'step-input-dropdown-pane',
     });
   }
@@ -190,19 +189,20 @@ export class InputDropdownTriggerDirective {
 
   // Runs outside of the Angular zone and at most once per animation frame, so scrolling does not trigger change detection.
   // Scroll events of arbitrary ancestors do not bubble, so they are caught in the capture phase.
-  // Layout shifts that move the anchor without resizing it are detected by the resize observer and by the mutation observer,
-  // which watches the nearest scroll container of the anchor (or the body, when there is none).
+  // Resize observes both the anchor and the panel. Mutation observes the nearest scroll container for layout shifts.
   private followAnchor(overlayRef: OverlayRef, anchor: HTMLElement): void {
+    const panel = overlayRef.overlayElement;
     const ancestors = this.getAncestors(anchor);
     const clippingAncestors = ancestors.filter((element) => this.isClipping(element));
     const mutationRoot = ancestors.find((element) => this.isScrollContainer(element)) ?? this._document.body;
     let lastRect = anchor.getBoundingClientRect();
     const hadSizeAtOpen = !this.isEmptyRect(lastRect);
+    let lastPanelHeight = panel.getBoundingClientRect().height;
 
     this._zone.runOutsideAngular(() => {
       merge(
         fromEvent(this._document, 'scroll', { capture: true }),
-        observeLayoutChanges(anchor, ancestors, mutationRoot),
+        observeLayoutChanges([anchor, panel, ...ancestors], mutationRoot),
       )
         .pipe(auditTime(0, animationFrameScheduler), takeUntil(this.closeTerminator$))
         .subscribe(() => {
@@ -212,13 +212,15 @@ export class InputDropdownTriggerDirective {
             this._zone.run(() => this.close());
             return;
           }
-          if (this.isSameRect(rect, lastRect)) {
+          const panelHeight = panel.getBoundingClientRect().height;
+          if (this.isSameRect(rect, lastRect) && panelHeight === lastPanelHeight) {
             return;
           }
           if (rect.width !== lastRect.width) {
             this.applyAnchorWidth(overlayRef, rect.width);
           }
           lastRect = rect;
+          lastPanelHeight = panelHeight;
           overlayRef.updatePosition();
         });
     });
@@ -294,11 +296,12 @@ export class InputDropdownTriggerDirective {
     removeAriaReferencedId(this._elementRef.nativeElement, 'aria-describedby', id);
   }
 
-  private close(): void {
+  close(): void {
     this.closeTerminator$.next();
     this.removeDescribedBy();
     if (this.overlayRef?.hasAttached()) {
       this.overlayRef.detach();
     }
+    this.openState.set(false);
   }
 }

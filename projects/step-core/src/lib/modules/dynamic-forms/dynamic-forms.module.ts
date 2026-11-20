@@ -81,4 +81,5 @@ export * from './components/add-field-schema-button/add-field-schema-button.comp
 export * from './components/dynamic-time-input/dynamic-time-input.component';
 export * from './shared/dynamic-field-group-value';
 export * from './shared/dynamic-forms-help.token';
+export * from './shared/interpolation-suggestions';
 export * from './services/schemas-factory.service';

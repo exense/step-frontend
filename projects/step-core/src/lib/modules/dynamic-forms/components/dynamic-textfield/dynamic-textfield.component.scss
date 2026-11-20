@@ -1,0 +1,29 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.step-input-dropdown-panel:has(.step-interpolation-suggestions) {
+  max-block-size: 60dvh;
+  overflow-y: auto;
+}
+
+.step-interpolation-suggestions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-block-size: min(14rem, 30dvh);
+  overflow-y: auto;
+
+  [role='option'] {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+
+    &:hover,
+    &[aria-selected='true'] {
+      background: var.$gray-100;
+    }
+  }
+}
