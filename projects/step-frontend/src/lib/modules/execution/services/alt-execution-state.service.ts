@@ -12,6 +12,7 @@ import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types
 import { Status } from '../../_common/shared/status.enum';
 import { TimeRangeExt } from '../shared/time-range-ext';
 import { TestCasesDisplayMode } from '../shared/test-cases-display-mode';
+import { Signal } from '@angular/core';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
@@ -28,7 +29,8 @@ export abstract class AltExecutionStateService {
   abstract readonly testCasesDisplayMode$: Observable<TestCasesDisplayMode>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
   abstract readonly timeRange$: Observable<TimeRangeExt | undefined>;
-  abstract readonly treeInProgress$: Observable<boolean>;
+  abstract readonly aggregatedTreeInProgress: Signal<boolean>;
+  abstract readonly reportTreeInProgress: Signal<boolean>;
   abstract readonly errorsDisplayInProgress$: Observable<boolean>;
   abstract toggleTestCasesDisplayMode(): void;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;

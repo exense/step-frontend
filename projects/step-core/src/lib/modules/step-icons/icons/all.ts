@@ -207,6 +207,7 @@ import { Music } from './svg/music';
 import { Navigation } from './svg/navigation';
 import { Navigation2 } from './svg/navigation-2';
 import { Octagon } from './svg/octagon';
+import { OpenInTree } from './svg/open-in-tree';
 import { OutOfScope } from './svg/out-of-scope';
 import { Package } from './svg/package';
 import { Packages } from './svg/packages';
@@ -558,6 +559,7 @@ export const allIcons = {
   Navigation,
   Navigation2,
   Octagon,
+  OpenInTree,
   OutOfScope,
   Package,
   Packages,

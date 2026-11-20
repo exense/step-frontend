@@ -17,7 +17,7 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
     {
       directive: TreeNodeDirective,
       inputs: ['node'],
-      outputs: ['contextMenu'],
+      outputs: ['contextMenu', 'nodeClick'],
     },
   ],
 })

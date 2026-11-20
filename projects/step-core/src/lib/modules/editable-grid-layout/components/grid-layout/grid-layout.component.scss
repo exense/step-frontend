@@ -131,6 +131,10 @@ step-grid-layout {
 
   &.is-resize {
     cursor: nwse-resize;
+
+    step-grid-background .grid-cells {
+      visibility: hidden;
+    }
   }
 
   &.edit-mode .step-grid-element {

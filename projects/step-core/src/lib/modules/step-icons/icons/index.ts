@@ -207,6 +207,7 @@ export { Music } from './svg/music';
 export { Navigation } from './svg/navigation';
 export { Navigation2 } from './svg/navigation-2';
 export { Octagon } from './svg/octagon';
+export { OpenInTree } from './svg/open-in-tree';
 export { OutOfScope } from './svg/out-of-scope';
 export { Package } from './svg/package';
 export { Packages } from './svg/packages';

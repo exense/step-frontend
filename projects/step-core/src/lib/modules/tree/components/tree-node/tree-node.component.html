@@ -14,7 +14,11 @@
     <div class="no-toggle"></div>
   }
   @if (_treeNode.node(); as n) {
-    <div class="node-content" (contextmenu)="_treeNode.openContextMenu($event)">
+    <div
+      class="node-content"
+      (contextmenu)="_treeNode.openContextMenu($event)"
+      (click)="_treeNode.handleNodeClick($event)"
+    >
       <step-tree-node-name [node]="n" />
     </div>
   }

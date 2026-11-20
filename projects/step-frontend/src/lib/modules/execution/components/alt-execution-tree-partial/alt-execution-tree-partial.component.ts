@@ -19,7 +19,6 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
-import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 import { Router } from '@angular/router';
@@ -41,7 +40,6 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
   private _router = inject(Router);
 
@@ -91,7 +89,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._treeUtils.cleanupImportantIds();
+    this._treeState._treeNodeUtils.cleanupImportantIds();
   }
 
   focusAndSearch(query: string): void {
@@ -147,7 +145,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
       )
       .subscribe((result) => {
         if (!result?.aggregatedReportView) {
-          this._treeUtils.cleanupImportantIds();
+          this._treeState._treeNodeUtils.cleanupImportantIds();
           this._treeState.init(undefined);
           return;
         }
@@ -158,7 +156,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
         const treeNode = this.findTreeNode(reportNode);
 
         if (treeNode?.id) {
-          this._treeUtils.markIdAsImportant(treeNode.id);
+          this._treeState._treeNodeUtils.markIdAsImportant(treeNode.id);
           this._treeState.selectNode(treeNode);
           if (this.autoFocusNode()) {
             this.tree()?.focusNode?.(treeNode.id);
