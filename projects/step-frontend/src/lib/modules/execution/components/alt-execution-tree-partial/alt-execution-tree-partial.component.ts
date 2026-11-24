@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   effect,
   inject,
   input,
@@ -18,8 +19,9 @@ import {
   AggregatedReportViewRequest,
   AugmentedExecutionsService,
   ReportNode,
+  resizeObservable,
 } from '@exense/step-core';
-import { catchError, combineLatest, filter, finalize, map, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, distinctUntilChanged, filter, finalize, map, of, pairwise, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
@@ -49,6 +51,7 @@ interface PartialTreeResult extends AggregatedReport {
 export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _executionState = inject(AltExecutionStateService);
   private _destroyRef = inject(DestroyRef);
+  private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
@@ -99,6 +102,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setupTree();
+    this.setupTreeResize();
   }
 
   ngOnDestroy(): void {
@@ -112,6 +116,26 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   protected openDetails(node: AggregatedTreeNode): void {
     this.openIterations.emit({ node, restParams: {} });
+  }
+
+  private setupTreeResize(): void {
+    resizeObservable(this._elementRef.nativeElement)
+      .pipe(
+        map(([entry]) => entry.contentRect.width),
+        distinctUntilChanged(),
+        pairwise(),
+        filter(([previousWidth, width]) => width > 0 && width < previousWidth),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => {
+        if (!this.autoFocusNode()) {
+          return;
+        }
+        const selectedName = this._elementRef.nativeElement.querySelector<HTMLElement>(
+          '.tree-node-selected step-tree-node-name',
+        );
+        selectedName?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
   }
 
   private setupTree(): void {

@@ -1,6 +1,7 @@
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import {
   AggregatedReport,
@@ -30,8 +31,12 @@ import { AltExecutionNodesHelperService } from '../../services/alt-execution-nod
 import { AltExecutionReportSettingsService } from '../../services/alt-execution-report-settings.service';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
-import { AggregatedReportViewTreeStateContextService } from '../../services/aggregated-report-view-tree-state.service';
+import {
+  AggregatedReportViewTreeStateContextService,
+  AggregatedReportViewTreeStateService,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { DrillDownStackItemType } from '../../shared/drilldown-stack-item';
+import { DrilldownRootType } from '../../shared/drilldown-root-type';
 import { TestCasesDisplayMode } from '../../shared/test-cases-display-mode';
 import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
@@ -39,7 +44,7 @@ import { AggregatedTreeNodeDrilldownComponent } from './aggregated-tree-node-dri
 
 describe('Drilldown partial tree navigation', () => {
   it.each(['cached', 'delayed'] as const)(
-    'focuses the report with %s iteration data and preserves scrolling during live refresh',
+    'focuses the report with %s data and preserves scrolling during refresh and opening details',
     fakeAsync((loadMode: 'cached' | 'delayed') => {
       const report: ReportNode = {
         _class: 'step.artefacts.reports.EchoReportNode',
@@ -68,7 +73,11 @@ describe('Drilldown partial tree navigation', () => {
         },
       };
       const routeData = new BehaviorSubject({
-        drilldownState: [{ type: DrillDownStackItemType.PARTIAL_TREE, nodeId: report.id }],
+        drilldownState: [
+          { type: DrillDownStackItemType.ROOT, rootType: DrilldownRootType.TESTCASES, nodeId: 'root' },
+          { type: DrillDownStackItemType.REPORT_NODE, nodeId: report.id },
+          { type: DrillDownStackItemType.PARTIAL_TREE, nodeId: report.id },
+        ],
       });
       const getAggregatedReportView = jest.fn(() => (loadMode === 'cached' ? of(iteration) : response));
       TestBed.configureTestingModule({
@@ -118,7 +127,17 @@ describe('Drilldown partial tree navigation', () => {
         set: {
           providers: [
             { provide: AltExecutionNodesHelperService, useValue: { getReportNode: () => of(report) } },
-            { provide: AltExecutionDrilldownNavigationUtilsService, useValue: {} },
+            {
+              provide: AltExecutionDrilldownNavigationUtilsService,
+              useValue: {
+                getSingleReportNode: ({
+                  singleInstanceReportNode,
+                }: {
+                  singleInstanceReportNode: ReportNode;
+                }): ReportNode => singleInstanceReportNode,
+                changeDrilldownLocation: jest.fn(),
+              },
+            },
             { provide: AltExecutionDialogsService, useValue: {} },
           ],
         },
@@ -165,6 +184,55 @@ describe('Drilldown partial tree navigation', () => {
       tick(500);
       fixture.detectChanges();
       expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'nearest' });
+
+      const partialTree = fixture.debugElement.query(By.directive(AltExecutionTreePartialComponent));
+      const partialElement: HTMLElement = partialTree.nativeElement;
+      const verticalScroller = partialElement.closest<HTMLElement>('.item-content')!;
+      const horizontalScroller = partialElement.querySelector<HTMLElement>('step-tree')!;
+      resizeObserverMock.resize(partialElement, { width: 540, height: 463 });
+      verticalScroller.scrollTop = 9000;
+      horizontalScroller.scrollLeft = 512;
+      const panelContainer = partialElement.closest('step-split')!;
+      const insertBefore = panelContainer.insertBefore.bind(panelContainer);
+      // Happy DOM does not reset scrolling when a connected panel is moved, unlike the browser.
+      jest.spyOn(panelContainer, 'insertBefore').mockImplementation((node, reference) => {
+        const movesPartialTree = node.contains(partialElement);
+        const result = insertBefore(node, reference);
+        if (movesPartialTree) {
+          verticalScroller.scrollTop = 0;
+          horizontalScroller.scrollLeft = 0;
+        }
+        return result;
+      });
+      const clickedReport: ReportNode = { ...report, id: 'report-100', artefactID: 'node-100', name: 'Opened node' };
+      const treeState = partialTree.injector.get(AggregatedReportViewTreeStateService);
+      const clickedNode = treeState.findNodesByArtefactId('node-100')[0];
+      treeState.selectNode(clickedNode);
+      const clickedElement = partialElement.querySelector<HTMLElement>(
+        `[data-tree-node-id="${clickedNode.id}"] step-tree-node-name`,
+      )!;
+      const revealSelectedNode = jest.spyOn(clickedElement, 'scrollIntoView');
+      partialTree.componentInstance.openIterations.emit({
+        node: { ...clickedNode, singleInstanceReportNode: clickedReport },
+        restParams: {},
+      });
+      flushMicrotasks();
+      fixture.detectChanges();
+      tick(500);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('step-view-item')).toHaveLength(3);
+      expect(fixture.nativeElement.querySelector('step-view-group')).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('step-alt-execution-tree-partial')).toBe(partialElement);
+      expect([verticalScroller.scrollTop, horizontalScroller.scrollLeft]).toEqual([9000, 512]);
+      resizeObserverMock.resize(partialElement, { width: 210, height: 463 });
+      fixture.detectChanges();
+      tick(500);
+      fixture.detectChanges();
+      expect(revealSelectedNode).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+      revealSelectedNode.mockClear();
+      resizeObserverMock.resize(partialElement, { width: 210, height: 300 });
+      resizeObserverMock.resize(partialElement, { width: 540, height: 463 });
+      expect(revealSelectedNode).not.toHaveBeenCalled();
       fixture.destroy();
     }),
   );

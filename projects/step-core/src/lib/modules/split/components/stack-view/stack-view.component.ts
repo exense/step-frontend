@@ -81,7 +81,7 @@ export class StackViewComponent {
       const group = views.slice(0, views.length - 1);
       return [
         {
-          id: 'group',
+          id: group[0].id,
           title: 'Group',
           content: '',
           children: group,
@@ -97,7 +97,7 @@ export class StackViewComponent {
     return [
       views[0],
       {
-        id: 'group',
+        id: group[0].id,
         title: 'Group',
         content: '',
         children: group,
