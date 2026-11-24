@@ -168,6 +168,9 @@ export class AltExecutionLaunchDialogComponent
     })
       .pipe(
         switchMap(({ artefact, testCases }) => {
+          if (!artefact) {
+            throw new Error('Unable to load artefact information.');
+          }
           const icon = this._artefactsService.getArtefactType(artefact.type)?.icon;
           this.artefact.set({ ...artefact, icon } as ArtefactInfo);
           if (artefact.type !== 'TestSet' || testCases?.items !== undefined) {
