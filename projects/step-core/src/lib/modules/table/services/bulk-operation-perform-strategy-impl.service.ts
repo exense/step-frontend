@@ -12,12 +12,13 @@ import {
 } from '../../async-operations/async-operations.module';
 import { BulkOperationConfig, BulkOperationPerformStrategy, BulkSelectionType } from '../../entities-selection';
 import { AsyncTaskStatus, TableBulkOperationRequest, TableParameters } from '../../../client/step-client-module';
+import { escapeHtml } from '../../basics/utils/escape-html';
 
 const formatMessageWithDeleteWarning = (
   strings: TemplateStringsArray,
   operationType: BulkOperationType | string,
   ...otherExpressions: string[]
-) => {
+): string => {
   const firstPart = strings[0] + operationType;
   let restPart = strings.slice(1).reduce((result, part, index) => result + part + (otherExpressions[index] ?? ''), '');
   if (operationType === BulkOperationType.DELETE) {
@@ -193,9 +194,10 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
   }
 
   private alertLayout(alertType: AlertType, text: string): string {
+    const escapedText = escapeHtml(text);
     return `<step-alert type="${alertType}">
       <section class="message-content">
-        <div>${text}</div>
+        <div>${escapedText}</div>
       </section>
     </step-alert>`;
   }

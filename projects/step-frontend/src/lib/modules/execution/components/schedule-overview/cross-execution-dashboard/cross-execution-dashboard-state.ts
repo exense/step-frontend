@@ -306,8 +306,8 @@ export abstract class CrossExecutionDashboardState {
               legendName: seriesKey,
               data: seriesData,
               width: 1,
-              value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
+              value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number | null): string | number =>
+                idx === null ? '' : this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
               stroke: fill,
               fill: fill,
               points: { show: false },
@@ -468,8 +468,8 @@ export abstract class CrossExecutionDashboardState {
                       displayedExecutions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
                     ),
                     // width: 1,
-                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                      this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number | null): string | number =>
+                      idx === null ? '' : this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
                     points: { show: false },
@@ -569,8 +569,8 @@ export abstract class CrossExecutionDashboardState {
                       displayedExecutions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
                     ),
                     width: 1,
-                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                      this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number | null): string | number =>
+                      idx === null ? '' : this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
                     points: { show: false },
@@ -692,8 +692,8 @@ export abstract class CrossExecutionDashboardState {
         label: 'Execution',
         show: false,
         values: executions.map((item, i) => i),
-        valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-          return executions[idx]?.description || 'Empty';
+        valueFormatFn: (uPlot, rawValue, seriesIdx, idx): string => {
+          return idx === null ? '' : executions[idx]?.description || 'Empty';
         },
       },
       cursor: {
@@ -733,8 +733,8 @@ export abstract class CrossExecutionDashboardState {
         label: 'Execution',
         show: false,
         values: executions.map((item, i) => i),
-        valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-          return executions[idx]?.description || 'Empty';
+        valueFormatFn: (uPlot, rawValue, seriesIdx, idx): string => {
+          return idx === null ? '' : executions[idx]?.description || 'Empty';
         },
       },
       cursor: {
