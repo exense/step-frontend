@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -32,7 +33,9 @@ import { OpenIterationsEvent } from '../../services/alt-execution-dialogs.servic
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class.no-padding]': 'noPadding()',
+    '[attr.aria-busy]': 'showLoading()',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
@@ -58,14 +61,23 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly showDetailsButton = input(false);
   readonly details = input<readonly string[] | undefined>(undefined);
 
-  private readonly isFirstLoad = signal(true);
-  private lastLoadedReportNodeId?: string;
-  private readonly loadInProgress = signal(false);
-  protected readonly showSpinner = computed(() => {
-    const isFirstLoad = this.isFirstLoad();
+  private lastRequestedReportNodeId?: string;
+  private readonly loadedReportNodeId = signal<string | undefined>(undefined);
+  private readonly loadInProgress = signal(true);
+  protected readonly loadFailed = signal(false);
+  protected readonly showLoading = computed(() => {
+    const reportNode = this.node();
+    const loadedReportNodeId = this.loadedReportNodeId();
     const isRunningExecution = this.isRunningExecution();
     const loadInProgress = this.loadInProgress();
-    return (isFirstLoad || !isRunningExecution) && loadInProgress;
+    const hasTree = !!this._treeState.flatTree().length;
+    return (reportNode.id !== loadedReportNodeId || !hasTree || !isRunningExecution) && loadInProgress;
+  });
+
+  protected readonly showEmptyState = computed(() => {
+    const loadInProgress = this.loadInProgress();
+    const tree = this._treeState.flatTree();
+    return !loadInProgress && !tree.length;
   });
 
   private readonly reportNode$ = toObservable(this.node);
@@ -107,19 +119,17 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
           if (!range) {
             return false;
           }
-          if (this.lastLoadedReportNodeId !== reportNode?.id) {
+          if (this.lastRequestedReportNodeId !== reportNode.id || range.isManualChange) {
             return true;
           }
-          if (this.isFirstLoad()) {
-            return true;
+          if (this.loadInProgress()) {
+            return false;
           }
-          if (range.isManualChange) {
-            return true;
-          }
-          return reportNode?.status === Status.RUNNING;
+          return this.loadedReportNodeId() !== reportNode.id || reportNode.status === Status.RUNNING;
         }),
         switchMap(([executionId, range, reportNode]) => {
-          this.lastLoadedReportNodeId = reportNode?.id;
+          this.lastRequestedReportNodeId = reportNode.id;
+          this.loadFailed.set(false);
           this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
@@ -128,15 +138,15 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
               partialTreeRootNodeId: response?.partialTreeRootNodeId,
               reportNode,
             })),
-            catchError(() =>
-              of({
+            catchError(() => {
+              this.loadFailed.set(true);
+              return of({
                 aggregatedReportView: undefined,
                 partialTreeRootNodeId: undefined,
                 reportNode,
-              }),
-            ),
+              });
+            }),
             finalize(() => {
-              this.isFirstLoad.set(false);
               this.loadInProgress.set(false);
             }),
           );
@@ -144,7 +154,8 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((result) => {
-        if (!result?.aggregatedReportView) {
+        this.loadedReportNodeId.set(result.reportNode.id);
+        if (!result.aggregatedReportView?.artefact?.id) {
           this._treeState._treeNodeUtils.cleanupImportantIds();
           this._treeState.init(undefined);
           return;

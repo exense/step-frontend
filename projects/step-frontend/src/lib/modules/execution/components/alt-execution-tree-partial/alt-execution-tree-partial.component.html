@@ -1,22 +1,35 @@
-@if (showSpinner()) {
-  <div class="spinner-container">
-    <mat-spinner />
-  </div>
+@if (showLoading()) {
+  <span class="cdk-visually-hidden" role="status">Loading executed path…</span>
 }
-<step-alt-execution-tree #tree [details]="details()" (openIterations)="openIterations.emit($event)">
-  <ng-container *stepAltExecutionTreeNodeAddon="let node; let isSelected = isSelected">
-    @if (showDetailsButton() && !(node | isEmptyStatus) && !(node | isCurrentReportDetailsOpened)) {
-      <button
-        mat-icon-button
-        type="button"
-        class="details-button"
-        [class.selected]="isSelected"
-        matTooltip="Open details for this node"
-        matTooltipPosition="below"
-        (click)="openDetails(node)"
-      >
-        <step-icon name="microscope" />
-      </button>
+@if (showEmptyState()) {
+  <p class="tree-empty-state" role="status">
+    @if (loadFailed()) {
+      Unable to load the executed path. Please try opening it again.
+    } @else {
+      No executed path is available for this node in the selected time range.
     }
-  </ng-container>
-</step-alt-execution-tree>
+  </p>
+} @else {
+  <step-alt-execution-tree
+    #tree
+    [showSkeletonWhileLoading]="showLoading()"
+    [details]="details()"
+    (openIterations)="openIterations.emit($event)"
+  >
+    <ng-container *stepAltExecutionTreeNodeAddon="let node; let isSelected = isSelected">
+      @if (showDetailsButton() && !(node | isEmptyStatus) && !(node | isCurrentReportDetailsOpened)) {
+        <button
+          mat-icon-button
+          type="button"
+          class="details-button"
+          [class.selected]="isSelected"
+          matTooltip="Open details for this node"
+          matTooltipPosition="below"
+          (click)="openDetails(node)"
+        >
+          <step-icon name="microscope" />
+        </button>
+      }
+    </ng-container>
+  </step-alt-execution-tree>
+}
