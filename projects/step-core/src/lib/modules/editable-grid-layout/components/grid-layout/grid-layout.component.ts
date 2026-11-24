@@ -28,7 +28,9 @@ import { WidgetsPersistenceStateService } from '../../injectables/widgets-persis
 import { GridElementComponent } from '../grid-element/grid-element.component';
 import { GridItemDirective } from '../../directives/grid-item.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { first, forkJoin, switchMap } from 'rxjs';
+import { GridItemConditionDirective } from '../../directives/grid-item-condition.directive';
+import { GridTemplateItem } from '../../types/grid-template-item';
+import { first, forkJoin, of, switchMap } from 'rxjs';
 
 interface GridItem {
   widgetId: string;
@@ -37,6 +39,7 @@ interface GridItem {
   isSupported: boolean;
   templateRef?: TemplateRef<any>;
   canResize: boolean;
+  conditionDescription?: string;
 }
 
 @Component({
@@ -92,9 +95,24 @@ export class GridLayoutComponent implements AfterViewInit {
   private readonly gridTemplateItems$ = this.contentWidgets$.pipe(
     switchMap((widgets) => {
       const items = widgets.map((widget) => widget.item$.pipe(first()));
-      return forkJoin(items);
+      return items.length ? forkJoin(items) : of([] as GridTemplateItem[]);
     }),
   );
+
+  private readonly contentConditions = contentChildren(GridItemConditionDirective);
+
+  private readonly conditionDescriptions = computed(() => {
+    const conditions = this.contentConditions().map((declaration) => declaration.condition());
+    return conditions.reduce(
+      (res, { widgetType, description }) => {
+        if (description) {
+          res[widgetType] = description;
+        }
+        return res;
+      },
+      {} as Record<string, string>,
+    );
+  });
 
   private readonly gridTemplateItems = toSignal(this.gridTemplateItems$, { initialValue: [] });
 
@@ -131,6 +149,7 @@ export class GridLayoutComponent implements AfterViewInit {
       },
       {} as Record<string, TemplateRef<any>>,
     );
+    const conditionDescriptions = this.conditionDescriptions();
     const widgetPositions = Object.values(this._widgetPositions.positions());
 
     const gridItems = widgetPositions.map((position) => {
@@ -141,7 +160,16 @@ export class GridLayoutComponent implements AfterViewInit {
       const isSupported = !!defaultParams;
       const canResize = isSupported ? defaultParams.canResize : false;
       const templateRef = templateDictionary[widgetType];
-      return { widgetId, widgetType, heightInCells, isSupported, templateRef, canResize } as GridItem;
+      const conditionDescription = conditionDescriptions[widgetType];
+      return {
+        widgetId,
+        widgetType,
+        heightInCells,
+        isSupported,
+        templateRef,
+        canResize,
+        conditionDescription,
+      } as GridItem;
     });
 
     return gridItems.filter((item) => !!item);
