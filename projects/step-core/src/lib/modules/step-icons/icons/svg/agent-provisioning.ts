@@ -1,5 +1,5 @@
 export const AgentProvisioning = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="feather feather-agent-provisioning">
-
+    
   <!-- outer hexagon -->
   <path
     class="agent-provisioning-status-shape"

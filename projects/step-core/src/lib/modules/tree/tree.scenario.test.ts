@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injectable } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DragDropContainerComponent, DropInfo } from '../drag-drop';
@@ -6,16 +6,29 @@ import { TreeComponent } from './components/tree/tree.component';
 import { TreeNodeDraggableComponent } from './components/tree-node-draggable/tree-node-draggable.component';
 import { TreeNodeTemplateDirective } from './directives/tree-node-template.directive';
 import { TreeStateService } from './services/tree-state.service';
+import { treeStateFactoryProvider } from './services/tree-state-factory.provider';
 import { TreeNodeUtilsService } from './services/tree-node-utils.service';
 import { TreeNode } from './types/tree-node';
+
+@Injectable()
+class TestTreeStateService extends TreeStateService<TreeNode, TreeNode> {}
+
+@Injectable()
+class TestTreeNodeUtilsService implements TreeNodeUtilsService<TreeNode, TreeNode> {
+  readonly updateChildren = jest.fn();
+  readonly updateNodeData = jest.fn(() => false);
+
+  convertItem(node: TreeNode): TreeNode {
+    return node;
+  }
+}
 
 @Component({
   selector: 'step-tree-test',
   imports: [TreeComponent, TreeNodeDraggableComponent, TreeNodeTemplateDirective, DragDropContainerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    TreeStateService,
-    { provide: TreeNodeUtilsService, useValue: { convertItem: (node: TreeNode): TreeNode => node } },
+    { provide: TreeStateService, useFactory: treeStateFactoryProvider(TestTreeStateService, TestTreeNodeUtilsService) },
   ],
   template: `
     <step-drag-drop-container>

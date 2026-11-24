@@ -17,7 +17,7 @@ import { AltExecutionDrilldownNavigationUtilsService } from './alt-execution-dri
 import { DrillDownStackItemType } from '../shared/drilldown-stack-item';
 
 export interface OpenIterationsParams {
-  aggregatedNodeId: string;
+  aggregatedNodeId?: string;
   countByStatus?: Record<string, number>;
   singleInstanceReportNode?: ReportNodeWithArtefact<AbstractArtefact>;
   nodeStatus?: Status;
@@ -83,7 +83,9 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       this.navigateToIterationDetails(drilldownRootType, reportNode.id!, searchFor, openPartialTree);
       return;
     }
-    this.navigateToIterationList(drilldownRootType, aggregatedNodeId, nodeStatus, nodeStatusCount);
+    if (!!aggregatedNodeId) {
+      this.navigateToIterationList(drilldownRootType, aggregatedNodeId, nodeStatus, nodeStatusCount);
+    }
   }
 
   openIterationDetails<T extends ReportNode>(
