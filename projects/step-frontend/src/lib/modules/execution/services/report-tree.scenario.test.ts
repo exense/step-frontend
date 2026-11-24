@@ -114,7 +114,7 @@ describe('Report tree interactions', () => {
     const fixture = TestBed.createComponent(ReportTreeTestComponent);
     fixture.detectChanges();
     const element: HTMLElement = fixture.nativeElement;
-    expect(element.textContent).toContain('Some children are not shown');
+    expect(element.textContent).toContain('Some children are hidden - showing 0..2');
 
     const treeView = fixture.debugElement.query(By.directive(TreeComponent))
       .componentInstance as TreeComponent<ReportTreeNode>;
@@ -128,13 +128,13 @@ describe('Report tree interactions', () => {
     expect(actions.find((action) => action.id === ExecutionTreeAction.LOAD_NEXT_NODES)?.disabled).toBe(false);
     page(ExecutionTreeAction.LOAD_NEXT_NODES);
     expect(state.findNodeById('last')).toBeDefined();
-    expect(element.textContent).toContain('Some children are not shown');
+    expect(element.textContent).toContain('Some children are hidden - showing 2..3');
     const lastActions = await firstValueFrom(tree.getActionsForNode(state.findNodeById('root')!));
     expect(lastActions.find((action) => action.id === ExecutionTreeAction.LOAD_NEXT_NODES)?.disabled).toBe(true);
     expect(lastActions.find((action) => action.id === ExecutionTreeAction.LOAD_PREVIOUS_NODES)?.disabled).toBe(false);
     page(ExecutionTreeAction.LOAD_PREVIOUS_NODES);
     expect(state.findNodeById('before')).toBeDefined();
-    expect(element.textContent).toContain('Some children are not shown');
+    expect(element.textContent).toContain('Some children are hidden - showing 0..2');
     fixture.destroy();
   });
 
@@ -147,7 +147,7 @@ describe('Report tree interactions', () => {
     const tree = fixture.debugElement.children[1].componentInstance as AltExecutionTreeNonAggregatedComponent;
     const actions = await firstValueFrom(tree.getActionsForNode(state.findNodeById('root')!));
     expect(actions.find((action) => action.id === ExecutionTreeAction.LOAD_NEXT_NODES)?.disabled).toBe(true);
-    expect(fixture.nativeElement.textContent).not.toContain('Some children are not shown');
+    expect(fixture.nativeElement.querySelector('.children-limit')).toBeNull();
     fixture.destroy();
   });
 

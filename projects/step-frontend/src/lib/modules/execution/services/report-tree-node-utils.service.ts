@@ -212,7 +212,10 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const skip = this._paging[nodeId]?.skip || 0;
     const limit = this._executionTreePagingService.getExecutionTreePaging();
     return this._controllerService.getReportNodeChildren(nodeId, skip, limit + 1).pipe(
-      tap((nodes) => (this.childrenPages[nodeId] = { skip, hasNext: nodes.length > limit })),
+      tap(
+        (nodes) =>
+          (this.childrenPages[nodeId] = { skip, count: Math.min(nodes.length, limit), hasNext: nodes.length > limit }),
+      ),
       map((nodes) => nodes.slice(0, limit)),
       map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
       tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),

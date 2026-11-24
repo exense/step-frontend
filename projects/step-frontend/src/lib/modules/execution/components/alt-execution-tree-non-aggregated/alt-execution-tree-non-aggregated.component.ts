@@ -50,12 +50,14 @@ export class AltExecutionTreeNonAggregatedComponent implements TreeActionsServic
   readonly showSkeletonWhileLoading = input(false);
   readonly nodeClick = output<ReportNode>();
 
-  protected readonly omittedChildrenByNode = computed<Record<string, boolean>>(() => {
+  protected readonly partialChildrenRanges = computed<Record<string, { from: number; to: number } | undefined>>(() => {
     const nodes = this._treeState.flatTree();
     return Object.fromEntries(
       nodes.map(({ id }) => {
         const page = this._treeState.findNodeById(id)?.childrenPage;
-        return [id, !!page && (page.hasNext || page.skip > 0)];
+        const range =
+          page && (page.hasNext || page.skip > 0) ? { from: page.skip, to: page.skip + page.count } : undefined;
+        return [id, range];
       }),
     );
   });
