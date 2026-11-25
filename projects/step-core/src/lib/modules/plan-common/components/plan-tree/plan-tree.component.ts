@@ -12,7 +12,7 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { filter, map, Observable, of, partition } from 'rxjs';
+import { filter, map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../../../client/generated';
 import { TreeAction, TreeActionsService, TreeComponent, TreeNode, TreeStateService, TREE_EXPORTS } from '../../../tree';
 import { ArtefactChildContainerSettingsComponent } from '../artefact-child-container-settings/artefact-child-container-settings.component';
@@ -29,6 +29,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SPLIT_EXPORTS } from '../../../split';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { AsyncPipe } from '@angular/common';
+import { PlanDropHintComponent } from '../plan-drop-hint/plan-drop-hint.component';
+import { PlanNodeDropSectionsComponent } from '../plan-node-drop-sections/plan-node-drop-sections.component';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 
 const TREE_SIZE = 'TREE_SIZE';
@@ -48,6 +50,8 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
     ArtefactDetailsComponent,
     ArtefactChildContainerSettingsComponent,
     AsyncPipe,
+    PlanNodeDropSectionsComponent,
+    PlanDropHintComponent,
   ],
   providers: [
     {
@@ -182,18 +186,6 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     this._planArtefactResolver.openArtefact(node.originalArtefact);
   }
 
-  protected handleDragOver(event: DropInfo): void {
-    if (!this._treeState.rootNodeId()) {
-      return;
-    }
-    const isTreeNode = typeof event.draggedElement === 'string';
-    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
-    if (isTreeNode && !this._treeState.canInsertTo(this.candidatesForDropInsert, newParentId)) {
-      return;
-    }
-    this._treeState.notifyPotentialInsert?.(newParentId);
-  }
-
   protected handleDropNode(event: DropInfo): void {
     if (!this._treeState.rootNodeId()) {
       this._treeState.notifyInsertionComplete?.();
@@ -302,24 +294,15 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   private setupDragStart(): void {
     const dragData = this.dragData()!;
-    const dragData$ = dragData.dragData$.pipe(
-      filter((dragItemId) => !!dragItemId),
-      takeUntilDestroyed(this._destroyRef),
-    );
-
-    const [internalDrag$, externalDrag$] = partition(dragData$, (dragData) => typeof dragData === 'string');
-
-    (internalDrag$ as Observable<string>).subscribe((dragItemId) => {
-      const draggingIds = [...this._treeState.selectedNodeIds(), dragItemId];
-      this.candidatesForDropInsert = this._treeState.findSubtreeRootsAmongIds(draggingIds);
-    });
-
-    externalDrag$.subscribe(() => {
-      const selectedForInsert = this._treeState.selectedForInsertCandidate();
-      if (selectedForInsert) {
-        this._treeState.notifyPotentialInsert?.(selectedForInsert);
-      }
-    });
+    dragData.dragData$
+      .pipe(
+        filter((dragItemId): dragItemId is string => typeof dragItemId === 'string'),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((dragItemId) => {
+        const draggingIds = [...this._treeState.selectedNodeIds(), dragItemId];
+        this.candidatesForDropInsert = this._treeState.findSubtreeRootsAmongIds(draggingIds);
+      });
   }
 
   private setupDragEnd(): void {

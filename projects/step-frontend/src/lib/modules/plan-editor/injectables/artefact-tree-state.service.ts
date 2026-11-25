@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactClass,
@@ -12,13 +12,20 @@ import { ControlDropInfo } from '../types/control-drop-info.interface';
 import { ControlType } from '../types/control-type.enum';
 
 @Injectable()
-export class ArtefactTreeStateService
-  extends TreeStateService<AbstractArtefact, ArtefactTreeNode>
-  implements OnDestroy
-{
+export class ArtefactTreeStateService extends TreeStateService<AbstractArtefact, ArtefactTreeNode> {
   private _artefactTreeNodeUtils = inject(ArtefactTreeNodeUtilsService);
-  private timerId?: number;
-  private nodeId?: string;
+
+  override findNodeById(id?: string): ArtefactTreeNode | undefined {
+    const node = super.findNodeById(id);
+    if (node || !id) {
+      return node;
+    }
+    const [, parentId] = this._artefactTreeNodeUtils.parseNodeId(id);
+    if (parentId === id) {
+      return undefined;
+    }
+    return super.findNodeById(parentId)?.dropSections?.find((section) => section.id === id);
+  }
 
   override canDropTo({ draggedElement, droppedArea, additionalInfo }: DropInfo): boolean {
     const parentId = droppedArea as string;
@@ -67,29 +74,7 @@ export class ArtefactTreeStateService
     ) {
       return dropInfo;
     }
-    this.showPseudoContainers(parent.id, true);
     return { ...dropInfo, droppedArea: `${ArtefactNodeSource.AFTER}|${parent.id}` };
-  }
-
-  override notifyPotentialInsert(potentialParentId: string): void {
-    const [_, id] = this._artefactTreeNodeUtils.parseNodeId(potentialParentId);
-    if (this.isRefreshInProgress) {
-      return;
-    }
-    if (id === this.selectedForInsertCandidate()) {
-      this.showPseudoContainers(id, true);
-      return;
-    }
-    this.showPseudoContainersWithDelay(id);
-  }
-
-  override notifyInsertionComplete(): void {
-    this.hidePseudoContainers();
-  }
-
-  override ngOnDestroy(): void {
-    super.ngOnDestroy();
-    clearTimeout(this.timerId);
   }
 
   private dropRequiresAfterSection(draggedElement: unknown): boolean {
@@ -120,37 +105,5 @@ export class ArtefactTreeStateService
       current = this.findNodeById(current.parentId);
     }
     return false;
-  }
-
-  private showPseudoContainersWithDelay(id: string): void {
-    if (this.nodeId === id) {
-      return;
-    }
-    clearTimeout(this.timerId);
-    this.nodeId = id;
-    this.timerId = setTimeout(() => {
-      this.showPseudoContainers(id);
-      this.timerId = undefined;
-      this.nodeId = undefined;
-    }, 500) as unknown as number;
-  }
-
-  private showPseudoContainers(id: string, isPersistent?: boolean): void {
-    const needsToRefresh = this._artefactTreeNodeUtils.setPseudoContainersVisibility(id, isPersistent);
-    if (!needsToRefresh) {
-      return;
-    }
-    this.refresh({ emitTreeUpdate: false });
-    this.expandNodes([id, ...this._artefactTreeNodeUtils.getPseudoNodesIds(id)]);
-  }
-
-  private hidePseudoContainers(): void {
-    clearTimeout(this.timerId);
-    this.timerId = undefined;
-    this.nodeId = undefined;
-    const needsToRefresh = this._artefactTreeNodeUtils.hidePseudoContainers();
-    if (needsToRefresh) {
-      this.refresh({ emitTreeUpdate: false });
-    }
   }
 }

@@ -269,19 +269,9 @@ describe('Plan editor context lifecycle', () => {
       expect(tree.selectedNodeIds()).toEqual(['first-root']);
       api.createRepositoryObjectReference.mockClear();
 
-      tree.notifyPotentialInsert!('first-root');
-      settle(fixture);
-      expect(api.createRepositoryObjectReference).not.toHaveBeenCalled();
-      expect(api.savePlan).not.toHaveBeenCalled();
-      expect(editor.hasUndo()).toBe(false);
-      tree.notifyInsertionComplete!();
       tree.selectNode('first-child');
       settle(fixture);
       expect(tree.selectedNodeIds()).toEqual(['first-child']);
-      tree.notifyPotentialInsert!('first-child');
-      settle(fixture);
-      expect(tree.selectedNodeIds()).toEqual(['first-child']);
-      expect(api.createRepositoryObjectReference).not.toHaveBeenCalled();
 
       const element: HTMLElement = fixture.nativeElement;
       const source = element.querySelector<HTMLElement>('step-plan-artefact-list tr.content-row')!;
@@ -296,6 +286,9 @@ describe('Plan editor context lifecycle', () => {
       source.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
       source.dispatchEvent(dragEvent('dragstart'));
       settle(fixture);
+      expect(api.createRepositoryObjectReference).not.toHaveBeenCalled();
+      expect(api.savePlan).not.toHaveBeenCalled();
+      expect(editor.hasUndo()).toBe(false);
       expect([...mutations, ...observer.takeRecords()]).toEqual([]);
       observer.disconnect();
       expect(tree.selectedNodeIds()).toEqual(['first-child']);

@@ -1,6 +1,13 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 .step-tree-node-container {
+  .node-drop-popover,
+  .node-drop-popover > .trigger-wrapper {
+    display: flex;
+    min-width: 0;
+    cursor: inherit;
+  }
+
   &.drop-disabled .node-content {
     opacity: 0.4;
     cursor: not-allowed;
@@ -50,5 +57,14 @@
         pointer-events: none;
       }
     }
+  }
+}
+
+.step-popover-pane:has(.tree-node-drop-info) {
+  pointer-events: none;
+
+  .step-popover {
+    pointer-events: none;
+    max-width: 28rem;
   }
 }

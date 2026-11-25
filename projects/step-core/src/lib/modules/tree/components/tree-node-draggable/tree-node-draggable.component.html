@@ -20,13 +20,28 @@
       [stepDragItem]="n.id"
       [dragDisabled]="dragDisabled()"
       [stepDropArea]="n.id"
+      (dragenter)="handleNodeDragEnter()"
+      (dragOver)="handleNodeDragEnter()"
       (dragover)="handleDragOver()"
-      (dropItem)="dropNode.emit($event)"
+      (dragleave)="handleNodeDragLeave($event)"
+      (dropItem)="handleNodeDrop($event)"
       [dropDisabled]="dropDisabled() || isDropTargetDisabled()"
     >
-      <step-tree-node-name [node]="n" />
+      <step-popover
+        class="node-drop-popover"
+        [mode]="PopoverMode.MANUAL"
+        [hasBackdrop]="false"
+        [constrainToViewport]="true"
+        yPosition="above"
+      >
+        <step-tree-node-name [node]="n" />
+        <step-popover-content class="tree-node-drop-info">
+          <ng-content select="[stepTreeNodeDropHint]" />
+        </step-popover-content>
+      </step-popover>
     </div>
   }
+  <ng-content />
 </div>
 @if (_treeNode.node(); as n) {
   @for (pId of n.parentPath; track pId; let idx = $index) {

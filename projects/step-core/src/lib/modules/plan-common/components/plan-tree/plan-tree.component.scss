@@ -7,20 +7,82 @@ step-plan-tree {
   step-tree {
     overflow: hidden;
     margin-top: 2rem;
-    padding-right: 6.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 1.6rem;
     &:hover {
       overflow: auto;
     }
   }
 
-  step-tree-node-draggable.step-tree-node-container.empty-pseudo-node {
-    .tree-node .node-content step-tree-node-name {
-      border: dashed 0.1rem var.$muted;
-      min-width: 8rem;
-    }
-  }
-
   step-tree-node-draggable {
+    &.plan-section-header {
+      .tree-node {
+        width: 100%;
+      }
+
+      .tree-node .node-content {
+        padding-top: 0.2rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .node-content,
+      .node-drop-popover,
+      .node-drop-popover > .trigger-wrapper,
+      step-tree-node-name {
+        flex: 1;
+        min-width: 0;
+      }
+
+      step-tree-node-name {
+        padding: 0 0.6rem;
+      }
+
+      .node-icon {
+        display: none;
+      }
+
+      .node-content .node-name {
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+        font-weight: 400;
+        color: var.$gray-500;
+      }
+
+      .node-content:hover step-tree-node-name {
+        background: var(--step-selection-background-color, var.$gray-100);
+      }
+
+      .node-content.dragover step-tree-node-name {
+        background: var(--step-selection-background-color, var.$gray-100);
+        outline: 0.1rem solid var(--step-accent-color, var.$blue-600);
+        outline-offset: -0.1rem;
+      }
+
+      section.middle-drop-container {
+        top: 1.5rem;
+      }
+    }
+
+    .tree-node:has(.plan-drop-section) {
+      max-width: 100%;
+
+      .node-content,
+      step-tree-node-name,
+      .node-name {
+        min-width: 0;
+      }
+
+      .node-name > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .node-name button {
+        display: none;
+      }
+    }
+
     .tree-node {
       .node-content .node-name {
         display: flex;

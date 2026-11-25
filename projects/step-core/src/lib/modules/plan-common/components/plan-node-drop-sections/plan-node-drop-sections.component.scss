@@ -1,0 +1,42 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-plan-node-drop-sections {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.4rem;
+
+  .plan-drop-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    box-sizing: border-box;
+    border: 0.1rem dashed var.$gray-200;
+    border-radius: 50%;
+    color: var.$gray-500;
+
+    .trigger-wrapper {
+      display: flex;
+      pointer-events: none;
+    }
+
+    step-icon {
+      @include core.step-icon-size(16px);
+    }
+
+    &.dragover {
+      border-style: solid;
+      border-color: var(--step-accent-color, var.$blue-600);
+      color: var(--step-accent-color, var.$blue-600);
+      background: var(--step-selection-background-color, var.$gray-100);
+    }
+
+    &.drop-disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}

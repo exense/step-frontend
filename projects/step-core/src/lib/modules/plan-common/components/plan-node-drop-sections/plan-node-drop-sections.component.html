@@ -1,0 +1,22 @@
+@for (section of sections(); track section.id) {
+  <step-popover
+    #popover
+    class="plan-drop-section"
+    [class.drop-disabled]="section.disabled"
+    [mode]="PopoverMode.MANUAL"
+    [constrainToViewport]="true"
+    [hasBackdrop]="false"
+    yPosition="above"
+    [attr.aria-label]="section.name + ' of ' + node().name"
+    [stepDropArea]="section.id"
+    [dropDisabled]="section.disabled"
+    (dragenter)="popover.openPopover()"
+    (dragLeave)="popover.closePopover()"
+    (dropItem)="popover.closePopover(); dropNode.emit($event)"
+  >
+    <step-icon [name]="section.icon" />
+    <step-popover-content class="tree-node-drop-info">
+      <step-plan-drop-hint [node]="node()" [dropArea]="section.id" />
+    </step-popover-content>
+  </step-popover>
+}

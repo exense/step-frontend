@@ -252,7 +252,6 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   canDropTo?(dropInfo: DropInfo): boolean;
   resolveDrop?(dropInfo: DropInfo): DropInfo;
 
-  notifyPotentialInsert?(potentialParentId: string): void;
   notifyInsertionComplete?(): void;
 
   insertNodesTo(
@@ -291,9 +290,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this._treeNodeUtils.updateChildren(this.originalRoot!, newParentId, children, 'replace');
     this.selectedInsertionParentId.set(newParentId);
     this.refresh();
-    if (!this.isNodeExpanded(newParentId)) {
-      this.expandNodeInternal(newParentId);
-    }
+    this.expandNodes(this.getNodePath(this.findNodeById(newParentId)));
   }
 
   canInsertTo(insertCandidatesIds: string[], newParentId: string): boolean {
@@ -564,9 +561,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     this.refresh();
 
-    if (!this.isNodeExpanded(parentId)) {
-      this.expandNodeInternal(parentId);
-    }
+    this.expandNodes(this.getNodePath(this.findNodeById(parentId)));
 
     const lastChild = newNodes[newNodes.length - 1];
     this.selectedNodeIdsInternal.set([lastChild.id!]);
@@ -774,11 +769,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     if (idsToInsert.includes(newParentId)) {
       return false;
     }
-    const parentNode = this.treeData().tree.find((node) => node.id === newParentId);
+    const parentNode = this.findNodeById(newParentId);
     if (!parentNode) {
       return false;
     }
-    const isPossibleNodeCycleExits = idsToInsert.some((nodeId) => parentNode.parentPath.includes(nodeId));
+    const parentPath = this.getNodePath(parentNode);
+    const isPossibleNodeCycleExits = idsToInsert.some((nodeId) => parentPath.includes(nodeId));
     return !isPossibleNodeCycleExits;
   }
 
