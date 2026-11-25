@@ -1,10 +1,15 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 .step-tree-node-container {
+  &.drop-disabled .node-content {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   section.middle-drop-container {
     min-height: 2.4rem;
     padding: 0.3rem 0;
-    left: calc(var(--idx) * 3rem + 6rem);
+    left: calc(var(--style__idx) * 3rem + 6rem);
     position: absolute;
     min-width: 10rem;
     top: 2.7rem;
@@ -14,6 +19,7 @@
     user-select: none;
     & > div {
       flex: 1;
+      height: 1.8rem;
       // border: dotted .1rem #000;
     }
     &.dragover > div {
@@ -23,10 +29,26 @@
     }
   }
 
-  &.drag-in-progress ~ section.middle-drop-container {
-    top: 0.7rem;
-    padding: 0;
-    min-height: 2.4rem;
-    z-index: 1 !important;
+  &.is-drag-in-progress {
+    .node-content {
+      cursor: grabbing;
+    }
+
+    section.middle-drop-container {
+      top: 0;
+      padding: 0;
+      height: 100%;
+      min-width: 0;
+      width: var(--tree-node-indent-size, 3rem);
+      align-items: center;
+      justify-content: flex-start;
+      z-index: 3;
+
+      > div {
+        flex: none;
+        width: 10rem;
+        pointer-events: none;
+      }
+    }
   }
 }

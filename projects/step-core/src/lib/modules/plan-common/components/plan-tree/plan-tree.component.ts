@@ -199,12 +199,18 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
       this._treeState.notifyInsertionComplete?.();
       return;
     }
-    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
-    const dropAdditionalInfo = event.additionalInfo as string | undefined;
+    const proposedDrop = { ...event, droppedArea: event.droppedArea ?? this._treeState.rootNodeId() };
+    if (this._treeState.canDropTo?.(proposedDrop) === false) {
+      this._treeState.notifyInsertionComplete?.();
+      return;
+    }
 
-    const isTreeNode = typeof event.draggedElement === 'string';
+    const resolvedDrop = this._treeState.resolveDrop?.(proposedDrop) ?? proposedDrop;
+    const newParentId = resolvedDrop.droppedArea as string;
+    const dropAdditionalInfo = resolvedDrop.additionalInfo as string | undefined;
+    const isTreeNode = typeof resolvedDrop.draggedElement === 'string';
     if (!isTreeNode) {
-      this.externalObjectDrop.emit(event);
+      this.externalObjectDrop.emit(resolvedDrop);
       return;
     }
 

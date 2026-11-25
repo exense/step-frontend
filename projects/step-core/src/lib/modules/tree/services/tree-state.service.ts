@@ -7,6 +7,7 @@ import { TreeStateInitOptions } from '../types/tree-state-init-options.interface
 import { TreeFlattenerService } from './tree-flattener.service';
 import { TreeFlatNode } from '../types/tree-flat-node';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { DropInfo } from '../../drag-drop/types/drop-info';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
@@ -231,6 +232,25 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       this.selectedInsertionParentId.set(nId);
     }
   }
+
+  getNextVisibleNode(nodeId: string, options?: { skipDescendants?: boolean }): TreeFlatNode | undefined {
+    const indexes = this.flatTreeNodeIndexes();
+    const nodes = this.flatTree();
+    const index = indexes.get(nodeId);
+    if (index === undefined) {
+      return undefined;
+    }
+    let nextIndex = index + 1;
+    if (options?.skipDescendants) {
+      while (nodes[nextIndex]?.parentPath.includes(nodeId)) {
+        nextIndex++;
+      }
+    }
+    return nodes[nextIndex];
+  }
+
+  canDropTo?(dropInfo: DropInfo): boolean;
+  resolveDrop?(dropInfo: DropInfo): DropInfo;
 
   notifyPotentialInsert?(potentialParentId: string): void;
   notifyInsertionComplete?(): void;
