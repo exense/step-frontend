@@ -49,7 +49,7 @@ const DEFAULT_TOOLTIP = 'Filter by package name';
     PopoverOverlayService,
   ],
   host: {
-    '[class.disabled]': '!isEnabled()',
+    '[class.disabled]': '!isEnabled() && !selectedIds.length',
   },
   encapsulation: ViewEncapsulation.None,
   standalone: false,
@@ -96,6 +96,10 @@ export class AutomationPackageFilterComponent
 
   protected showPopover(): void {
     if (!this.isEnabled()) {
+      if (this.selectedIds.length) {
+        this.filterControl.setValue([]);
+        this.selectedIds = [];
+      }
       return;
     }
 

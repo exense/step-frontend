@@ -4,6 +4,6 @@
   [matBadge]="selectedIdsBadge"
   matBadgeColor="primary"
   matBadgeSize="small"
-  [matTooltip]="(tooltipText$ | async) ?? ''"
+  [matTooltip]="!isEnabled() && selectedIds.length ? 'Clear package filter' : ((tooltipText$ | async) ?? '')"
   matTooltipPosition="below"
 />
