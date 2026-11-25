@@ -2,6 +2,28 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
+@media screen {
+  #step-main-scrollable-content:has(step-alt-execution-progress.is-drilldown-opened) {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    > .main-workspace-content,
+    #mainView,
+    step-alt-executions {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    step-alt-execution-progress {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+}
+
 step-alt-execution-progress {
   --execution-progress-horizontal-padding: 2.5rem;
 
@@ -298,16 +320,8 @@ step-alt-execution-progress {
       background: var.$white;
     }
 
-    &.has-drilldown > step-simple-outlet {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
-      padding-top: 1rem;
-
-      .primary-content {
-        display: none;
-      }
+    &.has-drilldown > .primary-content {
+      overflow: hidden;
 
       > step-simple-outlet {
         display: flex;
@@ -395,6 +409,10 @@ step-alt-execution-progress {
     display: block;
     min-height: 0;
     flex: 1 1 auto;
+
+    .item-content {
+      overscroll-behavior-y: contain;
+    }
   }
 }
 
