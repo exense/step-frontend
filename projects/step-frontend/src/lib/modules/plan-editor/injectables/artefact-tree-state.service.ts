@@ -33,8 +33,11 @@ export class ArtefactTreeStateService extends TreeStateService<AbstractArtefact,
     if (!parent) {
       return false;
     }
-    if (additionalInfo === 'first' && parent.nodeType !== undefined && !parent.children?.length) {
-      return false;
+    if (additionalInfo === 'first') {
+      const children = parent.nodeType === undefined ? parent.originalArtefact?.children : parent.children;
+      if (!children?.length) {
+        return false;
+      }
     }
     if (additionalInfo && additionalInfo !== 'first') {
       const sibling = parent.children?.find((child) => child.id === additionalInfo) as ArtefactTreeNode | undefined;

@@ -6,17 +6,19 @@ step-plan-node-drop-sections {
   flex-shrink: 0;
   align-items: center;
   gap: 0.4rem;
+  opacity: 0;
 
   .plan-drop-section {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 3.2rem;
+    height: 3.2rem;
     box-sizing: border-box;
-    border: 0.1rem dashed var.$gray-200;
+    border: 0.1rem dashed var.$gray-400;
     border-radius: 50%;
     color: var.$gray-500;
+    background: var.$gray-50;
 
     .trigger-wrapper {
       display: flex;

@@ -22,19 +22,20 @@ step-plan-tree {
       }
 
       .tree-node .node-content {
+        flex: 0 1 auto;
+        min-width: 0;
         padding-top: 0.2rem;
         margin-bottom: 0.2rem;
       }
 
-      .node-content,
       .node-drop-popover,
-      .node-drop-popover > .trigger-wrapper,
-      step-tree-node-name {
+      .node-drop-popover > .trigger-wrapper {
         flex: 1;
         min-width: 0;
       }
 
       step-tree-node-name {
+        min-width: 0;
         padding: 0 0.6rem;
       }
 
@@ -53,19 +54,45 @@ step-plan-tree {
         background: var(--step-selection-background-color, var.$gray-100);
       }
 
+      &:not(.drop-disabled) .tree-node.is-drop-row-hovered .node-content:not(.dragover) step-tree-node-name {
+        background: var.$gray-50;
+        outline: 0.1rem dashed var.$gray-400;
+        outline-offset: -0.1rem;
+      }
+
       .node-content.dragover step-tree-node-name {
         background: var(--step-selection-background-color, var.$gray-100);
         outline: 0.1rem solid var(--step-accent-color, var.$blue-600);
         outline-offset: -0.1rem;
       }
+    }
 
-      section.middle-drop-container {
-        top: 1.5rem;
+    .tree-node.is-drop-row-hovered step-plan-node-drop-sections {
+      opacity: 1;
+    }
+
+    &:not(.drop-disabled):not(.is-drag-in-progress) .tree-node:has(.plan-drop-section).is-drop-row-hovered {
+      .node-content step-tree-node-name {
+        outline: 0.1rem dashed var.$gray-400;
+        outline-offset: 0.3rem;
+        background: var.$gray-50;
+        box-shadow: 0 0 0 0.3rem var.$gray-50;
+      }
+
+      .node-content.dragover step-tree-node-name {
+        outline-style: solid;
+        outline-color: var(--step-accent-color, var.$blue-600);
+        background: var(--step-selection-background-color, var.$gray-100);
+        box-shadow: 0 0 0 0.3rem var(--step-selection-background-color, var.$gray-100);
       }
     }
 
     .tree-node:has(.plan-drop-section) {
-      max-width: 100%;
+      width: 100%;
+
+      .node-content {
+        flex: 0 1 auto;
+      }
 
       .node-content,
       step-tree-node-name,

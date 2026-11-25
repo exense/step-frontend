@@ -1,11 +1,15 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
   contentChild,
+  DestroyRef,
+  ElementRef,
   inject,
   input,
   output,
+  Renderer2,
   ViewEncapsulation,
   viewChild,
 } from '@angular/core';
@@ -47,10 +51,14 @@ import { TreeNodeDropHintDirective } from '../../directives/tree-node-drop-hint.
   ],
   host: {
     '[class.is-drag-in-progress]': 'isDragInProgress()',
+    '[class.is-drag-active]': 'isDragActive()',
     '[class.drop-disabled]': '!isDragInProgress() && isDropTargetDisabled()',
   },
 })
-export class TreeNodeDraggableComponent {
+export class TreeNodeDraggableComponent implements AfterViewInit {
+  private readonly row = viewChild<ElementRef<HTMLElement>>('row');
+  private readonly _renderer = inject(Renderer2);
+  private readonly _destroyRef = inject(DestroyRef);
   private readonly dropPopover = viewChild(PopoverComponent);
   private readonly dropHint = contentChild(TreeNodeDropHintDirective);
   private isDropHintOpen = false;
@@ -73,7 +81,19 @@ export class TreeNodeDraggableComponent {
   /** @Output() **/
   readonly dropNode = output<DropInfo>();
 
-  private readonly dragData = toSignal(this._dragDataService.dragData$.pipe(tap(() => this.closeDropHint())));
+  private readonly dragData = toSignal(
+    this._dragDataService.dragData$.pipe(
+      tap(() => {
+        this.closeDropHint();
+        const row = this.row()?.nativeElement;
+        if (row) {
+          this._renderer.removeClass(row, 'is-drop-row-hovered');
+        }
+      }),
+    ),
+  );
+
+  protected readonly isDragActive = computed(() => !!this.dragData());
 
   protected readonly isDropTargetDisabled = computed(() => {
     const draggedElement = this.dragData();
@@ -107,9 +127,39 @@ export class TreeNodeDraggableComponent {
     const dropDisabled = this.dropDisabled();
     return (
       !dropDisabled &&
+      node.hasChild &&
       this._treeState.canDropTo?.({ draggedElement, droppedArea: node.id, additionalInfo: 'first' }) !== false
     );
   });
+
+  ngAfterViewInit(): void {
+    const row = this.row()!.nativeElement;
+    const stopDragEnter = this._renderer.listen(
+      row,
+      'dragenter',
+      () => {
+        if (this._dragDataService.isDragStarted) {
+          this._renderer.addClass(row, 'is-drop-row-hovered');
+        }
+      },
+      { capture: true },
+    );
+    const stopDragLeave = this._renderer.listen(
+      row,
+      'dragleave',
+      (event: DragEvent) => {
+        const nextTarget = event.relatedTarget ?? row.ownerDocument.elementFromPoint?.(event.clientX, event.clientY);
+        if (!(nextTarget instanceof Node) || !row.contains(nextTarget)) {
+          this._renderer.removeClass(row, 'is-drop-row-hovered');
+        }
+      },
+      { capture: true },
+    );
+    this._destroyRef.onDestroy(() => {
+      stopDragEnter();
+      stopDragLeave();
+    });
+  }
 
   protected handleDragOver(): void {
     if (this.dropDisabled() || !this._dragDataService.isDragStarted) {
@@ -132,19 +182,12 @@ export class TreeNodeDraggableComponent {
     this.dropPopover()?.openPopover();
   }
 
-  protected handleNodeDragLeave(event: DragEvent): void {
-    const content = event.currentTarget as HTMLElement;
-    if (!(event.relatedTarget instanceof Node) || !content.contains(event.relatedTarget)) {
-      this.closeDropHint();
-    }
-  }
-
   protected handleNodeDrop(event: DropInfo): void {
     this.closeDropHint();
     this.dropNode.emit(event);
   }
 
-  private closeDropHint(): void {
+  protected closeDropHint(): void {
     if (!this.isDropHintOpen) {
       return;
     }

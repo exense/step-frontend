@@ -84,7 +84,12 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   }
 
   private handleDragLeave(event: DragEvent): void {
-    this._elRef.nativeElement.classList.remove(this._classNames.DRAG_OVER);
+    const element = this._elRef.nativeElement;
+    const nextTarget = event.relatedTarget ?? element.ownerDocument.elementFromPoint?.(event.clientX, event.clientY);
+    if (nextTarget instanceof Node && element.contains(nextTarget)) {
+      return;
+    }
+    element.classList.remove(this._classNames.DRAG_OVER);
     this.dragLeave.emit(this.getDropInfo());
   }
 

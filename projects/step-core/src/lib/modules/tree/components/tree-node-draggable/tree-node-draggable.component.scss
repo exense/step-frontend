@@ -14,19 +14,22 @@
   }
 
   section.middle-drop-container {
-    min-height: 2.4rem;
-    padding: 0.3rem 0;
+    height: 1.6rem;
+    padding: 0;
     left: calc(var(--style__idx) * 3rem + 6rem);
     position: absolute;
     min-width: 10rem;
-    top: 2.7rem;
+    top: calc(100% - 0.8rem);
     display: flex;
+    align-items: center;
     justify-content: space-around;
-    z-index: 1;
+    z-index: 3;
+    pointer-events: none;
     user-select: none;
     & > div {
       flex: 1;
       height: 1.8rem;
+      pointer-events: none;
       // border: dotted .1rem #000;
     }
     &.dragover > div {
@@ -34,6 +37,10 @@
       border-radius: 2rem;
       opacity: 0.2;
     }
+  }
+
+  &.is-drag-active section.middle-drop-container {
+    pointer-events: auto;
   }
 
   &.is-drag-in-progress {

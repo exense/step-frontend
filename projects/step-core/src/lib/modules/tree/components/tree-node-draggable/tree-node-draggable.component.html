@@ -1,4 +1,5 @@
 <div
+  #row
   class="tree-node"
   [class.tree-node-selected]="_treeNode.isSelected()"
   [class.tree-node-selected-for-insert]="_treeNode.isSelectedForInsert()"
@@ -23,7 +24,7 @@
       (dragenter)="handleNodeDragEnter()"
       (dragOver)="handleNodeDragEnter()"
       (dragover)="handleDragOver()"
-      (dragleave)="handleNodeDragLeave($event)"
+      (dragLeave)="closeDropHint()"
       (dropItem)="handleNodeDrop($event)"
       [dropDisabled]="dropDisabled() || isDropTargetDisabled()"
     >
