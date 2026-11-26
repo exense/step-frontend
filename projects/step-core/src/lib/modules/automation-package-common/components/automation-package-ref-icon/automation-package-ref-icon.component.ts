@@ -1,9 +1,12 @@
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { EntityAutomationPackageService } from '../../injectables/entity-automation-package.service';
-import { Observable, of } from 'rxjs';
+import { of, combineLatest, map, switchMap } from 'rxjs';
 import { AutomationPackage } from '../../../../client/generated';
 import { AutomationPackageChildEntity } from '../../types/automation-package-child-entity';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../auth';
+import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-automation-package-ref-icon',
@@ -11,23 +14,31 @@ import { Router } from '@angular/router';
   styleUrls: ['./automation-package-ref-icon.component.scss'],
   standalone: false,
 })
-export class AutomationPackageRefIconComponent<T extends AutomationPackageChildEntity> implements OnChanges {
+export class AutomationPackageRefIconComponent<T extends AutomationPackageChildEntity> {
   private _router = inject(Router);
   private _entityAutomationPackageService = inject(EntityAutomationPackageService);
+  private _auth = inject(AuthService);
 
-  protected automationPackage$: Observable<AutomationPackage | undefined> = of(undefined);
+  readonly entity = input<T | undefined>();
 
-  @Input() entity?: T;
+  private readonly entity$ = toObservable(this.entity);
+  private readonly isReadPackageAvailable$ = this._auth
+    .hasRight$(AutomationPackagePermission.READ)
+    .pipe(takeUntilDestroyed());
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cEntity = changes['entity'];
-    if (cEntity?.previousValue !== cEntity?.currentValue || cEntity?.firstChange) {
-      this.automationPackage$ = this._entityAutomationPackageService.getEntityPackage(cEntity?.currentValue);
-    }
-  }
+  private readonly automationPackage$ = combineLatest([this.entity$, this.isReadPackageAvailable$]).pipe(
+    switchMap(([entity, isReadPackageAvailable]) => {
+      if (!entity || !isReadPackageAvailable) {
+        return of(undefined);
+      }
+      return this._entityAutomationPackageService.getEntityPackage(entity);
+    }),
+  );
 
-  openPackageList(automationPackage: AutomationPackage): void {
-    const automationPackageFileName = automationPackage.customFields?.['automationPackageFileName'];
+  protected readonly automationPackage = toSignal(this.automationPackage$, { initialValue: undefined });
+
+  protected openPackageList(automationPackage?: AutomationPackage): void {
+    const automationPackageFileName = automationPackage?.customFields?.['automationPackageFileName'];
     if (!automationPackageFileName) {
       return;
     }

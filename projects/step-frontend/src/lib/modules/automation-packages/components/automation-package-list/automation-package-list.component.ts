@@ -11,11 +11,11 @@ import {
   tableColumnsConfigProvider,
   TableComponent,
   tablePersistenceConfigProvider,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { AP_ENTITY_ID } from '../../types/constants';
 import { AutomationPackagesActionsService } from '../../injectables/automation-packages-actions.service';
 import { map, Observable, of } from 'rxjs';
-import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 import { ExecutionModule } from '../../../execution/execution.module';
@@ -52,7 +52,7 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
 
   private automationPackageFileName?: string;
 
-  private table = viewChild('table', { read: TableComponent<AutomationPackage> });
+  private readonly table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
   private effectTableChange = effect(() => {
     const table = this.table();

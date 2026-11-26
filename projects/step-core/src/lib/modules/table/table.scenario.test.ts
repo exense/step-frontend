@@ -4,7 +4,18 @@ import { By } from '@angular/platform-browser';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject } from 'rxjs';
-import { AugmentedScreenService, TableApiWrapperService, TableResponseGeneric } from '../../client/step-client-module';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { MatTooltip } from '@angular/material/tooltip';
+import { AuthService } from '../auth';
+import { AutomationPackageCommonModule } from '../automation-package-common/automation-package-common.module';
+import { tablePersistenceConfigProvider } from './services/table-persistence-config.provider';
+import { TableStorageService } from './services/table-storage.service';
+import {
+  AugmentedAutomationPackagesService,
+  AugmentedScreenService,
+  TableApiWrapperService,
+  TableResponseGeneric,
+} from '../../client/step-client-module';
 import { StepMaterialModule } from '../step-material/step-material.module';
 import {
   EntitySelectionComponent,
@@ -68,7 +79,36 @@ class TableTestComponent {
 }
 /* eslint-enable step-lint/component-public-fields */
 
-function settle(fixture: ComponentFixture<TableTestComponent>): void {
+@Component({
+  selector: 'step-package-filter-table-test',
+  imports: [TableModule, StepMaterialModule, AutomationPackageCommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    tableColumnsConfigProvider(null),
+    tablePersistenceConfigProvider('packageFilterScenario', { storeSearch: true }),
+  ],
+  template: `
+    <step-table [dataSource]="dataSource">
+      <ng-container matColumnDef="name" stepSearchCol>
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="automationPackage" stepSearchCol>
+        <step-automation-package-filter *stepSearchCellDef stepFilterConnect />
+        <th mat-header-cell *matHeaderCellDef>Automation Package</th>
+        <td mat-cell *matCellDef></td>
+      </ng-container>
+    </step-table>
+  `,
+})
+class PackageFilterTableTestComponent {
+  protected readonly dataSource = new TableRemoteDataSource<Row>('scenario', inject(TableApiWrapperService), {
+    name: 'attributes.name',
+    automationPackage: 'customFields.automationPackageId',
+  });
+}
+
+function settle<T>(fixture: ComponentFixture<T>): void {
   fixture.detectChanges();
   tick();
   fixture.detectChanges();
@@ -76,7 +116,7 @@ function settle(fixture: ComponentFixture<TableTestComponent>): void {
   fixture.detectChanges();
 }
 
-function names(fixture: ComponentFixture<TableTestComponent>): string[] {
+function names<T>(fixture: ComponentFixture<T>): string[] {
   const element: HTMLElement = fixture.nativeElement;
   return Array.from(element.querySelectorAll('tr.content-row .mat-column-name'), (cell) => cell.textContent!.trim());
 }
@@ -101,7 +141,10 @@ describe('Table scenarios', () => {
     requestTable: jest.fn(),
   };
 
+  const searchPackages = jest.fn();
+
   beforeEach(() => {
+    searchPackages.mockReset().mockReturnValue(of([]));
     api.getTableSettings.mockReset().mockReturnValue(of({ columnSettingList: [] }));
     api.saveTableSettings.mockReset().mockReturnValue(of({}));
     api.requestTable.mockReset();
@@ -111,6 +154,8 @@ describe('Table scenarios', () => {
         provideNoopAnimations(),
         { provide: REPOSITORY_PARAMETERS, useValue: [] },
         { provide: TableApiWrapperService, useValue: api },
+        { provide: AuthService, useValue: { hasRight$: () => of(false) } },
+        { provide: AugmentedAutomationPackagesService, useValue: { searchByIDs: searchPackages } },
         {
           provide: AugmentedScreenService,
           useValue: {
@@ -245,6 +290,56 @@ describe('Table scenarios', () => {
     settle(fixture);
     expect(names(fixture)).toEqual(['Alpha']);
     fixture.destroy();
+  }));
+
+  it('clears a restored package filter without package-read permission or package requests', fakeAsync(() => {
+    const storage = TestBed.inject(TableStorageService);
+    storage.setItem(
+      'packageFilterScenario_SEARCH',
+      JSON.stringify({ automationPackage: { value: '^package-a$', regex: true }, name: 'a' }),
+    );
+    api.requestTable
+      .mockReturnValueOnce(of({ data: [rows[0]], recordsFiltered: 1, recordsTotal: 4 }))
+      .mockReturnValue(of({ data: [rows[0], rows[1]], recordsFiltered: 4, recordsTotal: 4 }));
+    const fixture = TestBed.createComponent(PackageFilterTableTestComponent);
+    settle(fixture);
+    tick(500);
+    settle(fixture);
+    expect(names(fixture)).toEqual(['Alpha']);
+    expect(api.requestTable).toHaveBeenLastCalledWith(
+      'scenario',
+      expect.objectContaining({
+        filters: [
+          { field: 'customFields.automationPackageId', value: '^package-a$', regex: true },
+          { field: 'attributes.name', value: 'a', regex: false },
+        ],
+      }),
+      undefined,
+    );
+    const element: HTMLElement = fixture.nativeElement;
+    const icon = fixture.debugElement.query(By.css('step-automation-package-filter step-icon'));
+    const tooltipBeforeClearing = icon.injector.get(MatTooltip).message;
+    (icon.nativeElement as HTMLElement).click();
+    settle(fixture);
+    tick(500);
+    settle(fixture);
+    expect(names(fixture)).toEqual(['Alpha', 'Beta']);
+    expect(api.requestTable).toHaveBeenLastCalledWith(
+      'scenario',
+      expect.objectContaining({ filters: [{ field: 'attributes.name', value: 'a', regex: false }] }),
+      undefined,
+    );
+    expect(JSON.parse(storage.getItem('packageFilterScenario_SEARCH')!)).toEqual({
+      automationPackage: { value: '', regex: true },
+      name: 'a',
+    });
+    expect(tooltipBeforeClearing).toBe('Clear package filter');
+    expect(icon.injector.get(MatTooltip).message).toBe('Filter by package name');
+    expect(element.querySelector('step-automation-package-filter')!.classList.contains('disabled')).toBe(true);
+    expect(searchPackages).not.toHaveBeenCalled();
+    expect(TestBed.inject(OverlayContainer).getContainerElement().children).toHaveLength(0);
+    fixture.destroy();
+    storage.removeItem('packageFilterScenario_SEARCH');
   }));
 
   it('reloads fetched local data while retaining the filter', fakeAsync(() => {
