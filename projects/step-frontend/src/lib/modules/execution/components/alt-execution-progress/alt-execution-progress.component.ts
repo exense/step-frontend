@@ -317,6 +317,15 @@ export class AltExecutionProgressComponent
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
 
+  protected readonly interruptionReason = computed(() => {
+    const execution = this.execution();
+    if (execution?.status !== 'ENDED' || execution.result !== 'INTERRUPTED') {
+      return undefined;
+    }
+    const description: unknown = execution.customFields?.['description'];
+    return typeof description === 'string' && description.trim() ? description : undefined;
+  });
+
   protected readonly notices$ = this.activeExecution$.pipe(
     switchMap((active) => active.resolvedNotices$),
     shareReplay(1),

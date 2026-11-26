@@ -1,3 +1,4 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
@@ -60,6 +61,7 @@ describe('Individual execution-list commands', () => {
         {
           provide: AuthService,
           useValue: {
+            context$: of({ userID: 'tester' }),
             getUserID: () => 'tester',
             hasRight$: (right: string) => of(['plan-execute', 'execution-read'].includes(right)),
             getConf: () => ({}),
@@ -123,8 +125,21 @@ describe('Individual execution-list commands', () => {
     expect(stop.disabled).toBe(false);
     stop.click();
     tick();
-    const request = http.expectOne((value) => value.url.endsWith('/executions/original/stop'));
+    const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+    const dialog = overlay.querySelector('[role="dialog"]')!;
+    const confirm = Array.from(dialog.querySelectorAll('button')).find(
+      (button) => button.textContent?.trim() === 'Stop',
+    );
+    expect(confirm).toBeDefined();
+    confirm!.click();
+    tick();
+    const request = http.expectOne((value) =>
+      new URL(value.urlWithParams, document.baseURI).pathname.endsWith('/executions/original/stop'),
+    );
     expect(request.request.method).toBe('GET');
+    expect(new URL(request.request.urlWithParams, document.baseURI).searchParams.get('abortReason')).toBe(
+      'Interrupted by tester',
+    );
     request.flush(null);
     tick();
   }));

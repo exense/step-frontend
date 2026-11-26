@@ -16,7 +16,7 @@
           />
         }
         @if (displayStatus$ | async; as status) {
-          <step-status [status]="status" [iconMode]="true" />
+          <step-status [status]="status" [iconMode]="true" [tooltip]="interruptionReason()" />
         }
         <div>{{ execution | executionName }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {

@@ -8,8 +8,6 @@ import {
   EntitySelectionState,
   entitySelectionStateProvider,
   Execution,
-  ExecutionActionGuardRegistryService,
-  ExecutionActionGuardService,
   ExecutionListFiltersService,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
@@ -25,6 +23,7 @@ import { ExecutionListFilterInterceptorService } from '../../services/execution-
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
+import { ExecutionStopConfirmationService } from '../../services/execution-stop-confirmation.service';
 
 @Component({
   selector: 'step-execution-list',
@@ -66,8 +65,7 @@ export class ExecutionListComponent implements OnDestroy {
   );
   private readonly _dialogs = inject(DialogsService);
   private readonly _auth = inject(AuthService);
-  private readonly _guardRegistry = inject(ExecutionActionGuardRegistryService);
-  private readonly _actionGuard = inject(ExecutionActionGuardService);
+  private readonly _stopConfirmation = inject(ExecutionStopConfirmationService);
 
   protected autoRefreshDisabled: boolean = false;
 
@@ -111,10 +109,8 @@ export class ExecutionListComponent implements OnDestroy {
       : this._augmentedExecutionsService
           .getExecutionById(execution.id!)
           .pipe(map((value) => value.executionParameters));
-    const authorization$ = this._guardRegistry.hasGuards('execute')
-      ? this._actionGuard.check('execute', execution)
-      : this._dialogs.showWarning(`Are you sure you want to restart Execution ${name}?`);
-    authorization$
+    this._dialogs
+      .showWarning(`Are you sure you want to restart Execution ${name}?`)
       .pipe(
         filter((confirmed) => !!confirmed),
         switchMap(() => parameters$),
@@ -131,14 +127,11 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   protected stopExecution(execution: Execution): void {
-    const name = execution.description;
-    const authorization$ = this._guardRegistry.hasGuards('stop')
-      ? this._actionGuard.check('stop', execution)
-      : this._dialogs.showWarning(`Are you sure you want to stop Execution ${name}?`);
-    authorization$
+    this._stopConfirmation
+      .confirmStop(execution)
       .pipe(
-        filter((confirmed) => !!confirmed),
-        switchMap(() => this._augmentedExecutionsService.abort(execution.id!)),
+        filter((reason) => reason !== undefined),
+        switchMap((reason) => this._augmentedExecutionsService.abort(execution.id!, reason)),
       )
       .subscribe(() => this.refreshTable());
   }

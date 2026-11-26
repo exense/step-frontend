@@ -1,10 +1,9 @@
 import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, DOCUMENT } from '@angular/core';
-import { EMPTY, finalize, from, map, Observable, switchMap } from 'rxjs';
+import { defer, EMPTY, filter, finalize, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
   CommonEntitiesUrlsService,
   ExecutiontTaskParameters,
-  ExecutionActionGuardService,
   ExecutionCommandsContext,
   ExecutionStrategy,
   ExecutionStrategyController,
@@ -14,12 +13,13 @@ import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
 import { LocalExecutionStrategyService } from './local-execution-strategy.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ExecutionStopConfirmationService } from './execution-stop-confirmation.service';
 
 @Injectable()
 export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyController {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _executionService = inject(AugmentedExecutionsService);
-  private readonly _actionGuard = inject(ExecutionActionGuardService);
+  private readonly _stopConfirmation = inject(ExecutionStopConfirmationService);
   private _localStrategy = inject(LocalExecutionStrategyService);
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
@@ -66,13 +66,10 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
     }
 
     const context = this.context;
-    const execution = context.getExecution();
-    const currentEId = execution?.id;
+    const currentEId = context.getExecution()?.id;
     this.submitting.set(true);
-    this._actionGuard
-      .check('execute', execution)
+    defer(() => strategy.execute(context, { simulate }))
       .pipe(
-        switchMap((allowed) => (allowed ? strategy.execute(context, { simulate }) : EMPTY)),
         finalize(() => this.submitting.set(false)),
         takeUntilDestroyed(this._destroyRef),
       )
@@ -90,16 +87,15 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
 
   stop(): Observable<void> {
     const execution = this.context.getExecution()!;
-    return this._actionGuard
-      .check('stop', execution)
-      .pipe(switchMap((allowed) => (allowed ? this._executionService.abort(execution.id!) : EMPTY)));
+    return this._stopConfirmation.confirmStop(execution).pipe(
+      filter((reason) => reason !== undefined),
+      switchMap((reason) => this._executionService.abort(execution.id!, reason)),
+    );
   }
 
   forceStop(): Observable<void> {
     const execution = this.context.getExecution()!;
-    return this._actionGuard
-      .check('forceStop', execution)
-      .pipe(switchMap((allowed) => (allowed ? this._executionService.forceStop(execution.id!) : EMPTY)));
+    return this._executionService.forceStop(execution.id!);
   }
 
   copyExecutionServiceAsCurlToClipboard(): void {
