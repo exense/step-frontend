@@ -7,6 +7,7 @@ import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { TreeStateService } from '../../../tree';
 import { AbstractArtefact } from '../../../../client/generated';
 import { PlanDropHintComponent } from '../plan-drop-hint/plan-drop-hint.component';
+import { ArtefactNodeSource } from '../../types/artefact-node-source.enum';
 import { ArtefactTreeNode } from '../../types/artefact-tree-node';
 
 @Component({
@@ -36,6 +37,8 @@ export class PlanNodeDropSectionsComponent {
     }
     return (node.dropSections ?? []).map((section) => ({
       ...section,
+      isThreadSection:
+        section.nodeType === ArtefactNodeSource.BEFORE_THREAD || section.nodeType === ArtefactNodeSource.AFTER_THREAD,
       disabled: this._treeState.canDropTo?.({ draggedElement, droppedArea: section.id }) === false,
     }));
   });

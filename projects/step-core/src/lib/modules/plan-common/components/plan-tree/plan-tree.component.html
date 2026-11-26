@@ -1,6 +1,6 @@
 <step-split>
   <step-split-area [size]="treeSize" (sizeChange)="handleTreeSizeChange($event)">
-    <step-drag-drop-container stepDropAreaId="planTree">
+    <step-drag-drop-container stepDropAreaId="planTree" [animatedPreview]="true">
       <step-tree
         #tree
         [dragDisabled]="isReadonly()"

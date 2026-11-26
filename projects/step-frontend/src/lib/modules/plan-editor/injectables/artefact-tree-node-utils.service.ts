@@ -271,25 +271,25 @@ export class ArtefactTreeNodeUtilsService
     switch (nodeType) {
       case ArtefactNodeSource.AFTER:
         name = 'After (cleanup)';
-        icon = 'chevron-right';
+        icon = 'arrow-right-from-line';
         childContainer = originalArtefact.after;
         break;
       case ArtefactNodeSource.AFTER_THREAD:
         if (isThreadGroup) {
           name = 'After Thread';
-          icon = 'chevrons-right';
+          icon = 'arrow-right-from-line';
           childContainer = threadGroupArtefact!.afterThread;
         }
         break;
       case ArtefactNodeSource.BEFORE:
         name = 'Before (init)';
-        icon = 'chevron-left';
+        icon = 'arrow-right-to-line';
         childContainer = originalArtefact.before;
         break;
       case ArtefactNodeSource.BEFORE_THREAD:
         if (isThreadGroup) {
           name = 'Before Thread';
-          icon = 'chevrons-left';
+          icon = 'arrow-right-to-line';
           childContainer = threadGroupArtefact!.beforeThread;
         }
         break;

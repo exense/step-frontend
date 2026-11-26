@@ -5,6 +5,7 @@ step-plan-tree {
   height: 100%;
 
   step-tree {
+    container: plan-tree / inline-size;
     overflow: hidden;
     margin-top: 2rem;
     box-sizing: border-box;
@@ -87,9 +88,22 @@ step-plan-tree {
       }
     }
 
-    .tree-node:has(.plan-drop-section) {
+    .tree-node {
       width: 100%;
+    }
 
+    @container plan-tree (max-width: 40rem) {
+      .tree-node:has(.thread-section) {
+        gap: 0.4rem;
+
+        step-tree-node-name {
+          gap: 0.4rem;
+          padding-right: 0.4rem;
+        }
+      }
+    }
+
+    .tree-node:has(.plan-drop-section) {
       .node-content {
         flex: 0 1 auto;
       }

@@ -19,6 +19,7 @@
       class="node-content"
       (contextmenu)="_treeNode.openContextMenu($event)"
       [stepDragItem]="n.id"
+      [dragPreviewOrigin]="row"
       [dragDisabled]="dragDisabled()"
       [stepDropArea]="n.id"
       (dragenter)="handleNodeDragEnter()"

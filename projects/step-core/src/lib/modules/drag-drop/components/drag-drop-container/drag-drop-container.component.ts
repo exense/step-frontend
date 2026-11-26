@@ -5,6 +5,7 @@ import {
   EnvironmentInjector,
   forwardRef,
   inject,
+  input,
   InjectionToken,
   Injector,
   OnDestroy,
@@ -24,7 +25,7 @@ const DRAG_DROP_CONTAINER_INTERNAL = new InjectionToken<DragDataService & DragDr
   'Internal token for drag drop group container',
 );
 
-const dragDropGroupContainerFactory = () => {
+const dragDropGroupContainerFactory = (): DragDataService & DragDropGroupService => {
   const _injector = inject(Injector);
   const _destroyRef = inject(DestroyRef);
   const _elRef = inject(ElementRef);
@@ -80,13 +81,15 @@ const dragDropGroupContainerFactory = () => {
 export class DragDropContainerComponent implements OnInit, OnDestroy, DragDropContainerService {
   private _dragDropGroup = inject(DragDropGroupService);
 
-  protected isDragStarted = signal(false);
+  readonly animatedPreview = input(false);
+
+  protected readonly isDragStarted = signal(false);
 
   /** @ViewChild('dragImageContainer', { static: true }) **/
-  private dragImageContainer = viewChild<ElementRef<HTMLDivElement>>('dragImageContainer');
+  private readonly dragImageContainer = viewChild<ElementRef<HTMLDivElement>>('dragImageContainer');
 
   /** @ViewChild('dragPreview', { static: true }) **/
-  private dragPreview = viewChild<ElementRef<HTMLDivElement>>('dragPreview');
+  private readonly dragPreview = viewChild<ElementRef<HTMLDivElement>>('dragPreview');
 
   ngOnInit(): void {
     this._dragDropGroup.registerGroupItem(this);
@@ -96,14 +99,17 @@ export class DragDropContainerComponent implements OnInit, OnDestroy, DragDropCo
     this._dragDropGroup.unregisterGroupItem(this);
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Implements DragDropContainerService.
   getImageContainer(): HTMLElement | undefined {
     return this.dragImageContainer()?.nativeElement;
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Implements DragDropContainerService.
   getPreviewNode(): HTMLElement | undefined {
     return this.dragPreview()?.nativeElement;
   }
 
+  // eslint-disable-next-line step-lint/component-public-fields -- Implements DragDropContainerService.
   setIsDragStarted(value: boolean): void {
     this.isDragStarted.set(value);
   }

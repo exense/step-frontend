@@ -2,6 +2,7 @@
   <step-popover
     #popover
     class="plan-drop-section"
+    [class.thread-section]="section.isThreadSection"
     [class.drop-disabled]="section.disabled"
     [mode]="PopoverMode.MANUAL"
     [constrainToViewport]="true"
@@ -14,7 +15,10 @@
     (dragLeave)="popover.closePopover()"
     (dropItem)="popover.closePopover(); dropNode.emit($event)"
   >
-    <step-icon [name]="section.icon" />
+    <step-icon [name]="section.icon" aria-hidden="true" />
+    @if (section.isThreadSection) {
+      <span>Thread</span>
+    }
     <step-popover-content class="tree-node-drop-info">
       <step-plan-drop-hint [node]="node()" [dropArea]="section.id" />
     </step-popover-content>

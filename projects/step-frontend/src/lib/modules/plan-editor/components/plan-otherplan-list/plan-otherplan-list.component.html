@@ -23,7 +23,7 @@
       }
     </div>
     <ng-container *stepRowsExtension="let rows">
-      <step-drag-drop-container stepDropAreaId="planTree">
+      <step-drag-drop-container stepDropAreaId="planTree" [animatedPreview]="true">
         @for (row of rows; track row) {
           <step-drag-item
             [elRef]="row.elRef"

@@ -28,14 +28,13 @@
     user-select: none;
     & > div {
       flex: 1;
-      height: 1.8rem;
+      height: 0.2rem;
       pointer-events: none;
       // border: dotted .1rem #000;
     }
     &.dragover > div {
-      background: var(--step-surface-dark-color, var.$gray-800);
-      border-radius: 2rem;
-      opacity: 0.2;
+      background: var(--step-accent-color, var.$blue-600);
+      border-radius: 0.1rem;
     }
   }
 
