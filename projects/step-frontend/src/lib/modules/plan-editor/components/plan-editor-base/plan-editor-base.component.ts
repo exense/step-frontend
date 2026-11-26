@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   effect,
   forwardRef,
@@ -148,6 +149,16 @@ export class PlanEditorBaseComponent
     showExportSourceButton: true,
   });
   readonly runPlan = output();
+
+  protected readonly insertTargetName = computed(() => {
+    const plan = this._planEditorService.plan();
+    const parentId = this._treeState.selectedForInsertCandidate();
+    const selected = this._treeState.selectedNodes();
+    if (plan._class === 'step.core.plans.Plan' && selected.length === 1 && parentId) {
+      return this._treeState.findNodeById(parentId)?.name;
+    }
+    return undefined;
+  });
 
   selectedTab = 'controls';
 

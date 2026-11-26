@@ -18,6 +18,7 @@ export class TablePartPaginationDirective implements OnDestroy {
 
   private _itemsPerPageService = inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
   readonly pageSizeInputDisabled = input(false);
+  readonly defaultPageSize = input<number>();
 
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
   private readonly paginatorReadyInternal = signal(false);
@@ -52,7 +53,9 @@ export class TablePartPaginationDirective implements OnDestroy {
       initialPage$ = of(statePage);
     } else {
       this.page?.firstPage?.();
-      initialPage$ = this._itemsPerPageService.getDefaultPageSizeItem().pipe(
+      const defaultSize = this.defaultPageSize();
+      const pageSize$ = defaultSize ? of(defaultSize) : this._itemsPerPageService.getDefaultPageSizeItem();
+      initialPage$ = pageSize$.pipe(
         tap((pageSize) => this.page?.pageSize?.set?.(pageSize)),
         map((pageSize) => this.createPageInitialValue(pageSize)),
       );

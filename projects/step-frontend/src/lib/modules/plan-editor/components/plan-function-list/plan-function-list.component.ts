@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, viewChild, ViewEncapsulation, effect } from '@angular/core';
+import { Component, computed, inject, input, output, viewChild, ViewEncapsulation, effect } from '@angular/core';
 import {
   AugmentedKeywordsService,
   BulkSelectionType,
@@ -17,7 +17,6 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
 @Component({
   selector: 'step-plan-function-list',
   templateUrl: './plan-function-list.component.html',
-  styleUrls: ['./plan-function-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
     ...entitySelectionStateProvider<string, Keyword>('id'),
@@ -34,6 +33,7 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
   standalone: false,
 })
 export class PlanFunctionListComponent {
+  readonly insertTargetName = input<string>();
   private _selectionState = inject<EntitySelectionState<string, Keyword>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
   private _planEditorService = inject(PlanEditorService);
@@ -48,7 +48,6 @@ export class PlanFunctionListComponent {
     this.dataSource.reload({ immediateHideProgress: true });
   });
 
-  protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
   protected readonly activatableEntitiesTableParams = computed(() =>
     createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters()),
   );
@@ -78,7 +77,10 @@ export class PlanFunctionListComponent {
 
   private requestKeywordIdsWithoutPagination(): Observable<string[]> {
     const tableId = this.dataSource.tableId;
-    const request = this.dataSource.getCurrentRequest();
+    const request =
+      this._selectionState.selectionType() === BulkSelectionType.ALL
+        ? this.dataSource.getFilterRequest({ params: this.activatableEntitiesTableParams() })
+        : this.dataSource.getCurrentRequest();
     if (!request) {
       return of([]);
     }

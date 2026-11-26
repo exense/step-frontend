@@ -1,6 +1,12 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
 @mixin plan-editor-control-selections($with-entity-selection: true) {
+  .icon-cell > step-icon,
+  td > entity-icon > step-icon {
+    @include core.step-icon-size(18px);
+  }
+
   .actions {
     display: flex;
     align-items: center;
@@ -23,8 +29,8 @@
     @if ($with-entity-selection) {
       thead > tr > th:first-child,
       tbody > tr > td:first-child {
-        padding-left: 0.8rem !important;
-        padding-right: 0;
+        padding-left: calc(0.8rem - 2px) !important;
+        padding-right: 2px;
         width: 0;
       }
       thead > tr:first-child > th:last-child .header-cell-container {
@@ -48,15 +54,58 @@
 
   @if ($with-entity-selection) {
     .additional-header {
-      padding-left: 0.8rem !important;
+      padding-left: calc(0.8rem - 2px) !important;
       padding-right: 0;
     }
 
-    .selection-control {
+    .mat-column-search-attributes-name:has(step-input-filter) .header-cell-container {
+      box-sizing: border-box;
+      padding-inline-start: 0.6rem;
+    }
+
+    .mat-column-attributes-name .custom-cell-container {
+      display: inline-flex;
+      vertical-align: middle;
+    }
+
+    .current-plan-label,
+    .version-warning {
+      margin-inline-start: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .current-plan-label {
+      font-size: 1.1rem;
+      color: var.$gray-500;
+      white-space: nowrap;
+    }
+
+    step-plan-sidebar-bulk-add {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      min-height: 4rem;
+      gap: 0.6rem;
+      min-height: 3.6rem;
+
+      .selection-scope {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 0.6rem;
+
+        button {
+          padding: 0;
+          border: 0;
+          background: none;
+          color: var(--step-link-color, var.$blue-675);
+          cursor: pointer;
+        }
+      }
+
+      .bulk-add {
+        height: 2.8rem;
+        padding-inline: 0.8rem;
+        margin-inline-start: auto;
+        flex-shrink: 0;
+      }
     }
 
     .entity-column-header,

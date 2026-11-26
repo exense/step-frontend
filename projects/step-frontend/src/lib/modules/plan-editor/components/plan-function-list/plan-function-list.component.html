@@ -1,7 +1,10 @@
 <step-drag-drop-container>
   <step-table
     #selectionList
-    class="paddingless-cells"
+    class="paddingless-cells compact-rows"
+    [defaultPageSize]="50"
+    [compactPaginator]="{ singular: 'keyword', plural: 'keywords' }"
+    stepCustomCellSuffix="attributes.name"
     [dataSource]="dataSource"
     [tableParams]="activatableEntitiesTableParams()"
     matSort
@@ -9,22 +12,14 @@
     matSortDirection="asc"
     [matSortDisableClear]="true"
   >
-    <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-bulk-selection />
-      @if (hasSelection()) {
-        <button
-          mat-icon-button
-          matTooltip="Add selected keywords"
-          (click)="addSelectedKeywords()"
-          [disabled]="!('plan-write' | hasRight | async)"
-        >
-          <step-icon name="plus-circle" />
-        </button>
-      }
-    </div>
+    <step-plan-sidebar-bulk-add
+      *stepAdditionalHeader="'btngroup-bulk-import-create'"
+      item="keyword"
+      (add)="addSelectedKeywords()"
+    />
     <ng-container *stepRowsExtension="let rows">
       <step-drag-drop-container stepDropAreaId="planTree" [animatedPreview]="true">
-        @for (row of rows; track row) {
+        @for (row of rows; track row.elRef.nativeElement) {
           <step-drag-item
             [elRef]="row.elRef"
             [data]="row.data | keywordDropInfo"
@@ -42,20 +37,15 @@
         <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
-    <ng-container matColumnDef="move">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="move" mat-cell *matCellDef="let element">
-        <div class="flex">
-          <step-icon name="drag-handle" matTooltip="drag & drop into tree" />
-          @if (!element['customFields'].activated) {
-            <step-icon
-              name="alert-circle"
-              matTooltip="The version of this keyword doesn’t match the selected target execution parameters. Adjust them in the toolbar if needed."
-            />
-          }
-        </div>
-      </td>
-    </ng-container>
+    <ng-template #cellSuffix let-element>
+      @if (element.customFields?.activated === false) {
+        <step-icon
+          class="version-warning"
+          name="alert-circle"
+          matTooltip="The version of this keyword doesn’t match the selected target execution parameters. Adjust them in the toolbar if needed."
+        />
+      }
+    </ng-template>
     <step-entity-column-container entityName="functions" />
     <ng-container
       data-step-testid="keywords-type-col"
@@ -99,7 +89,8 @@
           <step-description-hint [description]="element.description" yPosition="below" />
           <button
             mat-icon-button
-            matTooltip="Add function"
+            [matTooltip]="'Add ' + element.attributes?.name + (insertTargetName() ? ' to ' + insertTargetName() : '')"
+            [attr.aria-label]="'Add ' + element.attributes?.name"
             (click)="addKeyword(element.id)"
             [disabled]="!('plan-write' | hasRight | async)"
           >

@@ -3,6 +3,7 @@ import { PlanTypeRegistryService } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ExecutionModule } from '../execution/execution.module';
 import { PlanEditorBaseComponent } from './components/plan-editor-base/plan-editor-base.component';
+import { PlanSidebarBulkAddComponent } from './components/plan-sidebar-bulk-add/plan-sidebar-bulk-add.component';
 import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
 import { PlanFunctionListComponent } from './components/plan-function-list/plan-function-list.component';
 import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
@@ -32,7 +33,7 @@ import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
     KeywordDropInfoPipe,
     PlanDropInfoPipe,
   ],
-  imports: [StepCommonModule, ExecutionModule],
+  imports: [StepCommonModule, ExecutionModule, PlanSidebarBulkAddComponent],
   exports: [
     PlanEditorBaseComponent,
     PlanCommonTreeEditorFormComponent,

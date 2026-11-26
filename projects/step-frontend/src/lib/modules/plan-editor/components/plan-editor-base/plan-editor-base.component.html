@@ -1,4 +1,4 @@
-<div>
+<div class="plan-editor-layout">
   <step-plan-alerts [planContext]="_planEditorService.planContext()" />
   @if (showInteractiveWarning$ | async) {
     <step-alert type="info">
@@ -43,8 +43,8 @@
     }
   </div>
 
-  <section stepDragDropGroupContainer stepDropAreaId="planTree">
-    <step-split stepMaxHeightViewportHeightMinusOffsetTop>
+  <section class="plan-editor-panes" stepDragDropGroupContainer stepDropAreaId="planTree">
+    <step-split>
       <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
         @if (planClass) {
           <step-plan-type [itemKey]="planClass" />
@@ -54,6 +54,7 @@
       <step-split-gutter />
 
       <step-split-area
+        class="plan-sidebar"
         [size]="planControlsSize"
         (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
       >
@@ -61,13 +62,13 @@
         <div class="tab-content">
           @switch (selectedTab) {
             @case ('controls') {
-              <step-plan-artefact-list (onSelection)="addControl($event)" />
+              <step-plan-artefact-list [insertTargetName]="insertTargetName()" (onSelection)="addControl($event)" />
             }
             @case ('keywords') {
-              <step-plan-function-list (addKeywords)="addKeywords($event)" />
+              <step-plan-function-list [insertTargetName]="insertTargetName()" (addKeywords)="addKeywords($event)" />
             }
             @case ('other') {
-              <step-plan-otherplan-list (addPlans)="addPlans($event)" />
+              <step-plan-otherplan-list [insertTargetName]="insertTargetName()" (addPlans)="addPlans($event)" />
             }
             @case ('console') {
               <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />

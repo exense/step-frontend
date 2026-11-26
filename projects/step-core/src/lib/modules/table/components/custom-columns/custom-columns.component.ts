@@ -18,6 +18,7 @@ import {
 } from '@angular/core';
 import { ScreenInput } from '../../../../client/step-client-module';
 import { BehaviorSubject, distinctUntilChanged, filter, Subject } from 'rxjs';
+import { CustomCellSuffixDirective } from '../../directives/custom-cell-suffix.directive';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { CustomColumnOptions } from '../../services/custom-column-options';
@@ -56,6 +57,7 @@ export class CustomColumnsComponent
     CustomColumnsScreenInputs,
     Reloadable
 {
+  protected readonly cellSuffix = inject(CustomCellSuffixDirective, { optional: true });
   private _activatedRoute = inject(ActivatedRoute);
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _customColumns = inject(TableCustomColumnsService);

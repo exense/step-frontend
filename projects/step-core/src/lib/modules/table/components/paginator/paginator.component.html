@@ -11,25 +11,27 @@
   <div>{{ pageLabel() }}</div>
   <ng-content />
 </div>
-<div class="sub-section">
-  <button
-    type="button"
-    mat-icon-button
-    [disabled]="isPageDisabled() || !canGoPrev()"
-    matTooltip="Previous page"
-    matTooltipPosition="above"
-    (click)="prev()"
-  >
-    <step-icon name="chevron-left" />
-  </button>
-  <button
-    type="button"
-    mat-icon-button
-    [disabled]="isPageDisabled() || !canGoNext()"
-    matTooltip="Next page"
-    matTooltipPosition="above"
-    (click)="next()"
-  >
-    <step-icon name="chevron-right" />
-  </button>
-</div>
+@if (!compactLabel() || canGoPrev() || canGoNext()) {
+  <div class="sub-section">
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="isPageDisabled() || !canGoPrev()"
+      matTooltip="Previous page"
+      matTooltipPosition="above"
+      (click)="prev()"
+    >
+      <step-icon name="chevron-left" />
+    </button>
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="isPageDisabled() || !canGoNext()"
+      matTooltip="Next page"
+      matTooltipPosition="above"
+      (click)="next()"
+    >
+      <step-icon name="chevron-right" />
+    </button>
+  </div>
+}

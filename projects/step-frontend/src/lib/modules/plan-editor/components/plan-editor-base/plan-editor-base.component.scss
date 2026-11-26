@@ -2,10 +2,71 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
-step-plan-editor-base {
-  flex: 1;
+// The routed editor shares the available space with any workspace banners above it.
+.main-workspace-content:has(step-plan-editor-base) {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+#mainView:has(step-plan-editor-base),
+#mainView :has(step-plan-editor-base),
+step-plan-editor-base,
+step-plan-editor-base > .plan-editor-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+step-plan-editor-base {
+  .plan-editor-panes {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .plan-sidebar > section {
+    overflow: hidden;
+  }
+
+  .plan-sidebar step-tabs .mat-mdc-tab-header {
+    border-bottom: 0;
+  }
+
+  .plan-sidebar .tab-content {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+
+    > :is(step-plan-artefact-list, step-plan-function-list, step-plan-otherplan-list),
+    > :is(step-plan-function-list, step-plan-otherplan-list) > step-drag-drop-container {
+      display: block;
+      height: 100%;
+    }
+
+    .table-container {
+      overscroll-behavior: contain;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var.$white;
+    }
+
+    .paginator-container {
+      flex-shrink: 0;
+      border-top: 1px solid var.$gray-100;
+    }
+
+    step-paginator {
+      gap: 0.8rem;
+      white-space: nowrap;
+      color: var.$gray-500;
+    }
+  }
 
   [stepPlanEditorKeyHandler] {
     flex: 1;

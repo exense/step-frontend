@@ -1,7 +1,32 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-plan-artefact-list {
   @include common.plan-editor-control-selections(false);
+
+  .control-grip {
+    display: inline-block;
+    width: 8px;
+    height: 12px;
+    margin-inline: 1px 5px;
+    vertical-align: middle;
+    color: var.$gray-400;
+    background: radial-gradient(circle, currentColor 0.85px, transparent 1.1px) 0 0 / 4px 4px;
+  }
+
+  .control-help {
+    opacity: 0;
+  }
+
+  tr:is(:hover, :focus-within) {
+    .control-grip {
+      color: var.$gray-550;
+    }
+    .control-help {
+      opacity: 1;
+    }
+  }
+
   .artefact-name {
     display: flex;
     align-items: center;
@@ -11,7 +36,7 @@ step-plan-artefact-list {
   .icon-cell {
     width: 1%;
     step-icon {
-      margin-right: 0.3rem;
+      margin-inline-end: 0.4rem;
     }
   }
 }
