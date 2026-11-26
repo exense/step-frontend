@@ -12,6 +12,13 @@
   <ng-container matColumnDef="executionTime">
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="data-cell" mat-cell *matCellDef="let element">
+      <button
+        type="button"
+        class="cdk-visually-hidden row-details-button"
+        [attr.aria-label]="element.name ? 'Open details for ' + element.name : 'Open step details'"
+        (focus)="row.renderNow()"
+        (click)="openDetails.emit(element)"
+      ></button>
       <div
         class="details-trigger"
         stepUndraggedClick

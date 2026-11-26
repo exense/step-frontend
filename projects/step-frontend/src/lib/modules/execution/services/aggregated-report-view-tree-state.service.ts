@@ -253,7 +253,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     (item.children ?? []).forEach((child) => this.buildArtefactsNodeIdIndex(child as AggregatedTreeNode));
   }
 
-  private buildQuerySearchIndex(item: AggregatedTreeNode, parentId?: string): void {
+  private buildQuerySearchIndex(item: AggregatedTreeNode): void {
     const artefact = item.originalArtefact;
     if (!artefact?._class) {
       return;
@@ -288,25 +288,23 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     searchValues.push(artefact?.attributes?.['name'] ?? '');
 
-    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
-    this.querySearchIndex.register(nodeId, searchValues);
+    this.querySearchIndex.register(item.id, searchValues);
 
-    (item.children ?? []).forEach((child) => this.buildQuerySearchIndex(child as AggregatedTreeNode, nodeId));
+    (item.children ?? []).forEach((child) => this.buildQuerySearchIndex(child as AggregatedTreeNode));
   }
 
-  private buildErrorStatusesSearchIndex(item: AggregatedTreeNode, parentId?: string): void {
+  private buildErrorStatusesSearchIndex(item: AggregatedTreeNode): void {
     const artefact = item.originalArtefact;
     if (!artefact?._class) {
       return;
     }
-    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
 
     // As we perform search over all error statuses at once, we use only one status as search condition
     const hasErrorStatuses = this._utils.nodeHasStatuses(item, ERROR_STATUSES);
     if (hasErrorStatuses) {
-      this.errorsSearchIndex.register(nodeId, [Status.FAILED]);
+      this.errorsSearchIndex.register(item.id, [Status.FAILED]);
     }
-    (item.children ?? []).forEach((child) => this.buildErrorStatusesSearchIndex(child as AggregatedTreeNode, nodeId));
+    (item.children ?? []).forEach((child) => this.buildErrorStatusesSearchIndex(child as AggregatedTreeNode));
   }
 }
 

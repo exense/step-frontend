@@ -1,21 +1,22 @@
-import { ElementRef, inject, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { VIEW_MODE, ViewMode } from '../shared/view-mode';
 
-interface PendingReportRow {
-  element: HTMLElement;
-  prioritized: () => boolean;
-  render: () => void;
-}
-
 const ROWS_PER_FRAME = 6;
+// scrollMargin also gives rows inside nested scrolling panels a head start.
+const ROW_VISIBILITY_OPTIONS = { rootMargin: '120px 0px', scrollMargin: '120px 0px' };
 
 @Injectable()
 export class ReportRowRenderQueueService implements OnDestroy {
   private readonly _zone = inject(NgZone);
   private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _changeDetector = inject(ChangeDetectorRef);
   readonly immediate = inject(VIEW_MODE, { optional: true }) === ViewMode.PRINT;
 
-  private readonly pending = new Set<PendingReportRow>();
+  private readonly pending = new Map<HTMLElement, () => void>();
+  private readonly nearViewport = new Set<HTMLElement>();
+  private readonly pressedPointers = new Set<number>();
+  private readonly windowListeners = new AbortController();
+  private readonly visibilityObserver?: IntersectionObserver;
   private frame?: number;
   private task?: ReturnType<typeof setTimeout>;
   private layoutObserver?: ResizeObserver;
@@ -24,26 +25,78 @@ export class ReportRowRenderQueueService implements OnDestroy {
   private style__previousOverflowAnchor = '';
   private anchor?: { element: HTMLElement; top: number; scrollTop: number };
 
-  enqueue(row: PendingReportRow): () => void {
-    this.pending.add(row);
-    this.schedule();
+  constructor() {
+    if (this.immediate) return;
+    this.visibilityObserver = this._zone.runOutsideAngular(() => {
+      const signal = this.windowListeners.signal;
+      window.addEventListener('beforeprint', this.renderForPrint, { signal });
+      window.addEventListener('pointerup', this.endPress, { capture: true, signal });
+      window.addEventListener('pointercancel', this.endPress, { capture: true, signal });
+      window.addEventListener('blur', this.endPress, { signal });
+      return new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          const row = entry.target as HTMLElement;
+          if (entry.isIntersecting && this.pending.has(row)) this.nearViewport.add(row);
+          else this.nearViewport.delete(row);
+        }
+        if (this.nearViewport.size) this.schedule();
+      }, ROW_VISIBILITY_OPTIONS);
+    });
+  }
+
+  enqueue(element: HTMLElement, render: () => void): () => void {
+    this.pending.set(element, render);
+    this.visibilityObserver?.observe(element);
     return () => {
-      this.pending.delete(row);
-      this.schedule();
+      this.remove(element);
+      if (!this.pending.size) this.schedule();
     };
   }
 
+  holdForPress(pointerId: number): void {
+    // Touch browsers can hit-test again for the click after release. Keep neighboring rows still until then.
+    this.pressedPointers.add(pointerId);
+    this.cancelScheduledWork();
+  }
+
+  private readonly endPress = (event: PointerEvent | FocusEvent): void => {
+    if (!this.pressedPointers.size) return;
+    if ('pointerId' in event) this.pressedPointers.delete(event.pointerId);
+    else this.pressedPointers.clear();
+    this.schedule();
+  };
+
   ngOnDestroy(): void {
     this.destroyed = true;
-    if (this.frame !== undefined) cancelAnimationFrame(this.frame);
-    if (this.task !== undefined) clearTimeout(this.task);
+    this.cancelScheduledWork();
+    this.windowListeners.abort();
+    this.visibilityObserver?.disconnect();
     this.stopWaitingForLayout();
     this.pending.clear();
+    this.nearViewport.clear();
     this.releaseViewport();
   }
 
+  private readonly renderForPrint = (): void => {
+    if (!this.pending.size || !this.hasLayout()) return;
+    for (const element of this.pending.keys()) this.renderRow(element);
+    this._changeDetector.detectChanges();
+  };
+
+  private remove(element: HTMLElement): void {
+    if (!this.pending.delete(element)) return;
+    this.nearViewport.delete(element);
+    this.visibilityObserver?.unobserve(element);
+  }
+
+  private renderRow(element: HTMLElement): void {
+    const render = this.pending.get(element);
+    this.remove(element);
+    render?.();
+  }
+
   private schedule(): void {
-    if (this.destroyed || this.frame !== undefined || this.task !== undefined) {
+    if (this.destroyed || this.pressedPointers.size || this.frame !== undefined || this.task !== undefined) {
       return;
     }
     if (!this.pending.size && !this.anchor) {
@@ -60,7 +113,7 @@ export class ReportRowRenderQueueService implements OnDestroy {
           return;
         }
         this.restoreAnchor();
-        if (!this.pending.size) {
+        if (!this.nearViewport.size) {
           this.releaseViewport();
           return;
         }
@@ -74,13 +127,20 @@ export class ReportRowRenderQueueService implements OnDestroy {
           }
           this._zone.run(() => {
             for (const row of batch) {
-              if (this.pending.delete(row)) row.render();
+              if (this.nearViewport.has(row)) this.renderRow(row);
             }
           });
           this.schedule();
         }, 0);
       });
     });
+  }
+
+  private cancelScheduledWork(): void {
+    if (this.frame !== undefined) cancelAnimationFrame(this.frame);
+    if (this.task !== undefined) clearTimeout(this.task);
+    this.frame = undefined;
+    this.task = undefined;
   }
 
   private hasLayout(): boolean {
@@ -103,7 +163,7 @@ export class ReportRowRenderQueueService implements OnDestroy {
     this.layoutObserver = undefined;
   }
 
-  private nextBatch(): PendingReportRow[] {
+  private nextBatch(): HTMLElement[] {
     if (!this.viewport) {
       this.viewport = this.scrollViewport();
       if (this.viewport) {
@@ -111,23 +171,22 @@ export class ReportRowRenderQueueService implements OnDestroy {
         this.viewport.style.overflowAnchor = 'none';
       }
     }
-    const bounds = this.viewport?.getBoundingClientRect();
-    const top = bounds?.top ?? 0;
-    const bottom = bounds?.bottom ?? window.innerHeight;
-    if (this.viewport) {
+    const { top, bottom } = this.visibleBounds();
+    if (this.viewport && top < bottom) {
+      const viewportTop = this.viewport.getBoundingClientRect().top;
       const rows = this._host.nativeElement.querySelectorAll<HTMLElement>('[stepReportRowRender]');
       for (const element of Array.from(rows)) {
         const rect = element.getBoundingClientRect();
-        if (rect.bottom > top && rect.top < bottom) {
-          this.anchor = { element, top: rect.top - top, scrollTop: this.viewport.scrollTop };
+        if (rect.height > 0 && rect.bottom > top && rect.top < bottom) {
+          this.anchor = { element, top: rect.top - viewportTop, scrollTop: this.viewport.scrollTop };
           break;
         }
       }
     }
-    return [...this.pending]
+    return [...this.nearViewport]
       .map((row) => {
-        const rect = row.element.getBoundingClientRect();
-        const distance = row.prioritized() ? -1 : Math.max(top - rect.bottom, rect.top - bottom, 0);
+        const rect = row.getBoundingClientRect();
+        const distance = Math.max(top - rect.bottom, rect.top - bottom, 0);
         return { row, distance };
       })
       .sort((a, b) => a.distance - b.distance)
@@ -149,6 +208,22 @@ export class ReportRowRenderQueueService implements OnDestroy {
     if (this.viewport) this.viewport.style.overflowAnchor = this.style__previousOverflowAnchor;
     this.viewport = undefined;
     this.anchor = undefined;
+  }
+
+  private visibleBounds(): { top: number; bottom: number } {
+    let top = 0;
+    let bottom = window.innerHeight;
+    for (
+      let element = this._host.nativeElement.parentElement;
+      element && element !== document.body;
+      element = element.parentElement
+    ) {
+      if (!/^(auto|scroll|hidden|clip|overlay)$/.test(getComputedStyle(element).overflowY)) continue;
+      const contentTop = element.getBoundingClientRect().top + element.clientTop;
+      top = Math.max(top, contentTop);
+      bottom = Math.min(bottom, contentTop + element.clientHeight);
+    }
+    return { top, bottom };
   }
 
   private scrollViewport(): HTMLElement | undefined {
