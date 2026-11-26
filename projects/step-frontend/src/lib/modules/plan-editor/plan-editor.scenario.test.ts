@@ -2,6 +2,8 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import {
   AbstractArtefact,
@@ -14,6 +16,9 @@ import {
   CommonEntitiesUrlsService,
   CallPlan,
   DialogsService,
+  ErrorMessageHandlerService,
+  ENTITY_ACCESS_DENIED_CODE,
+  provideTestStepApi,
   FunctionActionsService,
   KeywordsService,
   IDE_MODE,
@@ -44,6 +49,8 @@ import { PlanNodesDragPreviewComponent } from './components/plan-nodes-drag-prev
 import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 import { StepBasicsModule, ViewRegistryService } from '@exense/step-core';
+import { HttpErrorInterceptor } from '../_common/interceptors/http-error.interceptor';
+import { HttpErrorLoggerService } from '../_common/injectables/http-error-logger.service';
 
 function context(id: string): PlanContext {
   return {
@@ -175,7 +182,7 @@ describe('Plan editor context lifecycle', () => {
       set: {
         template: `
           <step-drag-drop-container stepDropAreaId="planTree">
-            <step-tree #tree>
+            <step-tree #tree (nodeDblClick)="handleDoubleClick($event.node, $event.event)">
               <ng-container *stepTreeNodeTemplate="let node">
                 <step-tree-node-draggable
                   [node]="node"
@@ -190,6 +197,74 @@ describe('Plan editor context lifecycle', () => {
         `,
       },
     });
+  });
+
+  it.each([
+    { type: 'CallPlan', reference: 'plan', url: '/plans/source/artefacts/call/lookup/plan' },
+    { type: 'CallKeyword', reference: 'keyword', url: '/functions/lookup' },
+  ])('shows one message per $type lookup failure on double-click', ({ type, reference, url }) => {
+    fakeAsync(() => {
+      const messages: string[] = [];
+      TestBed.configureTestingModule({
+        providers: [
+          provideTestStepApi(),
+          provideHttpClientTesting(),
+          PlansService,
+          KeywordsService,
+          { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
+          { provide: ErrorMessageHandlerService, useValue: { showError: (message: string) => messages.push(message) } },
+          {
+            provide: DialogsService,
+            useValue: {
+              showErrorMsg: (message: string) => {
+                messages.push(message);
+                return of(true);
+              },
+            },
+          },
+          {
+            provide: PlanContextApiService,
+            useFactory: (plans: PlansService) => ({ ...api, lookupPlan: plans.lookupPlan.bind(plans) }),
+            deps: [PlansService],
+          },
+        ],
+      });
+      TestBed.inject(HttpErrorLoggerService).disable();
+      const http = TestBed.inject(HttpTestingController);
+      const fixture = TestBed.createComponent(PlanEditorBaseComponent);
+      const source = context('source');
+      source.plan.root!.after = { steps: [{ id: 'call', _class: type }] };
+      fixture.componentRef.setInput('initialPlanContext', source);
+      settle(fixture);
+      fixture.debugElement.injector.get(TreeStateService).expandAll();
+      settle(fixture);
+
+      const lookup = (): TestRequest => {
+        const element: HTMLElement = fixture.nativeElement;
+        element
+          .querySelector<HTMLElement>('[data-tree-node-id="call"]')!
+          .dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+        tick();
+        return http.expectOne((request) => request.url.endsWith(url));
+      };
+
+      const headers = { 'Content-Type': 'application/json' };
+      lookup().flush({ errorMessage: 'Lookup failed' }, { status: 500, statusText: 'Server Error', headers });
+      expect(messages.splice(0)).toEqual(['Error: Lookup failed']);
+
+      lookup().flush(null, { status: 204, statusText: 'No Content' });
+      expect(messages.splice(0)).toEqual([`The related ${reference} was not found`]);
+
+      lookup().flush(
+        { errorName: ENTITY_ACCESS_DENIED_CODE, errorMessage: 'Access denied' },
+        { status: 403, statusText: 'Forbidden', headers },
+      );
+      expect(messages).toHaveLength(1);
+      expect(messages[0]).toMatch(/access|permission/i);
+      http.verify();
+      fixture.destroy();
+      tick(1000);
+    })();
   });
 
   it('displays a plain-text plan and its reason without allowing edits, then opens an editable plan', fakeAsync(() => {

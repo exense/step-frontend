@@ -21,9 +21,8 @@ import {
   ArtefactTreeNode,
   CallFunction,
   DialogsService,
-  Keyword,
   KeywordsService,
-  Plan,
+  NoAccessEntityError,
   PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
@@ -45,7 +44,7 @@ import {
   AuthService,
   PlanReferencePolicyService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { catchError, debounceTime, EMPTY, filter, ignoreElements, map, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -283,60 +282,39 @@ export class PlanEditorBaseComponent
     }
 
     const artefact = this._treeState.getSelectedNodes()[0]?.originalArtefact;
-    const isPlan = artefact?._class === 'CallPlan';
-    const isKeyword = artefact?._class === 'CallKeyword';
+    if (artefact?._class === 'CallPlan') {
+      if (!this._planReferencePolicy.canNavigateToReferencedPlan(artefact)) {
+        return;
+      }
 
-    if (isPlan && !this._planReferencePolicy.canNavigateToReferencedPlan(artefact)) {
-      return;
-    }
-
-    const NO_DATA = 'NO_DATA';
-
-    if (isPlan) {
       this._planEditorApi
-        .lookupPlan(this._planEditorService.planContext()!.id!, artefact!.id!)
+        .lookupPlan(this._planEditorService.planContext()!.id!, artefact.id!)
         .pipe(
-          map((plan) => plan || NO_DATA),
-          catchError((err) => {
-            console.error(err);
-            return of(undefined);
-          }),
-          switchMap((plan) => {
-            if (!plan) {
-              this._dialogsService.showErrorMsg('The related plan was not found').subscribe();
-              return of(undefined);
+          catchError((error: unknown) => {
+            if (error instanceof NoAccessEntityError) {
+              return this._dialogsService
+                .showErrorMsg('You do not have access to the related plan')
+                .pipe(ignoreElements());
             }
-
-            if (plan.toString() === NO_DATA) {
-              this._dialogsService.showErrorMsg('No editor configured for this plan type').subscribe();
-              return of(undefined);
-            }
-
-            return this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan as Plan));
+            return EMPTY;
           }),
+          switchMap((plan) =>
+            plan
+              ? this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan))
+              : this._dialogsService.showErrorMsg('The related plan was not found'),
+          ),
         )
         .subscribe();
-    } else if (isKeyword) {
-      const keyword = artefact as CallFunction;
+    } else if (artefact?._class === 'CallKeyword') {
       this._keywordCallsApi
-        .lookupCallFunction(keyword)
+        .lookupCallFunction(artefact as CallFunction)
         .pipe(
-          map((keyword) => keyword || NO_DATA),
-          catchError((err) => {
-            console.error(err);
-            return of(undefined);
-          }),
-          switchMap((keyword) => {
-            if (!keyword) {
-              this._dialogsService.showErrorMsg('The related keyword was not found').subscribe();
-              return of('');
-            }
-            if (keyword.toString() === NO_DATA) {
-              this._dialogsService.showErrorMsg('No editor configured for this function type').subscribe();
-              return of('');
-            }
-            return this.openFunctionEditor(keyword as Keyword);
-          }),
+          catchError(() => EMPTY),
+          switchMap((keyword) =>
+            keyword
+              ? this._functionActions.openFunctionEditor(keyword)
+              : this._dialogsService.showErrorMsg('The related keyword was not found'),
+          ),
         )
         .subscribe();
     }
@@ -406,10 +384,6 @@ export class PlanEditorBaseComponent
           this.selectedTab = consoleTab.id;
         }
       });
-  }
-
-  private openFunctionEditor(keyword: Keyword): Observable<unknown> {
-    return this._functionActions.openFunctionEditor(keyword);
   }
 
   private synchronizeDynamicName(artefact: AbstractArtefact): void {
