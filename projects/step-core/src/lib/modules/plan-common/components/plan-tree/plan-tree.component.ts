@@ -12,11 +12,12 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { filter, map, Observable, of } from 'rxjs';
+import { filter, map, Observable, of, switchMap } from 'rxjs';
 import { AbstractArtefact } from '../../../../client/generated';
 import { TreeAction, TreeActionsService, TreeComponent, TreeNode, TreeStateService, TREE_EXPORTS } from '../../../tree';
 import { ArtefactChildContainerSettingsComponent } from '../artefact-child-container-settings/artefact-child-container-settings.component';
 import { ArtefactDetailsComponent } from '../artefact-details/artefact-details.component';
+import { ArtefactNodeSource } from '../../types/artefact-node-source.enum';
 import { ArtefactTreeNode } from '../../types/artefact-tree-node';
 import { PlanArtefactResolverService } from '../../injectables/plan-artefact-resolver.service';
 import { PlanEditorPersistenceStateService } from '../../injectables/plan-editor-persistence-state.service';
@@ -25,7 +26,7 @@ import { PlanReferencePolicyService } from '../../injectables/plan-reference-pol
 import { PlanInteractiveSessionService } from '../../injectables/plan-interactive-session.service';
 import { PlanTreeAction } from '../../types/plan-tree-action.enum';
 import { DragDataService, DropInfo, DragEndType, DRAG_DROP_EXPORTS } from '../../../drag-drop';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SPLIT_EXPORTS } from '../../../split';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { AsyncPipe } from '@angular/common';
@@ -83,6 +84,38 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   /** @ViewChild **/
   private readonly dragData = viewChild(DragDataService);
+
+  private readonly draggedElement = toSignal(
+    toObservable(this.dragData).pipe(switchMap((service) => service?.dragData$ ?? of(undefined))),
+  );
+
+  protected readonly rootAppendTarget = computed(() => {
+    const draggedElement = this.draggedElement();
+    const root = this._treeState.findNodeById(this._treeState.rootNodeId());
+    const visible = this._treeState.flatTree();
+    const readonly = this.isReadonly();
+    if (!draggedElement || readonly || !root || root.isDropDisabled) {
+      return undefined;
+    }
+
+    const siblingId = root.originalArtefact?.children?.at(-1)?.id;
+    const drop = { draggedElement, droppedArea: root.id, additionalInfo: siblingId };
+    if (
+      this._treeState.canDropTo?.(drop) === false ||
+      (this._treeState.resolveDrop?.(drop) ?? drop).droppedArea !== root.id
+    ) {
+      return undefined;
+    }
+
+    const firstCleanup = root.dropSections?.find(
+      (section) =>
+        !!section.children?.length &&
+        (section.nodeType === ArtefactNodeSource.AFTER_THREAD || section.nodeType === ArtefactNodeSource.AFTER),
+    );
+    const cleanupIndex = firstCleanup ? this._treeState.indexOf(firstCleanup.id) : -1;
+    const anchor = cleanupIndex > 0 ? visible[cleanupIndex - 1] : visible.at(-1);
+    return { parentId: root.id, siblingId, anchorId: anchor?.id };
+  });
 
   protected readonly treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
   protected readonly artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);

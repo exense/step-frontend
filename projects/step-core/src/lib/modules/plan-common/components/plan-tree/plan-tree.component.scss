@@ -16,6 +16,42 @@ step-plan-tree {
     }
   }
 
+  .editable-plan-tree {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+
+    > step-tree {
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 0;
+
+      > div[draggable='false'] {
+        flex: none;
+      }
+    }
+
+    .plan-tree-end-drop {
+      position: relative;
+      z-index: 3;
+      flex: 1 0 4rem;
+      margin-inline: -2.4rem -1.6rem;
+    }
+
+    step-tree:has(> .plan-tree-end-drop.dragover) .root-append-anchor::after {
+      content: '';
+      position: absolute;
+      left: 6rem;
+      bottom: -0.1rem;
+      width: 10rem;
+      height: 0.2rem;
+      border-radius: 0.1rem;
+      background: var(--step-accent-color, var.$blue-600);
+      pointer-events: none;
+      z-index: 3;
+    }
+  }
+
   step-tree-node-draggable {
     &.plan-section-header {
       .tree-node {

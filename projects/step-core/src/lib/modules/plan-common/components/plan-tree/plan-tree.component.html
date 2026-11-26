@@ -1,6 +1,10 @@
 <step-split>
   <step-split-area [size]="treeSize" (sizeChange)="handleTreeSizeChange($event)">
-    <step-drag-drop-container stepDropAreaId="planTree" [animatedPreview]="true">
+    <step-drag-drop-container
+      stepDropAreaId="planTree"
+      [animatedPreview]="true"
+      [class.editable-plan-tree]="!isReadonly()"
+    >
       <step-tree
         #tree
         [dragDisabled]="isReadonly()"
@@ -9,6 +13,7 @@
       >
         <ng-container *stepTreeNodeTemplate="let node; let originalNode = originalNode">
           <step-tree-node-draggable
+            [class.root-append-anchor]="node.id === rootAppendTarget()?.anchorId"
             [class.context-menu-open]="node.id === tree.openedMenuNodeId"
             [class.plan-section-header]="originalNode.nodeType !== undefined"
             [dragDisabled]="!!(isReadonly() || originalNode.isDragDisabled)"
@@ -56,6 +61,16 @@
             }
           </div>
         </ng-container>
+        @if (!isReadonly()) {
+          <div
+            stepTreeEndDrop
+            class="plan-tree-end-drop"
+            [stepDropArea]="rootAppendTarget()?.parentId"
+            [dropAdditionalInfo]="rootAppendTarget()?.siblingId"
+            [dropDisabled]="!rootAppendTarget()"
+            (dropItem)="handleDropNode($event)"
+          ></div>
+        }
       </step-tree>
       <step-drag-preview>
         <step-tree-drag-preview />

@@ -30,8 +30,11 @@
       thead > tr > th:first-child,
       tbody > tr > td:first-child {
         padding-left: calc(0.8rem - 2px) !important;
-        padding-right: 2px;
+        padding-right: 4px;
         width: 0;
+      }
+      td.mat-column-attributes-name {
+        padding-inline-start: calc(0.1rem + 2px);
       }
       thead > tr:first-child > th:last-child .header-cell-container {
         justify-content: flex-end;
