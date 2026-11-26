@@ -283,12 +283,13 @@ export class PlanEditorBaseComponent
 
     const artefact = this._treeState.getSelectedNodes()[0]?.originalArtefact;
     if (artefact?._class === 'CallPlan') {
-      if (!this._planReferencePolicy.canNavigateToReferencedPlan(artefact)) {
+      const planId = this._planEditorService.planContext()?.id;
+      if (!planId || !artefact.id || !this._planReferencePolicy.canNavigateToReferencedPlan(artefact)) {
         return;
       }
 
       this._planEditorApi
-        .lookupPlan(this._planEditorService.planContext()!.id!, artefact.id!)
+        .lookupPlan(planId, artefact.id)
         .pipe(
           catchError((error: unknown) => {
             if (error instanceof NoAccessEntityError) {

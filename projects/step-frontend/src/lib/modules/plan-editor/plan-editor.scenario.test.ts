@@ -4,7 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import {
   AbstractArtefact,
   ArtefactService,
@@ -266,6 +266,28 @@ describe('Plan editor context lifecycle', () => {
       tick(1000);
     })();
   });
+
+  it('skips a plan lookup when the call ID or editor context is missing', fakeAsync(() => {
+    const lookupPlan = jest.fn(() => EMPTY);
+    TestBed.overrideProvider(PlanContextApiService, { useValue: { ...api, lookupPlan } });
+    const fixture = TestBed.createComponent(PlanEditorBaseComponent);
+    const source = context('source');
+    const call = { _class: 'CallPlan', id: 'call' };
+    const callWithoutId = { _class: 'CallPlan' };
+    source.plan.root!.children = [call, callWithoutId];
+    fixture.componentRef.setInput('initialPlanContext', source);
+    settle(fixture);
+
+    fixture.componentInstance.openArtefact(callWithoutId);
+    expect(lookupPlan).not.toHaveBeenCalled();
+
+    TestBed.inject(PlanEditorService).removeStrategy();
+    fixture.componentInstance.openArtefact(call);
+    expect(lookupPlan).not.toHaveBeenCalled();
+
+    fixture.destroy();
+    tick(1000);
+  }));
 
   it('displays a plain-text plan and its reason without allowing edits, then opens an editable plan', fakeAsync(() => {
     TestBed.overrideProvider(IDE_MODE, { useValue: true });
