@@ -15,13 +15,13 @@ import {
   RichEditorComponent,
   ScreensService,
   ActivationExpressionWizardDialogComponent,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
-import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { UploadType } from '../../types/upload-type.enum';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';

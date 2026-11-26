@@ -12,11 +12,11 @@ import {
   ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
   IDE_MODE,
+  AutomationPackagePermission,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
 import { SchedulerInvokerService } from '../../../execution/services/scheduler-invoker.service';
 import { Router } from '@angular/router';
-import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-plan-list',
