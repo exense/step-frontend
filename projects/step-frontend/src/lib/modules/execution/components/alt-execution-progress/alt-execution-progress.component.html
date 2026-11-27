@@ -16,7 +16,7 @@
           />
         }
         @if (displayStatus$ | async; as status) {
-          <step-status [status]="status" [iconMode]="true" [tooltip]="interruptionReason()" />
+          <step-status [status]="status" [iconMode]="true" />
         }
         <div>{{ execution | executionName }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
@@ -27,6 +27,9 @@
         @if (!isCompactReport) {
           <step-alt-execution-repository-link [execution]="execution" />
         }
+        <step-editable-label [(ngModel)]="description" [tooltip]="description()">
+          <span *stepEditableLabelTemplate class="description-placeholder">Description</span>
+        </step-editable-label>
       </h3>
     </div>
     <div class="sub-title">
