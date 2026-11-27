@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AugmentedExecutionsService, BulkOperationType, EntityBulkOperationsRegistryService } from '@exense/step-core';
+import { ExecutionStopBulkOperationStrategyService } from './execution-stop-bulk-operation-strategy.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,8 @@ export class ExecutionBulkOperationsRegisterService {
       .register('executions', {
         type: BulkOperationType.STOP,
         permission: 'plan-bulk-execute',
-        operation: (requestBody) => this._api.stopExecutions(requestBody),
+        operation: (requestBody) => this._api.stopExecutions(undefined, requestBody),
+        performStrategy: ExecutionStopBulkOperationStrategyService,
       });
   }
 }

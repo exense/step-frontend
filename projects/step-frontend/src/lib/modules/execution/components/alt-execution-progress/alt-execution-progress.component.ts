@@ -5,6 +5,7 @@ import {
   DestroyRef,
   forwardRef,
   inject,
+  model,
   OnDestroy,
   OnInit,
   signal,
@@ -18,10 +19,12 @@ import {
   debounceTime,
   defer,
   distinctUntilChanged,
+  EMPTY,
   filter,
   finalize,
   fromEvent,
   map,
+  mergeMap,
   Observable,
   of,
   pairwise,
@@ -45,6 +48,7 @@ import {
   EXECUTION_REPORT_GRID,
   IDE_MODE,
   ExecutionCloseHandleService,
+  ExecutionDescriptionService,
   EXECUTION_REPORT_LAYOUT_QUERY_PARAM,
   EXECUTION_REPORT_LAYOUT_ROUTE_DATA,
   ExecutionReportStaticLayoutRegistryService,
@@ -67,7 +71,7 @@ import {
   TimeRangeSelection,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { outputToObservable, takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -214,6 +218,10 @@ interface AgentProvisioningEventState {
       provide: EntityRefService,
       useExisting: forwardRef(() => AltExecutionProgressComponent),
     },
+    {
+      provide: ExecutionDescriptionService,
+      useExisting: forwardRef(() => AltExecutionProgressComponent),
+    },
     AggregatedTreeDataLoaderService,
     {
       provide: REPORT_TYPE,
@@ -237,7 +245,7 @@ interface AgentProvisioningEventState {
   standalone: false,
 })
 export class AltExecutionProgressComponent
-  implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
+  implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>, ExecutionDescriptionService
 {
   private _refreshActivityService = inject(AltExecutionRefreshActivityService);
   private _urlParamsService = inject(DashboardUrlParamsService);
@@ -316,6 +324,9 @@ export class AltExecutionProgressComponent
   );
 
   private readonly execution = toSignal(this.execution$, { initialValue: undefined });
+
+  readonly description = model('');
+  private isSettingDescription = false;
 
   protected readonly notices$ = this.activeExecution$.pipe(
     switchMap((active) => active.resolvedNotices$),
@@ -650,6 +661,7 @@ export class AltExecutionProgressComponent
   );
 
   ngOnInit(): void {
+    this.setupExecutionDescription();
     this.setupTreeRefresh();
     this.setupToggleWarningReset();
     this.setupNavigationHistoryChange();
@@ -658,6 +670,66 @@ export class AltExecutionProgressComponent
   }
 
   readonly currentEntity = this.execution;
+
+  private setupExecutionDescription(): void {
+    let executionId: string | undefined;
+    let confirmedDescription = '';
+
+    this.execution$
+      .pipe(
+        map((execution) => {
+          const value: unknown = execution.customFields?.['description'];
+          let description = typeof value === 'string' ? value : '';
+          if (description.length >= 2 && description.startsWith('"') && description.endsWith('"')) {
+            description = description.substring(1, description.length - 1);
+          }
+          return { id: execution.id, description };
+        }),
+        distinctUntilChanged((a, b) => a.id === b.id && a.description === b.description),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(({ id, description }) => {
+        executionId = id;
+        confirmedDescription = description;
+        this.setDescriptionWithoutSaving(confirmedDescription);
+      });
+
+    outputToObservable(this.description)
+      .pipe(
+        filter(() => !this.isSettingDescription),
+        takeUntilDestroyed(this._destroyRef),
+        mergeMap((description) => {
+          const id = executionId;
+          if (!this.canLoadExecutionData(id)) {
+            this.setDescriptionWithoutSaving(confirmedDescription);
+            return EMPTY;
+          }
+          return this._executionsApi.setExecutionDescription(id, description).pipe(
+            tap(() => {
+              if (executionId === id) {
+                confirmedDescription = description;
+              }
+            }),
+            catchError(() => {
+              if (!this._destroyRef.destroyed && executionId === id && this.description() === description) {
+                this.setDescriptionWithoutSaving(confirmedDescription);
+              }
+              return EMPTY;
+            }),
+          );
+        }),
+      )
+      .subscribe();
+  }
+
+  private setDescriptionWithoutSaving(text: string): void {
+    this.isSettingDescription = true;
+    try {
+      this.description.set(text);
+    } finally {
+      this.isSettingDescription = false;
+    }
+  }
 
   private setupNavigationHistoryChange(): void {
     // subscribe to back and forward events

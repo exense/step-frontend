@@ -12,14 +12,20 @@ type DisplayStatus = Execution['status'] | Execution['result'] | undefined;
   standalone: false,
 })
 export class ExecutionStatusComponent {
-  /** @Input() **/
-  execution = input<Execution | undefined>();
+  readonly execution = input<Execution | undefined>();
 
-  status = computed<DisplayStatus>(() => {
+  protected readonly status = computed<DisplayStatus>(() => {
     const { status, result } = this.execution() ?? { status: undefined, result: undefined };
     if (status !== 'ENDED') {
       return status;
     }
     return result;
+  });
+
+  protected readonly interruptionReason = computed(() => {
+    const execution = this.execution();
+    const status = this.status();
+    const description: unknown = execution?.customFields?.['description'];
+    return status === 'INTERRUPTED' && typeof description === 'string' && description.trim() ? description : undefined;
   });
 }

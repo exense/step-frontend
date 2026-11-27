@@ -1,0 +1,38 @@
+@let currentState = state();
+<step-modal-window [title]="title" [hideButtonsSection]="currentState.kind === 'progress'">
+  <div step-modal-window-body>
+    @switch (currentState.kind) {
+      @case ('progress') {
+        <mat-progress-bar
+          [value]="progress()"
+          color="primary"
+          mode="buffer"
+          aria-label="Previewing selected executions"
+        />
+      }
+      @case ('confirmation') {
+        @if (currentState.message) {
+          <p>{{ currentState.message }}</p>
+        }
+        <step-form-field>
+          <step-label>Reason:</step-label>
+          <textarea rows="5" [formControl]="reason" aria-label="Reason" aria-required="true"></textarea>
+          @if (reason.touched && reason.invalid) {
+            <step-error>Reason is required.</step-error>
+          }
+        </step-form-field>
+      }
+      @case ('error') {
+        <div role="alert">{{ currentState.message }}</div>
+      }
+    }
+  </div>
+  <div step-modal-window-buttons>
+    @if (currentState.kind === 'confirmation') {
+      <button type="button" mat-stroked-button [matDialogClose]="undefined">Cancel</button>
+      <button type="button" mat-flat-button color="primary" (click)="confirm()">Stop</button>
+    } @else if (currentState.kind === 'error') {
+      <button type="button" mat-flat-button color="primary" (click)="acknowledgeError(currentState.error)">Ok</button>
+    }
+  </div>
+</step-modal-window>

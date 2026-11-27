@@ -1,5 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, OnDestroy, signal, DOCUMENT } from '@angular/core';
-import { EMPTY, finalize, from, map, Observable, switchMap } from 'rxjs';
+import { defer, EMPTY, filter, finalize, from, map, Observable, switchMap } from 'rxjs';
 import {
   AugmentedExecutionsService,
   CommonEntitiesUrlsService,
@@ -13,11 +13,13 @@ import { ExecutionTabManagerService } from './execution-tab-manager.service';
 import { Router } from '@angular/router';
 import { LocalExecutionStrategyService } from './local-execution-strategy.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ExecutionStopConfirmationService } from './execution-stop-confirmation.service';
 
 @Injectable()
 export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyController {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _executionService = inject(AugmentedExecutionsService);
+  private readonly _stopConfirmation = inject(ExecutionStopConfirmationService);
   private _localStrategy = inject(LocalExecutionStrategyService);
   private _document = inject(DOCUMENT);
   private _router = inject(Router);
@@ -63,10 +65,10 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
       return;
     }
 
-    const currentEId = this.context.getExecution()?.id;
+    const context = this.context;
+    const currentEId = context.getExecution()?.id;
     this.submitting.set(true);
-    strategy
-      .execute(this.context, { simulate })
+    defer(() => strategy.execute(context, { simulate }))
       .pipe(
         finalize(() => this.submitting.set(false)),
         takeUntilDestroyed(this._destroyRef),
@@ -84,11 +86,16 @@ export class ExecutionCommandsService implements OnDestroy, ExecutionStrategyCon
   }
 
   stop(): Observable<void> {
-    return this._executionService.abort(this.context.getExecution()!.id!);
+    const execution = this.context.getExecution()!;
+    return this._stopConfirmation.confirmStop(execution).pipe(
+      filter((reason) => reason !== undefined),
+      switchMap((reason) => this._executionService.abort(execution.id!, reason)),
+    );
   }
 
   forceStop(): Observable<void> {
-    return this._executionService.forceStop(this.context.getExecution()!.id!);
+    const execution = this.context.getExecution()!;
+    return this._executionService.forceStop(execution.id!);
   }
 
   copyExecutionServiceAsCurlToClipboard(): void {

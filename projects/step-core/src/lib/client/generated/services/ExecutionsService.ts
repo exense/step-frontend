@@ -24,17 +24,21 @@ export class ExecutionsService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * Stops the execution with the given execution id.
+   * Stops the execution with the given execution id. The optional abort reason is appended to the execution description.
    * @param id
+   * @param abortReason
    * @returns any default response
    * @throws ApiError
    */
-  public abort(id: string): Observable<any> {
+  public abort(id: string, abortReason?: string): Observable<any> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/executions/{id}/stop',
       path: {
         id: id,
+      },
+      query: {
+        abortReason: abortReason,
       },
     });
   }
@@ -532,15 +536,41 @@ export class ExecutionsService {
   }
 
   /**
+   * Sets the description of the execution with the given execution id.
+   * @param id
+   * @param requestBody
+   * @returns any default response
+   * @throws ApiError
+   */
+  public setExecutionDescription(id: string, requestBody?: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/{id}/description',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Stop multiple executions according to the provided parameters.
+   * @param abortReason
    * @param requestBody
    * @returns AsyncTaskStatusTableBulkOperationReport default response
    * @throws ApiError
    */
-  public stopExecutions(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+  public stopExecutions(
+    abortReason?: string,
+    requestBody?: TableBulkOperationRequest,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/bulk/stop',
+      query: {
+        abortReason: abortReason,
+      },
       body: requestBody,
       mediaType: 'application/json',
     });

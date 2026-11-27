@@ -6,5 +6,7 @@
     matTooltipPosition="below"
   />
 } @else {
-  <div class="status" [ngClass]="className()">{{ status() }}</div>
+  <div class="status" [ngClass]="className()" [matTooltip]="tooltip() ?? ''" matTooltipPosition="below">
+    {{ status() }}
+  </div>
 }
