@@ -193,7 +193,11 @@ function panelHeader(
 ): HTMLElement {
   const element: HTMLElement = fixture.nativeElement;
   const header = Array.from(element.querySelectorAll<HTMLElement>(`${panel.selector} mat-expansion-panel-header`)).find(
-    (candidate) => candidate.querySelector('mat-panel-title')?.textContent?.trim() === panel.title,
+    (candidate) => {
+      const title = candidate.querySelector('mat-panel-title');
+      const label = title?.querySelector(':scope > span:first-child') ?? title;
+      return label?.textContent?.trim() === panel.title;
+    },
   );
   expect(header).toBeDefined();
   return header!;
@@ -205,6 +209,19 @@ function expectExpanded(
   expanded: boolean,
 ): void {
   expect(panelHeader(fixture, panel).getAttribute('aria-expanded')).toBe(`${expanded}`);
+}
+
+function expectSection(
+  fixture: ComponentFixture<ArtefactDetailsComponent>,
+  panel: Pick<EditorCase, 'selector' | 'title'>,
+  expanded: boolean,
+  configured: boolean,
+): void {
+  const header = panelHeader(fixture, panel);
+  expect(header.getAttribute('aria-expanded')).toBe(`${expanded}`);
+  expect(header.querySelector('mat-panel-title .configured-badge')?.textContent?.trim()).toBe(
+    configured ? 'Configured' : undefined,
+  );
 }
 
 function editInput(fixture: ComponentFixture<ArtefactDetailsComponent>, selector: string, value: string): void {
@@ -240,7 +257,7 @@ describe('Artefact panel initialization', () => {
     }).compileComponents();
   });
 
-  it('opens saved advanced settings without saving or changing the artefact', fakeAsync(() => {
+  it('marks saved advanced settings without saving or changing the artefact', fakeAsync(() => {
     const artefact = createArtefact('RetryIfFails', { releaseTokens: constant(true) });
     const originalArtefact = copyArtefact(artefact);
     withDetails((fixture) => {
@@ -248,15 +265,15 @@ describe('Artefact panel initialization', () => {
       openControl(fixture, artefact);
       expect(onSave).not.toHaveBeenCalled();
       expect(artefact).toEqual(originalArtefact);
-      expectExpanded(fixture, { selector: 'step-retry-if-fails', title: 'Advanced' }, true);
+      expectSection(fixture, { selector: 'step-retry-if-fails', title: 'Advanced' }, false, true);
     });
   }));
 
-  it.each(editors)('opens only configured panel fields in $type', (editor) => {
+  it.each(editors)('marks only configured panel fields in $type', (editor) => {
     fakeAsync(() =>
       withDetails((fixture) => {
         openControl(fixture, createArtefact(editor.type));
-        expectExpanded(fixture, editor, false);
+        expectSection(fixture, editor, false, false);
         expectExpanded(fixture, { selector: ':scope > form', title: 'Properties' }, true);
         if (editor.type === 'ThreadGroup') {
           expectExpanded(fixture, { ...editor, title: 'Load distribution parameters' }, true);
@@ -264,13 +281,13 @@ describe('Artefact panel initialization', () => {
         }
 
         openControl(fixture, createArtefact(editor.type, editor.outsideFields));
-        expectExpanded(fixture, editor, false);
+        expectSection(fixture, editor, false, false);
 
         for (const [field, value] of Object.entries(editor.configuredFields)) {
           const artefact = createArtefact(editor.type, { [field]: value });
           const original = copyArtefact(artefact);
           openControl(fixture, artefact);
-          expectExpanded(fixture, editor, true);
+          expectSection(fixture, editor, false, true);
           expect(artefact).toEqual(original);
         }
       }),
@@ -283,30 +300,30 @@ describe('Artefact panel initialization', () => {
       const missingHandle = createArtefact('For');
       delete missingHandle['item'];
       openControl(fixture, missingHandle);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, false);
       for (const field of [null, { dynamic: false }, constant(null), constant('counter')]) {
         openControl(fixture, createArtefact('For', { item: field }));
-        expectExpanded(fixture, handles, false);
+        expectSection(fixture, handles, false, false);
       }
       openControl(fixture, createArtefact('For', { item: constant('') }));
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, false, true);
 
       const advanced = { selector: 'step-sequence', title: 'Advanced' };
       const missingPacing = createArtefact('Sequence');
       delete missingPacing['pacing'];
       openControl(fixture, missingPacing);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, false, false);
       for (const field of [null, { dynamic: false }, constant(null), constant(0)]) {
         openControl(fixture, createArtefact('Sequence', { pacing: field }));
-        expectExpanded(fixture, advanced, false);
+        expectSection(fixture, advanced, false, false);
       }
       openControl(fixture, createArtefact('Sequence', { pacing: constant(1) }));
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
 
       const waiting = { selector: 'step-waiting-artefacts-advanced', title: 'Advanced' };
       for (const field of [null, { dynamic: false }, constant(null), constant(false)]) {
         openControl(fixture, createArtefact('Sleep', { releaseTokens: field }));
-        expectExpanded(fixture, waiting, false);
+        expectSection(fixture, waiting, false, false);
       }
     });
   }));
@@ -317,7 +334,7 @@ describe('Artefact panel initialization', () => {
       const missingToken = createArtefact('CallKeyword');
       delete missingToken['token'];
       openControl(fixture, missingToken);
-      expectExpanded(fixture, routing, false);
+      expectSection(fixture, routing, false, false);
       for (const field of [
         null,
         { dynamic: false },
@@ -327,20 +344,20 @@ describe('Artefact panel initialization', () => {
         constant(' { \n } '),
       ]) {
         openControl(fixture, createArtefact('CallKeyword', { token: field }));
-        expectExpanded(fixture, routing, false);
+        expectSection(fixture, routing, false, false);
       }
       for (const value of ['{"pool":"custom"}', '[]', 'false', 'null', '{invalid']) {
         openControl(fixture, createArtefact('CallKeyword', { token: constant(value) }));
-        expectExpanded(fixture, routing, true);
+        expectSection(fixture, routing, false, true);
       }
       for (const field of [undefined, null, { dynamic: false }, constant(null), constant(true)]) {
         openControl(fixture, createArtefact('CallKeyword', { remote: field }));
-        expectExpanded(fixture, routing, false);
+        expectSection(fixture, routing, false, false);
       }
     });
   }));
 
-  it('opens dynamic handle, boolean, pacing and selector fields even for default or empty expressions', fakeAsync(() => {
+  it('marks dynamic handle, boolean, pacing and selector fields even for default or empty expressions', fakeAsync(() => {
     withDetails((fixture) => {
       const cases = [
         {
@@ -387,17 +404,17 @@ describe('Artefact panel initialization', () => {
             fixture,
             createArtefact(editor.type, { [editor.field]: { dynamic: true, value: editor.value, expression } }),
           );
-          expectExpanded(fixture, editor, true);
+          expectSection(fixture, editor, false, true);
         }
         openControl(fixture, createArtefact(editor.type, { [editor.field]: { dynamic: true, expression: '' } }));
-        expectExpanded(fixture, editor, true);
+        expectSection(fixture, editor, false, true);
         openControl(
           fixture,
           createArtefact(editor.type, {
             [editor.field]: { dynamic: false, value: editor.value, expression: 'configuredExpression' },
           }),
         );
-        expectExpanded(fixture, editor, false);
+        expectSection(fixture, editor, false, false);
       }
     });
   }));
@@ -408,56 +425,59 @@ describe('Artefact panel initialization', () => {
     const defaults = createArtefact('For');
     withDetails((fixture) => {
       openControl(fixture, configured);
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, false, true);
       const onSave = jest.spyOn(fixture.componentInstance.onSave, 'emit');
       panelHeader(fixture, handles).click();
       settle(fixture);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, true, true);
+      panelHeader(fixture, handles).click();
+      settle(fixture);
+      expectSection(fixture, handles, false, true);
       expect(onSave).not.toHaveBeenCalled();
 
       editInput(fixture, 'step-for step-dynamic-textfield[name="end"] input', '9');
       expect(onSave).toHaveBeenCalledTimes(1);
       expect(onSave).toHaveBeenLastCalledWith(configured);
       expect(configured['dataSource']).toMatchObject({ end: { value: 9 } });
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, true);
       onSave.mockClear();
       openControl(fixture, copyArtefact(configured));
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, true);
       expect(onSave).not.toHaveBeenCalled();
 
       openControl(fixture, defaults);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, false);
       panelHeader(fixture, handles).click();
       settle(fixture);
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, true, false);
       expect(onSave).not.toHaveBeenCalled();
       editInput(fixture, 'step-for step-dynamic-textfield[name="item"] input', 'temporaryCounter');
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, true, true);
       editInput(fixture, 'step-for step-dynamic-textfield[name="item"] input', 'counter');
       expect(onSave).toHaveBeenCalledTimes(2);
       expect(defaults['item']).toMatchObject({ value: 'counter', dynamic: false });
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, true, false);
       openControl(fixture, copyArtefact(defaults));
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, true, false);
 
       openControl(fixture, configured);
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, false, true);
       panelHeader(fixture, handles).click();
       settle(fixture);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, true, true);
       openControl(fixture, defaults);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, false);
       openControl(fixture, configured);
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, false, true);
       panelHeader(fixture, handles).click();
       settle(fixture);
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, true, true);
     });
     withDetails((fixture) => {
       openControl(fixture, copyArtefact(configured));
-      expectExpanded(fixture, handles, true);
+      expectSection(fixture, handles, false, true);
       openControl(fixture, copyArtefact(defaults));
-      expectExpanded(fixture, handles, false);
+      expectSection(fixture, handles, false, false);
     });
   }));
 
@@ -467,7 +487,7 @@ describe('Artefact panel initialization', () => {
     const configured = createArtefact('Sleep', { releaseTokens: constant(true) });
     withDetails((fixture) => {
       openControl(fixture, defaults);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, false, false);
       const onSave = jest.spyOn(fixture.componentInstance.onSave, 'emit');
       panelHeader(fixture, advanced).click();
       settle(fixture);
@@ -480,32 +500,35 @@ describe('Artefact panel initialization', () => {
         releaseTokens.click();
         settle(fixture);
         expect(defaults['releaseTokens']).toMatchObject({ dynamic: false, value: checked });
-        expectExpanded(fixture, advanced, true);
+        expectSection(fixture, advanced, true, checked);
       }
       expect(onSave).toHaveBeenCalledTimes(2);
       expect(onSave).toHaveBeenLastCalledWith(defaults);
 
       openControl(fixture, configured);
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
       onSave.mockClear();
+      panelHeader(fixture, advanced).click();
+      settle(fixture);
+      expectSection(fixture, advanced, true, true);
       panelHeader(fixture, advanced).click();
       settle(fixture);
       expect(onSave).not.toHaveBeenCalled();
       editInput(fixture, 'step-sleep step-dynamic-time-input[name="duration"] input', '9');
       expect(configured['duration']).toMatchObject({ value: 9 });
       expect(onSave).toHaveBeenCalledTimes(1);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, false, true);
       onSave.mockClear();
       openControl(fixture, copyArtefact(configured));
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, false, true);
       expect(onSave).not.toHaveBeenCalled();
       openControl(fixture, defaults);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, false, false);
       openControl(fixture, configured);
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
       panelHeader(fixture, advanced).click();
       settle(fixture);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, true, true);
     });
 
     withDetails((fixture) => {
@@ -514,18 +537,21 @@ describe('Artefact panel initialization', () => {
       const original = copyArtefact(artefact);
       const onSave = jest.spyOn(fixture.componentInstance.onSave, 'emit');
       openControl(fixture, artefact);
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
       const element: HTMLElement = fixture.nativeElement;
       expect(element.querySelector<HTMLInputElement>('step-waiting-artefacts-advanced input')!.disabled).toBe(true);
       panelHeader(fixture, advanced).click();
       settle(fixture);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, true, true);
+      panelHeader(fixture, advanced).click();
+      settle(fixture);
+      expectSection(fixture, advanced, false, true);
       expect(onSave).not.toHaveBeenCalled();
       expect(artefact).toEqual(original);
     });
   }));
 
-  it('opens configured read-only settings with disabled fields and no saves or mutations', fakeAsync(() => {
+  it('marks configured read-only settings with disabled fields and no saves or mutations', fakeAsync(() => {
     const artefact = createArtefact('RetryIfFails', { releaseTokens: constant(true) });
     const original = copyArtefact(artefact);
     const advanced = { selector: 'step-retry-if-fails', title: 'Advanced' };
@@ -533,7 +559,7 @@ describe('Artefact panel initialization', () => {
       fixture.componentRef.setInput('readonly', true);
       const onSave = jest.spyOn(fixture.componentInstance.onSave, 'emit');
       openControl(fixture, artefact);
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
       const element: HTMLElement = fixture.nativeElement;
       const inputs = Array.from(element.querySelectorAll<HTMLInputElement>('step-retry-if-fails input'));
       expect(inputs.length).toBeGreaterThan(0);
@@ -543,10 +569,10 @@ describe('Artefact panel initialization', () => {
       ).toBe(true);
       panelHeader(fixture, advanced).click();
       settle(fixture);
-      expectExpanded(fixture, advanced, false);
+      expectSection(fixture, advanced, true, true);
       panelHeader(fixture, advanced).click();
       settle(fixture);
-      expectExpanded(fixture, advanced, true);
+      expectSection(fixture, advanced, false, true);
       expect(onSave).not.toHaveBeenCalled();
       expect(artefact).toEqual(original);
     });

@@ -27,9 +27,18 @@
       name="protect"
     />
   }
-  <mat-expansion-panel [(expanded)]="showHandles">
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
-      <mat-panel-title>Handles</mat-panel-title>
+      <mat-panel-title>
+        <span>Handles</span>
+        @if (
+          (context.artefact?.item | panelFieldConfigured: 'row') ||
+          (context.artefact?.userItem | panelFieldConfigured: 'userId') ||
+          (context.artefact?.globalCounter | panelFieldConfigured: 'gcounter')
+        ) {
+          <span class="configured-badge">Configured</span>
+        }
+      </mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
       <step-dynamic-textfield

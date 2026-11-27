@@ -1,7 +1,6 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
   ArtefactFormChangeHelperService,
-  ArtefactPanelDefaultsService,
   BaseArtefactComponent,
   TimeUnit,
   ThreadDistributionWizardDialogComponent,
@@ -19,7 +18,6 @@ import { ThreadGroupArtefact } from '../../types/thread-group.artefact';
 })
 export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtefact> {
   private _matDialog = inject(MatDialog);
-  private _panelDefaults = inject(ArtefactPanelDefaultsService);
 
   // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
@@ -27,19 +25,8 @@ export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtef
 
   protected showLoadDistribution = true;
   protected showDurationParameters = true;
-  protected showHandles = false;
 
   protected readonly TimeUnit = TimeUnit;
-
-  // eslint-disable-next-line step-lint/component-public-fields -- Custom component rendering invokes this public base-class hook.
-  override contextChange(): void {
-    super.contextChange();
-    const artefact = this.context.artefact;
-    this.showHandles =
-      this._panelDefaults.isNonDefault(artefact?.localItem, 'literationId') ||
-      this._panelDefaults.isNonDefault(artefact?.userItem, 'userId') ||
-      this._panelDefaults.isNonDefault(artefact?.item, 'gcounter');
-  }
 
   protected openDistributionWizard(): void {
     this._matDialog

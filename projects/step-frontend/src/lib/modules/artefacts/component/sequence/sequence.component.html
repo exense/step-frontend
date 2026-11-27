@@ -7,9 +7,14 @@
     name="continueOnError"
   >
   </step-dynamic-checkbox>
-  <mat-expansion-panel [(expanded)]="showAdvanced">
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
-      <mat-panel-title>Advanced</mat-panel-title>
+      <mat-panel-title>
+        <span>Advanced</span>
+        @if (context.artefact?.pacing | panelFieldConfigured: 0) {
+          <span class="configured-badge">Configured</span>
+        }
+      </mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
       <step-dynamic-time-input
