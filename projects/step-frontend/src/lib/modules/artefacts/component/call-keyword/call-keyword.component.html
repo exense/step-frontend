@@ -26,9 +26,17 @@
     [disabled]="context.readonly"
     name="resultMap"
   />
-  <mat-expansion-panel [(expanded)]="showTokenSelectionParameters">
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
-      <mat-panel-title>Keyword routing</mat-panel-title>
+      <mat-panel-title>
+        <span>Keyword routing</span>
+        @if (
+          (context.artefact?.remote | panelFieldConfigured: true) ||
+          (context.artefact?.token | panelTokenSelectorsConfigured)
+        ) {
+          <span class="configured-badge">Configured</span>
+        }
+      </mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
       <step-dynamic-checkbox

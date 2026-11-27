@@ -40,6 +40,15 @@ step-artefact-details {
     position: relative;
   }
 
+  .configured-badge {
+    margin-inline-start: 0.8rem;
+    padding: 0.2rem 0.8rem;
+    border-radius: 0.4rem;
+    background-color: var.$blue-10;
+    color: var.$blue-650;
+    font-size: 1.3rem;
+  }
+
   .artefact-hint {
     position: absolute;
     z-index: 1000;

@@ -76,9 +76,18 @@
       ></step-dynamic-time-input>
     </section>
   </mat-expansion-panel>
-  <mat-expansion-panel [(expanded)]="showHandles">
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
-      <mat-panel-title>Handles</mat-panel-title>
+      <mat-panel-title>
+        <span>Handles</span>
+        @if (
+          (context.artefact?.localItem | panelFieldConfigured: 'literationId') ||
+          (context.artefact?.userItem | panelFieldConfigured: 'userId') ||
+          (context.artefact?.item | panelFieldConfigured: 'gcounter')
+        ) {
+          <span class="configured-badge">Configured</span>
+        }
+      </mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
       <step-dynamic-textfield

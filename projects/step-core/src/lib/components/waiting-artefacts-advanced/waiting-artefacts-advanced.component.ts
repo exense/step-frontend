@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, viewChild } from '@angular/core';
 import { AbstractArtefact, DynamicValueBoolean } from '../../client/step-client-module';
 import { BaseArtefactComponent } from '../../modules/artefacts-common/components/base-artefact.component';
 import { NgForm } from '@angular/forms';
@@ -19,13 +19,14 @@ export class WaitingArtefactsAdvancedComponent
   extends BaseArtefactComponent<WaitingArtefactsAdvancedArtefact>
   implements OnChanges
 {
-  // @ts-ignore
-  @Input() override context!: ArtefactContext<WaitingArtefactsAdvancedArtefact>;
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- The base component requires a mutable context for its rendering and form lifecycle.
+  @Input() declare context: ArtefactContext<WaitingArtefactsAdvancedArtefact>;
 
-  @ViewChild('form')
-  protected form!: NgForm;
+  private readonly formReference = viewChild<NgForm>('form');
 
-  protected showAdvancedAttributes = false;
+  protected get form(): NgForm | undefined {
+    return this.formReference();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cContext = changes['context'];

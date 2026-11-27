@@ -19,16 +19,16 @@ import { ThreadGroupArtefact } from '../../types/thread-group.artefact';
 export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtefact> {
   private _matDialog = inject(MatDialog);
 
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
 
   protected showLoadDistribution = true;
   protected showDurationParameters = true;
-  protected showHandles = false;
 
-  readonly TimeUnit = TimeUnit;
+  protected readonly TimeUnit = TimeUnit;
 
-  openDistributionWizard(): void {
+  protected openDistributionWizard(): void {
     this._matDialog
       .open(ThreadDistributionWizardDialogComponent, { data: this.context.artefact })
       .afterClosed()

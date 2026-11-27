@@ -11,8 +11,7 @@ import { ForArtefact } from '../../types/for.artefact';
   standalone: false,
 })
 export class ForComponent extends BaseArtefactComponent<ForArtefact> {
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected showHandles = false;
 }

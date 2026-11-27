@@ -11,8 +11,7 @@ import { RetryIfFailsArtefact } from '../../types/retry-if-fails.artefact';
   standalone: false,
 })
 export class RetryIfFailsComponent extends BaseArtefactComponent<RetryIfFailsArtefact> {
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected showAdvancedAttributes = false;
 }

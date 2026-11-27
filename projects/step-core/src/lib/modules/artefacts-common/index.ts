@@ -9,6 +9,8 @@ import { ArtefactInlineFieldListComponent } from './components/artefact-inline-f
 import { ArtefactInlineFieldListPrefixDirective } from './directives/artefact-inline-field-list-prefix.directive';
 import { ArtefactInlineDetailsHeaderDirective } from './directives/artefact-inline-details-header.directive';
 import { ArtefactInlineDetailsHeaderComponent } from './components/artefact-inline-details-header/artefact-inline-details-header.component';
+import { PanelFieldConfiguredPipe } from './pipes/panel-field-configured.pipe';
+import { PanelTokenSelectorsConfiguredPipe } from './pipes/panel-token-selectors-configured.pipe';
 
 export * from './components/base-inline-artefact.component';
 export * from './components/base-inline-artefact-legacy.component';
@@ -26,6 +28,9 @@ export * from './types/artefact-types';
 export * from './types/artefact-inline-item';
 export * from './types/artefact-class.enum';
 export * from './injectables/artefact.service';
+export * from './injectables/artefact-panel-defaults.service';
+export * from './pipes/panel-field-configured.pipe';
+export * from './pipes/panel-token-selectors-configured.pipe';
 export * from './injectables/artefacts-factory.service';
 export * from './injectables/artefact-refresh-notification.service';
 export * from './injectables/artefact-inline-item-utils.service';
@@ -47,4 +52,6 @@ export const ARTEFACTS_COMMON_EXPORTS = [
   ArtefactInlineFieldListPrefixDirective,
   ArtefactInlineDetailsHeaderComponent,
   ArtefactInlineDetailsHeaderDirective,
+  PanelFieldConfiguredPipe,
+  PanelTokenSelectorsConfiguredPipe,
 ];

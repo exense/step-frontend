@@ -11,10 +11,9 @@ import { KeywordArtefact } from '../../types/keyword.artefact';
   standalone: false,
 })
 export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact> {
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected showTokenSelectionParameters = false;
 
   protected keyword?: Keyword;
   protected schema?: JsonFieldsSchema;

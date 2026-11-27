@@ -11,8 +11,7 @@ import { SessionArtefact } from '../../types/session.artefact';
   standalone: false,
 })
 export class SessionComponent extends BaseArtefactComponent<SessionArtefact> {
+  // eslint-disable-next-line @angular-eslint/prefer-signals -- Retain the existing form query for the base form lifecycle.
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected showTokenSelectionParameters = false;
 }
