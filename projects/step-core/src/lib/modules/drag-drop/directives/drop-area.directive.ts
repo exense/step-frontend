@@ -24,6 +24,7 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   private _renderer = inject(Renderer2);
   private _zone = inject(NgZone);
 
+  private stopListenDragEnter?: () => void;
   private stopListenDragOver?: () => void;
   private stopListenDragLeave?: () => void;
   private stopListenDrop?: () => void;
@@ -51,18 +52,29 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopListenDragEnter?.();
     this.stopListenDragOver?.();
     this.stopListenDragLeave?.();
     this.stopListenDrop?.();
   }
 
+  private canAcceptDrop(): boolean {
+    return (
+      !this.dropDisabled() &&
+      this._dragDataService.isDragStarted &&
+      !this._elRef.nativeElement.classList.contains(this._classNames.DRAG_IN_PROGRESS) &&
+      (!this.dropArea() || this.dropArea() !== this._dragDataService.dragData)
+    );
+  }
+
   private handleDragOver(event: DragEvent): void {
-    if (
-      this.dropDisabled() ||
-      !this._dragDataService.isDragStarted ||
-      this._elRef.nativeElement.classList.contains(this._classNames.DRAG_IN_PROGRESS) ||
-      (!!this.dropArea() && this.dropArea() === this._dragDataService.dragData)
-    ) {
+    if (!this._dragDataService.isDragStarted) {
+      return;
+    }
+    event.stopPropagation();
+    if (!this.canAcceptDrop()) {
+      event.dataTransfer!.dropEffect = 'none';
+      this._elRef.nativeElement.classList.remove(this._classNames.DRAG_OVER);
       return;
     }
     event.preventDefault();
@@ -72,18 +84,21 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   }
 
   private handleDragLeave(event: DragEvent): void {
-    if (this.dropDisabled()) {
+    const element = this._elRef.nativeElement;
+    const nextTarget = event.relatedTarget ?? element.ownerDocument.elementFromPoint?.(event.clientX, event.clientY);
+    if (nextTarget instanceof Node && element.contains(nextTarget)) {
       return;
     }
-    this._elRef.nativeElement.classList.remove(this._classNames.DRAG_OVER);
+    element.classList.remove(this._classNames.DRAG_OVER);
     this.dragLeave.emit(this.getDropInfo());
   }
 
   private handleDrop(event: DragEvent): void {
-    if (this.dropDisabled()) {
+    if (!this.canAcceptDrop()) {
       return;
     }
     event.preventDefault();
+    event.stopPropagation();
     this._zone.run(() => {
       this.dropItem.emit(this.getDropInfo());
       this._dragDataService.dragEnd(DragEndType.DROP);
@@ -100,6 +115,9 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
 
   private initListeners(): void {
     const element = this._elRef.nativeElement;
+    this.stopListenDragEnter = this._renderer.listen(element, 'dragenter', (event: DragEvent) =>
+      this.handleDragOver(event),
+    );
     this.stopListenDragOver = this._renderer.listen(element, 'dragover', (event: DragEvent) =>
       this.handleDragOver(event),
     );

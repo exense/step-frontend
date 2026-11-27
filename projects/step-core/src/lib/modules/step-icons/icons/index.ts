@@ -24,6 +24,8 @@ export { ArrowLeft } from './svg/arrow-left';
 export { ArrowLeftCircle } from './svg/arrow-left-circle';
 export { ArrowRight } from './svg/arrow-right';
 export { ArrowRightCircle } from './svg/arrow-right-circle';
+export { ArrowRightFromLine } from './svg/arrow-right-from-line';
+export { ArrowRightToLine } from './svg/arrow-right-to-line';
 export { ArrowUp } from './svg/arrow-up';
 export { ArrowUpCircle } from './svg/arrow-up-circle';
 export { ArrowUpLeft } from './svg/arrow-up-left';

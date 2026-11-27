@@ -1,0 +1,23 @@
+@if (target(); as target) {
+  @if (target.disabled) {
+    Cannot drop here.
+  } @else {
+    @switch (target.section) {
+      @case (ArtefactNodeSource.BEFORE) {
+        Drop to run before “{{ target.name }}”.
+      }
+      @case (ArtefactNodeSource.BEFORE_THREAD) {
+        Drop to run at the start of each thread in “{{ target.name }}”.
+      }
+      @case (ArtefactNodeSource.AFTER_THREAD) {
+        Drop to run at the end of each thread in “{{ target.name }}”.
+      }
+      @case (ArtefactNodeSource.AFTER) {
+        Drop to run after “{{ target.name }}”.
+      }
+      @default {
+        Drop to add a step inside “{{ target.name }}”.
+      }
+    }
+  }
+}

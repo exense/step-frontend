@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, inject, input, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedPlansService,
   BulkSelectionType,
@@ -17,7 +17,6 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
 @Component({
   selector: 'step-plan-otherplan-list',
   templateUrl: './plan-otherplan-list.component.html',
-  styleUrls: ['./plan-otherplan-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
     ...entitySelectionStateProvider<string, Plan>('id'),
@@ -34,6 +33,7 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
   standalone: false,
 })
 export class PlanOtherplanListComponent {
+  readonly insertTargetName = input<string>();
   private _selectionState = inject<EntitySelectionState<string, Plan>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
   private _planEditorService = inject(PlanEditorService);
@@ -49,7 +49,7 @@ export class PlanOtherplanListComponent {
 
   private selectionList = viewChild('selectionList', { read: SelectionList<string, Plan> });
 
-  protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
+  protected readonly currentPlanId = computed(() => this._planEditorService.plan().id);
   protected readonly activatableEntitiesTableParams = computed(() =>
     createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters()),
   );
@@ -80,7 +80,10 @@ export class PlanOtherplanListComponent {
 
   private requestPlanIdsWithoutPagination(): Observable<string[]> {
     const tableId = this.dataSource.tableId;
-    const request = this.dataSource.getCurrentRequest();
+    const request =
+      this._selectionState.selectionType() === BulkSelectionType.ALL
+        ? this.dataSource.getFilterRequest({ params: this.activatableEntitiesTableParams() })
+        : this.dataSource.getCurrentRequest();
     if (!request) {
       return of([]);
     }

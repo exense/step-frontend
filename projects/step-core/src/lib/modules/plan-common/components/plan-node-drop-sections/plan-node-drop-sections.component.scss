@@ -1,0 +1,80 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-plan-node-drop-sections {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+
+  .plan-drop-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    box-sizing: border-box;
+    border: 0.1rem dashed var.$gray-400;
+    border-radius: 50%;
+    color: var.$gray-500;
+    background: var.$gray-50;
+
+    &.thread-section {
+      width: auto;
+      padding-inline: 0.7rem;
+      border-radius: 1.6rem;
+      font-size: 1.2rem;
+    }
+
+    .trigger-wrapper {
+      align-items: center;
+      gap: 0.3rem;
+      display: flex;
+      pointer-events: none;
+    }
+
+    step-icon {
+      @include core.step-icon-size(16px);
+    }
+
+    &.dragover {
+      border-style: solid;
+      border-color: var(--step-accent-color, var.$blue-600);
+      color: var(--step-accent-color, var.$blue-600);
+      background: var(--step-selection-background-color, var.$gray-100);
+    }
+
+    &.drop-disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  @container plan-tree (max-width: 40rem) {
+    &:has(.thread-section) {
+      gap: 0.2rem;
+
+      .plan-drop-section {
+        width: 2.8rem;
+        height: 2.8rem;
+      }
+
+      .thread-section {
+        width: auto;
+        padding-inline: 0.1rem;
+        font-size: 1rem;
+        line-height: 1;
+
+        .trigger-wrapper {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        step-icon {
+          @include core.step-icon-size(14px);
+        }
+      }
+    }
+  }
+}

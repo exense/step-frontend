@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, input, Output, ViewEncapsulation } from '@angular/core';
 import { ArtefactService, TableIndicatorMode } from '@exense/step-core';
 
 @Component({
@@ -9,6 +9,7 @@ import { ArtefactService, TableIndicatorMode } from '@exense/step-core';
   standalone: false,
 })
 export class PlanArtefactListComponent {
+  readonly insertTargetName = input<string>();
   readonly availableArtefacts$ = inject(ArtefactService).availableArtefacts$;
 
   @Output() onSelection = new EventEmitter<string>();

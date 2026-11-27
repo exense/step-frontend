@@ -26,6 +26,7 @@ export enum PopoverMode {
   BOTH,
   HOVER,
   CLICK,
+  MANUAL,
 }
 
 export abstract class PopoverService {
@@ -60,6 +61,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   readonly yPosition = input<'above' | 'below'>('below');
   readonly noPadding = input(false);
   readonly withBorder = input(false);
+  readonly hasBackdrop = input(true);
   readonly whiteBackground = input(false);
   readonly smallFont = input(true);
   readonly constrainToViewport = input(false);
@@ -142,7 +144,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
         ? ['step-popover-pane', 'step-popover-pane--constrained']
         : ['step-popover-pane'],
       ...(this.constrainToViewport() ? { maxWidth: 'calc(100vw - 16px)' } : {}),
-      hasBackdrop: true,
+      hasBackdrop: this.hasBackdrop(),
       backdropClass: this.passiveBackdropClass,
       scrollStrategy: this._overlay.scrollStrategies.reposition(),
     });
@@ -231,7 +233,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   }
 
   protected handleClick(event: MouseEvent): void {
-    if (this.mode() === PopoverMode.HOVER) return;
+    if (this.mode() === PopoverMode.HOVER || this.mode() === PopoverMode.MANUAL) return;
     event.preventDefault();
     event.stopImmediatePropagation();
 
@@ -244,25 +246,25 @@ export class PopoverComponent implements PopoverService, AfterViewInit, OnDestro
   }
 
   protected handleTriggerMouseEnter(): void {
-    if (this.mode() === PopoverMode.CLICK || this.toggled) return;
+    if (this.mode() === PopoverMode.CLICK || this.mode() === PopoverMode.MANUAL || this.toggled) return;
     this.isMouseOverTrigger = true;
     this.tooltipTimeout = setTimeout(() => this.openPopover(), 300);
   }
 
   protected handleTriggerMouseLeave(): void {
-    if (this.mode() === PopoverMode.CLICK) return;
+    if (this.mode() === PopoverMode.CLICK || this.mode() === PopoverMode.MANUAL) return;
     this.isMouseOverTrigger = false;
     clearTimeout(this.tooltipTimeout);
     this.scheduleCloseIfNotHovered();
   }
 
   protected handlePopoverMouseEnter(): void {
-    if (this.mode() === PopoverMode.CLICK) return;
+    if (this.mode() === PopoverMode.CLICK || this.mode() === PopoverMode.MANUAL) return;
     this.isMouseOverPopover = true;
   }
 
   protected handlePopoverMouseLeave(): void {
-    if (this.mode() === PopoverMode.CLICK) return;
+    if (this.mode() === PopoverMode.CLICK || this.mode() === PopoverMode.MANUAL) return;
     this.isMouseOverPopover = false;
     this.scheduleCloseIfNotHovered();
   }

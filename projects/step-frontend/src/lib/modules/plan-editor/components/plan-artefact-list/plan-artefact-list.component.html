@@ -1,5 +1,7 @@
 <step-table
-  class="paddingless-cells"
+  class="paddingless-cells compact-rows"
+  [defaultPageSize]="50"
+  [compactPaginator]="{ singular: 'control', plural: 'controls' }"
   [dataSource]="(availableArtefacts$ | async)!"
   matSort
   matSortActive="label"
@@ -8,8 +10,8 @@
   [matSortDisableClear]="true"
 >
   <ng-container *stepRowsExtension="let rows">
-    <step-drag-drop-container stepDropAreaId="planTree">
-      @for (row of rows; track row) {
+    <step-drag-drop-container stepDropAreaId="planTree" [animatedPreview]="true">
+      @for (row of rows; track row.elRef.nativeElement) {
         <step-drag-item
           [elRef]="row.elRef"
           [data]="row.data | artefactDropInfo"
@@ -24,7 +26,7 @@
   <ng-container matColumnDef="move">
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="move" mat-cell *matCellDef="let element">
-      <step-icon name="drag-handle" matTooltip="drag & drop into tree" />
+      <span class="control-grip" matTooltip="Drag into the tree"></span>
     </td>
   </ng-container>
   <ng-container matColumnDef="icon">
@@ -46,11 +48,14 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
       <div class="actions">
-        <step-icon *ngIf="element.description" [matTooltip]="element.description" name="help-circle"></step-icon>
+        @if (element.description) {
+          <step-icon class="control-help" tabindex="0" [matTooltip]="element.description" name="help-circle" />
+        }
 
         <button
           mat-icon-button
-          matTooltip="Add Control"
+          [matTooltip]="'Add ' + element.label + (insertTargetName() ? ' to ' + insertTargetName() : '')"
+          [attr.aria-label]="'Add ' + element.label"
           (click)="addControl(element.label)"
           [disabled]="!('plan-write' | hasRight | async)"
         >

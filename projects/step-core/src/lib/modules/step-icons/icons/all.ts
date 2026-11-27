@@ -24,6 +24,8 @@ import { ArrowLeft } from './svg/arrow-left';
 import { ArrowLeftCircle } from './svg/arrow-left-circle';
 import { ArrowRight } from './svg/arrow-right';
 import { ArrowRightCircle } from './svg/arrow-right-circle';
+import { ArrowRightFromLine } from './svg/arrow-right-from-line';
+import { ArrowRightToLine } from './svg/arrow-right-to-line';
 import { ArrowUp } from './svg/arrow-up';
 import { ArrowUpCircle } from './svg/arrow-up-circle';
 import { ArrowUpLeft } from './svg/arrow-up-left';
@@ -375,6 +377,8 @@ export const allIcons = {
   ArrowLeftCircle,
   ArrowRight,
   ArrowRightCircle,
+  ArrowRightFromLine,
+  ArrowRightToLine,
   ArrowUp,
   ArrowUpCircle,
   ArrowUpLeft,

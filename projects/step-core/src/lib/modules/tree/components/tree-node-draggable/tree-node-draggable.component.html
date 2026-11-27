@@ -1,4 +1,5 @@
 <div
+  #row
   class="tree-node"
   [class.tree-node-selected]="_treeNode.isSelected()"
   [class.tree-node-selected-for-insert]="_treeNode.isSelectedForInsert()"
@@ -18,39 +19,54 @@
       class="node-content"
       (contextmenu)="_treeNode.openContextMenu($event)"
       [stepDragItem]="n.id"
+      [dragPreviewOrigin]="row"
       [dragDisabled]="dragDisabled()"
       [stepDropArea]="n.id"
-      (dragOver)="dragOver.emit($event)"
-      (dropItem)="dropNode.emit($event)"
-      [dropDisabled]="dropDisabled()"
+      (dragenter)="handleNodeDragEnter()"
+      (dragOver)="handleNodeDragEnter()"
+      (dragover)="handleDragOver()"
+      (dragLeave)="closeDropHint()"
+      (dropItem)="handleNodeDrop($event)"
+      [dropDisabled]="dropDisabled() || isDropTargetDisabled()"
     >
-      <step-tree-node-name [node]="n" />
+      <step-popover
+        class="node-drop-popover"
+        [mode]="PopoverMode.MANUAL"
+        [hasBackdrop]="false"
+        [constrainToViewport]="true"
+        yPosition="above"
+      >
+        <step-tree-node-name [node]="n" />
+        <step-popover-content class="tree-node-drop-info">
+          <ng-content select="[stepTreeNodeDropHint]" />
+        </step-popover-content>
+      </step-popover>
     </div>
   }
+  <ng-content />
 </div>
 @if (_treeNode.node(); as n) {
-  @if (dropDisabled()) {
-    @for (pId of n.parentPath; track pId; let idx = $index) {
-      <div draggable="false" [style.--idx]="idx" class="node-line"></div>
-    }
-  } @else {
-    @for (pId of n.parentPath; track pId; let idx = $index) {
-      <div draggable="false" [style.--idx]="idx" class="node-line"></div>
-      <section
-        draggable="false"
-        class="middle-drop-container"
-        [style.--idx]="idx"
-        [stepDropArea]="pId"
-        [dropAdditionalInfo]="n.parentPath[idx + 1] || n.id"
-        (dropItem)="dropNode.emit($event)"
-      >
-        <div></div>
-      </section>
-    }
+  @for (pId of n.parentPath; track pId; let idx = $index) {
+    <!-- eslint-disable-next-line step-lint/inline-style-variables-name -- Shared tree connector styles consume --idx. -->
+    <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+  }
+  @for (target of siblingDropTargets(); track target.parentId) {
     <section
       draggable="false"
       class="middle-drop-container"
-      [style.--idx]="n.parentPath.length"
+      [style.--style__idx]="target.level"
+      [stepDropArea]="target.parentId"
+      [dropAdditionalInfo]="target.siblingId"
+      (dropItem)="dropNode.emit($event)"
+    >
+      <div></div>
+    </section>
+  }
+  @if (canDropFirstChild()) {
+    <section
+      draggable="false"
+      class="middle-drop-container"
+      [style.--style__idx]="n.parentPath.length"
       [stepDropArea]="n.id"
       dropAdditionalInfo="first"
       (dropItem)="dropNode.emit($event)"

@@ -5,6 +5,7 @@ import { ArtefactNodeSource } from './artefact-node-source.enum';
 export interface ArtefactTreeNode extends TreeNode {
   originalArtefact?: AbstractArtefact;
   childContainer?: ChildrenBlock;
+  dropSections?: ArtefactTreeNode[];
   nodeType?: ArtefactNodeSource;
   isDragDisabled?: boolean;
   isDropDisabled?: boolean;

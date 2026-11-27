@@ -5,22 +5,161 @@ step-plan-tree {
   height: 100%;
 
   step-tree {
+    container: plan-tree / inline-size;
     overflow: hidden;
     margin-top: 2rem;
-    padding-right: 6.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    padding-right: 1.6rem;
     &:hover {
       overflow: auto;
     }
   }
 
-  step-tree-node-draggable.step-tree-node-container.empty-pseudo-node {
-    .tree-node .node-content step-tree-node-name {
-      border: dashed 0.1rem var.$muted;
-      min-width: 8rem;
+  .editable-plan-tree {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+
+    > step-tree {
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 0;
+
+      > div[draggable='false'] {
+        flex: none;
+      }
+    }
+
+    .plan-tree-end-drop {
+      position: relative;
+      z-index: 3;
+      flex: 1 0 4rem;
+      margin-inline: -2.4rem -1.6rem;
+    }
+
+    step-tree:has(> .plan-tree-end-drop.dragover) .root-append-anchor::after {
+      content: '';
+      position: absolute;
+      left: 6rem;
+      bottom: -0.1rem;
+      width: 10rem;
+      height: 0.2rem;
+      border-radius: 0.1rem;
+      background: var(--step-accent-color, var.$blue-600);
+      pointer-events: none;
+      z-index: 3;
     }
   }
 
   step-tree-node-draggable {
+    &.plan-section-header {
+      .tree-node {
+        width: 100%;
+      }
+
+      .tree-node .node-content {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding-top: 0.2rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .node-drop-popover,
+      .node-drop-popover > .trigger-wrapper {
+        flex: 1;
+        min-width: 0;
+      }
+
+      step-tree-node-name {
+        min-width: 0;
+        padding: 0 0.6rem;
+      }
+
+      .node-icon {
+        display: none;
+      }
+
+      .node-content .node-name {
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+        font-weight: 400;
+        color: var.$gray-500;
+      }
+
+      .node-content:hover step-tree-node-name {
+        background: var(--step-selection-background-color, var.$gray-100);
+      }
+
+      &:not(.drop-disabled) .tree-node.is-drop-row-hovered .node-content:not(.dragover) step-tree-node-name {
+        background: var.$gray-50;
+        outline: 0.1rem dashed var.$gray-400;
+        outline-offset: -0.1rem;
+      }
+
+      .node-content.dragover step-tree-node-name {
+        background: var(--step-selection-background-color, var.$gray-100);
+        outline: 0.1rem solid var(--step-accent-color, var.$blue-600);
+        outline-offset: -0.1rem;
+      }
+    }
+
+    .tree-node.is-drop-row-hovered step-plan-node-drop-sections {
+      opacity: 1;
+    }
+
+    &:not(.drop-disabled):not(.is-drag-in-progress) .tree-node:has(.plan-drop-section).is-drop-row-hovered {
+      .node-content step-tree-node-name {
+        outline: 0.1rem dashed var.$gray-400;
+        outline-offset: 0.3rem;
+        background: var.$gray-50;
+        box-shadow: 0 0 0 0.3rem var.$gray-50;
+      }
+
+      .node-content.dragover step-tree-node-name {
+        outline-style: solid;
+        outline-color: var(--step-accent-color, var.$blue-600);
+        background: var(--step-selection-background-color, var.$gray-100);
+        box-shadow: 0 0 0 0.3rem var(--step-selection-background-color, var.$gray-100);
+      }
+    }
+
+    .tree-node {
+      width: 100%;
+    }
+
+    @container plan-tree (max-width: 40rem) {
+      .tree-node:has(.thread-section) {
+        gap: 0.4rem;
+
+        step-tree-node-name {
+          gap: 0.4rem;
+          padding-right: 0.4rem;
+        }
+      }
+    }
+
+    .tree-node:has(.plan-drop-section) {
+      .node-content {
+        flex: 0 1 auto;
+      }
+
+      .node-content,
+      step-tree-node-name,
+      .node-name {
+        min-width: 0;
+      }
+
+      .node-name > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .node-name button {
+        display: none;
+      }
+    }
+
     .tree-node {
       .node-content .node-name {
         display: flex;

@@ -29,6 +29,9 @@
       } @else {
         {{ $any(element | getObjectField: entitySubPath) | getObjectField: col.input!.id! }}
       }
+      @if (cellSuffix && cellSuffix.column() === col.input!.id!) {
+        <ng-container *ngTemplateOutlet="cellSuffix.template(); context: { $implicit: element }" />
+      }
     </td>
   </ng-container>
 }

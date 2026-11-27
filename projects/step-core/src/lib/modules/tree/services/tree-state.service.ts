@@ -7,6 +7,7 @@ import { TreeStateInitOptions } from '../types/tree-state-init-options.interface
 import { TreeFlattenerService } from './tree-flattener.service';
 import { TreeFlatNode } from '../types/tree-flat-node';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { DropInfo } from '../../drag-drop/types/drop-info';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
@@ -232,7 +233,25 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  notifyPotentialInsert?(potentialParentId: string): void;
+  getNextVisibleNode(nodeId: string, options?: { skipDescendants?: boolean }): TreeFlatNode | undefined {
+    const indexes = this.flatTreeNodeIndexes();
+    const nodes = this.flatTree();
+    const index = indexes.get(nodeId);
+    if (index === undefined) {
+      return undefined;
+    }
+    let nextIndex = index + 1;
+    if (options?.skipDescendants) {
+      while (nodes[nextIndex]?.parentPath.includes(nodeId)) {
+        nextIndex++;
+      }
+    }
+    return nodes[nextIndex];
+  }
+
+  canDropTo?(dropInfo: DropInfo): boolean;
+  resolveDrop?(dropInfo: DropInfo): DropInfo;
+
   notifyInsertionComplete?(): void;
 
   insertNodesTo(
@@ -271,9 +290,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this._treeNodeUtils.updateChildren(this.originalRoot!, newParentId, children, 'replace');
     this.selectedInsertionParentId.set(newParentId);
     this.refresh();
-    if (!this.isNodeExpanded(newParentId)) {
-      this.expandNodeInternal(newParentId);
-    }
+    this.expandNodes(this.getNodePath(this.findNodeById(newParentId)));
   }
 
   canInsertTo(insertCandidatesIds: string[], newParentId: string): boolean {
@@ -544,9 +561,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     this.refresh();
 
-    if (!this.isNodeExpanded(parentId)) {
-      this.expandNodeInternal(parentId);
-    }
+    this.expandNodes(this.getNodePath(this.findNodeById(parentId)));
 
     const lastChild = newNodes[newNodes.length - 1];
     this.selectedNodeIdsInternal.set([lastChild.id!]);
@@ -754,11 +769,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     if (idsToInsert.includes(newParentId)) {
       return false;
     }
-    const parentNode = this.treeData().tree.find((node) => node.id === newParentId);
+    const parentNode = this.findNodeById(newParentId);
     if (!parentNode) {
       return false;
     }
-    const isPossibleNodeCycleExits = idsToInsert.some((nodeId) => parentNode.parentPath.includes(nodeId));
+    const parentPath = this.getNodePath(parentNode);
+    const isPossibleNodeCycleExits = idsToInsert.some((nodeId) => parentPath.includes(nodeId));
     return !isPossibleNodeCycleExits;
   }
 

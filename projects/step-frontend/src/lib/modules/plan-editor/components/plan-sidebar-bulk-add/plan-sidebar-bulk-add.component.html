@@ -1,0 +1,30 @@
+<step-bulk-selection [showLabel]="false" />
+@if (selectedCount() || selectionType() === types.ALL || selectionType() === types.FILTERED) {
+  <div class="selection-scope">
+    @if (selectionType() !== types.ALL && selectionType() !== types.FILTERED) {
+      <button type="button" (click)="list.selectAll()">Select all</button>
+    }
+    @if (filter.hasFilter() && selectionType() !== types.FILTERED) {
+      <button type="button" (click)="list.selectFiltered()">Select all filtered</button>
+    }
+  </div>
+  <button
+    type="button"
+    class="bulk-add"
+    mat-stroked-button
+    (click)="add.emit()"
+    [disabled]="!('plan-write' | hasRight | async)"
+  >
+    @switch (selectionType()) {
+      @case (types.ALL) {
+        Add all {{ item() }}s
+      }
+      @case (types.FILTERED) {
+        Add filtered {{ item() }}s
+      }
+      @default {
+        Add {{ selectedCount() }} {{ item() }}{{ selectedCount() === 1 ? '' : 's' }}
+      }
+    }
+  </button>
+}

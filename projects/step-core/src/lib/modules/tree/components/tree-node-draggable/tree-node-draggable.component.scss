@@ -1,32 +1,76 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 .step-tree-node-container {
+  .node-drop-popover,
+  .node-drop-popover > .trigger-wrapper {
+    display: flex;
+    min-width: 0;
+    cursor: inherit;
+  }
+
+  &.drop-disabled .node-content {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   section.middle-drop-container {
-    min-height: 2.4rem;
-    padding: 0.3rem 0;
-    left: calc(var(--idx) * 3rem + 6rem);
+    height: 1.6rem;
+    padding: 0;
+    left: calc(var(--style__idx) * 3rem + 6rem);
     position: absolute;
     min-width: 10rem;
-    top: 2.7rem;
+    top: calc(100% - 0.8rem);
     display: flex;
+    align-items: center;
     justify-content: space-around;
-    z-index: 1;
+    z-index: 3;
+    pointer-events: none;
     user-select: none;
     & > div {
       flex: 1;
+      height: 0.2rem;
+      pointer-events: none;
       // border: dotted .1rem #000;
     }
     &.dragover > div {
-      background: var(--step-surface-dark-color, var.$gray-800);
-      border-radius: 2rem;
-      opacity: 0.2;
+      background: var(--step-accent-color, var.$blue-600);
+      border-radius: 0.1rem;
     }
   }
 
-  &.drag-in-progress ~ section.middle-drop-container {
-    top: 0.7rem;
-    padding: 0;
-    min-height: 2.4rem;
-    z-index: 1 !important;
+  &.is-drag-active section.middle-drop-container {
+    pointer-events: auto;
+  }
+
+  &.is-drag-in-progress {
+    .node-content {
+      cursor: grabbing;
+    }
+
+    section.middle-drop-container {
+      top: 0;
+      padding: 0;
+      height: 100%;
+      min-width: 0;
+      width: var(--tree-node-indent-size, 3rem);
+      align-items: center;
+      justify-content: flex-start;
+      z-index: 3;
+
+      > div {
+        flex: none;
+        width: 10rem;
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.step-popover-pane:has(.tree-node-drop-info) {
+  pointer-events: none;
+
+  .step-popover {
+    pointer-events: none;
+    max-width: 28rem;
   }
 }

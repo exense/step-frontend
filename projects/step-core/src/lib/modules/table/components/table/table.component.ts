@@ -63,7 +63,7 @@ import { TableColumnsRender } from '../../services/table-columns-render';
     TablePartSelectionListDirective,
     {
       directive: TablePartPaginationDirective,
-      inputs: ['pageSizeInputDisabled'],
+      inputs: ['pageSizeInputDisabled', 'defaultPageSize'],
     },
     TablePartSortDirective,
     {
@@ -150,6 +150,8 @@ export class TableComponent<T>
     this._tableDataSource.initialize(isColumnsInitialized);
   });
   protected readonly EmptyState = EmptyState;
+
+  readonly compactPaginator = input<{ singular: string; plural: string }>();
 
   readonly visibleColumns = input(undefined, {
     transform: (source?: string[]) => (!!source ? new Set<string>(source) : undefined),

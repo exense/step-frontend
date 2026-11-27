@@ -1,4 +1,10 @@
-<mat-checkbox color="primary" #checkBox [disabled]="isDisabled()" (click)="handleCheckboxChange()" />
+<mat-checkbox
+  color="primary"
+  #checkBox
+  aria-label="Select visible rows or clear selection"
+  [disabled]="isDisabled()"
+  (click)="handleCheckboxChange()"
+/>
 @if (showLabel()) {
   <step-bulk-selection-label [isDisabled]="isDisabled()" />
 }

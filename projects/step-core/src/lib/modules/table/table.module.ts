@@ -48,6 +48,7 @@ import { TablePaginatorPrefixDirective } from './directives/table-paginator-pref
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
 import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
 import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/columns-placeholders.component';
+import { CustomCellSuffixDirective } from './directives/custom-cell-suffix.directive';
 import { TablePaginatorContentDirective } from './directives/table-paginator-content.directive';
 import { DatasourceListComponent } from './components/datasource-list/datasource-list.component';
 import { DatasourceListItemDirective } from './directives/datasource-list-item.directive';
@@ -68,6 +69,7 @@ import { ExtractHighlightedItemPipe } from './pipe/extract-highlighted-item.pipe
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
     TablePaginatorContentDirective,
+    CustomCellSuffixDirective,
     PaginatorComponent,
     DatasourceListComponent,
     DatasourceListItemDirective,
@@ -129,6 +131,7 @@ import { ExtractHighlightedItemPipe } from './pipe/extract-highlighted-item.pipe
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
     TablePaginatorContentDirective,
+    CustomCellSuffixDirective,
     DatasourceListComponent,
     DatasourceListItemDirective,
   ],
@@ -173,6 +176,7 @@ export * from './components/base-column-container/base-column-container.componen
 export * from './components/paginator/paginator.component';
 export * from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 export * from './directives/rows-extension.directive';
+export * from './directives/custom-cell-suffix.directive';
 export * from './directives/column.directive';
 export * from './directives/activity-col.directive';
 export * from './directives/action-col.directive';

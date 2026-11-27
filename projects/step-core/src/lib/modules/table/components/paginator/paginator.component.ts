@@ -13,6 +13,7 @@ import { EDITABLE_LABELS_EXPORTS } from '../../../editable-labels';
 })
 export class PaginatorComponent {
   readonly showPageSizeOptions = input(true);
+  readonly compactLabel = input<{ singular: string; plural: string }>();
 
   readonly pageSizeOptions = input([], {
     transform: (value?: number[] | null) => value ?? [],
@@ -103,6 +104,10 @@ export class PaginatorComponent {
       this.usePagesCount(),
     ];
 
+    const compactLabel = this.compactLabel();
+    if (compactLabel && usePagesCount && pagesCount <= 1) {
+      return `${length} ${length === 1 ? compactLabel.singular : compactLabel.plural}`;
+    }
     if (usePagesCount && !length) {
       return '';
     }
@@ -119,7 +124,7 @@ export class PaginatorComponent {
     if (pageSize === 1) {
       return `${to} of ${total}`;
     }
-    return `${from + 1} - ${to} of ${total}`;
+    return compactLabel ? `${from + 1}–${to} of ${total}` : `${from + 1} - ${to} of ${total}`;
   });
 
   next(): void {

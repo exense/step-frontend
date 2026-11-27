@@ -67,6 +67,8 @@
     <ng-container *ngTemplateOutlet="paginatorPrefix.templateRef" />
   }
   <step-paginator
+    [compactLabel]="compactPaginator()"
+    [showPageSizeOptions]="!compactPaginator()"
     [disabled]="_tablePagination.pageSizeInputDisabled()"
     [length]="_tableDataSource.totalFiltered()"
     [hasNext]="_tableDataSource.hasNext()"

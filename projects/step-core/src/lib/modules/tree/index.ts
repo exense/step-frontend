@@ -5,6 +5,7 @@ import { TreeNodeDraggableComponent } from './components/tree-node-draggable/tre
 import { TreeDragPreviewComponent } from './components/tree-drag-preview/tree-drag-preview.component';
 import { TreeNodeTemplateDirective } from './directives/tree-node-template.directive';
 import { TreeNodeNameTemplateDirective } from './directives/tree-node-name-template.directive';
+import { TreeNodeDropHintDirective } from './directives/tree-node-drop-hint.directive';
 import { TreeNodeDetailsTemplateDirective } from './directives/tree-node-details-template.directive';
 import { TreeNodeHasActionsPipe } from './pipes/tree-node-has-actions.pipe';
 import { TreeVirtualScrollDirective } from './directives/tree-virtual-scroll.directive';
@@ -19,6 +20,7 @@ export const TREE_EXPORTS = [
   TreeNodeTemplateDirective,
   TreeNodeNameTemplateDirective,
   TreeNodeDetailsTemplateDirective,
+  TreeNodeDropHintDirective,
   TreeNodeHasActionsPipe,
   TreeVirtualScrollDirective,
   TreeAutoChooseVirtualScrollDirective,
@@ -32,6 +34,7 @@ export * from './components/tree-node-name/tree-node-name.component';
 export * from './directives/tree-node-template.directive';
 export * from './directives/tree-node-name-template.directive';
 export * from './directives/tree-node-details-template.directive';
+export * from './directives/tree-node-drop-hint.directive';
 export * from './directives/tree-node.directive';
 export * from './directives/tree-virtual-scroll.directive';
 export * from './directives/tree-auto-choose-virtual-scroll.directive';
